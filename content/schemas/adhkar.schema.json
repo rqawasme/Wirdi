@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wirdi.app/schemas/adhkar.schema.json",
+  "title": "Adhkar group file",
+  "description": "One hand-authored file per group of adhkar, e.g. morning.json. Every dhikr id is author-assigned and must be globally unique across all adhkar files; ids are never generated, because user collections in the app point at them.",
+  "type": "object",
+  "required": ["group", "adhkar"],
+  "additionalProperties": false,
+  "properties": {
+    "group": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Free-form label for this file, e.g. 'morning'. Organisational only - it is not written to the database."
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional note to yourself about what belongs in this file. Not written to the database."
+    },
+    "adhkar": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The adhkar in this group. Order here does not matter; collections decide order.",
+      "items": { "$ref": "#/$defs/dhikr" }
+    }
+  },
+  "$defs": {
+    "dhikr": {
+      "type": "object",
+      "required": ["id", "text_arabic", "translation", "default_count"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Author-assigned, globally unique, permanent. Changing it silently repoints user collections at different content."
+        },
+        "text_arabic": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The Arabic text of the dhikr."
+        },
+        "translation": {
+          "type": "string",
+          "minLength": 1,
+          "description": "English translation."
+        },
+        "transliteration": {
+          "type": ["string", "null"],
+          "description": "Optional Latin-script transliteration. Omit the key entirely when unused."
+        },
+        "default_count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "How many times this dhikr is said by default. A collection may override it per item with \"count\"."
+        },
+        "source_id": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "description": "Optional reference into content/sources/sources.json. Must resolve at build time."
+        },
+        "benefits": {
+          "type": ["string", "null"],
+          "description": "Optional narrated benefit or virtue. Omit when unused."
+        },
+        "notes": {
+          "type": ["string", "null"],
+          "description": "Optional editorial note shown to the user. Omit when unused."
+        }
+      }
+    }
+  }
+}

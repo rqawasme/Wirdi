@@ -1,0 +1,19 @@
+{
+  "id": 1,
+  "name_arabic": "PLACEHOLDER — to be filled by Rashid",
+  "name_english": "PLACEHOLDER — to be filled by Rashid",
+  "description": "PLACEHOLDER — to be filled by Rashid",
+  "author": "PLACEHOLDER — to be filled by Rashid",
+  "type": "wird",
+  "sort_order": 10,
+  "items": [
+    { "dhikr": 1001 },
+    { "dhikr": 1002, "count": 100 },
+    { "ayah": "2:255" },
+    { "ayah": "2:285-286" },
+    { "surah": 112, "repeat_group": 1, "repeat_group_count": 3, "note": "PLACEHOLDER — to be filled by Rashid" },
+    { "surah": 113, "repeat_group": 1, "repeat_group_count": 3 },
+    { "surah": 114, "repeat_group": 1, "repeat_group_count": 3 },
+    { "dhikr": 1003, "note": "PLACEHOLDER — to be filled by Rashid" }
+  ]
+}
