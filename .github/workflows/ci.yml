@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A second push to a PR makes the first run's answer irrelevant.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: content pipeline and data layer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pipeline dependencies
+        run: pip install -r content/requirements.txt
+
+      # The authored JSON first: a schema error here explains every failure
+      # that would otherwise surface later as a confusing build error.
+      - name: Validate the authored JSON
+        run: python3 content/scripts/validate_json.py
+
+      # The Quran source JSON is committed, so this builds the real database
+      # rather than an empty one, and --require-quran fails if that ever stops
+      # being true instead of quietly building without it.
+      - name: Build content.db
+        run: python3 content/scripts/build_content.py --require-quran
+
+      - name: Verify content invariants
+        run: python3 content/scripts/verify_content.py
+
+      # lib/data/schema/content.drift must mirror the schema the pipeline
+      # actually produces. This is the check that keeps the copy honest.
+      - name: Check schema parity
+        run: python3 tool/check_schema_parity.py
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          # Pinned: drift's generated code is committed, and a toolchain bump
+          # should be a deliberate commit rather than a surprise red build.
+          flutter-version: 3.47.2
+          cache: true
+
+      - name: Fetch packages
+        run: flutter pub get
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib test tool
+
+      - name: Analyze
+        run: flutter analyze
+
+      # Generated code is committed so a fresh clone can run the tests without
+      # generating first. That only holds if it is actually in sync.
+      - name: Check generated code is up to date
+        run: |
+          dart run build_runner build
+          if ! git diff --quiet -- '*.g.dart'; then
+            echo '::error::Generated code is stale. Run: dart run build_runner build'
+            git --no-pager diff --stat -- '*.g.dart'
+            exit 1
+          fi
+
+      # content.db exists by now, so the tests that check the data layer
+      # against the real thing run here rather than skipping.
+      - name: Test
+        run: flutter test
