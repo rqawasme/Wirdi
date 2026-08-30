@@ -1,0 +1,4 @@
+# Content pipeline dependencies (Python 3.9+).
+# Everything else the pipeline needs — sqlite3, json, hashlib, unicodedata —
+# is in the standard library.
+jsonschema>=4.21

@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wirdi.app/schemas/collection.schema.json",
+  "title": "Collection file",
+  "description": "One hand-authored file per built-in collection. Items are listed inline, in the order they are recited; the build script assigns positions 1..N in file order and derives collection_items.id as collection_id * 1000 + position.",
+  "type": "object",
+  "required": ["id", "name_arabic", "name_english", "type", "sort_order", "items"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 999999,
+      "description": "Author-assigned, globally unique across all collection files, permanent."
+    },
+    "name_arabic": { "type": "string", "minLength": 1 },
+    "name_english": { "type": "string", "minLength": 1 },
+    "description": { "type": ["string", "null"], "description": "Optional. Omit when unused." },
+    "author": { "type": ["string", "null"], "description": "Optional compiler or author of the litany, e.g. the scholar it is attributed to. Omit when unused." },
+    "type": {
+      "enum": ["wird", "dhikr_set", "surah_set"],
+      "description": "wird = a structured litany with a fixed order; dhikr_set = a loose set of adhkar; surah_set = a set of surahs or ayahs."
+    },
+    "sort_order": {
+      "type": "integer",
+      "description": "Display order among collections. Lower sorts first."
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Recitation order. Exactly one of dhikr / ayah / surah per item.",
+      "items": { "$ref": "#/$defs/item" }
+    }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "oneOf": [
+        { "required": ["dhikr"] },
+        { "required": ["ayah"] },
+        { "required": ["surah"] }
+      ],
+      "dependentRequired": {
+        "repeat_group": ["repeat_group_count"],
+        "repeat_group_count": ["repeat_group"]
+      },
+      "properties": {
+        "dhikr": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "A dhikr id from content/sources/adhkar/. Must resolve at build time."
+        },
+        "ayah": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,2}:[1-9][0-9]{0,2}(-[1-9][0-9]{0,2})?$",
+          "description": "An ayah reference as \"surah:ayah\", e.g. \"2:255\", or an inclusive range within one surah, e.g. \"2:285-286\". A range expands to one item per ayah, each taking the next position."
+        },
+        "surah": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 114,
+          "description": "A whole surah by number, e.g. 36."
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Optional. Repetitions of this single item, overriding the dhikr's default_count. Omit when the default is correct."
+        },
+        "repeat_group": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Optional. Groups consecutive items that are repeated together as a block. Items sharing a value must be contiguous and must agree on repeat_group_count. Numbering is per collection."
+        },
+        "repeat_group_count": {
+          "type": "integer",
+          "minimum": 2,
+          "description": "Optional. How many times the whole repeat_group block is repeated. Required whenever repeat_group is set, and vice versa."
+        },
+        "note": {
+          "type": ["string", "null"],
+          "description": "Optional per-item note shown to the user, e.g. a rubric. Omit when unused."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "group": "example",
+  "description": "Template file demonstrating every field of the adhkar format. Every text field below is a placeholder. Copy this file, rename it after the group (morning.json, evening.json, after_salah.json), and replace the placeholders with verified text.",
+  "adhkar": [
+    {
+      "id": 1001,
+      "text_arabic": "PLACEHOLDER — to be filled by Rashid",
+      "translation": "PLACEHOLDER — to be filled by Rashid",
+      "default_count": 1
+    },
+    {
+      "id": 1002,
+      "text_arabic": "PLACEHOLDER — to be filled by Rashid",
+      "translation": "PLACEHOLDER — to be filled by Rashid",
+      "transliteration": "PLACEHOLDER — to be filled by Rashid",
+      "default_count": 33,
+      "source_id": 1,
+      "benefits": "PLACEHOLDER — to be filled by Rashid"
+    },
+    {
+      "id": 1003,
+      "text_arabic": "PLACEHOLDER — to be filled by Rashid",
+      "translation": "PLACEHOLDER — to be filled by Rashid",
+      "default_count": 3,
+      "source_id": 2,
+      "notes": "PLACEHOLDER — to be filled by Rashid"
+    }
+  ]
+}
