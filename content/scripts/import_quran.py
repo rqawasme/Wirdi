@@ -67,13 +67,15 @@ VERSE_KEY_RE = re.compile(r"^(\d{1,3}):(\d{1,3})$")
 
 # Marks removed by simplify_arabic().
 #
-# The originally specified ranges were U+064B-U+0652, U+0653-U+0656, U+0670 and
+# The project originally specified U+064B-U+0652, U+0653-U+0656, U+0670 and
 # U+06D6-U+06ED. Measured against the real QPC Hafs text those leave two vowel
 # signs behind - U+0657 ARABIC INVERTED DAMMA (2,901 occurrences) and U+065E
 # ARABIC FATHA WITH TWO DOTS (1,807) - because the specified range stops at
 # U+0656 while the Arabic combining marks run to U+065F. The first range below
-# is therefore widened to U+064B-U+065F, which is a superset of the original two
-# and closes the gap. Narrow it back if that is not wanted.
+# is therefore widened to U+064B-U+065F, a superset of the original two.
+#
+# Reviewed and kept, 2026-08-30. Changing any of this silently changes what
+# text_simple matches, so treat it as a content migration, not a tweak.
 DIACRITIC_RANGES: tuple[tuple[int, int], ...] = (
     (0x064B, 0x065F),  # tanween, harakat, shadda, sukun, and the Quranic
                        # vowel signs through U+065F (widened from U+0656)
@@ -113,13 +115,12 @@ def simplify_arabic(text: str) -> str:
 
     1. Remove every character in these ranges:
          U+064B-U+065F  tanween, harakat, shadda, sukun, and the remaining
-                        Quranic vowel signs. The project spec said
-                        U+064B-U+0652 plus U+0653-U+0656; that stops one short
-                        of U+0657 ARABIC INVERTED DAMMA and U+065E ARABIC FATHA
-                        WITH TWO DOTS, both of which occur thousands of times in
-                        QPC Hafs text and would otherwise survive into
-                        text_simple and break search. U+064B-U+065F is a
-                        superset of the specified ranges.
+                        Quranic vowel signs. Widened from the originally
+                        specified U+064B-U+0652 plus U+0653-U+0656, which stop
+                        one short of U+0657 ARABIC INVERTED DAMMA and U+065E
+                        ARABIC FATHA WITH TWO DOTS; both occur thousands of
+                        times in QPC Hafs text and would otherwise survive into
+                        text_simple and break search.
          U+0670         superscript (dagger) alef
          U+06D6-U+06ED  Quranic annotation signs, small high and low letters
                         (including U+06E1, the QPC sukun substitute), the
@@ -132,9 +133,9 @@ def simplify_arabic(text: str) -> str:
        Arabic-Indic digit occurs anywhere else in the text.
     3. Normalise alef variants to bare alef U+0627:
          U+0622 (madda), U+0623 (hamza above), U+0625 (hamza below), and
-         U+0671 (alef wasla). Alef wasla was not in the project spec but occurs
-         13,483 times in QPC Hafs text; without it a search for a word spelled
-         with a plain alef silently fails to match.
+         U+0671 (alef wasla). Alef wasla occurs 13,483 times in QPC Hafs text;
+         without it a search for a word spelled with a plain alef silently
+         fails to match.
     4. Normalise alef maksura U+0649 to yeh U+064A.
     5. Collapse every run of whitespace to a single space and trim the ends.
        This also folds the U+00A0 no-break space that QUL places before the
