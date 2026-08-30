@@ -15,14 +15,14 @@ source data into the SQLite database the app bundles. No Flutter or Dart code ye
 
 - **Hand-authored JSON** — adhkar, collections and hadith references, written and
   maintained by hand under `content/sources/`, validated against JSON Schema.
-- **Quran data** — Uthmani text, The Clear Quran translation, transliteration and
+- **Quran data** — Uthmani text, the Saheeh International translation, transliteration and
   the juz/hizb/sajdah metadata, downloaded from
   [QUL](https://qul.tarteel.ai/) and normalised by an import script.
 
-The Quran source data is **not committed**. The Clear Quran translation is used
-with the translator's permission, and that permission does not cover
-redistributing it here, so each person who builds the database downloads it
-themselves. See [`content/sources/quran/README.md`](content/sources/quran/README.md).
+The Quran source data is **not committed**. Quran text and translations are
+licensed works and are not redistributed through this repository, so each person
+who builds the database downloads them from QUL themselves. See
+[`content/sources/quran/README.md`](content/sources/quran/README.md).
 
 Every id in the database is either computed by a fixed rule or written by hand in
 the source files. Nothing autoincrements. The database is rebuilt from source

@@ -233,6 +233,12 @@ knowledge (does this dhikr exist? is this ayah in range?) is `build_content.py`'
 normalised, for search matching later. Search is not a v1 feature; the column costs
 nothing at build time and means adding search later needs no content migration. The
 exact transformation is documented in `simplify_arabic()` in `import_quran.py`.
+Against the real QPC Hafs text it reduces to 33 codepoints: the Arabic letters, the
+hamza-carrying forms, teh marbuta and the space. No combining mark survives it.
+
+`ayahs.text_uthmani` keeps the trailing ayah number that QUL bakes into each ayah
+(Arabic-Indic digits after a no-break space). Import with `--strip-ayah-numbers` if
+the app should render its own numbering instead.
 
 ### Knowing when content changed
 

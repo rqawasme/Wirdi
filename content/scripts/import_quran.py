@@ -22,7 +22,7 @@ guess is wrong or ambiguous.
 Usage:
     python3 content/scripts/import_quran.py --check
     python3 content/scripts/import_quran.py
-    python3 content/scripts/import_quran.py --translation my-clear-quran.db
+    python3 content/scripts/import_quran.py --script downloads/uthmani.db
 """
 
 from __future__ import annotations
@@ -65,12 +65,27 @@ VERSE_KEY_RE = re.compile(r"^(\d{1,3}):(\d{1,3})$")
 # text_simple
 # --------------------------------------------------------------------------
 
-# Marks removed by simplify_arabic(), exactly as specified for this project.
+# Marks removed by simplify_arabic().
+#
+# The originally specified ranges were U+064B-U+0652, U+0653-U+0656, U+0670 and
+# U+06D6-U+06ED. Measured against the real QPC Hafs text those leave two vowel
+# signs behind - U+0657 ARABIC INVERTED DAMMA (2,901 occurrences) and U+065E
+# ARABIC FATHA WITH TWO DOTS (1,807) - because the specified range stops at
+# U+0656 while the Arabic combining marks run to U+065F. The first range below
+# is therefore widened to U+064B-U+065F, which is a superset of the original two
+# and closes the gap. Narrow it back if that is not wanted.
 DIACRITIC_RANGES: tuple[tuple[int, int], ...] = (
-    (0x064B, 0x0652),  # fathatan..sukun (tanween, harakat, shadda, sukun)
-    (0x0653, 0x0656),  # maddah above, hamza above/below, subscript alef
+    (0x064B, 0x065F),  # tanween, harakat, shadda, sukun, and the Quranic
+                       # vowel signs through U+065F (widened from U+0656)
     (0x0670, 0x0670),  # superscript (dagger) alef
-    (0x06D6, 0x06ED),  # Quranic annotation signs, small letters, end-of-ayah
+    (0x06D6, 0x06ED),  # Quranic annotation signs, small high/low letters,
+                       # rub-el-hizb and sajdah marks, end-of-ayah U+06DD
+)
+
+# Also removed: characters that change nothing about which word is written.
+DECORATIVE_CODEPOINTS: frozenset[int] = frozenset(
+    {0x0640}                       # tatweel / kashida - pure elongation
+    | set(range(0x0660, 0x066A))   # Arabic-Indic digits, see the docstring
 )
 
 # Letter normalisations applied after the marks are removed.
@@ -78,12 +93,13 @@ LETTER_NORMALISATION: dict[int, int] = {
     0x0622: 0x0627,  # alef with madda above  -> alef
     0x0623: 0x0627,  # alef with hamza above  -> alef
     0x0625: 0x0627,  # alef with hamza below  -> alef
+    0x0671: 0x0627,  # alef wasla             -> alef   (added, see docstring)
     0x0649: 0x064A,  # alef maksura           -> yeh
 }
 
 _STRIP_SET = frozenset(
     cp for low, high in DIACRITIC_RANGES for cp in range(low, high + 1)
-)
+) | DECORATIVE_CODEPOINTS
 
 
 def simplify_arabic(text: str) -> str:
@@ -96,22 +112,39 @@ def simplify_arabic(text: str) -> str:
     The transformation, in order:
 
     1. Remove every character in these ranges:
-         U+064B-U+0652  tanween, harakat, shadda, sukun
-         U+0653-U+0656  maddah above, hamza above, hamza below, subscript alef
+         U+064B-U+065F  tanween, harakat, shadda, sukun, and the remaining
+                        Quranic vowel signs. The project spec said
+                        U+064B-U+0652 plus U+0653-U+0656; that stops one short
+                        of U+0657 ARABIC INVERTED DAMMA and U+065E ARABIC FATHA
+                        WITH TWO DOTS, both of which occur thousands of times in
+                        QPC Hafs text and would otherwise survive into
+                        text_simple and break search. U+064B-U+065F is a
+                        superset of the specified ranges.
          U+0670         superscript (dagger) alef
-         U+06D6-U+06ED  Quranic annotation signs, small high letters, sajdah
-                        marks, and the end-of-ayah symbol U+06DD
-    2. Normalise alef variants to bare alef U+0627:
-         U+0622 (madda), U+0623 (hamza above), U+0625 (hamza below)
-    3. Normalise alef maksura U+0649 to yeh U+064A.
-    4. Collapse every run of whitespace to a single space and trim the ends,
-       so that a stray newline or double space in a source file cannot make two
-       otherwise identical strings compare unequal.
+         U+06D6-U+06ED  Quranic annotation signs, small high and low letters
+                        (including U+06E1, the QPC sukun substitute), the
+                        rub-el-hizb mark U+06DE, the sajdah mark U+06E9, and the
+                        end-of-ayah symbol U+06DD
+    2. Remove U+0640 tatweel, which only stretches a joining stroke, and the
+       Arabic-Indic digits U+0660-U+0669. The digits are removed because QUL's
+       ayah text ends with the ayah number written in them; leaving them in
+       would mean a search for a word could match an ayah number instead. No
+       Arabic-Indic digit occurs anywhere else in the text.
+    3. Normalise alef variants to bare alef U+0627:
+         U+0622 (madda), U+0623 (hamza above), U+0625 (hamza below), and
+         U+0671 (alef wasla). Alef wasla was not in the project spec but occurs
+         13,483 times in QPC Hafs text; without it a search for a word spelled
+         with a plain alef silently fails to match.
+    4. Normalise alef maksura U+0649 to yeh U+064A.
+    5. Collapse every run of whitespace to a single space and trim the ends.
+       This also folds the U+00A0 no-break space that QUL places before the
+       trailing ayah number, so a stray newline or double space in a source file
+       cannot make two otherwise identical strings compare unequal.
 
     Nothing else is touched. In particular hamza on the line (U+0621), waw and
-    yeh carrying hamza (U+0624, U+0626), teh marbuta (U+0629), tatweel
-    (U+0640) and Arabic-Indic digits are all left exactly as they are: removing
-    them changes which word is written, not merely how it is vocalised.
+    yeh carrying hamza (U+0624, U+0626) and teh marbuta (U+0629) are left
+    exactly as they are: removing them changes which word is written, not
+    merely how it is vocalised.
 
     The function is deliberately not idempotent-by-accident: running it on its
     own output is a no-op, because every character it produces is outside the
@@ -163,6 +196,15 @@ def ayah_id(surah: int, ayah: int) -> int:
     return surah * 1000 + ayah
 
 
+# QUL's ayah-level Arabic text ends with the ayah number written in
+# Arabic-Indic digits, preceded by a no-break space, e.g. "… ٢٥٥".
+TRAILING_AYAH_NUMBER_RE = re.compile(r"[\s ]*[٠-٩]+\s*$")
+
+
+def strip_trailing_ayah_number(text: str) -> str:
+    return TRAILING_AYAH_NUMBER_RE.sub("", text).strip()
+
+
 # --------------------------------------------------------------------------
 # reading downloaded files
 # --------------------------------------------------------------------------
@@ -177,6 +219,24 @@ def sqlite_tables(path: Path) -> set[str]:
         return {row[0] for row in rows}
     except sqlite3.Error:
         return set()
+
+
+def sqlite_schema(path: Path) -> dict[str, list[str]]:
+    """Return {table: [column, ...]} for a SQLite file, or {} if unreadable."""
+    try:
+        with sqlite3.connect(f"file:{path}?mode=ro", uri=True) as conn:
+            tables = [
+                row[0]
+                for row in conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'"
+                )
+            ]
+            return {
+                table: [row[1] for row in conn.execute(f'PRAGMA table_info("{table}")')]
+                for table in tables
+            }
+    except sqlite3.Error:
+        return {}
 
 
 def sqlite_rows(path: Path, table: str) -> list[dict[str, Any]]:
@@ -201,7 +261,8 @@ def classify(path: Path) -> str | None:
     """
     suffix = path.suffix.lower()
     if suffix in (".db", ".sqlite", ".sqlite3"):
-        tables = sqlite_tables(path)
+        schema = sqlite_schema(path)
+        tables = set(schema)
         if not tables:
             return None
         if "chapters" in tables:
@@ -210,16 +271,21 @@ def classify(path: Path) -> str | None:
             return "juz"
         if "hizbs" in tables:
             return "hizb"
-        if "sajdah" in tables:
+        if "sajdah" in tables or "sajda" in tables:
             return "sajdah"
         if "transliterations" in tables:
             return "transliteration"
         if "translations" in tables or "translation" in tables:
-            return "translation"
+            # QUL exports some transliterations through its translation
+            # exporter, so the table name alone is not conclusive.
+            return "transliteration" if "translit" in path.stem.lower() else "translation"
         if "pages" in tables and "info" in tables:
             return "mushaf_layout"
         if "verses" in tables:
             return "script"
+        if "words" in tables:
+            # Word-by-word script export: one row per word, not per ayah.
+            return "word_script"
         return None
 
     if suffix != ".json":
@@ -346,6 +412,32 @@ def load_script(path: Path) -> tuple[dict[str, str], dict[str, int]]:
     """Load Uthmani ayah text, and page numbers when the export carries them."""
     text_by_key: dict[str, str] = {}
     page_by_key: dict[str, int] = {}
+
+    if path.suffix.lower() != ".json" and "words" in sqlite_schema(path):
+        # Word-by-word export: rebuild each ayah by joining its words in order.
+        # This is verbatim source text reassembled, never reconstructed text.
+        by_key: dict[str, list[tuple[int, str]]] = {}
+        for row in sqlite_rows(path, "words"):
+            surah = row.get("surah") or row.get("surah_number")
+            ayah = row.get("ayah") or row.get("ayah_number")
+            if surah is None or ayah is None:
+                location = str(row.get("location") or "")
+                parts = location.split(":")
+                if len(parts) < 2:
+                    continue
+                surah, ayah = int(parts[0]), int(parts[1])
+            position = row.get("word") or row.get("position") or row.get("id") or 0
+            text = row.get("text")
+            if text:
+                by_key.setdefault(f"{int(surah)}:{int(ayah)}", []).append(
+                    (int(position), str(text))
+                )
+        for key, words in by_key.items():
+            words.sort(key=lambda pair: pair[0])
+            text_by_key[key] = WHITESPACE_RE.sub(
+                " ", " ".join(word for _, word in words)
+            ).strip()
+        return text_by_key, page_by_key
 
     if path.suffix.lower() == ".json":
         raw = read_json(path)
@@ -596,7 +688,7 @@ def block_of(cp: int) -> str:
 
 
 def build_encoding_report(
-    counts: Counter[int], script_file: Path, ayah_count: int
+    counts: Counter[int], script_file: Path, ayah_count: int, numbered: int = 0
 ) -> tuple[str, str]:
     """Render ENCODING_REPORT.md. Returns (markdown, one-line conclusion).
 
@@ -655,6 +747,18 @@ def build_encoding_report(
         f"- Distinct codepoints: {len(counts):,}",
         f"- Private Use Area codepoints: {sum(len(b) for b in pua.values())}",
         "",
+        "## Ayah numbering inside the text",
+        "",
+        (
+            f"{numbered:,} of {ayah_count:,} ayahs end with the ayah number written in "
+            "Arabic-Indic\ndigits (U+0660-U+0669), preceded by a no-break space, exactly as "
+            "QUL ships\nthem. `text_uthmani` keeps them; run the import with "
+            "`--strip-ayah-numbers` if the\napp should render its own numbering instead. "
+            "`text_simple` never contains them."
+            if numbered
+            else "No ayah carries a trailing ayah number in its text."
+        ),
+        "",
         "## Codepoints by Unicode block",
         "",
         "| Block | Distinct codepoints | Occurrences |",
@@ -708,7 +812,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--downloads", type=Path, default=DOWNLOADS_DIR)
     parser.add_argument("--out", type=Path, default=QURAN_DIR)
     parser.add_argument("--script", type=Path, help="Uthmani script export")
-    parser.add_argument("--translation", type=Path, help="The Clear Quran export")
+    parser.add_argument("--translation", type=Path, help="translation export (Saheeh International)")
     parser.add_argument("--transliteration", type=Path, help="English transliteration export")
     parser.add_argument("--surahs", type=Path, help="surah/chapter metadata export")
     parser.add_argument("--juz", type=Path, help="juz metadata export")
@@ -723,8 +827,15 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--translation-edition",
-        default="The Clear Quran (Dr. Mustafa Khattab)",
+        default="Saheeh International",
         help="stamped into content.db meta",
+    )
+    parser.add_argument(
+        "--strip-ayah-numbers",
+        action="store_true",
+        help="remove the trailing ayah number that QUL's ayah text ends with "
+        "(a no-break space followed by the number in Arabic-Indic digits). Off by "
+        "default, so text_uthmani stays byte-identical to the source.",
     )
     parser.add_argument(
         "--quran-source",
@@ -765,6 +876,7 @@ def main(argv: list[str] | None = None) -> int:
             "hizb",
             "sajdah",
             "pages",
+            "word_script",
             "mushaf_layout",
         ):
             for path in found.get(role, []):
@@ -773,6 +885,25 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  {'UNRECOGNISED':<16} {path.relative_to(args.downloads)}")
         if not found and not unknown:
             print("  (nothing found - see content/sources/quran/README.md)")
+
+        # Show what an unrecognised file actually contains, so the next step is
+        # obvious rather than a guessing game.
+        for path in unknown:
+            schema = sqlite_schema(path)
+            print(f"\n  {path.name} was not recognised. It contains:")
+            if not schema:
+                print("    (not a readable SQLite database)")
+            for table, columns in schema.items():
+                print(f"    table {table!r}: {', '.join(columns)}")
+
+        if found.get("word_script"):
+            names = ", ".join(p.name for p in found["word_script"])
+            print(
+                f"\nnote: {names} is a word-by-word script export - one row per word,\n"
+                "      not per ayah. It is not used unless you ask for it with\n"
+                f"      --script {found['word_script'][0].name}, which rebuilds each ayah\n"
+                "      by joining its words in order."
+            )
         if found.get("verse_text_json"):
             print(
                 "\nnote: plain {verse_key: string} JSON cannot be told apart as "
@@ -819,6 +950,19 @@ def main(argv: list[str] | None = None) -> int:
     script_file = pick("script", found, args.script, required=True)
     uthmani, page_from_script = load_script(script_file)
 
+    numbered = sum(1 for text in uthmani.values() if TRAILING_AYAH_NUMBER_RE.search(text))
+    if args.strip_ayah_numbers:
+        uthmani = {key: strip_trailing_ayah_number(t) for key, t in uthmani.items()}
+        if numbered:
+            print(f"note: stripped the trailing ayah number from {numbered:,} ayah(s)")
+    elif numbered:
+        print(
+            f"note: {numbered:,} of {len(uthmani):,} ayahs end with the ayah number in\n"
+            "      Arabic-Indic digits, as QUL ships them. text_uthmani keeps them.\n"
+            "      Pass --strip-ayah-numbers if the app should render its own numbering.\n"
+            "      (text_simple never contains them either way.)"
+        )
+
     translation_file = pick("translation", found, args.translation, required=True)
     translations = load_verse_text(
         translation_file, ("translations", "translation"), strip_html=not args.keep_html
@@ -835,6 +979,20 @@ def main(argv: list[str] | None = None) -> int:
         if transliteration_file
         else {}
     )
+
+    for label, mapping, source in (
+        ("script", uthmani, script_file),
+        ("translation", translations, translation_file),
+        ("transliteration", transliterations, transliteration_file),
+    ):
+        if source is None or not mapping:
+            continue
+        if len(mapping) != TOTAL_AYAHS:
+            print(
+                f"warning: {source.name} yielded {len(mapping):,} ayah keys, "
+                f"expected {TOTAL_AYAHS:,}.\n"
+                f"         Check that this is an ayah-level {label} export."
+            )
 
     juz_file = pick("juz", found, args.juz, required=True)
     juz_map = load_division(juz_file, "juz", "juz_number", ayah_counts, "juz")
@@ -953,7 +1111,9 @@ def main(argv: list[str] | None = None) -> int:
         encoding="utf-8",
     )
 
-    report, conclusion = build_encoding_report(codepoints, script_file, len(ayahs))
+    report, conclusion = build_encoding_report(
+        codepoints, script_file, len(ayahs), 0 if args.strip_ayah_numbers else numbered
+    )
     report_path.write_text(report, encoding="utf-8")
 
     with_page = sum(1 for a in ayahs if a["page"] is not None)
