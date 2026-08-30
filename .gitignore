@@ -19,3 +19,5 @@ content/build/
 content/sources/quran/*
 !content/sources/quran/README.md
 !content/sources/quran/ENCODING_REPORT.md
+!content/sources/quran/ayahs.json
+!content/sources/quran/surahs.json
