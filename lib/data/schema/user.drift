@@ -1,0 +1,196 @@
+-- user.db — read-write, in the app documents directory so that iOS iCloud
+-- backup and Android Auto Backup pick it up. That is the whole backup story:
+-- there is no sync and no server.
+--
+-- Never replaced, only migrated. content.db is the one that gets swapped out.
+--
+-- Ids are UUID v4 TEXT, not autoincrement integers, and every row carries
+-- updated_at (epoch milliseconds, UTC). Both cost nothing now and are what
+-- make export, sharing or any future sync possible without a painful
+-- migration.
+--
+-- Rows reference content.db by id. There are no cross-database foreign keys
+-- and no ATTACH; resolution happens in Dart.
+
+CREATE TABLE user_collections (
+    id          TEXT    NOT NULL PRIMARY KEY,
+    name        TEXT    NOT NULL,
+    description TEXT,
+    sort_order  INTEGER NOT NULL,
+    created_at  INTEGER NOT NULL,
+    updated_at  INTEGER NOT NULL,
+    deleted_at  INTEGER
+) AS UserCollectionRow;
+
+CREATE TABLE user_collection_items (
+    id                 TEXT    NOT NULL PRIMARY KEY,
+    collection_id      TEXT    NOT NULL REFERENCES user_collections (id),
+    -- 'dhikr' | 'ayah' | 'surah', referencing content.db by item_id.
+    item_type          TEXT    NOT NULL,
+    item_id            INTEGER NOT NULL,
+    position           INTEGER NOT NULL,
+    count_override     INTEGER,
+    repeat_group       INTEGER,
+    repeat_group_count INTEGER,
+    updated_at         INTEGER NOT NULL
+) AS UserCollectionItemRow;
+
+CREATE INDEX idx_user_collection_items_position
+    ON user_collection_items (collection_id, position);
+
+-- collection_ref is CollectionId.canonical: 'b:12' or 'u:<uuid>'.
+CREATE TABLE progress (
+    collection_ref TEXT    NOT NULL PRIMARY KEY,
+    item_index     INTEGER NOT NULL,
+    current_count  INTEGER NOT NULL,
+    updated_at     INTEGER NOT NULL
+) AS ProgressRow;
+
+-- date_key is YYYY-MM-DD in local time, denormalised deliberately: streak
+-- queries run against it constantly, and deriving local dates from timestamps
+-- at query time is slow and breaks when the user changes timezone.
+CREATE TABLE completions (
+    id             TEXT    NOT NULL PRIMARY KEY,
+    collection_ref TEXT    NOT NULL,
+    date_key       TEXT    NOT NULL,
+    completed_at   INTEGER NOT NULL
+) AS CompletionRow;
+
+CREATE UNIQUE INDEX idx_completions_ref_date
+    ON completions (collection_ref, date_key);
+CREATE INDEX idx_completions_date ON completions (date_key);
+
+-- Single row by construction.
+CREATE TABLE reading_position (
+    id           INTEGER NOT NULL PRIMARY KEY CHECK (id = 1),
+    surah_number INTEGER NOT NULL,
+    ayah_number  INTEGER NOT NULL,
+    updated_at   INTEGER NOT NULL
+) AS ReadingPositionRow;
+
+CREATE TABLE settings (
+    "key"      TEXT    NOT NULL PRIMARY KEY,
+    value      TEXT    NOT NULL,
+    updated_at INTEGER NOT NULL
+) AS SettingRow;
+
+-- ---------------------------------------------------------------------------
+-- Collections
+-- ---------------------------------------------------------------------------
+
+activeUserCollections:
+    SELECT * FROM user_collections
+    WHERE deleted_at IS NULL
+    ORDER BY sort_order, created_at, id;
+
+activeUserCollection:
+    SELECT * FROM user_collections WHERE id = :id AND deleted_at IS NULL;
+
+nextUserCollectionSortOrder:
+    SELECT COALESCE(MAX(sort_order), 0) + 1 AS v FROM user_collections;
+
+insertUserCollection:
+    INSERT INTO user_collections
+        (id, name, description, sort_order, created_at, updated_at, deleted_at)
+    VALUES (:id, :name, :description, :sortOrder, :createdAt, :updatedAt, NULL);
+
+renameUserCollection:
+    UPDATE user_collections SET name = :name, updated_at = :updatedAt
+    WHERE id = :id AND deleted_at IS NULL;
+
+softDeleteUserCollection:
+    UPDATE user_collections
+    SET deleted_at = :deletedAt, updated_at = :deletedAt
+    WHERE id = :id AND deleted_at IS NULL;
+
+-- ---------------------------------------------------------------------------
+-- Collection items
+-- ---------------------------------------------------------------------------
+
+itemsForUserCollection:
+    SELECT * FROM user_collection_items
+    WHERE collection_id = :collection
+    ORDER BY position;
+
+nextItemPosition:
+    SELECT COALESCE(MAX(position), 0) + 1 AS v
+    FROM user_collection_items WHERE collection_id = :collection;
+
+insertUserCollectionItem:
+    INSERT INTO user_collection_items
+        (id, collection_id, item_type, item_id, position, count_override,
+         repeat_group, repeat_group_count, updated_at)
+    VALUES (:id, :collection, :itemType, :itemId, :position, :countOverride,
+            :repeatGroup, :repeatGroupCount, :updatedAt);
+
+deleteUserCollectionItem:
+    DELETE FROM user_collection_items
+    WHERE id = :id AND collection_id = :collection;
+
+setItemPosition:
+    UPDATE user_collection_items
+    SET position = :position, updated_at = :updatedAt
+    WHERE id = :id AND collection_id = :collection;
+
+-- ---------------------------------------------------------------------------
+-- Progress and completions
+-- ---------------------------------------------------------------------------
+
+progressFor: SELECT * FROM progress WHERE collection_ref = :ref;
+
+upsertProgress:
+    INSERT INTO progress (collection_ref, item_index, current_count, updated_at)
+    VALUES (:ref, :itemIndex, :currentCount, :updatedAt)
+    ON CONFLICT (collection_ref) DO UPDATE SET
+        item_index = excluded.item_index,
+        current_count = excluded.current_count,
+        updated_at = excluded.updated_at;
+
+deleteProgress: DELETE FROM progress WHERE collection_ref = :ref;
+
+-- Two completions on the same local day count once: the unique index absorbs
+-- the second, keeping the earlier completed_at.
+logCompletion:
+    INSERT INTO completions (id, collection_ref, date_key, completed_at)
+    VALUES (:id, :ref, :dateKey, :completedAt)
+    ON CONFLICT (collection_ref, date_key) DO NOTHING;
+
+completionExists:
+    SELECT EXISTS(
+        SELECT 1 FROM completions
+        WHERE collection_ref = :ref AND date_key = :dateKey
+    ) AS v;
+
+-- date_key is YYYY-MM-DD, so lexicographic bounds are chronological bounds.
+completionDatesBetween:
+    SELECT DISTINCT date_key FROM completions
+    WHERE date_key >= :from AND date_key <= :to
+    ORDER BY date_key;
+
+completionDatesDescending:
+    SELECT DISTINCT date_key FROM completions ORDER BY date_key DESC;
+
+-- ---------------------------------------------------------------------------
+-- Reading position and settings
+-- ---------------------------------------------------------------------------
+
+-- Named around the table accessor drift generates for
+-- `reading_position`, which already owns the name `readingPosition`.
+currentReadingPosition: SELECT * FROM reading_position WHERE id = 1;
+
+upsertReadingPosition:
+    INSERT INTO reading_position (id, surah_number, ayah_number, updated_at)
+    VALUES (1, :surahNumber, :ayahNumber, :updatedAt)
+    ON CONFLICT (id) DO UPDATE SET
+        surah_number = excluded.surah_number,
+        ayah_number = excluded.ayah_number,
+        updated_at = excluded.updated_at;
+
+settingValue: SELECT value FROM settings WHERE "key" = :key;
+
+upsertSetting:
+    INSERT INTO settings ("key", value, updated_at)
+    VALUES (:key, :value, :updatedAt)
+    ON CONFLICT ("key") DO UPDATE SET
+        value = excluded.value,
+        updated_at = excluded.updated_at;

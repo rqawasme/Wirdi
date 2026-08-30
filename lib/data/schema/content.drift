@@ -1,0 +1,132 @@
+-- content.db — read-only, bundled as an asset and copied to app support on first run.
+--
+-- These CREATE TABLE statements mirror SCHEMA_SQL in content/scripts/build_content.py
+-- verbatim, modulo the `AS <RowClass>` suffixes drift uses to name generated row
+-- classes. tool/check_schema_parity.py diffs the two and fails on drift.
+--
+-- Two invariants this code relies on:
+--   * ayahs.id is always surah_number * 1000 + ayah_number
+--   * nothing autoincrements — every id is written by the build
+--
+-- Nothing here writes. The database is opened read-only with drift migrations
+-- disabled; the only statements in this file are SELECTs.
+
+CREATE TABLE surahs (
+    number              INTEGER PRIMARY KEY NOT NULL,
+    name_arabic         TEXT    NOT NULL,
+    name_transliterated TEXT    NOT NULL,
+    name_english        TEXT    NOT NULL,
+    revelation_place    TEXT    NOT NULL,
+    ayah_count          INTEGER NOT NULL,
+    has_bismillah       INTEGER NOT NULL,
+    order_revealed      INTEGER
+) AS SurahRow;
+
+CREATE TABLE ayahs (
+    id              INTEGER PRIMARY KEY NOT NULL,
+    surah_number    INTEGER NOT NULL,
+    ayah_number     INTEGER NOT NULL,
+    text_uthmani    TEXT    NOT NULL,
+    text_simple     TEXT    NOT NULL,
+    translation     TEXT    NOT NULL,
+    transliteration TEXT,
+    juz             INTEGER NOT NULL,
+    hizb            INTEGER NOT NULL,
+    page            INTEGER,
+    sajdah          INTEGER NOT NULL
+) AS AyahRow;
+
+CREATE UNIQUE INDEX idx_ayahs_surah_ayah ON ayahs (surah_number, ayah_number);
+CREATE INDEX idx_ayahs_juz  ON ayahs (juz);
+CREATE INDEX idx_ayahs_hizb ON ayahs (hizb);
+
+CREATE TABLE adhkar (
+    id              INTEGER PRIMARY KEY NOT NULL,
+    text_arabic     TEXT    NOT NULL,
+    translation     TEXT    NOT NULL,
+    transliteration TEXT,
+    default_count   INTEGER NOT NULL,
+    source_id       INTEGER,
+    benefits        TEXT,
+    notes           TEXT
+) AS DhikrRow;
+
+CREATE TABLE sources (
+    id         INTEGER PRIMARY KEY NOT NULL,
+    collection TEXT NOT NULL,
+    reference  TEXT NOT NULL,
+    grading    TEXT,
+    full_text  TEXT
+) AS SourceRow;
+
+CREATE TABLE collections (
+    id           INTEGER PRIMARY KEY NOT NULL,
+    name_arabic  TEXT    NOT NULL,
+    name_english TEXT    NOT NULL,
+    description  TEXT,
+    author       TEXT,
+    type         TEXT    NOT NULL,
+    sort_order   INTEGER NOT NULL
+) AS CollectionRow;
+
+CREATE TABLE collection_items (
+    id                 INTEGER PRIMARY KEY NOT NULL,
+    collection_id      INTEGER NOT NULL,
+    item_type          TEXT    NOT NULL,
+    item_id            INTEGER NOT NULL,
+    position           INTEGER NOT NULL,
+    count_override     INTEGER,
+    repeat_group       INTEGER,
+    repeat_group_count INTEGER,
+    note               TEXT
+) AS CollectionItemRow;
+
+CREATE INDEX idx_collection_items_position ON collection_items (collection_id, position);
+
+CREATE TABLE meta (
+    "key" TEXT PRIMARY KEY NOT NULL,
+    value TEXT NOT NULL
+) AS MetaRow;
+
+-- ---------------------------------------------------------------------------
+-- Queries
+--
+-- The three `...ByIds` queries are the batched fetches collection resolution
+-- runs after partitioning a collection's items by type. There is deliberately
+-- no polymorphic join: the rows are stitched back into position order in Dart.
+-- ---------------------------------------------------------------------------
+
+metaValue: SELECT value FROM meta WHERE "key" = :key;
+
+allSurahs: SELECT * FROM surahs ORDER BY number;
+
+surahByNumber: SELECT * FROM surahs WHERE number = :number;
+
+surahsByNumbers: SELECT * FROM surahs WHERE number IN :numbers;
+
+ayahsForSurah:
+    SELECT * FROM ayahs WHERE surah_number = :surah ORDER BY ayah_number;
+
+ayahById: SELECT * FROM ayahs WHERE id = :id;
+
+ayahsInRange:
+    SELECT * FROM ayahs
+    WHERE surah_number = :surah AND ayah_number BETWEEN :first AND :last
+    ORDER BY ayah_number;
+
+ayahsForJuz: SELECT * FROM ayahs WHERE juz = :juz ORDER BY id;
+
+ayahsByIds: SELECT * FROM ayahs WHERE id IN :ids;
+
+dhikrById: SELECT * FROM adhkar WHERE id = :id;
+
+adhkarByIds: SELECT * FROM adhkar WHERE id IN :ids;
+
+allCollections: SELECT * FROM collections ORDER BY sort_order, id;
+
+collectionById: SELECT * FROM collections WHERE id = :id;
+
+itemsForCollection:
+    SELECT * FROM collection_items
+    WHERE collection_id = :collection
+    ORDER BY position;
