@@ -19,8 +19,9 @@ class DriftContentRepository implements ContentRepository {
 
   @override
   Future<Surah> surah(int number) async {
-    final SurahRow? row =
-        await _db.surahByNumber(number: number).getSingleOrNull();
+    final SurahRow? row = await _db
+        .surahByNumber(number: number)
+        .getSingleOrNull();
     if (row == null) {
       throw ContentNotFoundException(ContentRef.surah(number));
     }
@@ -29,8 +30,9 @@ class DriftContentRepository implements ContentRepository {
 
   @override
   Future<List<Ayah>> ayahsForSurah(int surahNumber) async {
-    final List<AyahRow> rows =
-        await _db.ayahsForSurah(surah: surahNumber).get();
+    final List<AyahRow> rows = await _db
+        .ayahsForSurah(surah: surahNumber)
+        .get();
     return rows.map(ayahFromRow).toList(growable: false);
   }
 

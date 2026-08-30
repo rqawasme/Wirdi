@@ -53,8 +53,7 @@ class ContentDatabase extends _$ContentDatabase {
   }
 
   /// An empty in-memory content database with the schema created. For tests.
-  factory ContentDatabase.memory() =>
-      ContentDatabase(NativeDatabase.memory());
+  factory ContentDatabase.memory() => ContentDatabase(NativeDatabase.memory());
 
   @override
   int get schemaVersion => 1;
@@ -74,8 +73,9 @@ class ContentDatabase extends _$ContentDatabase {
 
   /// Fails loudly when the database was built by a different pipeline version.
   Future<void> assertSchemaVersion() async {
-    final String? version = await metaValue(key: 'schema_version')
-        .getSingleOrNull();
+    final String? version = await metaValue(
+      key: 'schema_version',
+    ).getSingleOrNull();
     if (version != expectedContentSchemaVersion) {
       throw ContentSchemaVersionMismatch(
         expected: expectedContentSchemaVersion,

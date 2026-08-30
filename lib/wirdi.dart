@@ -13,7 +13,10 @@
 library;
 
 export 'data/content_database.dart'
-    show ContentDatabase, ContentSchemaVersionMismatch, expectedContentSchemaVersion;
+    show
+        ContentDatabase,
+        ContentSchemaVersionMismatch,
+        expectedContentSchemaVersion;
 export 'data/database_files.dart';
 export 'data/user_database.dart' show UserDatabase;
 export 'data/wirdi_data.dart';

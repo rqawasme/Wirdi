@@ -41,8 +41,9 @@ class DriftCollectionRepository implements CollectionRepository {
     final List<CollectionRow> builtins = await _content.allCollections().get();
     // activeUserCollections filters deleted_at IS NULL: soft-deleted
     // collections never appear in a list.
-    final List<UserCollectionRow> mine =
-        await _user.activeUserCollections().get();
+    final List<UserCollectionRow> mine = await _user
+        .activeUserCollections()
+        .get();
 
     // Built-ins first, in the order the content pipeline assigns, then the
     // user's own. The two sort_order spaces are unrelated, so interleaving
@@ -64,12 +65,14 @@ class DriftCollectionRepository implements CollectionRepository {
   }
 
   Future<ResolvedCollection> _resolveBuiltin(BuiltinCollectionId id) async {
-    final CollectionRow? row =
-        await _content.collectionById(id: id.value).getSingleOrNull();
+    final CollectionRow? row = await _content
+        .collectionById(id: id.value)
+        .getSingleOrNull();
     if (row == null) throw CollectionNotFoundException(id);
 
-    final List<CollectionItemRow> items =
-        await _content.itemsForCollection(collection: id.value).get();
+    final List<CollectionItemRow> items = await _content
+        .itemsForCollection(collection: id.value)
+        .get();
     return _resolver.resolve(
       builtinSummaryFromRow(row),
       items.map(_builtinItem).toList(growable: false),
@@ -77,12 +80,14 @@ class DriftCollectionRepository implements CollectionRepository {
   }
 
   Future<ResolvedCollection> _resolveUser(UserCollectionId id) async {
-    final UserCollectionRow? row =
-        await _user.activeUserCollection(id: id.uuid).getSingleOrNull();
+    final UserCollectionRow? row = await _user
+        .activeUserCollection(id: id.uuid)
+        .getSingleOrNull();
     if (row == null) throw CollectionNotFoundException(id);
 
-    final List<UserCollectionItemRow> items =
-        await _user.itemsForUserCollection(collection: id.uuid).get();
+    final List<UserCollectionItemRow> items = await _user
+        .itemsForUserCollection(collection: id.uuid)
+        .get();
     return _resolver.resolve(
       userSummaryFromRow(row),
       items.map(_userItem).toList(growable: false),
@@ -93,8 +98,7 @@ class DriftCollectionRepository implements CollectionRepository {
   Future<UserCollectionId> create(String name, {String? description}) async {
     final String id = _uuid.v4();
     final int now = toEpochMs(_now());
-    final int sortOrder =
-        await _user.nextUserCollectionSortOrder().getSingle();
+    final int sortOrder = await _user.nextUserCollectionSortOrder().getSingle();
     await _user.insertUserCollection(
       id: id,
       name: name,
@@ -124,8 +128,9 @@ class DriftCollectionRepository implements CollectionRepository {
   }) async {
     await _requireLiveCollection(id);
     await _user.transaction(() async {
-      final int position =
-          await _user.nextItemPosition(collection: id.uuid).getSingle();
+      final int position = await _user
+          .nextItemPosition(collection: id.uuid)
+          .getSingle();
       await _user.insertUserCollectionItem(
         id: _uuid.v4(),
         collection: id.uuid,
@@ -146,10 +151,7 @@ class DriftCollectionRepository implements CollectionRepository {
   }
 
   @override
-  Future<void> reorder(
-    UserCollectionId id,
-    List<String> itemIdsInOrder,
-  ) async {
+  Future<void> reorder(UserCollectionId id, List<String> itemIdsInOrder) async {
     final int now = toEpochMs(_now());
     await _user.transaction(() async {
       for (int i = 0; i < itemIdsInOrder.length; i++) {
@@ -174,8 +176,9 @@ class DriftCollectionRepository implements CollectionRepository {
   }
 
   Future<void> _requireLiveCollection(UserCollectionId id) async {
-    final UserCollectionRow? row =
-        await _user.activeUserCollection(id: id.uuid).getSingleOrNull();
+    final UserCollectionRow? row = await _user
+        .activeUserCollection(id: id.uuid)
+        .getSingleOrNull();
     if (row == null) throw CollectionNotFoundException(id);
   }
 

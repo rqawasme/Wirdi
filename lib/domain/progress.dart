@@ -22,7 +22,11 @@ final class WirdProgress {
 
   final DateTime updatedAt;
 
-  WirdProgress copyWith({int? itemIndex, int? currentCount, DateTime? updatedAt}) {
+  WirdProgress copyWith({
+    int? itemIndex,
+    int? currentCount,
+    DateTime? updatedAt,
+  }) {
     return WirdProgress(
       collectionId: collectionId,
       itemIndex: itemIndex ?? this.itemIndex,

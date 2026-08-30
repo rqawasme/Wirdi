@@ -16,12 +16,9 @@ import '../user_database.dart' hide ReadingPosition;
 /// user collection share one progress table and one completions table without
 /// a discriminator column.
 class DriftUserRepository implements UserRepository {
-  DriftUserRepository(
-    this._db, {
-    Uuid? uuid,
-    DateTime Function()? clock,
-  }) : _uuid = uuid ?? const Uuid(),
-       _now = clock ?? DateTime.now;
+  DriftUserRepository(this._db, {Uuid? uuid, DateTime Function()? clock})
+    : _uuid = uuid ?? const Uuid(),
+      _now = clock ?? DateTime.now;
 
   final UserDatabase _db;
   final Uuid _uuid;
@@ -42,8 +39,9 @@ class DriftUserRepository implements UserRepository {
 
   @override
   Future<WirdProgress?> progress(CollectionId id) async {
-    final ProgressRow? row =
-        await _db.progressFor(ref: id.canonical).getSingleOrNull();
+    final ProgressRow? row = await _db
+        .progressFor(ref: id.canonical)
+        .getSingleOrNull();
     return row == null ? null : progressFromRow(row, id);
   }
 
@@ -113,8 +111,9 @@ class DriftUserRepository implements UserRepository {
 
   @override
   Future<ReadingPosition?> lastPosition() async {
-    final ReadingPositionRow? row =
-        await _db.currentReadingPosition().getSingleOrNull();
+    final ReadingPositionRow? row = await _db
+        .currentReadingPosition()
+        .getSingleOrNull();
     return row == null ? null : readingPositionFromRow(row);
   }
 

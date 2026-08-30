@@ -38,7 +38,9 @@ class WirdiDatabaseFiles {
     final ByteData asset = await rootBundle.load(contentAsset);
     final int assetLength = asset.lengthInBytes;
 
-    if (!force && await target.exists() && await target.length() == assetLength) {
+    if (!force &&
+        await target.exists() &&
+        await target.length() == assetLength) {
       return target;
     }
 

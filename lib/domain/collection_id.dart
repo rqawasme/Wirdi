@@ -23,7 +23,10 @@ sealed class CollectionId {
   static CollectionId parse(String s) {
     final CollectionId? parsed = tryParse(s);
     if (parsed == null) {
-      throw FormatException('not a collection id: expected "b:<int>" or "u:<uuid>"', s);
+      throw FormatException(
+        'not a collection id: expected "b:<int>" or "u:<uuid>"',
+        s,
+      );
     }
     return parsed;
   }

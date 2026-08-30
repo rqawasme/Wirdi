@@ -60,8 +60,10 @@ class CollectionResolver {
   ) async {
     // position is authoritative; never rely on row order.
     final List<ResolvableItem> ordered = List<ResolvableItem>.of(items)
-      ..sort((ResolvableItem a, ResolvableItem b) =>
-          a.position.compareTo(b.position));
+      ..sort(
+        (ResolvableItem a, ResolvableItem b) =>
+            a.position.compareTo(b.position),
+      );
 
     final _Batches batches = await _fetch(ordered);
 
@@ -77,11 +79,13 @@ class CollectionResolver {
 
     void closeBlock() {
       if (blockEntries != null && blockEntries!.isNotEmpty) {
-        entries.add(RepeatBlock(
-          group: blockGroup!,
-          repeatCount: blockCount,
-          entries: List<CollectionItemEntry>.unmodifiable(blockEntries!),
-        ));
+        entries.add(
+          RepeatBlock(
+            group: blockGroup!,
+            repeatCount: blockCount,
+            entries: List<CollectionItemEntry>.unmodifiable(blockEntries!),
+          ),
+        );
       }
       blockEntries = null;
       blockGroup = null;

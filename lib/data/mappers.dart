@@ -75,12 +75,13 @@ CollectionSummary builtinSummaryFromRow(CollectionRow row) => CollectionSummary(
   sortOrder: row.sortOrder,
 );
 
-CollectionSummary userSummaryFromRow(UserCollectionRow row) => CollectionSummary(
-  id: UserCollectionId(row.id),
-  name: row.name,
-  description: row.description,
-  sortOrder: row.sortOrder,
-);
+CollectionSummary userSummaryFromRow(UserCollectionRow row) =>
+    CollectionSummary(
+      id: UserCollectionId(row.id),
+      name: row.name,
+      description: row.description,
+      sortOrder: row.sortOrder,
+    );
 
 WirdProgress progressFromRow(ProgressRow row, CollectionId id) => WirdProgress(
   collectionId: id,
