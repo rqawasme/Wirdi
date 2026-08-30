@@ -87,6 +87,20 @@ pipeline actually produces. `tool/check_schema_parity.py` is that diff.
 Drift's generated row types stop at the repository boundary. `lib/domain/`
 imports no drift.
 
+A resolved collection has two views of the same data: `entries` is structural,
+with `RepeatBlock`s intact, for display and editing; `steps` is that flattened
+for playback, so a three-item block repeated seven times is one entry and
+twenty-one steps. Progress indexes `steps` and stores the `ContentRef` it
+pointed at, so a reorder or a content update cannot silently resume at the
+wrong dhikr — resume through `ResolvedCollection.resumableFrom`, never by
+indexing `steps` directly.
+
+SQLite itself comes from `package:sqlite3` 3.x, which downloads a precompiled
+library for the target at build time and packages it as a code asset. That
+replaces `sqlite3_flutter_libs`, which is end-of-life. `assertSupportedSqlite`
+runs at startup and fails if the version in use is old enough to suggest the
+platform library is being used instead.
+
 ### Running it
 
 ```bash

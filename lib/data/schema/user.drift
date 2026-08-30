@@ -32,6 +32,9 @@ CREATE TABLE user_collection_items (
     count_override     INTEGER,
     repeat_group       INTEGER,
     repeat_group_count INTEGER,
+    -- A rubric shown with this item, mirroring collection_items.note. A user
+    -- collection copied from a built-in keeps the built-in's notes.
+    note               TEXT,
     updated_at         INTEGER NOT NULL
 ) AS UserCollectionItemRow;
 
@@ -39,9 +42,17 @@ CREATE INDEX idx_user_collection_items_position
     ON user_collection_items (collection_id, position);
 
 -- collection_ref is CollectionId.canonical: 'b:12' or 'u:<uuid>'.
+--
+-- step_index indexes ResolvedCollection.steps, the flattened playback list, so
+-- a position inside a repeat block is expressible. step_ref is the
+-- ContentRef.canonical of the step that index pointed at when it was written:
+-- on resume, a step_ref that no longer matches means a content update or a
+-- reorder moved things underneath, and the progress is discarded rather than
+-- resumed at the wrong dhikr.
 CREATE TABLE progress (
     collection_ref TEXT    NOT NULL PRIMARY KEY,
-    item_index     INTEGER NOT NULL,
+    step_index     INTEGER NOT NULL,
+    step_ref       TEXT    NOT NULL,
     current_count  INTEGER NOT NULL,
     updated_at     INTEGER NOT NULL
 ) AS ProgressRow;
@@ -119,9 +130,9 @@ nextItemPosition:
 insertUserCollectionItem:
     INSERT INTO user_collection_items
         (id, collection_id, item_type, item_id, position, count_override,
-         repeat_group, repeat_group_count, updated_at)
+         repeat_group, repeat_group_count, note, updated_at)
     VALUES (:id, :collection, :itemType, :itemId, :position, :countOverride,
-            :repeatGroup, :repeatGroupCount, :updatedAt);
+            :repeatGroup, :repeatGroupCount, :note, :updatedAt);
 
 deleteUserCollectionItem:
     DELETE FROM user_collection_items
@@ -132,6 +143,21 @@ setItemPosition:
     SET position = :position, updated_at = :updatedAt
     WHERE id = :id AND collection_id = :collection;
 
+nextRepeatGroup:
+    SELECT COALESCE(MAX(repeat_group), 0) + 1 AS v
+    FROM user_collection_items WHERE collection_id = :collection;
+
+setItemRepeatGroup:
+    UPDATE user_collection_items
+    SET repeat_group = :group, repeat_group_count = :count,
+        updated_at = :updatedAt
+    WHERE id = :id AND collection_id = :collection;
+
+clearItemsRepeatGroup:
+    UPDATE user_collection_items
+    SET repeat_group = NULL, repeat_group_count = NULL, updated_at = :updatedAt
+    WHERE collection_id = :collection AND repeat_group = :group;
+
 -- ---------------------------------------------------------------------------
 -- Progress and completions
 -- ---------------------------------------------------------------------------
@@ -139,10 +165,12 @@ setItemPosition:
 progressFor: SELECT * FROM progress WHERE collection_ref = :ref;
 
 upsertProgress:
-    INSERT INTO progress (collection_ref, item_index, current_count, updated_at)
-    VALUES (:ref, :itemIndex, :currentCount, :updatedAt)
+    INSERT INTO progress
+        (collection_ref, step_index, step_ref, current_count, updated_at)
+    VALUES (:ref, :stepIndex, :stepRef, :currentCount, :updatedAt)
     ON CONFLICT (collection_ref) DO UPDATE SET
-        item_index = excluded.item_index,
+        step_index = excluded.step_index,
+        step_ref = excluded.step_ref,
         current_count = excluded.current_count,
         updated_at = excluded.updated_at;
 

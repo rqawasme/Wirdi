@@ -89,18 +89,14 @@ Future<void> seedContent(ContentDatabase db) async {
       for (int n = 1; n <= 4; n++) _ayah(112, n, juz: 30),
     ]);
 
-    b.insertAll(db.sources, <SourcesCompanion>[
-      SourcesCompanion.insert(
-        id: Value<int>(1),
-        collection: 'PLACEHOLDER source 1 collection',
-        reference: 'PLACEHOLDER source 1 reference',
-      ),
-    ]);
+    b.insertAll(db.sources, <SourcesCompanion>[_source(1), _source(2)]);
 
     b.insertAll(db.adhkar, <AdhkarCompanion>[
+      // 1001 cites nothing; two of the others do, so resolution has both
+      // cases to hydrate.
       _dhikr(1001, defaultCount: 1),
-      _dhikr(1002, defaultCount: 33),
-      _dhikr(1003, defaultCount: 3),
+      _dhikr(1002, defaultCount: 33, sourceId: 1),
+      _dhikr(1003, defaultCount: 3, sourceId: 2),
       _dhikr(1004, defaultCount: 7),
     ]);
 
@@ -178,12 +174,22 @@ AyahsCompanion _ayah(int surah, int ayah, {required int juz}) {
   );
 }
 
-AdhkarCompanion _dhikr(int id, {required int defaultCount}) {
+AdhkarCompanion _dhikr(int id, {required int defaultCount, int? sourceId}) {
   return AdhkarCompanion.insert(
     id: Value<int>(id),
     textArabic: 'PLACEHOLDER dhikr $id arabic',
     translation: 'PLACEHOLDER dhikr $id translation',
     defaultCount: defaultCount,
+    sourceId: Value<int?>(sourceId),
+  );
+}
+
+SourcesCompanion _source(int id) {
+  return SourcesCompanion.insert(
+    id: Value<int>(id),
+    collection: 'PLACEHOLDER source $id collection',
+    reference: 'PLACEHOLDER source $id reference',
+    grading: Value<String>('PLACEHOLDER source $id grading'),
   );
 }
 
@@ -270,6 +276,7 @@ Future<String> insertUserItem(
   int? countOverride,
   int? repeatGroup,
   int? repeatGroupCount,
+  String? note,
 }) async {
   await db
       .into(db.userCollectionItems)
@@ -283,6 +290,7 @@ Future<String> insertUserItem(
           countOverride: Value<int?>(countOverride),
           repeatGroup: Value<int?>(repeatGroup),
           repeatGroupCount: Value<int?>(repeatGroupCount),
+          note: Value<String?>(note),
           updatedAt: DateTime(2026, 1, 1).millisecondsSinceEpoch,
         ),
       );

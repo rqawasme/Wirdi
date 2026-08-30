@@ -1,6 +1,7 @@
 import '../domain/collection.dart';
 import '../domain/collection_id.dart';
 import '../domain/content.dart';
+import '../domain/content_ref.dart';
 import '../domain/progress.dart';
 import 'content_database.dart';
 // `reading_position` makes drift generate a table class called
@@ -56,6 +57,14 @@ Dhikr dhikrFromRow(DhikrRow row) => Dhikr(
   notes: row.notes,
 );
 
+Source sourceFromRow(SourceRow row) => Source(
+  id: row.id,
+  collection: row.collection,
+  reference: row.reference,
+  grading: row.grading,
+  fullText: row.fullText,
+);
+
 /// `collections.type` holds the authored strings; anything else is treated as
 /// unknown rather than crashing a list.
 CollectionType? collectionTypeFromSql(String value) => switch (value) {
@@ -83,12 +92,20 @@ CollectionSummary userSummaryFromRow(UserCollectionRow row) =>
       sortOrder: row.sortOrder,
     );
 
-WirdProgress progressFromRow(ProgressRow row, CollectionId id) => WirdProgress(
-  collectionId: id,
-  itemIndex: row.itemIndex,
-  currentCount: row.currentCount,
-  updatedAt: fromEpochMs(row.updatedAt),
-);
+/// `step_ref` is written by this app in [ContentRef.canonical] form. A value
+/// that does not parse means the row was written by something else, so it is
+/// treated as unresumable rather than guessed at.
+WirdProgress? progressFromRow(ProgressRow row, CollectionId id) {
+  final ContentRef? ref = ContentRef.tryParse(row.stepRef);
+  if (ref == null) return null;
+  return WirdProgress(
+    collectionId: id,
+    stepIndex: row.stepIndex,
+    stepRef: ref,
+    currentCount: row.currentCount,
+    updatedAt: fromEpochMs(row.updatedAt),
+  );
+}
 
 ReadingPosition readingPositionFromRow(ReadingPositionRow row) =>
     ReadingPosition(

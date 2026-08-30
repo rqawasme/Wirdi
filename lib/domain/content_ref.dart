@@ -29,6 +29,40 @@ final class ContentRef {
   final ContentType type;
   final int id;
 
+  /// `dhikr:1001`, `ayah:2255`, `surah:112`.
+  ///
+  /// This is what `progress.step_ref` stores. The mapping is an explicit
+  /// switch rather than [Enum.name] so that renaming a Dart enum value cannot
+  /// silently change what is already persisted.
+  String get canonical => switch (type) {
+    ContentType.dhikr => 'dhikr:$id',
+    ContentType.ayah => 'ayah:$id',
+    ContentType.surah => 'surah:$id',
+  };
+
+  /// Parses [s] in [canonical] form. Throws [FormatException] on anything else.
+  static ContentRef parse(String s) {
+    final ContentRef? parsed = tryParse(s);
+    if (parsed == null) {
+      throw FormatException('not a content ref: expected "<type>:<id>"', s);
+    }
+    return parsed;
+  }
+
+  static ContentRef? tryParse(String s) {
+    final int colon = s.indexOf(':');
+    if (colon < 0) return null;
+    final int? id = int.tryParse(s.substring(colon + 1));
+    if (id == null) return null;
+    final ContentType? type = switch (s.substring(0, colon)) {
+      'dhikr' => ContentType.dhikr,
+      'ayah' => ContentType.ayah,
+      'surah' => ContentType.surah,
+      _ => null,
+    };
+    return type == null ? null : ContentRef(type, id);
+  }
+
   @override
   bool operator ==(Object other) =>
       other is ContentRef && other.type == type && other.id == id;
@@ -37,5 +71,5 @@ final class ContentRef {
   int get hashCode => Object.hash(type, id);
 
   @override
-  String toString() => '${type.name}:$id';
+  String toString() => canonical;
 }

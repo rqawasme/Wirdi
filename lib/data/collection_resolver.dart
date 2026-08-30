@@ -42,12 +42,13 @@ final class ResolvableItem {
 ///
 ///   1. take the items, ordered by position
 ///   2. partition them by item type
-///   3. run three batched queries against content.db, one per type
+///   3. run three batched queries against content.db, one per type, then a
+///      fourth for the sources the fetched adhkar cite
 ///   4. stitch the results back together in Dart, preserving position order
 ///
-/// There is deliberately no polymorphic join. Three `WHERE id IN (…)` reads
-/// and a stitch is both faster and far easier to read than a union of three
-/// left joins, and it keeps the query shape independent of what a collection
+/// There is deliberately no polymorphic join. Four `WHERE id IN (…)` reads and
+/// a stitch is both faster and far easier to read than a union of three left
+/// joins, and it keeps the query shape independent of what a collection
 /// happens to contain.
 class CollectionResolver {
   const CollectionResolver(this._content);
@@ -154,6 +155,17 @@ class CollectionResolver {
         ? const <SurahRow>[]
         : await _content.surahsByNumbers(numbers: surahNumbers.toList()).get();
 
+    // The fourth batch, and the only one that depends on an earlier one: the
+    // references cited by the adhkar just fetched. Sourcing is a trust
+    // feature, so it rides along rather than waiting on a second call.
+    final Set<int> sourceIds = <int>{
+      for (final DhikrRow row in adhkar)
+        if (row.sourceId != null) row.sourceId!,
+    };
+    final List<SourceRow> sources = sourceIds.isEmpty
+        ? const <SourceRow>[]
+        : await _content.sourcesByIds(ids: sourceIds.toList()).get();
+
     return _Batches(
       adhkar: <int, Dhikr>{
         for (final DhikrRow row in adhkar) row.id: dhikrFromRow(row),
@@ -163,6 +175,9 @@ class CollectionResolver {
       },
       surahs: <int, Surah>{
         for (final SurahRow row in surahs) row.number: surahFromRow(row),
+      },
+      sources: <int, Source>{
+        for (final SourceRow row in sources) row.id: sourceFromRow(row),
       },
     );
   }
@@ -179,6 +194,9 @@ class CollectionResolver {
           count: item.countOverride ?? dhikr.defaultCount,
           note: item.note,
           dhikr: dhikr,
+          source: dhikr.sourceId == null
+              ? null
+              : batches.sources[dhikr.sourceId],
         );
       case ContentType.ayah:
         final Ayah? ayah = batches.ayahs[item.itemId];
@@ -212,9 +230,11 @@ class _Batches {
     required this.adhkar,
     required this.ayahs,
     required this.surahs,
+    required this.sources,
   });
 
   final Map<int, Dhikr> adhkar;
   final Map<int, Ayah> ayahs;
   final Map<int, Surah> surahs;
+  final Map<int, Source> sources;
 }

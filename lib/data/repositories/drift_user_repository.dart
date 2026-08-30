@@ -49,7 +49,8 @@ class DriftUserRepository implements UserRepository {
   Future<void> saveProgress(WirdProgress progress) async {
     await _db.upsertProgress(
       ref: progress.collectionId.canonical,
-      itemIndex: progress.itemIndex,
+      stepIndex: progress.stepIndex,
+      stepRef: progress.stepRef.canonical,
       currentCount: progress.currentCount,
       updatedAt: toEpochMs(progress.updatedAt),
     );

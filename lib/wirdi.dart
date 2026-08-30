@@ -18,6 +18,7 @@ export 'data/content_database.dart'
         ContentSchemaVersionMismatch,
         expectedContentSchemaVersion;
 export 'data/database_files.dart';
+export 'data/sqlite_runtime.dart';
 export 'data/user_database.dart' show UserDatabase;
 export 'data/wirdi_data.dart';
 export 'domain/domain.dart';

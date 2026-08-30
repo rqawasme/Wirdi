@@ -5,6 +5,7 @@ import 'database_files.dart';
 import 'repositories/drift_collection_repository.dart';
 import 'repositories/drift_content_repository.dart';
 import 'repositories/drift_user_repository.dart';
+import 'sqlite_runtime.dart';
 import 'user_database.dart';
 import '../domain/repositories.dart';
 
@@ -27,6 +28,10 @@ class WirdiData {
   static Future<WirdiData> open({
     WirdiDatabaseFiles files = const WirdiDatabaseFiles(),
   }) async {
+    // Before anything opens: confirm we are on the SQLite package:sqlite3
+    // bundles, not an old platform one.
+    assertSupportedSqlite();
+
     final File contentFile = await files.ensureContentDatabase();
     final ContentDatabase content = ContentDatabase.openReadOnly(contentFile);
     // Fail here, at startup, rather than on the first query that returns a

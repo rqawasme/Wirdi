@@ -550,6 +550,15 @@ class UserCollectionItems extends Table
     requiredDuringInsert: false,
     $customConstraints: '',
   );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
   );
@@ -571,6 +580,7 @@ class UserCollectionItems extends Table
     countOverride,
     repeatGroup,
     repeatGroupCount,
+    note,
     updatedAt,
   ];
   @override
@@ -652,6 +662,12 @@ class UserCollectionItems extends Table
         ),
       );
     }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
     if (data.containsKey('updated_at')) {
       context.handle(
         _updatedAtMeta,
@@ -701,6 +717,10 @@ class UserCollectionItems extends Table
         DriftSqlType.int,
         data['${effectivePrefix}repeat_group_count'],
       ),
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}updated_at'],
@@ -729,6 +749,10 @@ class UserCollectionItemRow extends DataClass
   final int? countOverride;
   final int? repeatGroup;
   final int? repeatGroupCount;
+
+  /// A rubric shown with this item, mirroring collection_items.note. A user
+  /// collection copied from a built-in keeps the built-in's notes.
+  final String? note;
   final int updatedAt;
   const UserCollectionItemRow({
     required this.id,
@@ -739,6 +763,7 @@ class UserCollectionItemRow extends DataClass
     this.countOverride,
     this.repeatGroup,
     this.repeatGroupCount,
+    this.note,
     required this.updatedAt,
   });
   @override
@@ -758,6 +783,9 @@ class UserCollectionItemRow extends DataClass
     if (!nullToAbsent || repeatGroupCount != null) {
       map['repeat_group_count'] = Variable<int>(repeatGroupCount);
     }
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
     map['updated_at'] = Variable<int>(updatedAt);
     return map;
   }
@@ -776,6 +804,7 @@ class UserCollectionItemRow extends DataClass
       countOverride: serializer.fromJson<int?>(json['count_override']),
       repeatGroup: serializer.fromJson<int?>(json['repeat_group']),
       repeatGroupCount: serializer.fromJson<int?>(json['repeat_group_count']),
+      note: serializer.fromJson<String?>(json['note']),
       updatedAt: serializer.fromJson<int>(json['updated_at']),
     );
   }
@@ -791,6 +820,7 @@ class UserCollectionItemRow extends DataClass
       'count_override': serializer.toJson<int?>(countOverride),
       'repeat_group': serializer.toJson<int?>(repeatGroup),
       'repeat_group_count': serializer.toJson<int?>(repeatGroupCount),
+      'note': serializer.toJson<String?>(note),
       'updated_at': serializer.toJson<int>(updatedAt),
     };
   }
@@ -804,6 +834,7 @@ class UserCollectionItemRow extends DataClass
     Value<int?> countOverride = const Value.absent(),
     Value<int?> repeatGroup = const Value.absent(),
     Value<int?> repeatGroupCount = const Value.absent(),
+    Value<String?> note = const Value.absent(),
     int? updatedAt,
   }) => UserCollectionItemRow(
     id: id ?? this.id,
@@ -818,6 +849,7 @@ class UserCollectionItemRow extends DataClass
     repeatGroupCount: repeatGroupCount.present
         ? repeatGroupCount.value
         : this.repeatGroupCount,
+    note: note.present ? note.value : this.note,
     updatedAt: updatedAt ?? this.updatedAt,
   );
   UserCollectionItemRow copyWithCompanion(UserCollectionItemsCompanion data) {
@@ -838,6 +870,7 @@ class UserCollectionItemRow extends DataClass
       repeatGroupCount: data.repeatGroupCount.present
           ? data.repeatGroupCount.value
           : this.repeatGroupCount,
+      note: data.note.present ? data.note.value : this.note,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -853,6 +886,7 @@ class UserCollectionItemRow extends DataClass
           ..write('countOverride: $countOverride, ')
           ..write('repeatGroup: $repeatGroup, ')
           ..write('repeatGroupCount: $repeatGroupCount, ')
+          ..write('note: $note, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -868,6 +902,7 @@ class UserCollectionItemRow extends DataClass
     countOverride,
     repeatGroup,
     repeatGroupCount,
+    note,
     updatedAt,
   );
   @override
@@ -882,6 +917,7 @@ class UserCollectionItemRow extends DataClass
           other.countOverride == this.countOverride &&
           other.repeatGroup == this.repeatGroup &&
           other.repeatGroupCount == this.repeatGroupCount &&
+          other.note == this.note &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -895,6 +931,7 @@ class UserCollectionItemsCompanion
   final Value<int?> countOverride;
   final Value<int?> repeatGroup;
   final Value<int?> repeatGroupCount;
+  final Value<String?> note;
   final Value<int> updatedAt;
   final Value<int> rowid;
   const UserCollectionItemsCompanion({
@@ -906,6 +943,7 @@ class UserCollectionItemsCompanion
     this.countOverride = const Value.absent(),
     this.repeatGroup = const Value.absent(),
     this.repeatGroupCount = const Value.absent(),
+    this.note = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -918,6 +956,7 @@ class UserCollectionItemsCompanion
     this.countOverride = const Value.absent(),
     this.repeatGroup = const Value.absent(),
     this.repeatGroupCount = const Value.absent(),
+    this.note = const Value.absent(),
     required int updatedAt,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -935,6 +974,7 @@ class UserCollectionItemsCompanion
     Expression<int>? countOverride,
     Expression<int>? repeatGroup,
     Expression<int>? repeatGroupCount,
+    Expression<String>? note,
     Expression<int>? updatedAt,
     Expression<int>? rowid,
   }) {
@@ -947,6 +987,7 @@ class UserCollectionItemsCompanion
       if (countOverride != null) 'count_override': countOverride,
       if (repeatGroup != null) 'repeat_group': repeatGroup,
       if (repeatGroupCount != null) 'repeat_group_count': repeatGroupCount,
+      if (note != null) 'note': note,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -961,6 +1002,7 @@ class UserCollectionItemsCompanion
     Value<int?>? countOverride,
     Value<int?>? repeatGroup,
     Value<int?>? repeatGroupCount,
+    Value<String?>? note,
     Value<int>? updatedAt,
     Value<int>? rowid,
   }) {
@@ -973,6 +1015,7 @@ class UserCollectionItemsCompanion
       countOverride: countOverride ?? this.countOverride,
       repeatGroup: repeatGroup ?? this.repeatGroup,
       repeatGroupCount: repeatGroupCount ?? this.repeatGroupCount,
+      note: note ?? this.note,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -1005,6 +1048,9 @@ class UserCollectionItemsCompanion
     if (repeatGroupCount.present) {
       map['repeat_group_count'] = Variable<int>(repeatGroupCount.value);
     }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<int>(updatedAt.value);
     }
@@ -1025,6 +1071,7 @@ class UserCollectionItemsCompanion
           ..write('countOverride: $countOverride, ')
           ..write('repeatGroup: $repeatGroup, ')
           ..write('repeatGroupCount: $repeatGroupCount, ')
+          ..write('note: $note, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -1048,14 +1095,25 @@ class Progress extends Table with TableInfo<Progress, ProgressRow> {
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL PRIMARY KEY',
   );
-  static const VerificationMeta _itemIndexMeta = const VerificationMeta(
-    'itemIndex',
+  static const VerificationMeta _stepIndexMeta = const VerificationMeta(
+    'stepIndex',
   );
-  late final GeneratedColumn<int> itemIndex = GeneratedColumn<int>(
-    'item_index',
+  late final GeneratedColumn<int> stepIndex = GeneratedColumn<int>(
+    'step_index',
     aliasedName,
     false,
     type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _stepRefMeta = const VerificationMeta(
+    'stepRef',
+  );
+  late final GeneratedColumn<String> stepRef = GeneratedColumn<String>(
+    'step_ref',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL',
   );
@@ -1084,7 +1142,8 @@ class Progress extends Table with TableInfo<Progress, ProgressRow> {
   @override
   List<GeneratedColumn> get $columns => [
     collectionRef,
-    itemIndex,
+    stepIndex,
+    stepRef,
     currentCount,
     updatedAt,
   ];
@@ -1111,13 +1170,21 @@ class Progress extends Table with TableInfo<Progress, ProgressRow> {
     } else if (isInserting) {
       context.missing(_collectionRefMeta);
     }
-    if (data.containsKey('item_index')) {
+    if (data.containsKey('step_index')) {
       context.handle(
-        _itemIndexMeta,
-        itemIndex.isAcceptableOrUnknown(data['item_index']!, _itemIndexMeta),
+        _stepIndexMeta,
+        stepIndex.isAcceptableOrUnknown(data['step_index']!, _stepIndexMeta),
       );
     } else if (isInserting) {
-      context.missing(_itemIndexMeta);
+      context.missing(_stepIndexMeta);
+    }
+    if (data.containsKey('step_ref')) {
+      context.handle(
+        _stepRefMeta,
+        stepRef.isAcceptableOrUnknown(data['step_ref']!, _stepRefMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_stepRefMeta);
     }
     if (data.containsKey('current_count')) {
       context.handle(
@@ -1151,9 +1218,13 @@ class Progress extends Table with TableInfo<Progress, ProgressRow> {
         DriftSqlType.string,
         data['${effectivePrefix}collection_ref'],
       )!,
-      itemIndex: attachedDatabase.typeMapping.read(
+      stepIndex: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}item_index'],
+        data['${effectivePrefix}step_index'],
+      )!,
+      stepRef: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}step_ref'],
       )!,
       currentCount: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
@@ -1177,12 +1248,14 @@ class Progress extends Table with TableInfo<Progress, ProgressRow> {
 
 class ProgressRow extends DataClass implements Insertable<ProgressRow> {
   final String collectionRef;
-  final int itemIndex;
+  final int stepIndex;
+  final String stepRef;
   final int currentCount;
   final int updatedAt;
   const ProgressRow({
     required this.collectionRef,
-    required this.itemIndex,
+    required this.stepIndex,
+    required this.stepRef,
     required this.currentCount,
     required this.updatedAt,
   });
@@ -1190,7 +1263,8 @@ class ProgressRow extends DataClass implements Insertable<ProgressRow> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['collection_ref'] = Variable<String>(collectionRef);
-    map['item_index'] = Variable<int>(itemIndex);
+    map['step_index'] = Variable<int>(stepIndex);
+    map['step_ref'] = Variable<String>(stepRef);
     map['current_count'] = Variable<int>(currentCount);
     map['updated_at'] = Variable<int>(updatedAt);
     return map;
@@ -1203,7 +1277,8 @@ class ProgressRow extends DataClass implements Insertable<ProgressRow> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ProgressRow(
       collectionRef: serializer.fromJson<String>(json['collection_ref']),
-      itemIndex: serializer.fromJson<int>(json['item_index']),
+      stepIndex: serializer.fromJson<int>(json['step_index']),
+      stepRef: serializer.fromJson<String>(json['step_ref']),
       currentCount: serializer.fromJson<int>(json['current_count']),
       updatedAt: serializer.fromJson<int>(json['updated_at']),
     );
@@ -1213,7 +1288,8 @@ class ProgressRow extends DataClass implements Insertable<ProgressRow> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'collection_ref': serializer.toJson<String>(collectionRef),
-      'item_index': serializer.toJson<int>(itemIndex),
+      'step_index': serializer.toJson<int>(stepIndex),
+      'step_ref': serializer.toJson<String>(stepRef),
       'current_count': serializer.toJson<int>(currentCount),
       'updated_at': serializer.toJson<int>(updatedAt),
     };
@@ -1221,12 +1297,14 @@ class ProgressRow extends DataClass implements Insertable<ProgressRow> {
 
   ProgressRow copyWith({
     String? collectionRef,
-    int? itemIndex,
+    int? stepIndex,
+    String? stepRef,
     int? currentCount,
     int? updatedAt,
   }) => ProgressRow(
     collectionRef: collectionRef ?? this.collectionRef,
-    itemIndex: itemIndex ?? this.itemIndex,
+    stepIndex: stepIndex ?? this.stepIndex,
+    stepRef: stepRef ?? this.stepRef,
     currentCount: currentCount ?? this.currentCount,
     updatedAt: updatedAt ?? this.updatedAt,
   );
@@ -1235,7 +1313,8 @@ class ProgressRow extends DataClass implements Insertable<ProgressRow> {
       collectionRef: data.collectionRef.present
           ? data.collectionRef.value
           : this.collectionRef,
-      itemIndex: data.itemIndex.present ? data.itemIndex.value : this.itemIndex,
+      stepIndex: data.stepIndex.present ? data.stepIndex.value : this.stepIndex,
+      stepRef: data.stepRef.present ? data.stepRef.value : this.stepRef,
       currentCount: data.currentCount.present
           ? data.currentCount.value
           : this.currentCount,
@@ -1247,7 +1326,8 @@ class ProgressRow extends DataClass implements Insertable<ProgressRow> {
   String toString() {
     return (StringBuffer('ProgressRow(')
           ..write('collectionRef: $collectionRef, ')
-          ..write('itemIndex: $itemIndex, ')
+          ..write('stepIndex: $stepIndex, ')
+          ..write('stepRef: $stepRef, ')
           ..write('currentCount: $currentCount, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -1256,50 +1336,57 @@ class ProgressRow extends DataClass implements Insertable<ProgressRow> {
 
   @override
   int get hashCode =>
-      Object.hash(collectionRef, itemIndex, currentCount, updatedAt);
+      Object.hash(collectionRef, stepIndex, stepRef, currentCount, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is ProgressRow &&
           other.collectionRef == this.collectionRef &&
-          other.itemIndex == this.itemIndex &&
+          other.stepIndex == this.stepIndex &&
+          other.stepRef == this.stepRef &&
           other.currentCount == this.currentCount &&
           other.updatedAt == this.updatedAt);
 }
 
 class ProgressCompanion extends UpdateCompanion<ProgressRow> {
   final Value<String> collectionRef;
-  final Value<int> itemIndex;
+  final Value<int> stepIndex;
+  final Value<String> stepRef;
   final Value<int> currentCount;
   final Value<int> updatedAt;
   final Value<int> rowid;
   const ProgressCompanion({
     this.collectionRef = const Value.absent(),
-    this.itemIndex = const Value.absent(),
+    this.stepIndex = const Value.absent(),
+    this.stepRef = const Value.absent(),
     this.currentCount = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ProgressCompanion.insert({
     required String collectionRef,
-    required int itemIndex,
+    required int stepIndex,
+    required String stepRef,
     required int currentCount,
     required int updatedAt,
     this.rowid = const Value.absent(),
   }) : collectionRef = Value(collectionRef),
-       itemIndex = Value(itemIndex),
+       stepIndex = Value(stepIndex),
+       stepRef = Value(stepRef),
        currentCount = Value(currentCount),
        updatedAt = Value(updatedAt);
   static Insertable<ProgressRow> custom({
     Expression<String>? collectionRef,
-    Expression<int>? itemIndex,
+    Expression<int>? stepIndex,
+    Expression<String>? stepRef,
     Expression<int>? currentCount,
     Expression<int>? updatedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (collectionRef != null) 'collection_ref': collectionRef,
-      if (itemIndex != null) 'item_index': itemIndex,
+      if (stepIndex != null) 'step_index': stepIndex,
+      if (stepRef != null) 'step_ref': stepRef,
       if (currentCount != null) 'current_count': currentCount,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -1308,14 +1395,16 @@ class ProgressCompanion extends UpdateCompanion<ProgressRow> {
 
   ProgressCompanion copyWith({
     Value<String>? collectionRef,
-    Value<int>? itemIndex,
+    Value<int>? stepIndex,
+    Value<String>? stepRef,
     Value<int>? currentCount,
     Value<int>? updatedAt,
     Value<int>? rowid,
   }) {
     return ProgressCompanion(
       collectionRef: collectionRef ?? this.collectionRef,
-      itemIndex: itemIndex ?? this.itemIndex,
+      stepIndex: stepIndex ?? this.stepIndex,
+      stepRef: stepRef ?? this.stepRef,
       currentCount: currentCount ?? this.currentCount,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -1328,8 +1417,11 @@ class ProgressCompanion extends UpdateCompanion<ProgressRow> {
     if (collectionRef.present) {
       map['collection_ref'] = Variable<String>(collectionRef.value);
     }
-    if (itemIndex.present) {
-      map['item_index'] = Variable<int>(itemIndex.value);
+    if (stepIndex.present) {
+      map['step_index'] = Variable<int>(stepIndex.value);
+    }
+    if (stepRef.present) {
+      map['step_ref'] = Variable<String>(stepRef.value);
     }
     if (currentCount.present) {
       map['current_count'] = Variable<int>(currentCount.value);
@@ -1347,7 +1439,8 @@ class ProgressCompanion extends UpdateCompanion<ProgressRow> {
   String toString() {
     return (StringBuffer('ProgressCompanion(')
           ..write('collectionRef: $collectionRef, ')
-          ..write('itemIndex: $itemIndex, ')
+          ..write('stepIndex: $stepIndex, ')
+          ..write('stepRef: $stepRef, ')
           ..write('currentCount: $currentCount, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -2355,10 +2448,11 @@ abstract class _$UserDatabase extends GeneratedDatabase {
     int? countOverride,
     int? repeatGroup,
     int? repeatGroupCount,
+    String? note,
     required int updatedAt,
   }) {
     return customInsert(
-      'INSERT INTO user_collection_items (id, collection_id, item_type, item_id, position, count_override, repeat_group, repeat_group_count, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)',
+      'INSERT INTO user_collection_items (id, collection_id, item_type, item_id, position, count_override, repeat_group, repeat_group_count, note, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)',
       variables: [
         Variable<String>(id),
         Variable<String>(collection),
@@ -2368,6 +2462,7 @@ abstract class _$UserDatabase extends GeneratedDatabase {
         Variable<int>(countOverride),
         Variable<int>(repeatGroup),
         Variable<int>(repeatGroupCount),
+        Variable<String>(note),
         Variable<int>(updatedAt),
       ],
       updates: {userCollectionItems},
@@ -2405,6 +2500,52 @@ abstract class _$UserDatabase extends GeneratedDatabase {
     );
   }
 
+  Selectable<int> nextRepeatGroup({required String collection}) {
+    return customSelect(
+      'SELECT COALESCE(MAX(repeat_group), 0) + 1 AS v FROM user_collection_items WHERE collection_id = ?1',
+      variables: [Variable<String>(collection)],
+      readsFrom: {userCollectionItems},
+    ).map((QueryRow row) => row.read<int>('v'));
+  }
+
+  Future<int> setItemRepeatGroup({
+    int? group,
+    int? count,
+    required int updatedAt,
+    required String id,
+    required String collection,
+  }) {
+    return customUpdate(
+      'UPDATE user_collection_items SET repeat_group = ?1, repeat_group_count = ?2, updated_at = ?3 WHERE id = ?4 AND collection_id = ?5',
+      variables: [
+        Variable<int>(group),
+        Variable<int>(count),
+        Variable<int>(updatedAt),
+        Variable<String>(id),
+        Variable<String>(collection),
+      ],
+      updates: {userCollectionItems},
+      updateKind: UpdateKind.update,
+    );
+  }
+
+  Future<int> clearItemsRepeatGroup({
+    required int updatedAt,
+    required String collection,
+    int? group,
+  }) {
+    return customUpdate(
+      'UPDATE user_collection_items SET repeat_group = NULL, repeat_group_count = NULL, updated_at = ?1 WHERE collection_id = ?2 AND repeat_group = ?3',
+      variables: [
+        Variable<int>(updatedAt),
+        Variable<String>(collection),
+        Variable<int>(group),
+      ],
+      updates: {userCollectionItems},
+      updateKind: UpdateKind.update,
+    );
+  }
+
   Selectable<ProgressRow> progressFor({required String ref}) {
     return customSelect(
       'SELECT * FROM progress WHERE collection_ref = ?1',
@@ -2415,15 +2556,17 @@ abstract class _$UserDatabase extends GeneratedDatabase {
 
   Future<int> upsertProgress({
     required String ref,
-    required int itemIndex,
+    required int stepIndex,
+    required String stepRef,
     required int currentCount,
     required int updatedAt,
   }) {
     return customInsert(
-      'INSERT INTO progress (collection_ref, item_index, current_count, updated_at) VALUES (?1, ?2, ?3, ?4) ON CONFLICT (collection_ref) DO UPDATE SET item_index = excluded.item_index, current_count = excluded.current_count, updated_at = excluded.updated_at',
+      'INSERT INTO progress (collection_ref, step_index, step_ref, current_count, updated_at) VALUES (?1, ?2, ?3, ?4, ?5) ON CONFLICT (collection_ref) DO UPDATE SET step_index = excluded.step_index, step_ref = excluded.step_ref, current_count = excluded.current_count, updated_at = excluded.updated_at',
       variables: [
         Variable<String>(ref),
-        Variable<int>(itemIndex),
+        Variable<int>(stepIndex),
+        Variable<String>(stepRef),
         Variable<int>(currentCount),
         Variable<int>(updatedAt),
       ],
@@ -2911,6 +3054,7 @@ typedef $UserCollectionItemsCreateCompanionBuilder =
       Value<int?> countOverride,
       Value<int?> repeatGroup,
       Value<int?> repeatGroupCount,
+      Value<String?> note,
       required int updatedAt,
       Value<int> rowid,
     });
@@ -2924,6 +3068,7 @@ typedef $UserCollectionItemsUpdateCompanionBuilder =
       Value<int?> countOverride,
       Value<int?> repeatGroup,
       Value<int?> repeatGroupCount,
+      Value<String?> note,
       Value<int> updatedAt,
       Value<int> rowid,
     });
@@ -3005,6 +3150,11 @@ class $UserCollectionItemsFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<int> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
@@ -3078,6 +3228,11 @@ class $UserCollectionItemsOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
@@ -3143,6 +3298,9 @@ class $UserCollectionItemsAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
   GeneratedColumn<int> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
@@ -3206,6 +3364,7 @@ class $UserCollectionItemsTableManager
                 Value<int?> countOverride = const Value.absent(),
                 Value<int?> repeatGroup = const Value.absent(),
                 Value<int?> repeatGroupCount = const Value.absent(),
+                Value<String?> note = const Value.absent(),
                 Value<int> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => UserCollectionItemsCompanion(
@@ -3217,6 +3376,7 @@ class $UserCollectionItemsTableManager
                 countOverride: countOverride,
                 repeatGroup: repeatGroup,
                 repeatGroupCount: repeatGroupCount,
+                note: note,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),
@@ -3230,6 +3390,7 @@ class $UserCollectionItemsTableManager
                 Value<int?> countOverride = const Value.absent(),
                 Value<int?> repeatGroup = const Value.absent(),
                 Value<int?> repeatGroupCount = const Value.absent(),
+                Value<String?> note = const Value.absent(),
                 required int updatedAt,
                 Value<int> rowid = const Value.absent(),
               }) => UserCollectionItemsCompanion.insert(
@@ -3241,6 +3402,7 @@ class $UserCollectionItemsTableManager
                 countOverride: countOverride,
                 repeatGroup: repeatGroup,
                 repeatGroupCount: repeatGroupCount,
+                note: note,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),
@@ -3314,7 +3476,8 @@ typedef $UserCollectionItemsProcessedTableManager =
 typedef $ProgressCreateCompanionBuilder =
     ProgressCompanion Function({
       required String collectionRef,
-      required int itemIndex,
+      required int stepIndex,
+      required String stepRef,
       required int currentCount,
       required int updatedAt,
       Value<int> rowid,
@@ -3322,7 +3485,8 @@ typedef $ProgressCreateCompanionBuilder =
 typedef $ProgressUpdateCompanionBuilder =
     ProgressCompanion Function({
       Value<String> collectionRef,
-      Value<int> itemIndex,
+      Value<int> stepIndex,
+      Value<String> stepRef,
       Value<int> currentCount,
       Value<int> updatedAt,
       Value<int> rowid,
@@ -3341,8 +3505,13 @@ class $ProgressFilterComposer extends Composer<_$UserDatabase, Progress> {
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get itemIndex => $composableBuilder(
-    column: $table.itemIndex,
+  ColumnFilters<int> get stepIndex => $composableBuilder(
+    column: $table.stepIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get stepRef => $composableBuilder(
+    column: $table.stepRef,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3370,8 +3539,13 @@ class $ProgressOrderingComposer extends Composer<_$UserDatabase, Progress> {
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get itemIndex => $composableBuilder(
-    column: $table.itemIndex,
+  ColumnOrderings<int> get stepIndex => $composableBuilder(
+    column: $table.stepIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get stepRef => $composableBuilder(
+    column: $table.stepRef,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -3399,8 +3573,11 @@ class $ProgressAnnotationComposer extends Composer<_$UserDatabase, Progress> {
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get itemIndex =>
-      $composableBuilder(column: $table.itemIndex, builder: (column) => column);
+  GeneratedColumn<int> get stepIndex =>
+      $composableBuilder(column: $table.stepIndex, builder: (column) => column);
+
+  GeneratedColumn<String> get stepRef =>
+      $composableBuilder(column: $table.stepRef, builder: (column) => column);
 
   GeneratedColumn<int> get currentCount => $composableBuilder(
     column: $table.currentCount,
@@ -3440,13 +3617,15 @@ class $ProgressTableManager
           updateCompanionCallback:
               ({
                 Value<String> collectionRef = const Value.absent(),
-                Value<int> itemIndex = const Value.absent(),
+                Value<int> stepIndex = const Value.absent(),
+                Value<String> stepRef = const Value.absent(),
                 Value<int> currentCount = const Value.absent(),
                 Value<int> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ProgressCompanion(
                 collectionRef: collectionRef,
-                itemIndex: itemIndex,
+                stepIndex: stepIndex,
+                stepRef: stepRef,
                 currentCount: currentCount,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -3454,13 +3633,15 @@ class $ProgressTableManager
           createCompanionCallback:
               ({
                 required String collectionRef,
-                required int itemIndex,
+                required int stepIndex,
+                required String stepRef,
                 required int currentCount,
                 required int updatedAt,
                 Value<int> rowid = const Value.absent(),
               }) => ProgressCompanion.insert(
                 collectionRef: collectionRef,
-                itemIndex: itemIndex,
+                stepIndex: stepIndex,
+                stepRef: stepRef,
                 currentCount: currentCount,
                 updatedAt: updatedAt,
                 rowid: rowid,

@@ -3340,6 +3340,17 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
     ).asyncMap(adhkar.mapFromRow);
   }
 
+  Selectable<SourceRow> sourcesByIds({required List<int> ids}) {
+    var $arrayStartIndex = 1;
+    final expandedids = $expandVar($arrayStartIndex, ids.length);
+    $arrayStartIndex += ids.length;
+    return customSelect(
+      'SELECT * FROM sources WHERE id IN ($expandedids)',
+      variables: [for (var $ in ids) Variable<int>($)],
+      readsFrom: {sources},
+    ).asyncMap(sources.mapFromRow);
+  }
+
   Selectable<CollectionRow> allCollections() {
     return customSelect(
       'SELECT * FROM collections ORDER BY sort_order, id',

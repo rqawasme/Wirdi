@@ -122,6 +122,11 @@ dhikrById: SELECT * FROM adhkar WHERE id = :id;
 
 adhkarByIds: SELECT * FROM adhkar WHERE id IN :ids;
 
+-- The fourth batched fetch of collection resolution: the references cited by
+-- the adhkar just fetched. Sourcing is a trust feature, so the reference rides
+-- along with the dhikr rather than waiting on a lookup the UI might forget.
+sourcesByIds: SELECT * FROM sources WHERE id IN :ids;
+
 allCollections: SELECT * FROM collections ORDER BY sort_order, id;
 
 collectionById: SELECT * FROM collections WHERE id = :id;

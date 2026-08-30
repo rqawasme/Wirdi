@@ -104,3 +104,30 @@ final class Dhikr {
   @override
   String toString() => 'Dhikr($id)';
 }
+
+/// A hadith or book reference that a dhikr cites.
+///
+/// Hydrated onto [DhikrItem] during collection resolution rather than fetched
+/// on demand: sourcing is a trust feature, and a reference the UI has to
+/// remember to ask for is a reference that sometimes goes missing.
+final class Source {
+  const Source({
+    required this.id,
+    required this.collection,
+    required this.reference,
+    this.grading,
+    this.fullText,
+  });
+
+  final int id;
+
+  /// The hadith collection or book, e.g. a Sunan or a Musnad.
+  final String collection;
+
+  final String reference;
+  final String? grading;
+  final String? fullText;
+
+  @override
+  String toString() => 'Source($id $collection $reference)';
+}

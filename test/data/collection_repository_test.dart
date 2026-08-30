@@ -483,4 +483,203 @@ void main() {
       );
     });
   });
+
+  group('sources are hydrated during the stitch', () {
+    test('a dhikr that cites one resolves with it attached', () async {
+      final ResolvedCollection resolved = await collections.resolve(
+        const BuiltinCollectionId(mixedCollectionId),
+      );
+      final List<DhikrItem> adhkar = resolved.entries
+          .whereType<DhikrItem>()
+          .toList();
+
+      final DhikrItem cited = adhkar.firstWhere(
+        (DhikrItem d) => d.dhikr.id == 1002,
+      );
+      expect(cited.dhikr.sourceId, 1);
+      expect(cited.source, isNotNull);
+      expect(cited.source!.id, 1);
+      expect(cited.source!.collection, 'PLACEHOLDER source 1 collection');
+      expect(cited.source!.reference, 'PLACEHOLDER source 1 reference');
+      expect(cited.source!.grading, 'PLACEHOLDER source 1 grading');
+    });
+
+    test('a dhikr that cites none resolves with a null source', () async {
+      final ResolvedCollection resolved = await collections.resolve(
+        const BuiltinCollectionId(mixedCollectionId),
+      );
+      final DhikrItem uncited = resolved.entries
+          .whereType<DhikrItem>()
+          .firstWhere((DhikrItem d) => d.dhikr.id == 1001);
+      expect(uncited.dhikr.sourceId, isNull);
+      expect(uncited.source, isNull);
+    });
+
+    test('different adhkar get their own sources', () async {
+      final ResolvedCollection resolved = await collections.resolve(
+        const BuiltinCollectionId(mixedCollectionId),
+      );
+      final Map<int, int?> bySourceId = <int, int?>{
+        for (final DhikrItem d in resolved.entries.whereType<DhikrItem>())
+          d.dhikr.id: d.source?.id,
+      };
+      expect(bySourceId, <int, int?>{1001: null, 1002: 1, 1003: 2});
+    });
+
+    test('a user collection hydrates sources through the same path', () async {
+      final UserCollectionId id = await collections.create('Mine');
+      await collections.addItem(id, const ContentRef.dhikr(1003));
+
+      final DhikrItem item =
+          (await collections.resolve(id)).entries.single as DhikrItem;
+      expect(item.source!.id, 2);
+    });
+  });
+
+  group('notes on user collection items', () {
+    test('addItem carries a note through to the resolved entry', () async {
+      final UserCollectionId id = await collections.create('Copy of a wird');
+      await collections.addItem(
+        id,
+        const ContentRef.dhikr(1001),
+        note: 'PLACEHOLDER copied rubric',
+      );
+      await collections.addItem(id, const ContentRef.dhikr(1002));
+
+      final List<CollectionItemEntry> entries = (await collections.resolve(
+        id,
+      )).entries.cast<CollectionItemEntry>().toList();
+      expect(entries.first.note, 'PLACEHOLDER copied rubric');
+      expect(entries.last.note, isNull);
+    });
+
+    test('a built-in wird copies across with its rubrics intact', () async {
+      final ResolvedCollection source = await collections.resolve(
+        const BuiltinCollectionId(mixedCollectionId),
+      );
+      final UserCollectionId copy = await collections.create('My copy');
+
+      // Copy the loose items; the block is reproduced below with
+      // setRepeatGroup.
+      for (final CollectionEntry entry in source.entries) {
+        if (entry is CollectionItemEntry) {
+          await collections.addItem(
+            copy,
+            entry.ref,
+            count: entry.count,
+            note: entry.note,
+          );
+        }
+      }
+
+      final List<CollectionItemEntry> copied = (await collections.resolve(
+        copy,
+      )).entries.cast<CollectionItemEntry>().toList();
+      expect(copied.last.note, 'PLACEHOLDER item note');
+      expect(copied.map((CollectionItemEntry e) => e.count).toList(), <int>[
+        1,
+        100,
+        1,
+        1,
+        3,
+      ]);
+    });
+  });
+
+  group('setRepeatGroup', () {
+    Future<(UserCollectionId, List<String>)> threeItems() async {
+      final UserCollectionId id = await collections.create('Mine');
+      await collections.addItem(id, const ContentRef.surah(112));
+      await collections.addItem(id, const ContentRef.surah(113));
+      await collections.addItem(id, const ContentRef.surah(114));
+      final List<String> ids = (await collections.resolve(id)).entries
+          .cast<CollectionItemEntry>()
+          .map((CollectionItemEntry e) => e.entryId)
+          .toList();
+      return (id, ids);
+    }
+
+    test('groups a contiguous run into one block', () async {
+      final (UserCollectionId id, List<String> ids) = await threeItems();
+      await collections.setRepeatGroup(id, ids, 3);
+
+      final ResolvedCollection resolved = await collections.resolve(id);
+      expect(describeAll(resolved), <String>[
+        'repeat(1 x3)[surah:112 x1, surah:113 x1, surah:114 x1]',
+      ]);
+      expect(resolved.steps, hasLength(9));
+      expect(resolved.steps.last.repetition, 3);
+    });
+
+    test('rejects a non-contiguous item list', () async {
+      final (UserCollectionId id, List<String> ids) = await threeItems();
+
+      // First and third, skipping the one between them.
+      expect(
+        () => collections.setRepeatGroup(id, <String>[ids[0], ids[2]], 3),
+        throwsA(isA<ArgumentError>()),
+      );
+
+      // And nothing was written.
+      final ResolvedCollection resolved = await collections.resolve(id);
+      expect(resolved.entries.whereType<RepeatBlock>(), isEmpty);
+      expect(resolved.entries, hasLength(3));
+    });
+
+    test('rejects an item that is not in the collection', () async {
+      final (UserCollectionId id, List<String> ids) = await threeItems();
+      expect(
+        () => collections.setRepeatGroup(id, <String>[ids[0], testUuid(77)], 3),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('rejects an item already in a group', () async {
+      final (UserCollectionId id, List<String> ids) = await threeItems();
+      await collections.setRepeatGroup(id, <String>[ids[0], ids[1]], 2);
+      expect(
+        () => collections.setRepeatGroup(id, <String>[ids[1], ids[2]], 4),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test(
+      'rejects an empty list, a duplicate and a repetition below one',
+      () async {
+        final (UserCollectionId id, List<String> ids) = await threeItems();
+        expect(
+          () => collections.setRepeatGroup(id, <String>[], 3),
+          throwsA(isA<ArgumentError>()),
+        );
+        expect(
+          () => collections.setRepeatGroup(id, <String>[ids[0], ids[0]], 3),
+          throwsA(isA<ArgumentError>()),
+        );
+        expect(
+          () => collections.setRepeatGroup(id, <String>[ids[0]], 0),
+          throwsA(isA<ArgumentError>()),
+        );
+      },
+    );
+
+    test('clearRepeatGroup ungroups them again', () async {
+      final (UserCollectionId id, List<String> ids) = await threeItems();
+      await collections.setRepeatGroup(id, ids, 3);
+
+      final RepeatBlock block =
+          (await collections.resolve(id)).entries.single as RepeatBlock;
+      await collections.clearRepeatGroup(id, block.group);
+
+      final ResolvedCollection resolved = await collections.resolve(id);
+      expect(describeAll(resolved), <String>[
+        'surah:112 x1',
+        'surah:113 x1',
+        'surah:114 x1',
+      ]);
+      expect(resolved.steps, hasLength(3));
+
+      // Clearing a group that no longer exists is a no-op.
+      await collections.clearRepeatGroup(id, block.group);
+    });
+  });
 }

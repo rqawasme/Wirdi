@@ -125,6 +125,7 @@ class DriftCollectionRepository implements CollectionRepository {
     UserCollectionId id,
     ContentRef ref, {
     int? count,
+    String? note,
   }) async {
     await _requireLiveCollection(id);
     await _user.transaction(() async {
@@ -138,8 +139,11 @@ class DriftCollectionRepository implements CollectionRepository {
         itemId: ref.id,
         position: position,
         countOverride: count,
+        // Repeat groups are set afterwards, over a run of items, by
+        // setRepeatGroup: a single item cannot form one on its own.
         repeatGroup: null,
         repeatGroupCount: null,
+        note: note,
         updatedAt: toEpochMs(_now()),
       );
     });
@@ -187,13 +191,116 @@ class DriftCollectionRepository implements CollectionRepository {
   }
 
   @override
-  Future<void> delete(UserCollectionId id) async {
-    // Soft: the row and its items stay, `all()` stops showing it.
-    final int changed = await _user.softDeleteUserCollection(
-      deletedAt: toEpochMs(_now()),
-      id: id.uuid,
+  Future<void> setRepeatGroup(
+    UserCollectionId id,
+    List<String> itemIds,
+    int repetitions,
+  ) async {
+    if (repetitions < 1) {
+      throw ArgumentError.value(
+        repetitions,
+        'repetitions',
+        'a repeat group is recited at least once',
+      );
+    }
+    if (itemIds.isEmpty) {
+      throw ArgumentError.value(
+        itemIds,
+        'itemIds',
+        'must name at least one item',
+      );
+    }
+    if (itemIds.toSet().length != itemIds.length) {
+      throw ArgumentError.value(itemIds, 'itemIds', 'lists an item twice');
+    }
+
+    final int now = toEpochMs(_now());
+    await _user.transaction(() async {
+      final List<UserCollectionItemRow> all = await _user
+          .itemsForUserCollection(collection: id.uuid)
+          .get();
+      final Map<String, UserCollectionItemRow> byId =
+          <String, UserCollectionItemRow>{
+            for (final UserCollectionItemRow row in all) row.id: row,
+          };
+
+      final List<UserCollectionItemRow> members = <UserCollectionItemRow>[];
+      for (final String itemId in itemIds) {
+        final UserCollectionItemRow? row = byId[itemId];
+        if (row == null) {
+          throw ArgumentError.value(
+            itemId,
+            'itemIds',
+            'is not an item of ${id.canonical}',
+          );
+        }
+        if (row.repeatGroup != null) {
+          throw ArgumentError.value(
+            itemId,
+            'itemIds',
+            'is already in repeat group ${row.repeatGroup}; '
+                'clear that group first',
+          );
+        }
+        members.add(row);
+      }
+
+      // A repeat group that is not a contiguous run has no coherent playback
+      // order: the items in between would have to be recited on some passes
+      // and not others.
+      final List<int> positions =
+          members.map((UserCollectionItemRow r) => r.position).toList()..sort();
+      for (int i = 1; i < positions.length; i++) {
+        if (positions[i] != positions[i - 1] + 1) {
+          throw ArgumentError.value(
+            itemIds,
+            'itemIds',
+            'must be contiguous by position, but positions are $positions',
+          );
+        }
+      }
+
+      final int group = await _user
+          .nextRepeatGroup(collection: id.uuid)
+          .getSingle();
+      for (final UserCollectionItemRow row in members) {
+        await _user.setItemRepeatGroup(
+          group: group,
+          count: repetitions,
+          updatedAt: now,
+          id: row.id,
+          collection: id.uuid,
+        );
+      }
+    });
+  }
+
+  @override
+  Future<void> clearRepeatGroup(UserCollectionId id, int repeatGroup) async {
+    await _user.clearItemsRepeatGroup(
+      updatedAt: toEpochMs(_now()),
+      collection: id.uuid,
+      group: repeatGroup,
     );
-    if (changed == 0) throw CollectionNotFoundException(id);
+  }
+
+  @override
+  Future<void> delete(UserCollectionId id) async {
+    await _user.transaction(() async {
+      // Soft: the row and its items stay, `all()` stops showing it.
+      final int changed = await _user.softDeleteUserCollection(
+        deletedAt: toEpochMs(_now()),
+        id: id.uuid,
+      );
+      if (changed == 0) throw CollectionNotFoundException(id);
+
+      // In-flight state for a deleted collection is meaningless.
+      await _user.deleteProgress(ref: id.canonical);
+
+      // Completions are deliberately left alone. They are historical record,
+      // streaks run across all of them regardless of collection, and deleting
+      // them would retroactively break a streak the user earned.
+    });
   }
 
   Future<void> _requireLiveCollection(UserCollectionId id) async {
@@ -222,6 +329,6 @@ class DriftCollectionRepository implements CollectionRepository {
     countOverride: row.countOverride,
     repeatGroup: row.repeatGroup,
     repeatGroupCount: row.repeatGroupCount,
-    // user_collection_items has no note column; notes are a built-in rubric.
+    note: row.note,
   );
 }

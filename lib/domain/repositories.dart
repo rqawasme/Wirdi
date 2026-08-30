@@ -42,20 +42,50 @@ abstract class CollectionRepository {
 
   Future<void> rename(UserCollectionId id, String name);
 
-  Future<void> addItem(UserCollectionId id, ContentRef ref, {int? count});
+  /// [note] is a rubric shown with the item, mirroring what the content
+  /// pipeline authors for built-ins. It is here so that copying a built-in
+  /// wird into a user collection keeps its per-item notes.
+  Future<void> addItem(
+    UserCollectionId id,
+    ContentRef ref, {
+    int? count,
+    String? note,
+  });
 
   Future<void> removeItem(UserCollectionId id, String itemId);
 
   Future<void> reorder(UserCollectionId id, List<String> itemIdsInOrder);
 
+  /// Groups [itemIds] into a repeat block recited [repetitions] times over.
+  ///
+  /// [itemIds] must be a contiguous run by position, and none of them may
+  /// already belong to a group — a repeat group that is not a contiguous run
+  /// has no coherent playback order. Throws [ArgumentError] otherwise.
+  Future<void> setRepeatGroup(
+    UserCollectionId id,
+    List<String> itemIds,
+    int repetitions,
+  );
+
+  /// Ungroups the items of [repeatGroup]. A no-op if no items carry it.
+  Future<void> clearRepeatGroup(UserCollectionId id, int repeatGroup);
+
   /// Soft delete: sets `deleted_at`. The row and its items stay, and [all]
   /// filters it out.
+  ///
+  /// Progress for the collection is cleared — in-flight state for a deleted
+  /// collection is meaningless. Completions are kept: they are historical
+  /// record, streaks run across all of them regardless of collection, and
+  /// deleting them would retroactively break a streak the user earned.
   Future<void> delete(UserCollectionId id);
 }
 
 /// Everything the user accumulates: progress, completions, reading position
 /// and settings.
 abstract class UserRepository {
+  /// The stored progress, as written. Validate it through
+  /// `ResolvedCollection.resumableFrom` before resuming from it — a bare
+  /// index outlives the content it pointed at.
   Future<WirdProgress?> progress(CollectionId id);
 
   Future<void> saveProgress(WirdProgress progress);
@@ -70,6 +100,9 @@ abstract class UserRepository {
 
   /// Distinct `YYYY-MM-DD` local days on which anything was completed,
   /// ascending. [from] and [to] are inclusive.
+  ///
+  /// Spans every collection, including ones since deleted: their completions
+  /// are kept deliberately, so a `collection_ref` here may not resolve.
   Future<List<String>> completionDates({DateTime? from, DateTime? to});
 
   /// Consecutive days up to today on which anything was completed.

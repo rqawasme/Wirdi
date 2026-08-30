@@ -31,7 +31,8 @@ void main() {
       await user.saveProgress(
         WirdProgress(
           collectionId: builtin,
-          itemIndex: 3,
+          stepIndex: 3,
+          stepRef: const ContentRef.dhikr(1001),
           currentCount: 17,
           updatedAt: now,
         ),
@@ -40,7 +41,8 @@ void main() {
       final WirdProgress? resumed = await user.progress(builtin);
       expect(resumed, isNotNull);
       expect(resumed!.collectionId, builtin);
-      expect(resumed.itemIndex, 3);
+      expect(resumed.stepIndex, 3);
+      expect(resumed.stepRef, const ContentRef.dhikr(1001));
       expect(resumed.currentCount, 17);
       expect(resumed.updatedAt, now);
     });
@@ -49,7 +51,8 @@ void main() {
       await user.saveProgress(
         WirdProgress(
           collectionId: mine,
-          itemIndex: 1,
+          stepIndex: 1,
+          stepRef: const ContentRef.surah(112),
           currentCount: 4,
           updatedAt: now,
         ),
@@ -57,7 +60,8 @@ void main() {
 
       final WirdProgress? resumed = await user.progress(mine);
       expect(resumed!.collectionId, mine);
-      expect(resumed.itemIndex, 1);
+      expect(resumed.stepIndex, 1);
+      expect(resumed.stepRef, const ContentRef.surah(112));
       expect(resumed.currentCount, 4);
     });
 
@@ -65,7 +69,8 @@ void main() {
       await user.saveProgress(
         WirdProgress(
           collectionId: builtin,
-          itemIndex: 3,
+          stepIndex: 3,
+          stepRef: const ContentRef.dhikr(1001),
           currentCount: 17,
           updatedAt: now,
         ),
@@ -73,21 +78,23 @@ void main() {
       await user.saveProgress(
         WirdProgress(
           collectionId: mine,
-          itemIndex: 1,
+          stepIndex: 1,
+          stepRef: const ContentRef.surah(112),
           currentCount: 4,
           updatedAt: now,
         ),
       );
 
-      expect((await user.progress(builtin))!.itemIndex, 3);
-      expect((await user.progress(mine))!.itemIndex, 1);
+      expect((await user.progress(builtin))!.stepIndex, 3);
+      expect((await user.progress(mine))!.stepIndex, 1);
     });
 
     test('saving again overwrites', () async {
       await user.saveProgress(
         WirdProgress(
           collectionId: builtin,
-          itemIndex: 0,
+          stepIndex: 0,
+          stepRef: const ContentRef.dhikr(1001),
           currentCount: 1,
           updatedAt: now,
         ),
@@ -95,7 +102,8 @@ void main() {
       await user.saveProgress(
         WirdProgress(
           collectionId: builtin,
-          itemIndex: 2,
+          stepIndex: 2,
+          stepRef: const ContentRef.ayah(2255),
           currentCount: 9,
           updatedAt: now,
         ),
@@ -108,7 +116,8 @@ void main() {
       await user.saveProgress(
         WirdProgress(
           collectionId: builtin,
-          itemIndex: 2,
+          stepIndex: 2,
+          stepRef: const ContentRef.ayah(2255),
           currentCount: 9,
           updatedAt: now,
         ),

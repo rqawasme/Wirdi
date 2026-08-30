@@ -10,5 +10,6 @@ export 'content.dart';
 export 'content_ref.dart';
 export 'date_key.dart';
 export 'errors.dart';
+export 'playback_step.dart';
 export 'progress.dart';
 export 'repositories.dart';

@@ -1,6 +1,8 @@
 import 'collection_id.dart';
 import 'content.dart';
 import 'content_ref.dart';
+import 'playback_step.dart';
+import 'progress.dart';
 
 /// The kind of a built-in collection, as authored in the content pipeline.
 /// User collections do not have one.
@@ -96,10 +98,15 @@ final class DhikrItem extends CollectionItemEntry {
     required super.position,
     required super.count,
     required this.dhikr,
+    this.source,
     super.note,
   });
 
   final Dhikr dhikr;
+
+  /// The reference `dhikr.sourceId` points at, hydrated during resolution.
+  /// Null when the dhikr cites none.
+  final Source? source;
 
   @override
   ContentRef get ref => ContentRef.dhikr(dhikr.id);
@@ -176,19 +183,24 @@ final class RepeatBlock extends CollectionEntry {
       'RepeatBlock($group x$repeatCount, ${entries.length} items)';
 }
 
-/// A collection with its items resolved against `content.db`, in position
-/// order.
+/// A collection with its items resolved against `content.db`.
+///
+/// Two views of the same data: [entries] is structural, for display and
+/// editing; [steps] is flat, for playback.
 final class ResolvedCollection {
-  const ResolvedCollection({
+  ResolvedCollection({
     required this.collection,
     required this.entries,
     this.unresolved = const <ContentRef>[],
-  });
+  }) : steps = _flatten(entries);
 
   final CollectionSummary collection;
 
-  /// Ordered by `position`.
+  /// Ordered by `position`, with [RepeatBlock]s intact.
   final List<CollectionEntry> entries;
+
+  /// [entries] flattened for playback, repeat blocks expanded pass by pass.
+  final List<PlaybackStep> steps;
 
   /// Items whose content row was not found and were therefore dropped.
   ///
@@ -200,7 +212,61 @@ final class ResolvedCollection {
 
   CollectionId get id => collection.id;
 
+  /// The progress to resume from, or null to start at the beginning.
+  ///
+  /// Returns null when [progress] points outside [steps], or when the step it
+  /// points at no longer holds the content it did when the progress was
+  /// written. A content update or a reorder both invalidate a bare index, and
+  /// silently resuming at the wrong dhikr is worse than losing a partial
+  /// session.
+  WirdProgress? resumableFrom(WirdProgress? progress) {
+    if (progress == null) return null;
+    if (progress.stepIndex < 0 || progress.stepIndex >= steps.length) {
+      return null;
+    }
+    if (steps[progress.stepIndex].ref != progress.stepRef) return null;
+    return progress;
+  }
+
+  static List<PlaybackStep> _flatten(List<CollectionEntry> entries) {
+    final List<PlaybackStep> steps = <PlaybackStep>[];
+
+    void add(CollectionItemEntry item, int repetition, int total) {
+      steps.add(
+        PlaybackStep(
+          index: steps.length,
+          ref: item.ref,
+          count: item.count,
+          entryId: item.entryId,
+          repetition: repetition,
+          repetitionsTotal: total,
+        ),
+      );
+    }
+
+    for (final CollectionEntry entry in entries) {
+      switch (entry) {
+        case CollectionItemEntry():
+          add(entry, 1, 1);
+        case RepeatBlock(
+          :final int repeatCount,
+          :final List<CollectionItemEntry> entries,
+        ):
+          // Pass by pass, not item by item: the block is recited whole each
+          // time round.
+          for (int pass = 1; pass <= repeatCount; pass++) {
+            for (final CollectionItemEntry item in entries) {
+              add(item, pass, repeatCount);
+            }
+          }
+      }
+    }
+
+    return List<PlaybackStep>.unmodifiable(steps);
+  }
+
   @override
   String toString() =>
-      'ResolvedCollection(${collection.id.canonical}, ${entries.length} entries)';
+      'ResolvedCollection(${collection.id.canonical}, '
+      '${entries.length} entries, ${steps.length} steps)';
 }
