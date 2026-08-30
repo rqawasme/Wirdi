@@ -376,6 +376,39 @@ void main() {
       );
     });
 
+    test(
+      'reorder rejects a list that is not a permutation of the items',
+      () async {
+        final UserCollectionId id = await collections.create('Mine');
+        await collections.addItem(id, const ContentRef.dhikr(1001));
+        await collections.addItem(id, const ContentRef.dhikr(1002));
+
+        final List<String> ids = (await collections.resolve(id)).entries
+            .cast<CollectionItemEntry>()
+            .map((CollectionItemEntry e) => e.entryId)
+            .toList();
+
+        // Too few, duplicated, and an id from nowhere.
+        for (final List<String> bad in <List<String>>[
+          <String>[ids.first],
+          <String>[ids.first, ids.first],
+          <String>[ids.first, ids.last, testUuid(99)],
+        ]) {
+          expect(
+            () => collections.reorder(id, bad),
+            throwsA(isA<ArgumentError>()),
+            reason: '$bad',
+          );
+        }
+
+        // And nothing moved.
+        expect(describeAll(await collections.resolve(id)), <String>[
+          'dhikr:1001 x1',
+          'dhikr:1002 x33',
+        ]);
+      },
+    );
+
     test('adding to a deleted collection throws', () async {
       final UserCollectionId id = await collections.create('Mine');
       await collections.delete(id);
@@ -429,6 +462,24 @@ void main() {
       expect(
         () => collections.resolve(id),
         throwsA(isA<CollectionNotFoundException>()),
+      );
+    });
+  });
+
+  group('user.db integrity', () {
+    test('an item cannot reference a collection that does not exist', () async {
+      // PRAGMA foreign_keys is on, so a stray item row is rejected outright
+      // rather than resolving to nothing later.
+      expect(
+        () => insertUserItem(
+          dbs.user,
+          id: testUuid(90),
+          collectionId: testUuid(91),
+          position: 1,
+          itemType: 'dhikr',
+          itemId: 1001,
+        ),
+        throwsA(isA<Exception>()),
       );
     });
   });

@@ -154,6 +154,27 @@ class DriftCollectionRepository implements CollectionRepository {
   Future<void> reorder(UserCollectionId id, List<String> itemIdsInOrder) async {
     final int now = toEpochMs(_now());
     await _user.transaction(() async {
+      final List<UserCollectionItemRow> current = await _user
+          .itemsForUserCollection(collection: id.uuid)
+          .get();
+      final Set<String> existing = <String>{
+        for (final UserCollectionItemRow row in current) row.id,
+      };
+
+      // A partial or padded list would leave items sharing a position, and
+      // position is the only ordering there is. Reject it rather than write an
+      // order nobody asked for.
+      if (itemIdsInOrder.length != existing.length ||
+          itemIdsInOrder.toSet().length != itemIdsInOrder.length ||
+          !existing.containsAll(itemIdsInOrder)) {
+        throw ArgumentError.value(
+          itemIdsInOrder,
+          'itemIdsInOrder',
+          'must list every item of ${id.canonical} exactly once '
+              '(${existing.length} items)',
+        );
+      }
+
       for (int i = 0; i < itemIdsInOrder.length; i++) {
         await _user.setItemPosition(
           position: i + 1,
