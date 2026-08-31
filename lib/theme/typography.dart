@@ -146,6 +146,11 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
   /// 15 x 0.87 = 13.
   static const double dhikrCaptionRatio = 0.87;
 
+  /// The wird player's remaining-count readout. Chrome, and the largest thing
+  /// on that screen by a distance: it is what the eye returns to between
+  /// repetitions without reading.
+  static const double counterSize = 44;
+
   static const double sectionHeaderSize = 17;
   static const double navLabelSize = 14;
   static const double captionSize = 12;
@@ -265,6 +270,19 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
   // -- Chrome ----------------------------------------------------------------
   //
   // Fixed. The two user multipliers do not reach any of these.
+
+  /// The remaining count in the wird player.
+  ///
+  /// Tabular figures, which is the whole reason this is not just a large
+  /// [sectionHeader]. Inter's proportional `1` is narrower than its `7`, so a
+  /// count changing on every tap would shift sideways as it went — the exact
+  /// movement the zero-animation rule on the counter exists to prevent, and
+  /// far more visible at 44px than anywhere else in the app.
+  TextStyle get counter => _latin(
+    size: counterSize,
+    weight: FontWeight.w500,
+    lineHeight: 1.1,
+  ).copyWith(fontFeatures: const <FontFeature>[FontFeature.tabularFigures()]);
 
   TextStyle get sectionHeader => _latin(
     size: sectionHeaderSize,
