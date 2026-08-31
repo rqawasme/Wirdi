@@ -1,0 +1,12 @@
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          # Named queries with more than a couple of variables read far better
+          # at the call site with named arguments.
+          named_parameters: true
+          # `SELECT *` on a table returns that table's row class rather than a
+          # freshly generated one.
+          data_class_to_companions: false
+          skip_verification_code: false
