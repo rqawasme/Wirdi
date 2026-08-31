@@ -168,8 +168,12 @@ class _SampleBlock extends StatelessWidget {
             horizontal: WirdiMetrics.readingColumnPadding,
             vertical: WirdiMetrics.space5,
           ),
+          // Stretch, not start: a Directionality only sets the direction of
+          // the paragraph inside it. If the box it lays out in is only as wide
+          // as the glyphs, right-to-left text still ends up parked against the
+          // left margin, correctly ordered and in the wrong place.
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               _SampleHeader(sample: resolved.sample),
               for (final Ayah ayah in resolved.ayahs) ...<Widget>[

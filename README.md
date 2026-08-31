@@ -209,3 +209,13 @@ known-hard Uthmani cases — elongation, imala, ishmam, the saad-seen variants,
 waqf marks in sequence, the sajdah mark — on screen at any size, in either
 Arabic face, in gold or in cedar ink, read out of the real database rather than
 from literals. It exists to answer two questions that a spec cannot.
+
+`test/render_samples.dart` renders that screen to PNGs under `build/render/`
+with the real fonts loaded. It is not run by `flutter test` — that only picks
+up `*_test.dart` — and it is not a substitute for looking at a phone. It is for
+the class of problem that is obvious in a picture and invisible in a widget
+test:
+
+```bash
+flutter test test/render_samples.dart
+```
