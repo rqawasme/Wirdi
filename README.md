@@ -17,13 +17,14 @@ layer** that reads it. There is no UI yet.
 - **Hand-authored JSON** — adhkar, collections and hadith references, written and
   maintained by hand under `content/sources/`, validated against JSON Schema.
 - **Quran data** — Uthmani text, the Saheeh International translation, transliteration and
-  the juz/hizb/sajdah metadata, downloaded from
-  [QUL](https://qul.tarteel.ai/) and normalised by an import script.
+  the juz/hizb/sajdah metadata, imported from [QUL](https://qul.tarteel.ai/) and
+  normalised by `import_quran.py`.
 
-The Quran source data is **not committed**. Quran text and translations are
-licensed works and are not redistributed through this repository, so each person
-who builds the database downloads them from QUL themselves. See
-[`content/sources/quran/README.md`](content/sources/quran/README.md).
+The normalised Quran JSON — `content/sources/quran/{surahs,ayahs}.json` — is
+committed, so a fresh clone builds the real database with nothing to fetch first.
+Only the raw QUL exports it was generated from are left out, and only because they
+are bulky and needed just to regenerate. See
+[`content/sources/quran/README.md`](content/sources/quran/README.md) for that.
 
 Every id in the database is either computed by a fixed rule or written by hand in
 the source files. Nothing autoincrements. The database is rebuilt from source
@@ -35,7 +36,6 @@ between builds would silently repoint saved content at something else.
 ```bash
 pip install -r content/requirements.txt
 
-python3 content/scripts/import_quran.py     # downloaded QUL files -> normalised JSON
 python3 content/scripts/validate_json.py    # JSON Schema check of the authored files
 python3 content/scripts/build_content.py    # -> content/build/content.db
 python3 content/scripts/verify_content.py   # invariant checks, non-zero exit on failure
@@ -44,8 +44,8 @@ python3 content/scripts/verify_content.py   # invariant checks, non-zero exit on
 `build_content.py` runs the validator itself and aborts if it fails. The database
 is always built from scratch, never incrementally.
 
-You can build and inspect the database before downloading any Quran data — the
-Quran tables will be empty and `verify_content.py` will fail until you import.
+`import_quran.py` is not part of a normal build. It regenerates the committed
+Quran JSON from QUL exports, and is only needed when refreshing that data.
 
 [`content/README.md`](content/README.md) documents the authoring formats, with a
 worked example.

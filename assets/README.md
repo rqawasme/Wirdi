@@ -1,8 +1,8 @@
 # Bundled assets
 
-`content.db` belongs here, and is **not committed**. It carries Quran text and a
-translation, which are licensed works this repository does not redistribute —
-the same reason `content/sources/quran/downloads/` is not committed.
+`content.db` belongs here, and is **not committed**. It is a build artifact:
+several megabytes, reproducible from `content/sources/` at any time, and stale the
+moment the sources change.
 
 Build it and copy it in:
 

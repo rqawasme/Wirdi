@@ -4,8 +4,8 @@
 #   python3 content/scripts/build_content.py   # -> content/build/content.db
 #   tool/sync_content_asset.sh                 # -> assets/content.db
 #
-# assets/content.db is gitignored: it carries licensed Quran text that this
-# repository does not redistribute.
+# assets/content.db is gitignored: it is a build artifact, reproducible from
+# content/sources/ at any time.
 set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
