@@ -4,6 +4,8 @@ analyzer:
   exclude:
     - "**/*.g.dart"
     - build/**
+    - android/**
+    - ios/**
   language:
     strict-casts: true
     strict-inference: true
