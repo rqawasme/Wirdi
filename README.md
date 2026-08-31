@@ -6,9 +6,11 @@ Daily islamic habits. Reminders. Counters. Dhikr etc based on famous litanies
 Wirdi is a Flutter app for daily Islamic practice: wird collections, dhikr
 collections and Quran surahs, with counters and reminders.
 
-This repository holds two things: the **content pipeline** — the Python that turns
-source data into the SQLite database the app bundles — and the Flutter **data
-layer** that reads it. There is no UI yet.
+This repository holds the **content pipeline** — the Python that turns source
+data into the SQLite database the app bundles — and the Flutter app that reads
+it: the data layer, the theme, and (for now) a single throwaway screen for
+checking how Arabic renders on a real device. None of the real features are
+built yet.
 
 ## The content pipeline
 
@@ -122,3 +124,88 @@ They never read the bundled asset. To build and bundle the real one:
 python3 content/scripts/build_content.py   # -> content/build/content.db
 tool/sync_content_asset.sh                 # -> assets/content.db (gitignored)
 ```
+
+## The app
+
+```
+lib/
+  main.dart               opens both databases, then runs the app
+  wirdi_app.dart          MaterialApp, both themes, the settings-driven type scale
+  providers/              riverpod: the databases, the repositories, settings
+  theme/                  colour, shape, motion, type
+  widgets/                the voussoir stripe, the failure screen
+  dev/                    throwaway — deleted before release
+```
+
+### Running it on a device
+
+```bash
+python3 content/scripts/build_content.py   # -> content/build/content.db
+tool/sync_content_asset.sh                 # -> assets/content.db (gitignored)
+
+flutter pub get
+flutter run                                # iOS or Android; there is no web or desktop target
+```
+
+`assets/content.db` is a build artifact and is not committed, but `pubspec.yaml`
+names it explicitly. A build without it fails with `unable to locate asset`
+rather than producing an app with no content in it.
+
+### The theme
+
+Both themes are written out by hand in `lib/theme/color_schemes.dart`. Neither
+is seeded: `ColorScheme.fromSeed` derives every role from one hue, which drags
+the limestone surfaces toward brick and throws away the point of the palette.
+
+Depth is tonal — `surface`, `surfaceContainer`, `surfaceContainerHigh` — plus
+hairline outlines. Elevation is zero everywhere and `shadowColor` is
+transparent in both themes, so nothing casts a shadow even if something later
+takes an elevation. Buttons are squared at 8dp, overriding Material's stadium
+default.
+
+`tertiary` is gold and is reserved for Quran text. Nothing in
+`lib/theme/wirdi_theme.dart` maps it onto a component. Gold appearing anywhere
+in the UI means a widget reached for the wrong role — that is the signal, and
+it is deliberate that Material components rarely pick `tertiary` on their own.
+
+### Type
+
+Arabic and Latin have two parallel definitions in `lib/theme/typography.dart`;
+a single `TextTheme` cannot express both. Three families are bundled as local
+assets and none are fetched at runtime — the app works with the radio off, and
+Quran text rendered in a substituted font is not the same text.
+
+| | Face | Nominal | Line height |
+|---|---|---:|---:|
+| Quran verse | Amiri Quran | 24 | 2.0 |
+| Dhikr | Noto Naskh Arabic | 20 | 2.0 |
+| Translation | Inter | 15 | 1.6 |
+| Dhikr caption | Inter | 13 | 1.5 |
+| Section header | Inter | 17 | 1.4 |
+| Nav and labels | Inter | 14 | 1.4 |
+| Caption and meta | Inter | 12 | 1.4 |
+
+Every size there is *nominal*. Arabic faces render at nominal x
+`ArabicFace.opticalMultiplier`, because a font's letterforms fill as much of its
+em as its designer decided they should, and Amiri Quran — which reserves room
+for vocalisation Inter never has to house — fills much less of it. The factor is
+per face, and it is derived rather than guessed; see the comment on
+`ArabicFace`.
+
+The 2.0 Arabic line height is required, not stylistic: voweled text collides
+below it.
+
+Two user multipliers, persisted through `UserRepository` settings, scale the
+reading text and nothing else. `arabicScale` drives the Quran verse and the
+dhikr with it; `translationScale` drives the translation and the dhikr caption.
+Chrome follows the OS accessibility text scale alone. Multipliers are stored,
+never pixel sizes — a stored pixel size freezes a choice against a type scale
+that will move.
+
+### The dev screen
+
+`lib/dev/` is a rendering harness and is deleted before release. It puts the
+known-hard Uthmani cases — elongation, imala, ishmam, the saad-seen variants,
+waqf marks in sequence, the sajdah mark — on screen at any size, in either
+Arabic face, in gold or in cedar ink, read out of the real database rather than
+from literals. It exists to answer two questions that a spec cannot.
