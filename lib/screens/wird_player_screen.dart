@@ -165,13 +165,18 @@ class _WirdPlayerScreenState extends ConsumerState<WirdPlayerScreen> {
 }
 
 /// Everything below the app bar, rebuilt on every count.
-class _Player extends ConsumerWidget {
+///
+/// The rebuild reaches the step's text, which sounds wasteful on a counting
+/// path and is not: the [TextSpan] compares equal across it, so the paragraph
+/// is neither re-shaped nor re-laid-out. What actually changes is the count,
+/// the stripe, and whether two buttons are enabled.
+class _Player extends StatelessWidget {
   const _Player({required this.player});
 
   final WirdPlayer player;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final CollectionItemEntry? item = player.currentItem;
 
     return Scaffold(
@@ -208,6 +213,17 @@ class _Player extends ConsumerWidget {
               children: <Widget>[
                 _CountHeader(player: player),
                 Expanded(
+                  // Keyed, so each step gets a fresh subtree: without it the
+                  // scroll position and an opened benefits panel carry over
+                  // from the step before, and the next dhikr arrives already
+                  // scrolled half way down. A surah is keyed on the pass as
+                  // well — each "done" starts a reading, and a reading starts
+                  // at the top.
+                  key: ValueKey<String>(
+                    item is SurahItem
+                        ? 'surah-${player.stepIndex}-${player.currentCount}'
+                        : 'step-${player.stepIndex}',
+                  ),
                   child: _StepContent(player: player, item: item),
                 ),
                 _Controls(player: player, item: item),
@@ -255,11 +271,7 @@ class _CountHeader extends StatelessWidget {
     final Color quiet = theme.colorScheme.onSurfaceVariant;
     final PlaybackStep step = player.step;
 
-    final String label = player.finished
-        ? 'done'
-        : step.count > 1
-        ? 'left of ${step.count}'
-        : 'left';
+    final String label = step.count > 1 ? 'left of ${step.count}' : 'left';
 
     return Semantics(
       container: true,
@@ -276,26 +288,42 @@ class _CountHeader extends StatelessWidget {
             WirdiMetrics.readingColumnPadding,
             WirdiMetrics.space3,
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                '${player.remaining}',
-                style: type.counter.copyWith(color: theme.colorScheme.primary),
-              ),
-              const SizedBox(width: WirdiMetrics.space3),
-              Expanded(
-                child: Text(
-                  label,
-                  style: theme.textTheme.bodySmall?.copyWith(color: quiet),
+          child: player.finished
+              // The mark, for the beat the screen holds: the stripe solid and
+              // this. The count line would say "0 done" otherwise, which reads
+              // as nothing having been done at all.
+              ? Text(
+                  'Wird complete',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: theme.colorScheme.primary,
+                  ),
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      '${player.remaining}',
+                      style: type.counter.copyWith(
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(width: WirdiMetrics.space3),
+                    Expanded(
+                      child: Text(
+                        label,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: quiet,
+                        ),
+                      ),
+                    ),
+                    if (step.isInRepeatBlock)
+                      _Plate(
+                        label:
+                            'Round ${step.repetition} of '
+                            '${step.repetitionsTotal}',
+                      ),
+                  ],
                 ),
-              ),
-              if (step.isInRepeatBlock)
-                _Plate(
-                  label: 'Round ${step.repetition} of ${step.repetitionsTotal}',
-                ),
-            ],
-          ),
         ),
       ),
     );

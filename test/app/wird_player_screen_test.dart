@@ -44,8 +44,12 @@ void main() {
 
   /// Opens the player at [stepIndex] by seeding the progress row, which is the
   /// same door a resume comes through.
-  Future<void> openAt(WidgetTester tester, int stepIndex) async {
-    tester.view.physicalSize = const Size(400, 1400);
+  Future<void> openAt(
+    WidgetTester tester,
+    int stepIndex, {
+    double height = 1400,
+  }) async {
+    tester.view.physicalSize = Size(400, height);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
@@ -238,6 +242,29 @@ void main() {
     });
   });
 
+  group('moving between steps', () {
+    testWidgets('a new step starts at the top of its own scroll', (
+      WidgetTester tester,
+    ) async {
+      // A short screen, so the verse overflows and there is something to
+      // scroll.
+      await openAt(tester, 2, height: 380);
+      await tester.drag(
+        find.byType(SingleChildScrollView),
+        const Offset(0, -120),
+      );
+      await tester.pump();
+      expect(_offsetOf(tester), greaterThan(0));
+
+      await tester.tap(find.byIcon(Icons.skip_next_outlined));
+      await settle(tester);
+
+      // A fresh subtree for the new step, so it does not arrive half way down
+      // the page the last one was left on.
+      expect(_offsetOf(tester), 0);
+    });
+  });
+
   group('the stripe', () {
     testWidgets('is one segment for a step said once', (
       WidgetTester tester,
@@ -309,7 +336,7 @@ void main() {
       // The quiet mark: the stripe solid and the screen still there. Nothing
       // is animating — the hold is the whole of it.
       await tester.pump();
-      expect(find.text('0'), findsOneWidget);
+      expect(find.text('Wird complete'), findsOneWidget);
       expect(_stripe(tester).value, 1);
 
       await tester.pump(const WirdiMotion.standardTiming().completion);
@@ -338,6 +365,14 @@ void main() {
       expect(await dbs.userRepository().progress(mixed), isNull);
     });
   });
+}
+
+/// Where the content area is scrolled to.
+double _offsetOf(WidgetTester tester) {
+  return tester
+      .state<ScrollableState>(find.byType(Scrollable).last)
+      .position
+      .pixels;
 }
 
 /// The progress stripe under the app bar. There is one, and it is the counter's.
