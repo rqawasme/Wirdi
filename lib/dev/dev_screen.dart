@@ -8,6 +8,7 @@ import '../domain/content.dart';
 import '../providers/settings.dart';
 import '../theme/theme.dart';
 import '../widgets/failure_screen.dart';
+import '../widgets/translation_text.dart';
 import '../widgets/voussoir_stripe.dart';
 import 'dev_controls.dart';
 import 'dev_samples.dart';
@@ -281,7 +282,11 @@ class _SampleBlock extends StatelessWidget {
                   child: Text(ayah.textUthmani, style: arabic),
                 ),
                 const SizedBox(height: WirdiMetrics.space3),
-                _Translation(text: ayah.translation, settings: settings),
+                TranslationText(
+                  ayah.translation,
+                  style: type.translation.copyWith(color: scheme.onSurface),
+                  dimBracketedText: settings.dimBrackets,
+                ),
                 if (ayah != resolved.ayahs.last)
                   const SizedBox(
                     height:
@@ -320,60 +325,6 @@ class _SampleHeader extends StatelessWidget {
         ),
       ],
     );
-  }
-}
-
-/// The translation, with the Saheeh International bracket convention either
-/// dimmed or left plain.
-///
-/// Just over half of the 6,236 translations carry at least one bracketed span:
-/// they are the interpolated words, the ones not in the Arabic. Whether that
-/// should be visible in the typography at all is one of the things this screen
-/// is for.
-class _Translation extends StatelessWidget {
-  const _Translation({required this.text, required this.settings});
-
-  final String text;
-  final WirdiSettings settings;
-
-  static final RegExp _bracketed = RegExp(r'\[[^\]]*\]');
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final WirdiTypography type = theme.extension<WirdiTypography>()!;
-    final TextStyle style = type.translation.copyWith(
-      color: theme.colorScheme.onSurface,
-    );
-
-    if (!settings.dimBrackets) {
-      return Text(text, style: style);
-    }
-    return Text.rich(
-      TextSpan(children: _spans(theme.colorScheme.onSurfaceVariant)),
-      style: style,
-    );
-  }
-
-  List<InlineSpan> _spans(Color dim) {
-    final List<InlineSpan> spans = <InlineSpan>[];
-    int cursor = 0;
-    for (final RegExpMatch match in _bracketed.allMatches(text)) {
-      if (match.start > cursor) {
-        spans.add(TextSpan(text: text.substring(cursor, match.start)));
-      }
-      spans.add(
-        TextSpan(
-          text: match[0],
-          style: TextStyle(color: dim),
-        ),
-      );
-      cursor = match.end;
-    }
-    if (cursor < text.length) {
-      spans.add(TextSpan(text: text.substring(cursor)));
-    }
-    return spans;
   }
 }
 

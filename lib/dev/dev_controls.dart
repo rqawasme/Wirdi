@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/settings.dart';
 import '../theme/theme.dart';
+import '../widgets/text_size_slider.dart';
 
 /// The dev screen's controls, pinned below the samples.
 ///
@@ -79,7 +80,7 @@ class _DevControlPanelState extends ConsumerState<DevControlPanel> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      _SizeSlider(
+                      TextSizeSlider(
                         label: 'Arabic',
                         // The slider shows pixels because that is what you are
                         // judging; what gets stored is the multiplier, so the
@@ -91,7 +92,7 @@ class _DevControlPanelState extends ConsumerState<DevControlPanel> {
                         onChanged: (double scale, {required bool commit}) =>
                             _controller.setArabicScale(scale, commit: commit),
                       ),
-                      _SizeSlider(
+                      TextSizeSlider(
                         label: 'Translation',
                         nominalSize: WirdiTypography.translationSize,
                         scale: settings.translationScale,
@@ -104,7 +105,7 @@ class _DevControlPanelState extends ConsumerState<DevControlPanel> {
                             ),
                       ),
                       const SizedBox(height: WirdiMetrics.space2),
-                      _Choice<ThemeMode>(
+                      SettingChoice<ThemeMode>(
                         label: 'Theme',
                         value: settings.themeMode,
                         options: const <ThemeMode, String>{
@@ -113,7 +114,8 @@ class _DevControlPanelState extends ConsumerState<DevControlPanel> {
                         },
                         onChanged: _controller.setThemeMode,
                       ),
-                      _Choice<bool>(
+                      const SizedBox(height: WirdiMetrics.space3),
+                      SettingChoice<bool>(
                         label: 'Quran colour',
                         value: settings.quranInGold,
                         options: const <bool, String>{
@@ -122,7 +124,8 @@ class _DevControlPanelState extends ConsumerState<DevControlPanel> {
                         },
                         onChanged: _controller.setQuranInGold,
                       ),
-                      _Choice<ArabicFace>(
+                      const SizedBox(height: WirdiMetrics.space3),
+                      SettingChoice<ArabicFace>(
                         label: 'Quran face',
                         value: settings.arabicFace,
                         options: const <ArabicFace, String>{
@@ -131,7 +134,8 @@ class _DevControlPanelState extends ConsumerState<DevControlPanel> {
                         },
                         onChanged: _controller.setArabicFace,
                       ),
-                      _Choice<bool>(
+                      const SizedBox(height: WirdiMetrics.space3),
+                      SettingChoice<bool>(
                         label: 'Bracketed words',
                         value: settings.dimBrackets,
                         options: const <bool, String>{
@@ -146,109 +150,6 @@ class _DevControlPanelState extends ConsumerState<DevControlPanel> {
               ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-/// A size control that reads in pixels and stores a multiplier.
-class _SizeSlider extends StatelessWidget {
-  const _SizeSlider({
-    required this.label,
-    required this.nominalSize,
-    required this.scale,
-    required this.min,
-    required this.max,
-    required this.onChanged,
-  });
-
-  final String label;
-
-  /// The size the multiplier is relative to. 1.0 renders at this.
-  final double nominalSize;
-
-  final double scale;
-  final double min;
-  final double max;
-  final void Function(double scale, {required bool commit}) onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final double pixels = (scale * nominalSize).clamp(min, max);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Row(
-          children: <Widget>[
-            Text(label, style: theme.textTheme.labelLarge),
-            const Spacer(),
-            Text(
-              '${pixels.round()} px  ·  ${scale.toStringAsFixed(2)}x',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-        Slider(
-          value: pixels,
-          min: min,
-          max: max,
-          divisions: (max - min).round(),
-          label: '${pixels.round()} px',
-          // Applied on every frame so the text under your thumb keeps up;
-          // written to the database once, on release.
-          onChanged: (double v) => onChanged(v / nominalSize, commit: false),
-          onChangeEnd: (double v) => onChanged(v / nominalSize, commit: true),
-        ),
-      ],
-    );
-  }
-}
-
-/// A labelled segmented choice.
-class _Choice<T> extends StatelessWidget {
-  const _Choice({
-    required this.label,
-    required this.value,
-    required this.options,
-    required this.onChanged,
-  });
-
-  final String label;
-  final T value;
-  final Map<T, String> options;
-  final void Function(T) onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(bottom: WirdiMetrics.space3),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(label, style: theme.textTheme.labelLarge),
-          const SizedBox(height: WirdiMetrics.space2),
-          SizedBox(
-            width: double.infinity,
-            child: SegmentedButton<T>(
-              showSelectedIcon: false,
-              segments: <ButtonSegment<T>>[
-                for (final MapEntry<T, String> option in options.entries)
-                  ButtonSegment<T>(
-                    value: option.key,
-                    label: Text(option.value),
-                  ),
-              ],
-              selected: <T>{value},
-              onSelectionChanged: (Set<T> selection) =>
-                  onChanged(selection.first),
-            ),
-          ),
-        ],
       ),
     );
   }
