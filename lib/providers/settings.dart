@@ -14,6 +14,7 @@ abstract final class SettingKeys {
   static const String arabicScale = 'text.arabic_scale';
   static const String translationScale = 'text.translation_scale';
   static const String themeMode = 'theme.mode';
+  static const String showTranslation = 'text.show_translation';
 
   static const String devQuranInGold = 'dev.quran_in_gold';
   static const String devArabicFace = 'dev.arabic_face';
@@ -30,6 +31,7 @@ final class WirdiSettings {
     this.arabicScale = 1,
     this.translationScale = 1,
     this.themeMode = ThemeMode.light,
+    this.showTranslation = true,
     this.quranInGold = false,
     this.arabicFace = ArabicFace.notoNaskh,
     this.dimBrackets = true,
@@ -43,6 +45,12 @@ final class WirdiSettings {
   final double translationScale;
 
   final ThemeMode themeMode;
+
+  /// Whether the translation is shown under each verse.
+  ///
+  /// Off is a real reading mode, not a way to save space: somebody reciting
+  /// from memory or reading for the Arabic wants the page uninterrupted.
+  final bool showTranslation;
 
   /// Dev screen: Quran text in `tertiary` gold, or in `onSurface` cedar ink.
   ///
@@ -67,6 +75,7 @@ final class WirdiSettings {
     double? arabicScale,
     double? translationScale,
     ThemeMode? themeMode,
+    bool? showTranslation,
     bool? quranInGold,
     ArabicFace? arabicFace,
     bool? dimBrackets,
@@ -75,6 +84,7 @@ final class WirdiSettings {
       arabicScale: arabicScale ?? this.arabicScale,
       translationScale: translationScale ?? this.translationScale,
       themeMode: themeMode ?? this.themeMode,
+      showTranslation: showTranslation ?? this.showTranslation,
       quranInGold: quranInGold ?? this.quranInGold,
       arabicFace: arabicFace ?? this.arabicFace,
       dimBrackets: dimBrackets ?? this.dimBrackets,
@@ -107,6 +117,9 @@ class SettingsController extends AsyncNotifier<WirdiSettings> {
       themeMode:
           _themeMode(await repository.setting(SettingKeys.themeMode)) ??
           defaults.themeMode,
+      showTranslation:
+          _bool(await repository.setting(SettingKeys.showTranslation)) ??
+          defaults.showTranslation,
       quranInGold:
           _bool(await repository.setting(SettingKeys.devQuranInGold)) ??
           defaults.quranInGold,
@@ -142,6 +155,14 @@ class SettingsController extends AsyncNotifier<WirdiSettings> {
       SettingKeys.themeMode,
       mode.name,
       (WirdiSettings s) => s.copyWith(themeMode: mode),
+    );
+  }
+
+  Future<void> setShowTranslation(bool value) {
+    return _set(
+      SettingKeys.showTranslation,
+      value.toString(),
+      (WirdiSettings s) => s.copyWith(showTranslation: value),
     );
   }
 
