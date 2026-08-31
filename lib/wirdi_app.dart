@@ -51,9 +51,9 @@ class WirdiApp extends ConsumerWidget {
       themeMode: resolved.themeMode,
       // A plain Navigator, no routing package — see Routes. There is no
       // loading gate: the theme falls back to the default typography for the
-      // one frame the settings read takes, and the surah list shows its own
-      // progress while the 114 rows arrive.
-      initialRoute: Routes.surahList,
+      // one frame the settings read takes, and the collections list shows its
+      // own progress while the rows arrive.
+      initialRoute: Routes.collections,
       onGenerateRoute: WirdiRouter.onGenerateRoute,
     );
   }
