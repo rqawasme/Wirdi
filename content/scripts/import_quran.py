@@ -706,6 +706,18 @@ def build_encoding_report(
     }
     unlisted = by_block.get("Other")
 
+    # What this report can say is which codepoints the text uses. What it
+    # cannot say is whether a given font draws them: "standard Unicode" is a
+    # statement about the encoding, not a promise that any particular face has
+    # the glyphs. Amiri Quran is standard-Unicode-compatible and still has no
+    # glyph for U+065E, which this text uses 1,807 times. So the conclusion
+    # stops at the encoding and points at the check that does know.
+    coverage_note = (
+        "Whether a bundled font actually has a glyph for each codepoint below is a "
+        "separate question, and not one this script can answer. "
+        "`tool/check_font_coverage.py` answers it against the built database."
+    )
+
     if pua:
         pua_total = sum(sum(block.values()) for block in pua.values())
         pua_distinct = sum(len(b) for b in pua.values())
@@ -713,18 +725,22 @@ def build_encoding_report(
             f"The Uthmani text is a **font-specific glyph encoding**: "
             f"{pua_distinct} distinct codepoint{'' if pua_distinct == 1 else 's'} "
             f"({pua_total:,} occurrences) fall in the Unicode Private Use Area, "
-            f"so it renders only with the matching QUL font and **not** with Amiri Quran."
+            f"so it renders only with the matching QUL font and with no general-purpose "
+            f"Arabic face at all."
         )
     elif presentation:
         conclusion = (
             "The Uthmani text is standard Unicode but uses Arabic Presentation Forms "
-            "(pre-shaped glyphs) rather than base Arabic letters; Amiri Quran will render "
-            "it, though shaping is baked in rather than done by the text engine."
+            "(pre-shaped glyphs) rather than base Arabic letters, so shaping is baked "
+            "into the text rather than done by the text engine.\n\n"
+            + coverage_note
         )
     else:
         conclusion = (
             "The Uthmani text is **standard Unicode Arabic** with no Private Use Area "
-            "codepoints, so Amiri Quran can render it directly."
+            "codepoints and no pre-shaped presentation forms, so any Arabic face that "
+            "covers these codepoints can render it and the text engine does the "
+            "shaping.\n\n" + coverage_note
         )
 
     total_chars = sum(counts.values())

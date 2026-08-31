@@ -7,7 +7,9 @@ each occurs. It contains no Quranic text.
 
 ## Conclusion
 
-The Uthmani text is **standard Unicode Arabic** with no Private Use Area codepoints, so Amiri Quran can render it directly.
+The Uthmani text is **standard Unicode Arabic** with no Private Use Area codepoints and no pre-shaped presentation forms, so any Arabic face that covers these codepoints can render it and the text engine does the shaping.
+
+Whether a bundled font actually has a glyph for each codepoint below is a separate question, and not one this script can answer. `tool/check_font_coverage.py` answers it against the built database.
 
 ## Summary
 

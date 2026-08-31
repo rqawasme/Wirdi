@@ -43,6 +43,12 @@ jobs:
       - name: Check schema parity
         run: python3 tool/check_schema_parity.py
 
+      # A font missing a codepoint draws an empty box, or quietly borrows the
+      # glyph from another face mid-word. Neither fails a build on its own, so
+      # this is the step that does.
+      - name: Check font coverage
+        run: python3 tool/check_font_coverage.py
+
       # pubspec.yaml names assets/content.db explicitly, so the asset has to
       # exist before anything builds an asset bundle — which `flutter test`
       # does. It is gitignored, being a build artifact of the step above.
