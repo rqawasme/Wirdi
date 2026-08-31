@@ -141,32 +141,37 @@ class _CollectionRow extends ConsumerWidget {
             vertical: WirdiMetrics.space4,
           ),
           child: ExcludeSemantics(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(listing.name, style: theme.textTheme.titleMedium),
-                      const SizedBox(height: WirdiMetrics.space2),
-                      _Meta(listing: listing, items: items, colour: quiet),
-                    ],
-                  ),
-                ),
-                if (nameArabic != null) ...<Widget>[
-                  const SizedBox(width: WirdiMetrics.space4),
-                  Flexible(
-                    child: Directionality(
-                      textDirection: TextDirection.rtl,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
                       child: Text(
-                        nameArabic,
-                        style: type.arabicTitle,
-                        locale: const Locale('ar'),
+                        listing.name,
+                        style: theme.textTheme.titleMedium,
                       ),
                     ),
-                  ),
-                ],
+                    if (nameArabic != null) ...<Widget>[
+                      const SizedBox(width: WirdiMetrics.space4),
+                      Flexible(
+                        child: Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: Text(
+                            nameArabic,
+                            style: type.arabicTitle,
+                            locale: const Locale('ar'),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: WirdiMetrics.space2),
+                // On its own line under both names, so it has the width to say
+                // what it has to say however long the collection is called.
+                _Meta(listing: listing, items: items, colour: quiet),
               ],
             ),
           ),
@@ -205,18 +210,29 @@ class _Meta extends StatelessWidget {
       context,
     ).textTheme.bodySmall?.copyWith(color: colour);
 
-    return Row(
-      children: <Widget>[
-        Text(items, style: style),
-        if (listing.completedToday) ...<Widget>[
-          Text(' · ', style: style),
-          Icon(Icons.check, size: WirdiMetrics.space4, color: colour),
-          const SizedBox(width: WirdiMetrics.space1),
-          Text('Done today', style: style),
-        ] else if (listing.inProgress) ...<Widget>[
-          Text(' · Part-way through', style: style),
+    // One paragraph rather than a row of boxes: the check is an inline glyph
+    // in the sentence, so a long name or a large accessibility text scale
+    // wraps the line instead of overflowing it.
+    return Text.rich(
+      TextSpan(
+        children: <InlineSpan>[
+          TextSpan(text: items),
+          if (listing.completedToday) ...<InlineSpan>[
+            const TextSpan(text: ' · '),
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: Icon(
+                Icons.check,
+                size: WirdiMetrics.space4,
+                color: colour,
+              ),
+            ),
+            const TextSpan(text: ' Done today'),
+          ] else if (listing.inProgress)
+            const TextSpan(text: ' · Part-way through'),
         ],
-      ],
+      ),
+      style: style,
     );
   }
 }
