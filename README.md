@@ -8,9 +8,8 @@ collections and Quran surahs, with counters and reminders.
 
 This repository holds the **content pipeline** — the Python that turns source
 data into the SQLite database the app bundles — and the Flutter app that reads
-it: the data layer, the theme, and (for now) a single throwaway screen for
-checking how Arabic renders on a real device. None of the real features are
-built yet.
+it: the data layer, the theme, and the reading experience. Collections, the wird
+player and the counter are not built yet.
 
 ## The content pipeline
 
@@ -131,11 +130,52 @@ tool/sync_content_asset.sh                 # -> assets/content.db (gitignored)
 lib/
   main.dart               opens both databases, then runs the app
   wirdi_app.dart          MaterialApp, both themes, the settings-driven type scale
+  routes.dart             named routes; a plain Navigator, no routing package
+  screens/                surah list, reading view, settings, about
+  widgets/                the pieces the screens share
   providers/              riverpod: the databases, the repositories, settings
+  quran/                  text transformations on the Uthmani text
   theme/                  colour, shape, motion, type
-  widgets/                the voussoir stripe, the failure screen
   dev/                    throwaway — deleted before release
 ```
+
+### The reading view
+
+Verse by verse, the whole surah loaded at once — Al-Baqarah is 286 rows, which
+is not worth a paging system — with `ListView.builder` virtualising the widgets,
+which is the part that costs anything.
+
+**Ayah numbers.** QUL bakes each verse's number onto the end of its text as bare
+Arabic-Indic digits. The app strips that and renders U+06DD, the end-of-ayah
+ornament, with the number inside it. Both bundled faces enclose the digits
+correctly up to three of them, which is measured rather than assumed —
+`test/quran/ayah_marker_test.dart` fails if a font update breaks it.
+
+**The bismillah** follows the database, not a rule:
+
+| | Where the basmala is | What renders |
+|---|---|---|
+| Al-Fatiha | ayah 1 | a numbered verse, no heading |
+| At-Tawbah | nowhere; `has_bismillah` is 0 | nothing |
+| the other 112 | not in `ayahs` at all | a heading, text taken from 1:1 |
+
+**Reading position** is stored as an ayah number, never a scroll offset: text
+size is user-adjustable, so an offset points at a different verse the moment the
+slider moves. It is written debounced while scrolling and flushed when the surah
+closes.
+
+### Measuring it
+
+```bash
+flutter test test/render_samples.dart        # -> build/render/*.png, every screen
+flutter test test/measure_reading_scroll.dart # text layout and fling frame times
+```
+
+Neither is run by `flutter test` — that only picks up `*_test.dart`. The first
+exists for the class of problem that is obvious in a picture and invisible in a
+widget test; it has already caught right-to-left text laid out in the wrong
+place, a missing glyph, and a ListTile title painted white on limestone. The
+second exists because "it feels smooth" is not a measurement.
 
 ### Running it on a device
 
