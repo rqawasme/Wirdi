@@ -131,3 +131,39 @@ final class Source {
   @override
   String toString() => 'Source($id $collection $reference)';
 }
+
+/// What the content build is, and where it came from.
+///
+/// Read out of `content.db`'s `meta` table rather than hard-coded in the app,
+/// so an About screen crediting a source cannot drift from the source the
+/// database was actually built from.
+final class ContentMetadata {
+  const ContentMetadata({
+    required this.contentVersion,
+    required this.schemaVersion,
+    required this.quranSource,
+    required this.translationEdition,
+    required this.contentChecksum,
+    this.builtAt,
+  });
+
+  /// `content/sources/VERSION`, stamped in at build time.
+  final String contentVersion;
+
+  final int schemaVersion;
+
+  /// Where the Quran text and its metadata were imported from.
+  final String quranSource;
+
+  final String translationEdition;
+
+  /// SHA-256 over the content rows. Same sources, same checksum.
+  final String contentChecksum;
+
+  /// Null if the stamp is missing or unparseable — it is provenance, not
+  /// something the app should fail to start over.
+  final DateTime? builtAt;
+
+  @override
+  String toString() => 'ContentMetadata($contentVersion, $quranSource)';
+}

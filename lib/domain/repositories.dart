@@ -27,6 +27,13 @@ abstract class ContentRepository {
   Future<List<Ayah>> ayahsForJuz(int juz);
 
   Future<Dhikr> dhikr(int id);
+
+  /// What this content build is and where it came from.
+  ///
+  /// Needed to credit the Quran text and the translation without hard-coding
+  /// either: a credit that lives in Dart drifts from the database the moment
+  /// the pipeline changes edition.
+  Future<ContentMetadata> metadata();
 }
 
 /// Collections, built-in and user-made, behind one interface.
