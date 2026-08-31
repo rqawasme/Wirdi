@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/content_database.dart' show expectedContentSchemaVersion;
 import '../data/sqlite_runtime.dart';
+import '../domain/collection.dart';
 import '../domain/content.dart';
 import '../providers/settings.dart';
 import '../theme/theme.dart';
@@ -32,6 +33,9 @@ class DevScreen extends ConsumerWidget {
     );
     final List<Dhikr> adhkar =
         ref.watch(dhikrSamplesProvider).value ?? const <Dhikr>[];
+    final CollectionSummary? dhikrCollection = ref
+        .watch(dhikrCollectionProvider)
+        .value;
     final WirdiSettings settings =
         ref.watch(settingsProvider).value ?? const WirdiSettings();
 
@@ -53,6 +57,7 @@ class DevScreen extends ConsumerWidget {
         AsyncData(:final List<ResolvedSample> value) => _SampleList(
           samples: value,
           adhkar: adhkar,
+          collection: dhikrCollection,
           settings: settings,
         ),
         _ => const Center(child: CircularProgressIndicator()),
@@ -66,11 +71,13 @@ class _SampleList extends StatelessWidget {
   const _SampleList({
     required this.samples,
     required this.adhkar,
+    required this.collection,
     required this.settings,
   });
 
   final List<ResolvedSample> samples;
   final List<Dhikr> adhkar;
+  final CollectionSummary? collection;
   final WirdiSettings settings;
 
   @override
@@ -84,7 +91,7 @@ class _SampleList extends StatelessWidget {
       itemBuilder: (BuildContext context, int index) {
         return switch (index) {
           0 => const _VoussoirSection(),
-          1 => _DhikrSection(adhkar: adhkar),
+          1 => _DhikrSection(adhkar: adhkar, collection: collection),
           _ => _SampleBlock(
             resolved: samples[index - leading],
             settings: settings,
@@ -101,9 +108,10 @@ class _SampleList extends StatelessWidget {
 /// this is where the Arabic multiplier's effect on dhikr shows up, and where
 /// the caption style under each one gets looked at.
 class _DhikrSection extends StatelessWidget {
-  const _DhikrSection({required this.adhkar});
+  const _DhikrSection({required this.adhkar, required this.collection});
 
   final List<Dhikr> adhkar;
+  final CollectionSummary? collection;
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +133,18 @@ class _DhikrSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Text('Dhikr', style: theme.textTheme.titleLarge),
-              const _Label('Wird of Imam al-Nawawi'),
+              if (collection case final CollectionSummary c) ...<Widget>[
+                _Label(c.name),
+                if (c.nameArabic case final String arabic) ...<Widget>[
+                  const SizedBox(height: WirdiMetrics.space1),
+                  // Arabic UI chrome: Noto Naskh 700, outside the reading
+                  // multipliers, at the nav label size.
+                  Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: Text(arabic, style: type.arabicChrome),
+                  ),
+                ],
+              ],
               for (int i = 0; i < adhkar.length; i++) ...<Widget>[
                 const SizedBox(height: WirdiMetrics.verseBlockSpacing),
                 _Label(dhikrSamples[i].tests),

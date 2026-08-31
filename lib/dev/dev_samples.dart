@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../domain/collection.dart';
+import '../domain/collection_id.dart';
 import '../domain/content.dart';
 import '../domain/repositories.dart';
 import '../providers/data_providers.dart';
@@ -45,6 +47,27 @@ const List<QuranSample> quranSamples = <QuranSample>[
   QuranSample(surah: 30, from: 54, tests: 'multiple marks, weak letters'),
   QuranSample(surah: 1, from: 1, to: 7, tests: 'full short surah — baseline'),
 ];
+
+/// The collection the dhikr samples come from.
+///
+/// Fetched rather than hard-coded so that the Arabic title is the one in
+/// `content.db`, and so the dev screen exercises [WirdiTypography.arabicChrome]
+/// — the only style in the scale that nothing else in the app reaches yet.
+final FutureProvider<CollectionSummary?> dhikrCollectionProvider =
+    FutureProvider<CollectionSummary?>((Ref ref) async {
+      final List<CollectionSummary> all = await ref
+          .watch(collectionRepositoryProvider)
+          .all();
+      for (final CollectionSummary summary in all) {
+        if (summary.id == const BuiltinCollectionId(dhikrCollectionId)) {
+          return summary;
+        }
+      }
+      return null;
+    }, name: 'dhikrCollection');
+
+/// The Wird of Imam al-Nawawi, which the adhkar below belong to.
+const int dhikrCollectionId = 2;
 
 /// Adhkar chosen for length, from the Wird of Imam al-Nawawi.
 ///
