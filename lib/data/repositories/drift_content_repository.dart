@@ -78,6 +78,26 @@ class DriftContentRepository implements ContentRepository {
   }
 
   @override
+  Future<ContentMetadata> metadata() async {
+    // Six rows; one round trip each would be six statements for a screen shown
+    // once, so they are read together and looked up in Dart.
+    final List<MetaRow> rows = await _db.allMeta().get();
+    final Map<String, String> meta = <String, String>{
+      for (final MetaRow row in rows) row.key: row.value,
+    };
+    return ContentMetadata(
+      contentVersion: meta['content_version'] ?? 'unknown',
+      // The schema version is asserted at open, so by the time anything reads
+      // this it is known good; the fallback is only for a hand-made database.
+      schemaVersion: int.tryParse(meta['schema_version'] ?? '') ?? 0,
+      quranSource: meta['quran_source'] ?? 'unknown',
+      translationEdition: meta['translation_edition'] ?? 'unknown',
+      contentChecksum: meta['content_checksum'] ?? '',
+      builtAt: DateTime.tryParse(meta['built_at'] ?? '')?.toLocal(),
+    );
+  }
+
+  @override
   Future<Dhikr> dhikr(int id) async {
     final DhikrRow? row = await _db.dhikrById(id: id).getSingleOrNull();
     if (row == null) {

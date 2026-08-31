@@ -98,6 +98,9 @@ CREATE TABLE meta (
 
 metaValue: SELECT value FROM meta WHERE "key" = :key;
 
+-- The whole table. Six rows, and the About screen wants most of them.
+allMeta: SELECT * FROM meta;
+
 allSurahs: SELECT * FROM surahs ORDER BY number;
 
 surahByNumber: SELECT * FROM surahs WHERE number = :number;

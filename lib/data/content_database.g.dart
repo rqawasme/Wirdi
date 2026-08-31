@@ -3243,6 +3243,14 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
     ).map((QueryRow row) => row.read<String>('value'));
   }
 
+  Selectable<MetaRow> allMeta() {
+    return customSelect(
+      'SELECT * FROM meta',
+      variables: [],
+      readsFrom: {meta},
+    ).asyncMap(meta.mapFromRow);
+  }
+
   Selectable<SurahRow> allSurahs() {
     return customSelect(
       'SELECT * FROM surahs ORDER BY number',

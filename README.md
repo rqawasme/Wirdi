@@ -6,9 +6,10 @@ Daily islamic habits. Reminders. Counters. Dhikr etc based on famous litanies
 Wirdi is a Flutter app for daily Islamic practice: wird collections, dhikr
 collections and Quran surahs, with counters and reminders.
 
-This repository holds two things: the **content pipeline** — the Python that turns
-source data into the SQLite database the app bundles — and the Flutter **data
-layer** that reads it. There is no UI yet.
+This repository holds the **content pipeline** — the Python that turns source
+data into the SQLite database the app bundles — and the Flutter app that reads
+it: the data layer, the theme, and the reading experience. Collections, the wird
+player and the counter are not built yet.
 
 ## The content pipeline
 
@@ -121,4 +122,157 @@ They never read the bundled asset. To build and bundle the real one:
 ```bash
 python3 content/scripts/build_content.py   # -> content/build/content.db
 tool/sync_content_asset.sh                 # -> assets/content.db (gitignored)
+```
+
+## The app
+
+```
+lib/
+  main.dart               opens both databases, then runs the app
+  wirdi_app.dart          MaterialApp, both themes, the settings-driven type scale
+  routes.dart             named routes; a plain Navigator, no routing package
+  screens/                surah list, reading view, settings, about
+  widgets/                the pieces the screens share
+  providers/              riverpod: the databases, the repositories, settings
+  quran/                  text transformations on the Uthmani text
+  theme/                  colour, shape, motion, type
+  dev/                    throwaway — deleted before release
+```
+
+### The reading view
+
+Verse by verse, the whole surah loaded at once — Al-Baqarah is 286 rows, which
+is not worth a paging system — with `ListView.builder` virtualising the widgets,
+which is the part that costs anything.
+
+**Ayah numbers.** QUL bakes each verse's number onto the end of its text as bare
+Arabic-Indic digits. The app strips that and renders U+06DD, the end-of-ayah
+ornament, with the number inside it. Both bundled faces enclose the digits
+correctly up to three of them, which is measured rather than assumed —
+`test/quran/ayah_marker_test.dart` fails if a font update breaks it.
+
+**The bismillah** follows the database, not a rule:
+
+| | Where the basmala is | What renders |
+|---|---|---|
+| Al-Fatiha | ayah 1 | a numbered verse, no heading |
+| At-Tawbah | nowhere; `has_bismillah` is 0 | nothing |
+| the other 112 | not in `ayahs` at all | a heading, text taken from 1:1 |
+
+**Reading position** is stored as an ayah number, never a scroll offset: text
+size is user-adjustable, so an offset points at a different verse the moment the
+slider moves. It is written debounced while scrolling and flushed when the surah
+closes.
+
+### Measuring it
+
+```bash
+flutter test test/render_samples.dart        # -> build/render/*.png, every screen
+flutter test test/measure_reading_scroll.dart # text layout and fling frame times
+```
+
+Neither is run by `flutter test` — that only picks up `*_test.dart`. The first
+exists for the class of problem that is obvious in a picture and invisible in a
+widget test; it has already caught right-to-left text laid out in the wrong
+place, a missing glyph, and a ListTile title painted white on limestone. The
+second exists because "it feels smooth" is not a measurement.
+
+### Running it on a device
+
+```bash
+python3 content/scripts/build_content.py   # -> content/build/content.db
+tool/sync_content_asset.sh                 # -> assets/content.db (gitignored)
+
+flutter pub get
+flutter run                                # iOS or Android; there is no web or desktop target
+```
+
+`assets/content.db` is a build artifact and is not committed, but `pubspec.yaml`
+names it explicitly. A build without it fails with `unable to locate asset`
+rather than producing an app with no content in it.
+
+### The theme
+
+Both themes are written out by hand in `lib/theme/color_schemes.dart`. Neither
+is seeded: `ColorScheme.fromSeed` derives every role from one hue, which drags
+the limestone surfaces toward brick and throws away the point of the palette.
+
+Depth is tonal — `surface`, `surfaceContainer`, `surfaceContainerHigh` — plus
+hairline outlines. Elevation is zero everywhere and `shadowColor` is
+transparent in both themes, so nothing casts a shadow even if something later
+takes an elevation. Buttons are squared at 8dp, overriding Material's stadium
+default.
+
+`tertiary` is gold, and is currently claimed by nothing. It was reserved for
+Quran text, which is now set in `onSurface` cedar ink. Nothing in
+`lib/theme/wirdi_theme.dart` maps it onto a component, so gold appearing
+anywhere in the UI still means a widget reached for the wrong role — that is the
+signal, and it is deliberate that Material components rarely pick `tertiary` on
+their own.
+
+### Type
+
+Arabic and Latin have two parallel definitions in `lib/theme/typography.dart`;
+a single `TextTheme` cannot express both. Three families are bundled as local
+assets and none are fetched at runtime — the app works with the radio off, and
+Quran text rendered in a substituted font is not the same text.
+
+| | Face | Nominal | Line height |
+|---|---|---:|---:|
+| Quran verse | Noto Naskh Arabic | 24 | 2.0 |
+| Dhikr | Noto Naskh Arabic | 20 | 2.0 |
+| Translation | Inter | 15 | 1.6 |
+| Dhikr caption | Inter | 13 | 1.5 |
+| Section header | Inter | 17 | 1.4 |
+| Nav and labels | Inter | 14 | 1.4 |
+| Caption and meta | Inter | 12 | 1.4 |
+
+Every size there is *nominal*. Arabic faces render at nominal x
+`ArabicFace.opticalMultiplier`, because a font's letterforms fill as much of its
+em as its designer decided they should, and an Arabic face reserving room for
+vocalisation fills much less of it than Inter does. The factor is per face, and
+it is derived rather than guessed; see the comment on `ArabicFace`.
+
+Quran and dhikr are set in the same face and separated by size alone. Amiri
+Quran is still bundled, for the dev screen's comparison, but nothing the app
+ships is set in it: it has no glyph for U+065E, which the Uthmani text uses
+1,807 times across a fifth of the mushaf.
+
+`tool/check_font_coverage.py` is what keeps that kind of gap from going
+unnoticed. It reads every Arabic and Latin string out of the built database and
+checks each codepoint against the cmap of the face that renders it, failing the
+build on a gap that is not recorded as a decision. A missing glyph does not
+raise anything by itself — it draws an empty box, or on a device quietly borrows
+the glyph from some other face mid-word, which looks almost right.
+
+```bash
+python3 tool/check_font_coverage.py
+```
+
+The 2.0 Arabic line height is required, not stylistic: voweled text collides
+below it.
+
+Two user multipliers, persisted through `UserRepository` settings, scale the
+reading text and nothing else. `arabicScale` drives the Quran verse and the
+dhikr with it; `translationScale` drives the translation and the dhikr caption.
+Chrome follows the OS accessibility text scale alone. Multipliers are stored,
+never pixel sizes — a stored pixel size freezes a choice against a type scale
+that will move.
+
+### The dev screen
+
+`lib/dev/` is a rendering harness and is deleted before release. It puts the
+known-hard Uthmani cases — elongation, imala, ishmam, the saad-seen variants,
+waqf marks in sequence, the sajdah mark — on screen at any size, in either
+Arabic face, in gold or in cedar ink, read out of the real database rather than
+from literals. It exists to answer two questions that a spec cannot.
+
+`test/render_samples.dart` renders that screen to PNGs under `build/render/`
+with the real fonts loaded. It is not run by `flutter test` — that only picks
+up `*_test.dart` — and it is not a substitute for looking at a phone. It is for
+the class of problem that is obvious in a picture and invisible in a widget
+test:
+
+```bash
+flutter test test/render_samples.dart
 ```
