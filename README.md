@@ -163,10 +163,12 @@ transparent in both themes, so nothing casts a shadow even if something later
 takes an elevation. Buttons are squared at 8dp, overriding Material's stadium
 default.
 
-`tertiary` is gold and is reserved for Quran text. Nothing in
-`lib/theme/wirdi_theme.dart` maps it onto a component. Gold appearing anywhere
-in the UI means a widget reached for the wrong role — that is the signal, and
-it is deliberate that Material components rarely pick `tertiary` on their own.
+`tertiary` is gold, and is currently claimed by nothing. It was reserved for
+Quran text, which is now set in `onSurface` cedar ink. Nothing in
+`lib/theme/wirdi_theme.dart` maps it onto a component, so gold appearing
+anywhere in the UI still means a widget reached for the wrong role — that is the
+signal, and it is deliberate that Material components rarely pick `tertiary` on
+their own.
 
 ### Type
 
@@ -177,7 +179,7 @@ Quran text rendered in a substituted font is not the same text.
 
 | | Face | Nominal | Line height |
 |---|---|---:|---:|
-| Quran verse | Amiri Quran | 24 | 2.0 |
+| Quran verse | Noto Naskh Arabic | 24 | 2.0 |
 | Dhikr | Noto Naskh Arabic | 20 | 2.0 |
 | Translation | Inter | 15 | 1.6 |
 | Dhikr caption | Inter | 13 | 1.5 |
@@ -187,10 +189,25 @@ Quran text rendered in a substituted font is not the same text.
 
 Every size there is *nominal*. Arabic faces render at nominal x
 `ArabicFace.opticalMultiplier`, because a font's letterforms fill as much of its
-em as its designer decided they should, and Amiri Quran — which reserves room
-for vocalisation Inter never has to house — fills much less of it. The factor is
-per face, and it is derived rather than guessed; see the comment on
-`ArabicFace`.
+em as its designer decided they should, and an Arabic face reserving room for
+vocalisation fills much less of it than Inter does. The factor is per face, and
+it is derived rather than guessed; see the comment on `ArabicFace`.
+
+Quran and dhikr are set in the same face and separated by size alone. Amiri
+Quran is still bundled, for the dev screen's comparison, but nothing the app
+ships is set in it: it has no glyph for U+065E, which the Uthmani text uses
+1,807 times across a fifth of the mushaf.
+
+`tool/check_font_coverage.py` is what keeps that kind of gap from going
+unnoticed. It reads every Arabic and Latin string out of the built database and
+checks each codepoint against the cmap of the face that renders it, failing the
+build on a gap that is not recorded as a decision. A missing glyph does not
+raise anything by itself — it draws an empty box, or on a device quietly borrows
+the glyph from some other face mid-word, which looks almost right.
+
+```bash
+python3 tool/check_font_coverage.py
+```
 
 The 2.0 Arabic line height is required, not stylistic: voweled text collides
 below it.

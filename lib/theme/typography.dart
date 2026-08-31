@@ -60,12 +60,22 @@ abstract final class WirdiFonts {
 ///
 /// Tune them. They are the one number in this file that is a judgement call.
 enum ArabicFace {
-  /// Amiri Quran. Uthmani orthography and Quranic mark positioning.
-  quran(WirdiFonts.quran, 1.27),
+  /// Noto Naskh Arabic. Everything the app sets in Arabic.
+  ///
+  /// It is the Quran face as well as the dhikr face. It reads better than
+  /// Amiri Quran at this size, and it is the only one of the two that covers
+  /// the text: see [amiriQuran].
+  notoNaskh(WirdiFonts.naskh, 1.15),
 
-  /// Noto Naskh Arabic. Dhikr, Arabic chrome, and the comparison face for
-  /// Quran text.
-  naskh(WirdiFonts.naskh, 1.15);
+  /// Amiri Quran. Bundled for comparison in the dev screen, and set by nothing
+  /// the app ships.
+  ///
+  /// It has no glyph for U+065E ARABIC FATHA WITH TWO DOTS, which the Uthmani
+  /// text uses 1,807 times across 1,241 ayahs — a fifth of the mushaf. A
+  /// device would fall back to some system Arabic face for that one mark,
+  /// mid-word, which looks almost right. `tool/check_font_coverage.py` is what
+  /// keeps that from going unnoticed again.
+  amiriQuran(WirdiFonts.quran, 1.27);
 
   const ArabicFace(this.family, this.opticalMultiplier);
 
@@ -171,8 +181,11 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
 
   // -- Arabic ----------------------------------------------------------------
 
-  /// A Quran verse in [ArabicFace.quran].
-  TextStyle get quranVerse => quranVerseIn(ArabicFace.quran);
+  /// A Quran verse.
+  ///
+  /// Quran and dhikr are set in the same face and separated by size alone,
+  /// which is why [dhikrSizeRatio] carries the distinction.
+  TextStyle get quranVerse => quranVerseIn(ArabicFace.notoNaskh);
 
   /// A Quran verse in an explicitly chosen face.
   ///
@@ -181,8 +194,8 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
   TextStyle quranVerseIn(ArabicFace face) =>
       _arabic(face: face, nominalSize: quranVerseSize * _clamp(arabicScale));
 
-  /// A dhikr, in Noto Naskh Arabic.
-  TextStyle get dhikr => dhikrIn(ArabicFace.naskh);
+  /// A dhikr.
+  TextStyle get dhikr => dhikrIn(ArabicFace.notoNaskh);
 
   TextStyle dhikrIn(ArabicFace face) => _arabic(
     face: face,
@@ -194,7 +207,7 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
   /// Bold, and outside the user multipliers: it is chrome, and it follows the
   /// OS text scale like the rest of the chrome does.
   TextStyle get arabicChrome => _arabic(
-    face: ArabicFace.naskh,
+    face: ArabicFace.notoNaskh,
     nominalSize: navLabelSize,
     weight: FontWeight.w700,
     lineHeight: chromeLineHeight,
@@ -262,11 +275,26 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
   }) {
     return TextStyle(
       fontFamily: WirdiFonts.latin,
+      fontFamilyFallback: _latinFallback,
       fontSize: size,
       fontWeight: weight,
       height: lineHeight,
     );
   }
+
+  /// The Saheeh International translation carries U+FDFA — the
+  /// sallallahu-alayhi-wasallam ligature — inline, 36 times, in the middle of
+  /// English sentences. Inter has no glyph for it, and a Latin text face has no
+  /// business owning one.
+  ///
+  /// Without this the platform picks the substitute itself, so the mark comes
+  /// out of a different face on iOS than on Android and out of nothing at all
+  /// where the fallback chain is thin. Naming the fallback means it comes from
+  /// a font that ships in the bundle, and looks the same everywhere.
+  ///
+  /// `tool/check_font_coverage.py` records this as an accepted gap; adding a
+  /// Latin codepoint Inter lacks will fail there rather than here.
+  static const List<String> _latinFallback = <String>[WirdiFonts.naskh];
 
   /// The Material roles, filled from the Latin chrome styles.
   ///

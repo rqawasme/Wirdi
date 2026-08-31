@@ -132,32 +132,32 @@ void main() {
     await settings.setThemeMode(ThemeMode.dark);
     await tester.pumpAndSettle();
     await shoot(tester, 'dark');
-
     await settings.setThemeMode(ThemeMode.light);
-    await settings.setQuranInGold(false);
-    await tester.pumpAndSettle();
-    await shoot(tester, 'cedar');
-
-    await settings.setQuranInGold(true);
-    await settings.setArabicFace(ArabicFace.quran);
     await tester.pumpAndSettle();
 
-    // Scroll to a dense one and look at it in both faces.
+    // Ayat al-Kursi is the dense one. Shot at the settings the app ships
+    // with, then at each of the alternatives that were considered and not
+    // taken, so the comparison stays on record rather than in a chat log.
     await tester.scrollUntilVisible(
       find.text('2:255'),
       300,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
-    await shoot(tester, 'kursi_amiri');
+    await shoot(tester, 'kursi_default');
 
-    await settings.setArabicFace(ArabicFace.naskh);
+    await settings.setQuranInGold(true);
     await tester.pumpAndSettle();
-    await shoot(tester, 'kursi_naskh');
+    await shoot(tester, 'kursi_gold');
+    await settings.setQuranInGold(false);
 
-    await settings.setArabicFace(ArabicFace.quran);
+    await settings.setArabicFace(ArabicFace.amiriQuran);
+    await tester.pumpAndSettle();
+    await shoot(tester, 'kursi_amiri');
+    await settings.setArabicFace(ArabicFace.notoNaskh);
+
     await settings.setDimBrackets(false);
     await tester.pumpAndSettle();
-    await shoot(tester, 'kursi_plain');
+    await shoot(tester, 'kursi_plain_brackets');
   });
 }

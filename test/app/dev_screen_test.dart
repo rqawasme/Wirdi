@@ -103,14 +103,14 @@ void _tests(File contentFile) {
 
     expect(await data.userRepository.setting(SettingKeys.devQuranInGold), null);
 
-    await tester.ensureVisible(find.text('Cedar ink'));
+    await tester.ensureVisible(find.text('Gold'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Cedar ink'));
+    await tester.tap(find.text('Gold'));
     await tester.pumpAndSettle();
 
     expect(
       await data.userRepository.setting(SettingKeys.devQuranInGold),
-      'false',
+      'true',
       reason: 'the dev controls persist the same way a real setting would',
     );
   });
@@ -141,7 +141,7 @@ void _tests(File contentFile) {
     ).extension<WirdiTypography>()!;
     expect(
       type.quranVerse.fontSize,
-      closeTo(32 * ArabicFace.quran.opticalMultiplier, 0.01),
+      closeTo(32 * ArabicFace.notoNaskh.opticalMultiplier, 0.01),
     );
   });
 }

@@ -117,8 +117,8 @@ class _DevControlPanelState extends ConsumerState<DevControlPanel> {
                         label: 'Quran colour',
                         value: settings.quranInGold,
                         options: const <bool, String>{
-                          true: 'Gold',
                           false: 'Cedar ink',
+                          true: 'Gold',
                         },
                         onChanged: _controller.setQuranInGold,
                       ),
@@ -126,8 +126,8 @@ class _DevControlPanelState extends ConsumerState<DevControlPanel> {
                         label: 'Quran face',
                         value: settings.arabicFace,
                         options: const <ArabicFace, String>{
-                          ArabicFace.quran: 'Amiri Quran',
-                          ArabicFace.naskh: 'Noto Naskh',
+                          ArabicFace.notoNaskh: 'Noto Naskh',
+                          ArabicFace.amiriQuran: 'Amiri Quran',
                         },
                         onChanged: _controller.setArabicFace,
                       ),

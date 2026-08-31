@@ -30,8 +30,8 @@ final class WirdiSettings {
     this.arabicScale = 1,
     this.translationScale = 1,
     this.themeMode = ThemeMode.light,
-    this.quranInGold = true,
-    this.arabicFace = ArabicFace.quran,
+    this.quranInGold = false,
+    this.arabicFace = ArabicFace.notoNaskh,
     this.dimBrackets = true,
   });
 
@@ -45,6 +45,9 @@ final class WirdiSettings {
   final ThemeMode themeMode;
 
   /// Dev screen: Quran text in `tertiary` gold, or in `onSurface` cedar ink.
+  ///
+  /// Cedar ink by decision, after looking at both on a device. Which leaves
+  /// `tertiary` unclaimed — see the note on gold in lib/theme/color_schemes.dart.
   final bool quranInGold;
 
   /// Dev screen: which face the Quran samples are set in.
@@ -193,12 +196,17 @@ class SettingsController extends AsyncNotifier<WirdiSettings> {
     _ => null,
   };
 
-  static ThemeMode? _themeMode(String? raw) {
-    for (final ThemeMode mode in ThemeMode.values) {
-      if (mode.name == raw) return mode;
-    }
-    return null;
-  }
+  /// Light and dark only.
+  ///
+  /// [ThemeMode.system] is deliberately not offered and deliberately not
+  /// parsed: the user picks one, and the default is light. Accepting a value
+  /// no control can produce would leave the app in a state nothing could get
+  /// it out of.
+  static ThemeMode? _themeMode(String? raw) => switch (raw) {
+    'light' => ThemeMode.light,
+    'dark' => ThemeMode.dark,
+    _ => null,
+  };
 
   static ArabicFace? _arabicFace(String? raw) {
     for (final ArabicFace face in ArabicFace.values) {
