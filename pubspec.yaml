@@ -34,6 +34,12 @@ flutter:
     #   python3 content/scripts/build_content.py && tool/sync_content_asset.sh
     - assets/content.db
 
+    # The OFL requires the licence to travel with the font, and the About screen
+    # shows these verbatim rather than paraphrasing them.
+    - assets/fonts/OFL-AmiriQuran.txt
+    - assets/fonts/OFL-NotoNaskhArabic.txt
+    - assets/fonts/OFL-Inter.txt
+
   # Bundled as local assets, never fetched: the app works fully offline, and
   # Quran text rendered in a substituted font is not the same text. The family
   # names here are the strings lib/theme/typography.dart uses; changing one

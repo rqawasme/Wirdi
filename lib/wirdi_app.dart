@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'dev/dev_screen.dart';
 import 'providers/settings.dart';
+import 'routes.dart';
 import 'theme/theme.dart';
 import 'widgets/failure_screen.dart';
 
@@ -23,24 +23,38 @@ class WirdiApp extends ConsumerWidget {
     final WirdiSettings resolved = settings.value ?? const WirdiSettings();
     final WirdiTypography typography = resolved.typography;
 
+    // A settings read that fails is not something to run past on defaults:
+    // it means user.db is unreadable, and everything the app remembers is
+    // going to silently not work.
+    if (settings case AsyncError(
+      :final Object error,
+      :final StackTrace stackTrace,
+    )) {
+      return MaterialApp(
+        title: 'Wirdi',
+        debugShowCheckedModeBanner: false,
+        theme: WirdiTheme.light(),
+        darkTheme: WirdiTheme.dark(),
+        home: FailureScreen(
+          title: 'Could not read settings',
+          error: error,
+          stackTrace: stackTrace,
+        ),
+      );
+    }
+
     return MaterialApp(
       title: 'Wirdi',
       debugShowCheckedModeBanner: false,
       theme: WirdiTheme.light(typography: typography),
       darkTheme: WirdiTheme.dark(typography: typography),
       themeMode: resolved.themeMode,
-      home: switch (settings) {
-        AsyncError(:final Object error, :final StackTrace stackTrace) =>
-          FailureScreen(
-            title: 'Could not read settings',
-            error: error,
-            stackTrace: stackTrace,
-          ),
-        // One frame, over the launch screen. A spinner here would be a flash
-        // of chrome, not a sign of progress.
-        AsyncLoading() => const Scaffold(body: SizedBox.shrink()),
-        _ => const DevScreen(),
-      },
+      // A plain Navigator, no routing package — see Routes. There is no
+      // loading gate: the theme falls back to the default typography for the
+      // one frame the settings read takes, and the surah list shows its own
+      // progress while the 114 rows arrive.
+      initialRoute: Routes.surahList,
+      onGenerateRoute: WirdiRouter.onGenerateRoute,
     );
   }
 }
