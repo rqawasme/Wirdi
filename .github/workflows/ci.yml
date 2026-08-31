@@ -43,6 +43,12 @@ jobs:
       - name: Check schema parity
         run: python3 tool/check_schema_parity.py
 
+      # pubspec.yaml names assets/content.db explicitly, so the asset has to
+      # exist before anything builds an asset bundle — which `flutter test`
+      # does. It is gitignored, being a build artifact of the step above.
+      - name: Bundle content.db as the app asset
+        run: tool/sync_content_asset.sh
+
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
