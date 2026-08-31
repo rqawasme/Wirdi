@@ -13,13 +13,17 @@ import 'package:wirdi/theme/theme.dart';
 import 'package:wirdi/widgets/voussoir_stripe.dart';
 import 'package:wirdi/wirdi_app.dart';
 
-/// The app, pumped.
+/// The dev screen, reached the way a developer reaches it.
 ///
 /// Not a test of how anything looks — `flutter_test` renders in a test font,
-/// and whether Amiri Quran holds up is a question for a device. What it does
-/// check is that the tree builds against real content without throwing, that
-/// the theme reaches the widgets that need it, and that a control writes
-/// through to `user.db` rather than only to a `setState`.
+/// and whether a face holds up is a question for a device. What it does check
+/// is that the tree builds against real content without throwing, that the
+/// theme reaches the widgets that need it, and that a control writes through to
+/// `user.db` rather than only to a `setState`.
+///
+/// It navigates in through the debug-only entry point on the surah list, so the
+/// fact that the entry point exists in a debug build is part of what is being
+/// tested.
 void main() {
   final File contentFile = File('content/build/content.db');
 
@@ -58,6 +62,10 @@ void _tests(File contentFile) {
         child: const WirdiApp(),
       ),
     );
+    await tester.pumpAndSettle();
+
+    // In through the debug-only entry point on the surah list.
+    await tester.tap(find.byIcon(Icons.science_outlined));
     await tester.pumpAndSettle();
   }
 
