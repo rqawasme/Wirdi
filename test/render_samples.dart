@@ -1,4 +1,4 @@
-/// Renders the dev screen to PNGs, with the real fonts loaded.
+/// Renders every screen to PNGs, with the real fonts loaded.
 ///
 /// Not a test, and not run by `flutter test` — that only picks up
 /// `*_test.dart`. Run it by name when there is no device to hand:
@@ -33,6 +33,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:wirdi/data/content_database.dart';
 import 'package:wirdi/data/user_database.dart';
 import 'package:wirdi/data/wirdi_data.dart';
+import 'package:wirdi/domain/domain.dart';
 import 'package:wirdi/providers/data_providers.dart';
 import 'package:wirdi/providers/settings.dart';
 import 'package:wirdi/routes.dart';
@@ -133,7 +134,7 @@ void main() {
       const RepaintBoundary(key: shotKey, child: _Wrapped()),
     );
     await settle(tester);
-    await shoot(tester, '01-surah-list');
+    await shoot(tester, '01-collections');
 
     final ProviderContainer container = ProviderScope.containerOf(
       tester.element(find.byType(WirdiApp)),
@@ -142,65 +143,132 @@ void main() {
       settingsProvider.notifier,
     );
 
-    Future<void> openSurah(int number, String name) async {
-      final NavigatorState navigator = tester.state<NavigatorState>(
-        find.byType(Navigator),
+    NavigatorState navigator() =>
+        tester.state<NavigatorState>(find.byType(Navigator));
+
+    /// Pushes a route, shoots it, and comes back.
+    ///
+    /// Not awaited: pushNamed completes when the route is *popped*, so
+    /// awaiting it here would wait for the pop two lines down.
+    Future<void> openRoute(
+      String route,
+      String name, {
+      Object? arguments,
+      Future<void> Function()? before,
+    }) async {
+      final NavigatorState nav = navigator();
+      unawaited(nav.pushNamed<void>(route, arguments: arguments));
+      await settle(tester);
+      if (before != null) await before();
+      await shoot(tester, name);
+      nav.pop();
+      await settle(tester);
+    }
+
+    /// Opens the player where the wird was left off, so a shot can show a step
+    /// other than the first without counting all the way to it.
+    Future<void> openPlayer(
+      CollectionId id,
+      String name, {
+      int stepIndex = 0,
+      int taps = 0,
+    }) async {
+      final ResolvedCollection resolved = await data.collectionRepository
+          .resolve(id);
+      if (stepIndex > 0) {
+        await data.userRepository.saveProgress(
+          WirdProgress.atStep(
+            collectionId: id,
+            step: resolved.steps[stepIndex],
+            currentCount: 0,
+          ),
+        );
+      } else {
+        await data.userRepository.clearProgress(id);
+      }
+
+      await openRoute(
+        Routes.player,
+        name,
+        arguments: PlayerArguments(collectionId: id),
+        before: () async {
+          for (int tap = 0; tap < taps; tap++) {
+            // Anywhere in the content area counts; the reference line above
+            // the text is inside it and is always on screen.
+            await tester.tap(find.byType(SingleChildScrollView));
+            await tester.pump();
+          }
+        },
       );
-      // Not awaited: pushNamed completes when the route is *popped*, so
-      // awaiting it here would wait for the pop two lines down.
+      await data.userRepository.clearProgress(id);
+    }
+
+    // The wird the content build ships: 39 adhkar, three of them said three
+    // times over.
+    const CollectionId wird = BuiltinCollectionId(2);
+    await openPlayer(wird, '02-player-dhikr');
+    // A step said three times, part-way counted, so the stripe has something
+    // to show.
+    await openPlayer(wird, '03-player-counting', stepIndex: 10, taps: 1);
+
+    // The same wird's other two kinds of step: an ayah said seven times, and a
+    // surah said three times over.
+    await openPlayer(wird, '04-player-ayah', stepIndex: 40, taps: 2);
+    await openPlayer(wird, '05-player-surah', stepIndex: 23);
+
+    await settings.setThemeMode(ThemeMode.dark);
+    await settle(tester);
+    await openPlayer(wird, '06-player-dark', stepIndex: 10, taps: 2);
+    await settings.setThemeMode(ThemeMode.light);
+    await settle(tester);
+
+    // The mushaf, a tap from home.
+    await openRoute(Routes.surahList, '07-surah-list');
+
+    Future<void> openSurah(int number, String name) async {
+      final NavigatorState nav = navigator();
       unawaited(
-        navigator.pushNamed<void>(
+        nav.pushNamed<void>(
           Routes.reading,
           arguments: ReadingArguments(surahNumber: number),
         ),
       );
       await settle(tester);
       await shoot(tester, name);
-      navigator.pop();
+      nav.pop();
       await settle(tester);
     }
 
     // Al-Fatiha: the basmala is verse 1, numbered like any other.
-    await openSurah(1, '02-reading-al-fatiha');
+    await openSurah(1, '08-reading-al-fatiha');
     // Al-Baqarah: the basmala is a heading, and the surah is the long one.
-    await openSurah(2, '03-reading-al-baqarah');
+    await openSurah(2, '09-reading-al-baqarah');
     // At-Tawbah: no basmala at all.
-    await openSurah(9, '04-reading-at-tawbah');
+    await openSurah(9, '10-reading-at-tawbah');
     // A sajdah mark.
-    await openSurah(32, '05-reading-as-sajdah');
+    await openSurah(32, '11-reading-as-sajdah');
 
     // The reading view at the largest Arabic size the slider offers.
     await settings.setArabicScale(40 / WirdiTypography.quranVerseSize);
     await settle(tester);
-    await openSurah(2, '06-reading-arabic-40');
+    await openSurah(2, '12-reading-arabic-40');
     await settings.setArabicScale(1);
 
     // Arabic alone.
     await settings.setShowTranslation(false);
     await settle(tester);
-    await openSurah(2, '07-reading-no-translation');
+    await openSurah(2, '13-reading-no-translation');
     await settings.setShowTranslation(true);
 
     // Dark.
     await settings.setThemeMode(ThemeMode.dark);
     await settle(tester);
-    await openSurah(2, '08-reading-dark');
+    await openSurah(2, '14-reading-dark');
     await settings.setThemeMode(ThemeMode.light);
     await settle(tester);
 
-    Future<void> openRoute(String route, String name) async {
-      final NavigatorState navigator = tester.state<NavigatorState>(
-        find.byType(Navigator),
-      );
-      unawaited(navigator.pushNamed<void>(route));
-      await settle(tester);
-      await shoot(tester, name);
-      navigator.pop();
-      await settle(tester);
-    }
-
-    await openRoute(Routes.settings, '09-settings');
-    await openRoute(Routes.about, '10-about');
-    await openRoute(Routes.dev, '11-dev-screen');
+    await openRoute(Routes.settings, '15-settings');
+    await openRoute(Routes.about, '16-about');
+    await openRoute(Routes.dev, '17-dev-screen');
   });
 }

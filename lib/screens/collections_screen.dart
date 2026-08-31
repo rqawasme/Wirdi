@@ -112,6 +112,9 @@ class _Empty extends StatelessWidget {
 class _CollectionRow extends ConsumerWidget {
   const _CollectionRow({required this.listing});
 
+  /// The most of a row the Arabic name may take before it starts wrapping.
+  static const double _arabicShare = 0.45;
+
   final CollectionListing listing;
 
   @override
@@ -144,29 +147,39 @@ class _CollectionRow extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        listing.name,
-                        style: theme.textTheme.titleMedium,
-                      ),
-                    ),
-                    if (nameArabic != null) ...<Widget>[
-                      const SizedBox(width: WirdiMetrics.space4),
-                      Flexible(
-                        child: Directionality(
-                          textDirection: TextDirection.rtl,
-                          child: Text(
-                            nameArabic,
-                            style: type.arabicTitle,
-                            locale: const Locale('ar'),
+                LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) =>
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              listing.name,
+                              style: theme.textTheme.titleMedium,
+                            ),
                           ),
-                        ),
+                          if (nameArabic != null) ...<Widget>[
+                            const SizedBox(width: WirdiMetrics.space4),
+                            // Capped rather than given a flex share: an Arabic
+                            // name that needs a third of the row should not
+                            // take half of it and wrap the English name that
+                            // would otherwise have fitted.
+                            ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth: constraints.maxWidth * _arabicShare,
+                              ),
+                              child: Directionality(
+                                textDirection: TextDirection.rtl,
+                                child: Text(
+                                  nameArabic,
+                                  style: type.arabicTitle,
+                                  locale: const Locale('ar'),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
-                    ],
-                  ],
                 ),
                 const SizedBox(height: WirdiMetrics.space2),
                 // On its own line under both names, so it has the width to say

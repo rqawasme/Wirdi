@@ -757,13 +757,12 @@ class _Controls extends StatelessWidget {
             children: <Widget>[
               if (isSurah) ...<Widget>[
                 const SizedBox(height: WirdiMetrics.space1),
+                // Just "Done". The count header above says how many passes are
+                // left, and repeating it on the button says it twice and
+                // disagrees with itself the moment the button is pressed.
                 FilledButton(
                   onPressed: player.finished ? null : player.increment,
-                  child: Text(
-                    player.step.count > 1
-                        ? 'Done — ${player.remaining} to go'
-                        : 'Done',
-                  ),
+                  child: const Text('Done'),
                 ),
                 const SizedBox(height: WirdiMetrics.space2),
               ],
