@@ -39,7 +39,19 @@ abstract final class WirdiTheme {
       color: scheme.outlineVariant,
       width: WirdiMetrics.hairline,
     );
-    final TextTheme text = typography.materialTextTheme;
+    // Coloured here, not left to ThemeData.
+    //
+    // WirdiTypography deliberately sets no colours — a reading style that
+    // carries one cannot be recoloured by its surroundings. ThemeData fills them
+    // in for `textTheme`, but the component themes below are built from this
+    // object directly, and a TextStyle handed to a component with a null colour
+    // does not fall back to onSurface: `ui.TextStyle` defaults to **white**. So
+    // a ListTile title came out cream on cream, which is invisible rather than
+    // merely wrong. `test/theme/component_text_colour_test.dart` keeps it fixed.
+    final TextTheme text = typography.materialTextTheme.apply(
+      bodyColor: scheme.onSurface,
+      displayColor: scheme.onSurface,
+    );
 
     return ThemeData(
       colorScheme: scheme,

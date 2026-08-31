@@ -202,7 +202,20 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
     nominalSize: quranVerseSize * _clamp(arabicScale) * dhikrSizeRatio,
   );
 
-  /// Arabic UI chrome — a surah name in a header, a collection's Arabic title.
+  /// An Arabic name given prominence — the surah name in a list row, where it
+  /// is the thing being scanned for rather than a label beside something else.
+  ///
+  /// Chrome, so outside the user multipliers: the surah list's layout should
+  /// not reflow because the reading size changed.
+  TextStyle get arabicTitle => _arabic(
+    face: ArabicFace.notoNaskh,
+    nominalSize: sectionHeaderSize,
+    weight: FontWeight.w700,
+    lineHeight: chromeLineHeight,
+  );
+
+  /// Arabic UI chrome beside something else — a label, a collection's Arabic
+  /// title, the sajdah mark.
   ///
   /// Bold, and outside the user multipliers: it is chrome, and it follows the
   /// OS text scale like the rest of the chrome does.
