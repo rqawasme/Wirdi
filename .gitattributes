@@ -1,0 +1,36 @@
+# Line endings.
+#
+# Git for Windows defaults to core.autocrlf=true, which rewrites LF to CRLF on
+# checkout. That is harmless for source the toolchain parses and fatal for a
+# script the shell executes: `set -euo pipefail\r` is not a valid option, and
+# the stray carriage return garbles the error message explaining so. It bites
+# hardest under WSL, where a repo checked out by Windows git is run by Linux
+# bash.
+#
+# So: normalise everything to LF in the repository and check it out as LF
+# everywhere. Nothing here needs CRLF.
+* text=auto eol=lf
+
+# Windows batch files are the exception — cmd.exe genuinely wants CRLF.
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+*.ps1  text eol=crlf
+
+# Executed directly, so the endings are not cosmetic.
+*.sh   text eol=lf
+*.py   text eol=lf
+gradlew text eol=lf
+
+# Binary. Never normalise, never diff as text.
+*.ttf  binary
+*.otf  binary
+*.woff binary
+*.woff2 binary
+*.db   binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.ico  binary
+*.jar  binary
+*.keystore binary
+*.jks  binary
