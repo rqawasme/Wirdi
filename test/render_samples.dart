@@ -135,6 +135,15 @@ void main() {
     await settings.setThemeMode(ThemeMode.light);
     await tester.pumpAndSettle();
 
+    // The dhikr styles, against the real adhkar.
+    await tester.scrollUntilVisible(
+      find.text('Dhikr'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    await shoot(tester, 'dhikr');
+
     // Ayat al-Kursi is the dense one. Shot at the settings the app ships
     // with, then at each of the alternatives that were considered and not
     // taken, so the comparison stays on record rather than in a chat log.

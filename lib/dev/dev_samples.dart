@@ -46,6 +46,38 @@ const List<QuranSample> quranSamples = <QuranSample>[
   QuranSample(surah: 1, from: 1, to: 7, tests: 'full short surah — baseline'),
 ];
 
+/// Adhkar chosen for length, from the Wird of Imam al-Nawawi.
+///
+/// The Quran samples exercise Amiri Quran and Noto Naskh against voweled
+/// Uthmani text. These exercise the dhikr styles — a different face size, a
+/// different line length, and a transliteration line under each — against the
+/// only real adhkar in the database.
+const List<DhikrSample> dhikrSamples = <DhikrSample>[
+  DhikrSample(id: 2014, tests: 'three words, shortest in the wird'),
+  DhikrSample(id: 2001, tests: 'one line'),
+  DhikrSample(id: 2011, tests: 'wraps to two or three, repeated 3x'),
+  DhikrSample(id: 2025, tests: 'long, many clauses'),
+  DhikrSample(id: 2039, tests: 'compound, ends with the salawat'),
+];
+
+/// One dhikr, and what rendering it is meant to expose.
+@immutable
+final class DhikrSample {
+  const DhikrSample({required this.id, required this.tests});
+
+  final int id;
+  final String tests;
+}
+
+/// [dhikrSamples], resolved against the real database.
+final FutureProvider<List<Dhikr>> dhikrSamplesProvider =
+    FutureProvider<List<Dhikr>>((Ref ref) async {
+      final ContentRepository content = ref.watch(contentRepositoryProvider);
+      return Future.wait(
+        dhikrSamples.map((DhikrSample s) => content.dhikr(s.id)),
+      );
+    }, name: 'dhikrSamples');
+
 /// A sample with its ayahs read out of `content.db`.
 @immutable
 final class ResolvedSample {

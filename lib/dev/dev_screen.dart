@@ -30,6 +30,8 @@ class DevScreen extends ConsumerWidget {
     final AsyncValue<List<ResolvedSample>> samples = ref.watch(
       quranSamplesProvider,
     );
+    final List<Dhikr> adhkar =
+        ref.watch(dhikrSamplesProvider).value ?? const <Dhikr>[];
     final WirdiSettings settings =
         ref.watch(settingsProvider).value ?? const WirdiSettings();
 
@@ -50,6 +52,7 @@ class DevScreen extends ConsumerWidget {
           ),
         AsyncData(:final List<ResolvedSample> value) => _SampleList(
           samples: value,
+          adhkar: adhkar,
           settings: settings,
         ),
         _ => const Center(child: CircularProgressIndicator()),
@@ -60,21 +63,93 @@ class DevScreen extends ConsumerWidget {
 }
 
 class _SampleList extends StatelessWidget {
-  const _SampleList({required this.samples, required this.settings});
+  const _SampleList({
+    required this.samples,
+    required this.adhkar,
+    required this.settings,
+  });
 
   final List<ResolvedSample> samples;
+  final List<Dhikr> adhkar;
   final WirdiSettings settings;
 
   @override
   Widget build(BuildContext context) {
+    // Two extra leading items: the voussoir stripe in both of its modes, then
+    // the dhikr samples.
+    const int leading = 2;
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: WirdiMetrics.space6),
-      // One extra leading item: the voussoir stripe in both of its modes.
-      itemCount: samples.length + 1,
+      itemCount: samples.length + leading,
       itemBuilder: (BuildContext context, int index) {
-        if (index == 0) return const _VoussoirSection();
-        return _SampleBlock(resolved: samples[index - 1], settings: settings);
+        return switch (index) {
+          0 => const _VoussoirSection(),
+          1 => _DhikrSection(adhkar: adhkar),
+          _ => _SampleBlock(
+            resolved: samples[index - leading],
+            settings: settings,
+          ),
+        };
       },
+    );
+  }
+}
+
+/// The dhikr styles, against the only real adhkar in the database.
+///
+/// Set in Noto Naskh at [WirdiTypography.dhikrSizeRatio] of the Quran size, so
+/// this is where the Arabic multiplier's effect on dhikr shows up, and where
+/// the caption style under each one gets looked at.
+class _DhikrSection extends StatelessWidget {
+  const _DhikrSection({required this.adhkar});
+
+  final List<Dhikr> adhkar;
+
+  @override
+  Widget build(BuildContext context) {
+    if (adhkar.isEmpty) return const SizedBox.shrink();
+
+    final ThemeData theme = Theme.of(context);
+    final WirdiTypography type = theme.extension<WirdiTypography>()!;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const VoussoirStripe.rule(),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: WirdiMetrics.readingColumnPadding,
+            vertical: WirdiMetrics.space5,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Text('Dhikr', style: theme.textTheme.titleLarge),
+              const _Label('Wird of Imam al-Nawawi'),
+              for (int i = 0; i < adhkar.length; i++) ...<Widget>[
+                const SizedBox(height: WirdiMetrics.verseBlockSpacing),
+                _Label(dhikrSamples[i].tests),
+                const SizedBox(height: WirdiMetrics.space2),
+                Directionality(
+                  textDirection: TextDirection.rtl,
+                  child: Text(adhkar[i].textArabic, style: type.dhikr),
+                ),
+                const SizedBox(height: WirdiMetrics.space2),
+                Text(adhkar[i].translation, style: type.translation),
+                if (adhkar[i].transliteration case final String t) ...<Widget>[
+                  const SizedBox(height: WirdiMetrics.space1),
+                  Text(
+                    t,
+                    style: type.dhikrCaption.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
