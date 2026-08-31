@@ -15,6 +15,7 @@ abstract final class SettingKeys {
   static const String translationScale = 'text.translation_scale';
   static const String themeMode = 'theme.mode';
   static const String showTranslation = 'text.show_translation';
+  static const String haptics = 'haptics.enabled';
 
   static const String devQuranInGold = 'dev.quran_in_gold';
   static const String devArabicFace = 'dev.arabic_face';
@@ -32,6 +33,7 @@ final class WirdiSettings {
     this.translationScale = 1,
     this.themeMode = ThemeMode.light,
     this.showTranslation = true,
+    this.haptics = true,
     this.quranInGold = false,
     this.arabicFace = ArabicFace.notoNaskh,
     this.dimBrackets = true,
@@ -51,6 +53,14 @@ final class WirdiSettings {
   /// Off is a real reading mode, not a way to save space: somebody reciting
   /// from memory or reading for the Arabic wants the page uninterrupted.
   final bool showTranslation;
+
+  /// Whether the counter answers a tap with a haptic.
+  ///
+  /// On by default, and the only feedback the counter gives: nothing on that
+  /// screen animates, so with this off a tap is confirmed by the number
+  /// changing and nothing else. Off is for somebody counting in a room where a
+  /// buzzing phone is the problem.
+  final bool haptics;
 
   /// Dev screen: Quran text in `tertiary` gold, or in `onSurface` cedar ink.
   ///
@@ -76,6 +86,7 @@ final class WirdiSettings {
     double? translationScale,
     ThemeMode? themeMode,
     bool? showTranslation,
+    bool? haptics,
     bool? quranInGold,
     ArabicFace? arabicFace,
     bool? dimBrackets,
@@ -85,6 +96,7 @@ final class WirdiSettings {
       translationScale: translationScale ?? this.translationScale,
       themeMode: themeMode ?? this.themeMode,
       showTranslation: showTranslation ?? this.showTranslation,
+      haptics: haptics ?? this.haptics,
       quranInGold: quranInGold ?? this.quranInGold,
       arabicFace: arabicFace ?? this.arabicFace,
       dimBrackets: dimBrackets ?? this.dimBrackets,
@@ -120,6 +132,9 @@ class SettingsController extends AsyncNotifier<WirdiSettings> {
       showTranslation:
           _bool(await repository.setting(SettingKeys.showTranslation)) ??
           defaults.showTranslation,
+      haptics:
+          _bool(await repository.setting(SettingKeys.haptics)) ??
+          defaults.haptics,
       quranInGold:
           _bool(await repository.setting(SettingKeys.devQuranInGold)) ??
           defaults.quranInGold,
@@ -163,6 +178,14 @@ class SettingsController extends AsyncNotifier<WirdiSettings> {
       SettingKeys.showTranslation,
       value.toString(),
       (WirdiSettings s) => s.copyWith(showTranslation: value),
+    );
+  }
+
+  Future<void> setHaptics(bool value) {
+    return _set(
+      SettingKeys.haptics,
+      value.toString(),
+      (WirdiSettings s) => s.copyWith(haptics: value),
     );
   }
 
