@@ -55,6 +55,13 @@ Future<void> loadFont(String family, List<String> paths) async {
   await loader.load();
 }
 
+/// Loads a font the build bundled, by its asset key.
+Future<void> loadBundledFont(String family, String key) async {
+  final FontLoader loader = FontLoader(family);
+  loader.addFont(rootBundle.load(key));
+  await loader.load();
+}
+
 const Key shotKey = Key('shot');
 
 /// Pumps a fixed run of frames rather than settling.
@@ -113,6 +120,12 @@ void main() {
       'assets/fonts/Inter-Regular.ttf',
       'assets/fonts/Inter-Medium.ttf',
     ]);
+    // Out of the built bundle rather than off disk: it comes from the SDK, not
+    // from this repository, and `uses-material-design: true` is what puts it
+    // there. Loading it here is also how a missing-glyph icon shows up in the
+    // PNGs, which is where this was caught — a widget test finds an Icon by
+    // its IconData whether or not a font can draw it.
+    await loadBundledFont('MaterialIcons', 'fonts/MaterialIcons-Regular.otf');
   });
 
   setUp(() {

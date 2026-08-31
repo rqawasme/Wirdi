@@ -167,11 +167,13 @@ them back late — which is the same lag arriving through the other sense. The
 end of a step is a heavier impact, which always fires, and the tap that
 finishes a step advances on its own rather than asking for another one.
 
-**The stripe is the count.** `VoussoirStripe.progress` is cut into
-`min(stepCount, 33)` segments, so a tasbih of thirty-three lights one segment
-per tap and a count of a hundred lights one roughly every third. The
-collection's own position is a small `4 of 45` in the controls bar, and
-deliberately not the stripe: one stripe measuring two things measures neither.
+**The stripe is the wird.** `VoussoirStripe.progress` is cut into
+`min(stepCount, 33)` segments — one per step where a collection is short
+enough, proportionally past that — and it fills with steps finished plus how
+far into the current one, so a dhikr said a hundred times moves it as it is
+counted rather than leaving it parked. The step's own indicator is the count
+below it. One stripe measuring two things measures neither, and the thing worth
+measuring across the top of the screen is how much of the wird is left.
 
 **A dhikr or an ayah is tap-to-count over the whole content area**, margins and
 empty space included, because at speed the thumb lands wherever it lands. A

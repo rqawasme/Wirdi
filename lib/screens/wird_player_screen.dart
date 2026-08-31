@@ -198,10 +198,13 @@ class _Player extends StatelessWidget {
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(VoussoirStripe.progressHeight),
-          // The identity moment: the count, as an arch filling in. One segment
-          // per repetition up to thirty-three, proportionally past that.
+          // The identity moment: the wird itself, as an arch filling in. One
+          // segment per step up to thirty-three, proportionally past that, and
+          // the current step's own share counted inside its segment. The
+          // step's indicator is the number below it — the stripe measures the
+          // whole thing, or it measures neither.
           child: VoussoirStripe.progress(
-            value: player.stepProgress,
+            value: player.collectionProgress,
             segments: player.stripeSegments,
           ),
         ),

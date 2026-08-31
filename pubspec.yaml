@@ -27,6 +27,12 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
 flutter:
+  # Bundles MaterialIcons-Regular.otf. Without it every Icon in the app is a
+  # missing glyph — the app bar's settings and info, the player's skips, the
+  # check on a completed row — and the failure is invisible in a widget test,
+  # which finds an Icon by its IconData whether or not a font can draw it.
+  uses-material-design: true
+
   assets:
     # Named file by file rather than as a directory, so that a missing
     # content.db fails the build with "unable to locate asset" instead of

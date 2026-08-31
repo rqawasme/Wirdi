@@ -568,37 +568,97 @@ void main() {
   });
 
   group('the stripe', () {
-    test('is one segment per repetition up to thirty-three', () {
-      final WirdPlayer player = playerFor(
+    test('is one segment per step, up to thirty-three', () {
+      final WirdPlayer short = playerFor(
         collectionOf(<CollectionEntry>[
           dhikrItem(1001, position: 1, count: 33),
           dhikrItem(1002, position: 2, count: 100),
           dhikrItem(1003, position: 3, count: 3),
         ]),
       );
+      expect(short.stripeSegments, 3, reason: 'three steps, three segments');
 
-      expect(player.stripeSegments, 33);
-      expect(player.stepProgress, 0);
-      player.increment();
-      // One tap of thirty-three lights exactly one segment.
-      expect(player.stepProgress * player.stripeSegments, closeTo(1, 0.001));
+      final WirdPlayer long = playerFor(
+        collectionOf(<CollectionEntry>[
+          RepeatBlock(
+            group: 1,
+            repeatCount: 20,
+            entries: <CollectionItemEntry>[
+              dhikrItem(1001, position: 1),
+              dhikrItem(1002, position: 2),
+            ],
+          ),
+        ]),
+      );
+      expect(long.steps, hasLength(40));
+      expect(long.stripeSegments, WirdPlayer.maxStripeSegments);
     });
 
-    test('past thirty-three it fills proportionally', () {
+    test('measures the wird, not the step', () {
       final WirdPlayer player = playerFor(
         collectionOf(<CollectionEntry>[
-          dhikrItem(1002, position: 1, count: 100),
+          dhikrItem(1001, position: 1, count: 4),
+          dhikrItem(1002, position: 2, count: 1),
         ]),
       );
 
-      expect(player.stripeSegments, WirdPlayer.maxStripeSegments);
-      for (int tap = 0; tap < 3; tap++) {
-        player.increment();
-      }
-      // A hundred across thirty-three segments: roughly every third tap.
-      expect((player.stepProgress * player.stripeSegments).floor(), 0);
+      expect(player.collectionProgress, 0);
+
       player.increment();
-      expect((player.stepProgress * player.stripeSegments).floor(), 1);
+      // A quarter of the way through the first of two steps.
+      expect(player.stepProgress, 0.25);
+      expect(player.collectionProgress, closeTo(0.125, 0.0001));
+
+      player.increment();
+      player.increment();
+      player.increment();
+      // The step is done and the stripe is half way, whatever the new step's
+      // own count is.
+      expect(player.stepIndex, 1);
+      expect(player.stepProgress, 0);
+      expect(player.collectionProgress, 0.5);
+    });
+
+    test(
+      'is full when the wird is done, and empty after starting over',
+      () async {
+        final WirdPlayer player = playerFor(
+          collectionOf(<CollectionEntry>[
+            dhikrItem(1001, position: 1, count: 1),
+            dhikrItem(1002, position: 2, count: 1),
+          ]),
+        );
+
+        player.increment();
+        player.increment();
+        expect(player.finished, isTrue);
+        expect(player.collectionProgress, 1);
+
+        player.startOver();
+        await player.writes;
+        expect(player.collectionProgress, 0);
+      },
+    );
+
+    test('goes backwards with undo and with a skip back', () {
+      final WirdPlayer player = playerFor(
+        collectionOf(<CollectionEntry>[
+          dhikrItem(1001, position: 1, count: 2),
+          dhikrItem(1002, position: 2, count: 2),
+        ]),
+      );
+
+      player.increment();
+      player.increment();
+      expect(player.collectionProgress, 0.5);
+
+      player.decrement();
+      // Back on the first step at its full count: half way, from the other
+      // side of the boundary.
+      expect(player.collectionProgress, 0.5);
+
+      player.decrement();
+      expect(player.collectionProgress, 0.25);
     });
   });
 }

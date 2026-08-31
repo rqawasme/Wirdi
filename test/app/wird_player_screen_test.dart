@@ -266,28 +266,36 @@ void main() {
   });
 
   group('the stripe', () {
-    testWidgets('is one segment for a step said once', (
+    testWidgets('is cut into one segment per step of the collection', (
       WidgetTester tester,
     ) async {
       await openAt(tester, 0);
 
-      expect(_stripe(tester).segments, 1);
+      // Fourteen steps, fourteen segments — not the current step's count.
+      expect(_stripe(tester).segments, 14);
       expect(_stripe(tester).value, 0);
     });
 
-    testWidgets('is cut into 33 for a count of 100', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('measures the wird, not the step', (WidgetTester tester) async {
+      // Step two of fourteen: a dhikr said a hundred times.
       await openAt(tester, 1);
-
-      expect(_stripe(tester).segments, 33);
+      expect(_stripe(tester).value, closeTo(1 / 14, 0.0001));
 
       await tester.tap(find.text('PLACEHOLDER dhikr 1002 translation'));
       await tester.pump();
 
-      // One tap of a hundred: the stripe moves by a hundredth, which is a
-      // third of a segment, which paints as nothing yet.
-      expect(_stripe(tester).value, closeTo(0.01, 0.0001));
+      // One tap of a hundred moves the stripe by a hundredth of one step's
+      // share of the wird, and the counter by one.
+      expect(find.text('99'), findsOneWidget);
+      expect(_stripe(tester).value, closeTo(1.01 / 14, 0.0001));
+    });
+
+    testWidgets('is half way at the half way step', (
+      WidgetTester tester,
+    ) async {
+      await openAt(tester, 7);
+
+      expect(_stripe(tester).value, closeTo(0.5, 0.0001));
     });
   });
 

@@ -102,10 +102,11 @@ class WirdPlayer extends ChangeNotifier {
 
   /// The most segments the progress stripe is cut into.
   ///
-  /// Thirty-three because that is the length of a tasbih and the largest count
-  /// where one segment per repetition still reads as a segment. Past it the
-  /// stripe fills proportionally instead — a hundred repetitions light a
-  /// segment roughly every third tap.
+  /// Thirty-three because that is the length of a tasbih and about the largest
+  /// number where a segment still reads as a segment. A collection with fewer
+  /// steps than this gets one segment per step; a longer one fills
+  /// proportionally, so a wird of forty-five steps lights a segment roughly
+  /// every step and a half.
   static const int maxStripeSegments = 33;
 
   final ResolvedCollection collection;
@@ -155,16 +156,29 @@ class WirdPlayer extends ChangeNotifier {
   /// What is left of the current step.
   int get remaining => math.max(0, step.count - _currentCount);
 
-  /// How full the stripe is, 0 to 1.
+  /// How far into the current step, 0 to 1.
   double get stepProgress {
     if (isEmpty) return 0;
     if (step.count <= 0) return 1;
     return (_currentCount / step.count).clamp(0.0, 1.0);
   }
 
-  /// How many segments the stripe is cut into for this step.
+  /// How far through the whole collection, 0 to 1. What the stripe shows.
+  ///
+  /// Steps finished plus how far into the current one, so a dhikr said a
+  /// hundred times moves the stripe as it is counted rather than leaving it
+  /// parked until the step ends. The remaining count is the step's own
+  /// indicator; the stripe is the wird's.
+  double get collectionProgress {
+    if (isEmpty) return 0;
+    if (_finished) return 1;
+    return ((_stepIndex + stepProgress) / steps.length).clamp(0.0, 1.0);
+  }
+
+  /// How many segments the stripe is cut into: one per step, up to
+  /// [maxStripeSegments].
   int get stripeSegments =>
-      isEmpty ? 1 : math.max(1, math.min(step.count, maxStripeSegments));
+      isEmpty ? 1 : math.max(1, math.min(steps.length, maxStripeSegments));
 
   /// The content behind the current step: the dhikr, the ayah or the surah,
   /// with its count, note and hydrated source.
