@@ -49,6 +49,21 @@ jobs:
       - name: Check font coverage
         run: python3 tool/check_font_coverage.py
 
+      # The worked examples are deliberately outside the build — their text is
+      # the placeholder sentinel, and a placeholder collection sitting in the
+      # app's list next to a real wird is worse than no example at all. Outside
+      # the build is not outside CI: they are schema-checked and then actually
+      # built, so a format change that breaks the documented example fails here
+      # rather than being found by the next person to copy it.
+      - name: Check the worked examples still validate and build
+        run: |
+          python3 content/scripts/validate_json.py --sources-dir content/examples
+          python3 content/scripts/build_content.py \
+            --sources-dir content/examples \
+            --quran-dir content/sources/quran \
+            --out "$RUNNER_TEMP/example-content.db" \
+            --require-quran
+
       # pubspec.yaml names assets/content.db explicitly, so the asset has to
       # exist before anything builds an asset bundle — which `flutter test`
       # does. It is gitignored, being a build artifact of the step above.

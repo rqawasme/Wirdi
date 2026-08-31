@@ -302,7 +302,7 @@ def load_collections(
         for index, item in enumerate(doc["items"]):
             where = f"{rel(path)} $.items[{index}]"
             resolved = resolve_item(
-                item, where, dhikr_ids, surah_ayah_counts, have_quran
+                item, where, dhikr_ids, surah_ayah_counts, have_quran, sources_dir
             )
             for item_type, item_id in resolved:
                 position += 1
@@ -340,6 +340,7 @@ def resolve_item(
     dhikr_ids: set[int],
     surah_ayah_counts: dict[int, int],
     have_quran: bool,
+    sources_dir: Path,
 ) -> list[tuple[str, int]]:
     """Turn one authored item into (item_type, item_id) pairs.
 
@@ -350,7 +351,8 @@ def resolve_item(
         dhikr_id = item["dhikr"]
         if dhikr_id not in dhikr_ids:
             raise BuildError(
-                f"{where}: dhikr {dhikr_id} does not exist in content/sources/adhkar/"
+                f"{where}: dhikr {dhikr_id} does not exist in "
+                f"{rel(sources_dir / 'adhkar')}/"
             )
         return [("dhikr", dhikr_id)]
 
@@ -459,7 +461,8 @@ def build(args: argparse.Namespace) -> int:
         if source_id is not None and source_id not in source_ids:
             raise BuildError(
                 f"{rel(dhikr['_file'])}: dhikr {dhikr['id']} references "
-                f"source_id {source_id}, which is not in content/sources/sources.json"
+                f"source_id {source_id}, which is not in "
+                f"{rel(sources_dir / 'sources.json')}"
             )
     dhikr_ids = {d["id"] for d in adhkar_rows}
 

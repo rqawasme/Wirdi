@@ -3,8 +3,8 @@
 
 Two phases run in order:
 
-  1. Schema validation - every file in content/sources/adhkar/ and
-     content/sources/collections/, plus content/sources/sources.json, is checked
+  1. Schema validation - every file in <sources>/adhkar/ and
+     <sources>/collections/, plus <sources>/sources.json, is checked
      against its JSON Schema. Malformed JSON is reported with the line, the
      column and the offending source line.
 
