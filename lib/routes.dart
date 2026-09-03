@@ -1,21 +1,29 @@
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 
+import 'domain/collection_id.dart';
 import 'dev/dev_screen.dart';
 import 'screens/about_screen.dart';
+import 'screens/collections_screen.dart';
 import 'screens/reading_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/surah_list_screen.dart';
+import 'screens/wird_player_screen.dart';
 
 /// The app's route names.
 ///
-/// A plain [Navigator] with named routes, and no routing package. Four screens
-/// and one argument between them do not need one, and nothing here has to be
+/// A plain [Navigator] with named routes, and no routing package. Six screens
+/// and two arguments between them do not need one, and nothing here has to be
 /// addressable from outside the app yet — when deep linking becomes a
 /// requirement it will bring its own constraints, and choosing a router before
 /// then is choosing without them.
 abstract final class Routes {
-  static const String surahList = '/';
+  /// Home. The app is for doing a wird; the mushaf is a tap away from here
+  /// rather than the other way round.
+  static const String collections = '/';
+
+  static const String player = '/player';
+  static const String surahList = '/quran';
   static const String reading = '/reading';
   static const String settings = '/settings';
   static const String about = '/about';
@@ -23,6 +31,14 @@ abstract final class Routes {
   /// The phase 3 rendering harness. Registered in debug builds only — see
   /// [WirdiRouter.onGenerateRoute].
   static const String dev = '/dev';
+}
+
+/// Which collection a [Routes.player] push is opening.
+@immutable
+final class PlayerArguments {
+  const PlayerArguments({required this.collectionId});
+
+  final CollectionId collectionId;
 }
 
 /// Where a [Routes.reading] push is going.
@@ -44,6 +60,24 @@ abstract final class WirdiRouter {
   /// leaving a typo to be discovered by a user.
   static Route<void>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case Routes.collections:
+        return _page(settings, (BuildContext _) => const CollectionsScreen());
+
+      case Routes.player:
+        final Object? arguments = settings.arguments;
+        if (arguments is! PlayerArguments) {
+          throw ArgumentError.value(
+            arguments,
+            'settings.arguments',
+            'pushing ${Routes.player} needs PlayerArguments',
+          );
+        }
+        return _page(
+          settings,
+          (BuildContext _) =>
+              WirdPlayerScreen(collectionId: arguments.collectionId),
+        );
+
       case Routes.surahList:
         return _page(settings, (BuildContext _) => const SurahListScreen());
 

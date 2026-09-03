@@ -80,6 +80,16 @@ class SettingsScreen extends ConsumerWidget {
                   value: settings.showTranslation,
                   onChanged: controller.setShowTranslation,
                 ),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Haptics'),
+                  subtitle: const Text(
+                    'The counter answers each tap, and knocks at the end of a '
+                    'step',
+                  ),
+                  value: settings.haptics,
+                  onChanged: controller.setHaptics,
+                ),
                 const SizedBox(height: WirdiMetrics.space4),
                 SettingChoice<ThemeMode>(
                   label: 'Theme',

@@ -8,8 +8,9 @@ collections and Quran surahs, with counters and reminders.
 
 This repository holds the **content pipeline** — the Python that turns source
 data into the SQLite database the app bundles — and the Flutter app that reads
-it: the data layer, the theme, and the reading experience. Collections, the wird
-player and the counter are not built yet.
+it: the data layer, the theme, the reading experience, and the wird player and
+its counter. Making and editing your own collections, and streaks, are not
+built yet.
 
 ## The content pipeline
 
@@ -131,13 +132,74 @@ lib/
   main.dart               opens both databases, then runs the app
   wirdi_app.dart          MaterialApp, both themes, the settings-driven type scale
   routes.dart             named routes; a plain Navigator, no routing package
-  screens/                surah list, reading view, settings, about
+  screens/                collections, wird player, surah list, reading view,
+                          settings, about
+  player/                 the counter's state and its haptics — no widgets
   widgets/                the pieces the screens share
   providers/              riverpod: the databases, the repositories, settings
   quran/                  text transformations on the Uthmani text
   theme/                  colour, shape, motion, type
   dev/                    throwaway — deleted before release
 ```
+
+### The wird player
+
+The counter, and the screen the app is for. It opens from the collections list,
+which is home.
+
+**Its state is a plain object.** `lib/player/wird_player.dart` is a
+`ChangeNotifier` and knows nothing about widgets, so counting, undo across a
+step boundary, resume, skipping and completion are all tested by calling
+methods rather than by pumping frames. The screen is a `ListenableBuilder` over
+it, and a tap goes from the gesture straight to the object holding the count.
+
+**Playback runs on `steps`, never `entries`.** A repeat block arrives already
+flattened, with `repetition` and `repetitionsTotal` on each step, so the player
+never has to know what a block is. Position is `stepIndex` plus `currentCount`,
+which is exactly what the `progress` row stores.
+
+**Nothing animates.** Not the count, not the stripe. At thirty-three
+repetitions a counter that eases into position is a counter running behind the
+thumb, and the lag is the whole experience. Feedback is haptic instead: a
+`selectionClick` on each tap, throttled to one per 60ms and **dropped** rather
+than queued, because some Android devices buffer rapid vibration calls and play
+them back late — which is the same lag arriving through the other sense. The
+end of a step is a heavier impact, which always fires, and the tap that
+finishes a step advances on its own rather than asking for another one.
+
+**The stripe is the wird.** `VoussoirStripe.progress` is cut into
+`min(stepCount, 33)` segments — one per step where a collection is short
+enough, proportionally past that — and it fills with steps finished plus how
+far into the current one, so a dhikr said a hundred times moves it as it is
+counted rather than leaving it parked. The step's own indicator is the count
+below it. One stripe measuring two things measures neither, and the thing worth
+measuring across the top of the screen is how much of the wird is left.
+
+**A dhikr or an ayah is tap-to-count over the whole content area**, margins and
+empty space included, because at speed the thumb lands wherever it lands. A
+surah is not: "read Al-Mulk" is a reading, so it renders as the same verse
+blocks the reading view uses, in a virtualised list, with one done action in
+the controls. Undo, the skips and start over all live outside that area for the
+same reason — the area is one large increment button.
+
+**Resume is silent.** On open the stored position goes through
+`ResolvedCollection.resumableFrom`; a position that survives is resumed without
+asking, and one that does not is deleted. There is no resume-or-restart dialog:
+this is a daily habit, and a question in front of it every morning is a tax on
+the habit. Start over is in the app bar's overflow for the days it is wanted.
+
+**Writes are coalesced.** A count change starts a 500ms timer if one is not
+already running — a rate limiter rather than a trailing debounce, so a long
+tasbih is written through every half second instead of writing nothing until
+the user stops. A step change is written immediately, and so is going to the
+background. Every write goes through one ordered chain, which is what keeps a
+count queued half a second ago from landing after the completion cleared the
+row.
+
+**Finishing** logs the completion, clears the progress row, holds the solid
+stripe for about half a second, and returns to the list. That hold is the one
+deliberate beat in the app — no confetti, no sound — and with reduce-motion on
+it is skipped.
 
 ### The reading view
 

@@ -64,7 +64,10 @@ void _tests(File contentFile) {
     );
     await tester.pumpAndSettle();
 
-    // In through the debug-only entry point on the surah list.
+    // In through the debug-only entry point on the surah list, which is now a
+    // tap from home rather than home itself.
+    await tester.tap(find.byIcon(Icons.menu_book_outlined));
+    await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.science_outlined));
     await tester.pumpAndSettle();
   }
