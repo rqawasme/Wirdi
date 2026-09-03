@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'domain/collection_id.dart';
 import 'dev/dev_screen.dart';
 import 'screens/about_screen.dart';
+import 'screens/collection_edit_screen.dart';
 import 'screens/collections_screen.dart';
+import 'screens/pickers/ayah_picker_screen.dart';
+import 'screens/pickers/dhikr_picker_screen.dart';
+import 'screens/pickers/surah_picker_screen.dart';
 import 'screens/reading_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/surah_list_screen.dart';
@@ -23,6 +27,16 @@ abstract final class Routes {
   static const String collections = '/';
 
   static const String player = '/player';
+
+  /// Editing one of the user's own collections.
+  static const String collectionEdit = '/collection/edit';
+
+  /// The three item pickers. Each is pushed to answer one question and popped
+  /// with a `List<PickedItem>`, or with nothing if it was backed out of.
+  static const String pickSurah = '/pick/surah';
+  static const String pickAyah = '/pick/ayah';
+  static const String pickDhikr = '/pick/dhikr';
+
   static const String surahList = '/quran';
   static const String reading = '/reading';
   static const String settings = '/settings';
@@ -39,6 +53,17 @@ final class PlayerArguments {
   const PlayerArguments({required this.collectionId});
 
   final CollectionId collectionId;
+}
+
+/// Which collection a [Routes.collectionEdit] push is editing.
+///
+/// A [UserCollectionId] and not a [CollectionId]: a built-in cannot be edited,
+/// and the way to say that is to make it impossible to ask for.
+@immutable
+final class CollectionEditArguments {
+  const CollectionEditArguments({required this.collectionId});
+
+  final UserCollectionId collectionId;
 }
 
 /// Where a [Routes.reading] push is going.
@@ -58,7 +83,7 @@ abstract final class WirdiRouter {
   /// Unknown names fall through to null, which makes [Navigator] throw with the
   /// name in the message — better than silently landing on the surah list and
   /// leaving a typo to be discovered by a user.
-  static Route<void>? onGenerateRoute(RouteSettings settings) {
+  static Route<Object?>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case Routes.collections:
         return _page(settings, (BuildContext _) => const CollectionsScreen());
@@ -77,6 +102,30 @@ abstract final class WirdiRouter {
           (BuildContext _) =>
               WirdPlayerScreen(collectionId: arguments.collectionId),
         );
+
+      case Routes.collectionEdit:
+        final Object? arguments = settings.arguments;
+        if (arguments is! CollectionEditArguments) {
+          throw ArgumentError.value(
+            arguments,
+            'settings.arguments',
+            'pushing ${Routes.collectionEdit} needs CollectionEditArguments',
+          );
+        }
+        return _page(
+          settings,
+          (BuildContext _) =>
+              CollectionEditScreen(collectionId: arguments.collectionId),
+        );
+
+      case Routes.pickSurah:
+        return _page(settings, (BuildContext _) => const SurahPickerScreen());
+
+      case Routes.pickAyah:
+        return _page(settings, (BuildContext _) => const AyahPickerScreen());
+
+      case Routes.pickDhikr:
+        return _page(settings, (BuildContext _) => const DhikrPickerScreen());
 
       case Routes.surahList:
         return _page(settings, (BuildContext _) => const SurahListScreen());
@@ -112,10 +161,12 @@ abstract final class WirdiRouter {
     return null;
   }
 
-  static MaterialPageRoute<void> _page(
+  /// Typed as `Object?` rather than `void` because the pickers pop with an
+  /// answer. A route that returns nothing simply never pops with one.
+  static MaterialPageRoute<Object?> _page(
     RouteSettings settings,
     WidgetBuilder builder,
   ) {
-    return MaterialPageRoute<void>(builder: builder, settings: settings);
+    return MaterialPageRoute<Object?>(builder: builder, settings: settings);
   }
 }
