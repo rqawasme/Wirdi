@@ -762,6 +762,16 @@ class CountingUserRepository implements UserRepository {
   Future<int> currentStreak() => _inner.currentStreak();
 
   @override
+  Future<List<Commitment>> commitments() => _inner.commitments();
+
+  @override
+  Future<void> commit(CollectionId id, DailySection section) =>
+      _inner.commit(id, section);
+
+  @override
+  Future<void> uncommit(CollectionId id) => _inner.uncommit(id);
+
+  @override
   Future<ReadingPosition?> lastPosition() => _inner.lastPosition();
 
   @override

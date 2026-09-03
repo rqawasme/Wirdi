@@ -2326,6 +2326,371 @@ class SettingsCompanion extends UpdateCompanion<SettingRow> {
   }
 }
 
+class Commitments extends Table with TableInfo<Commitments, CommitmentRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  Commitments(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _collectionRefMeta = const VerificationMeta(
+    'collectionRef',
+  );
+  late final GeneratedColumn<String> collectionRef = GeneratedColumn<String>(
+    'collection_ref',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _sectionMeta = const VerificationMeta(
+    'section',
+  );
+  late final GeneratedColumn<String> section = GeneratedColumn<String>(
+    'section',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    collectionRef,
+    section,
+    sortOrder,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'commitments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CommitmentRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('collection_ref')) {
+      context.handle(
+        _collectionRefMeta,
+        collectionRef.isAcceptableOrUnknown(
+          data['collection_ref']!,
+          _collectionRefMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_collectionRefMeta);
+    }
+    if (data.containsKey('section')) {
+      context.handle(
+        _sectionMeta,
+        section.isAcceptableOrUnknown(data['section']!, _sectionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sectionMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sortOrderMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {collectionRef};
+  @override
+  CommitmentRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CommitmentRow(
+      collectionRef: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}collection_ref'],
+      )!,
+      section: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}section'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  Commitments createAlias(String alias) {
+    return Commitments(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
+  final String collectionRef;
+  final String section;
+  final int sortOrder;
+  final int createdAt;
+  final int updatedAt;
+  const CommitmentRow({
+    required this.collectionRef,
+    required this.section,
+    required this.sortOrder,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['collection_ref'] = Variable<String>(collectionRef);
+    map['section'] = Variable<String>(section);
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  factory CommitmentRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CommitmentRow(
+      collectionRef: serializer.fromJson<String>(json['collection_ref']),
+      section: serializer.fromJson<String>(json['section']),
+      sortOrder: serializer.fromJson<int>(json['sort_order']),
+      createdAt: serializer.fromJson<int>(json['created_at']),
+      updatedAt: serializer.fromJson<int>(json['updated_at']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'collection_ref': serializer.toJson<String>(collectionRef),
+      'section': serializer.toJson<String>(section),
+      'sort_order': serializer.toJson<int>(sortOrder),
+      'created_at': serializer.toJson<int>(createdAt),
+      'updated_at': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  CommitmentRow copyWith({
+    String? collectionRef,
+    String? section,
+    int? sortOrder,
+    int? createdAt,
+    int? updatedAt,
+  }) => CommitmentRow(
+    collectionRef: collectionRef ?? this.collectionRef,
+    section: section ?? this.section,
+    sortOrder: sortOrder ?? this.sortOrder,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  CommitmentRow copyWithCompanion(CommitmentsCompanion data) {
+    return CommitmentRow(
+      collectionRef: data.collectionRef.present
+          ? data.collectionRef.value
+          : this.collectionRef,
+      section: data.section.present ? data.section.value : this.section,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CommitmentRow(')
+          ..write('collectionRef: $collectionRef, ')
+          ..write('section: $section, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(collectionRef, section, sortOrder, createdAt, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CommitmentRow &&
+          other.collectionRef == this.collectionRef &&
+          other.section == this.section &&
+          other.sortOrder == this.sortOrder &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
+  final Value<String> collectionRef;
+  final Value<String> section;
+  final Value<int> sortOrder;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const CommitmentsCompanion({
+    this.collectionRef = const Value.absent(),
+    this.section = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CommitmentsCompanion.insert({
+    required String collectionRef,
+    required String section,
+    required int sortOrder,
+    required int createdAt,
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : collectionRef = Value(collectionRef),
+       section = Value(section),
+       sortOrder = Value(sortOrder),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<CommitmentRow> custom({
+    Expression<String>? collectionRef,
+    Expression<String>? section,
+    Expression<int>? sortOrder,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (collectionRef != null) 'collection_ref': collectionRef,
+      if (section != null) 'section': section,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CommitmentsCompanion copyWith({
+    Value<String>? collectionRef,
+    Value<String>? section,
+    Value<int>? sortOrder,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return CommitmentsCompanion(
+      collectionRef: collectionRef ?? this.collectionRef,
+      section: section ?? this.section,
+      sortOrder: sortOrder ?? this.sortOrder,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (collectionRef.present) {
+      map['collection_ref'] = Variable<String>(collectionRef.value);
+    }
+    if (section.present) {
+      map['section'] = Variable<String>(section.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CommitmentsCompanion(')
+          ..write('collectionRef: $collectionRef, ')
+          ..write('section: $section, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$UserDatabase extends GeneratedDatabase {
   _$UserDatabase(QueryExecutor e) : super(e);
   $UserDatabaseManager get managers => $UserDatabaseManager(this);
@@ -2349,6 +2714,11 @@ abstract class _$UserDatabase extends GeneratedDatabase {
   );
   late final ReadingPosition readingPosition = ReadingPosition(this);
   late final Settings settings = Settings(this);
+  late final Commitments commitments = Commitments(this);
+  late final Index idxCommitmentsSection = Index(
+    'idx_commitments_section',
+    'CREATE INDEX idx_commitments_section ON commitments (section, sort_order)',
+  );
   Selectable<UserCollectionRow> activeUserCollections() {
     return customSelect(
       'SELECT * FROM user_collections WHERE deleted_at IS NULL ORDER BY sort_order, created_at, id',
@@ -2679,6 +3049,51 @@ abstract class _$UserDatabase extends GeneratedDatabase {
     );
   }
 
+  Selectable<CommitmentRow> allCommitments() {
+    return customSelect(
+      'SELECT * FROM commitments ORDER BY sort_order, created_at, collection_ref',
+      variables: [],
+      readsFrom: {commitments},
+    ).asyncMap(commitments.mapFromRow);
+  }
+
+  Selectable<int> nextCommitmentSortOrder() {
+    return customSelect(
+      'SELECT COALESCE(MAX(sort_order), 0) + 1 AS v FROM commitments',
+      variables: [],
+      readsFrom: {commitments},
+    ).map((QueryRow row) => row.read<int>('v'));
+  }
+
+  Future<int> upsertCommitment({
+    required String ref,
+    required String section,
+    required int sortOrder,
+    required int createdAt,
+    required int updatedAt,
+  }) {
+    return customInsert(
+      'INSERT INTO commitments (collection_ref, section, sort_order, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5) ON CONFLICT (collection_ref) DO UPDATE SET section = excluded.section, updated_at = excluded.updated_at',
+      variables: [
+        Variable<String>(ref),
+        Variable<String>(section),
+        Variable<int>(sortOrder),
+        Variable<int>(createdAt),
+        Variable<int>(updatedAt),
+      ],
+      updates: {commitments},
+    );
+  }
+
+  Future<int> deleteCommitment({required String ref}) {
+    return customUpdate(
+      'DELETE FROM commitments WHERE collection_ref = ?1',
+      variables: [Variable<String>(ref)],
+      updates: {commitments},
+      updateKind: UpdateKind.delete,
+    );
+  }
+
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2693,6 +3108,8 @@ abstract class _$UserDatabase extends GeneratedDatabase {
     idxCompletionsDate,
     readingPosition,
     settings,
+    commitments,
+    idxCommitmentsSection,
   ];
 }
 
@@ -4184,6 +4601,207 @@ typedef $SettingsProcessedTableManager =
       SettingRow,
       PrefetchHooks Function()
     >;
+typedef $CommitmentsCreateCompanionBuilder =
+    CommitmentsCompanion Function({
+      required String collectionRef,
+      required String section,
+      required int sortOrder,
+      required int createdAt,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $CommitmentsUpdateCompanionBuilder =
+    CommitmentsCompanion Function({
+      Value<String> collectionRef,
+      Value<String> section,
+      Value<int> sortOrder,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+class $CommitmentsFilterComposer extends Composer<_$UserDatabase, Commitments> {
+  $CommitmentsFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get collectionRef => $composableBuilder(
+    column: $table.collectionRef,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get section => $composableBuilder(
+    column: $table.section,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $CommitmentsOrderingComposer
+    extends Composer<_$UserDatabase, Commitments> {
+  $CommitmentsOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get collectionRef => $composableBuilder(
+    column: $table.collectionRef,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get section => $composableBuilder(
+    column: $table.section,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $CommitmentsAnnotationComposer
+    extends Composer<_$UserDatabase, Commitments> {
+  $CommitmentsAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get collectionRef => $composableBuilder(
+    column: $table.collectionRef,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get section =>
+      $composableBuilder(column: $table.section, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $CommitmentsTableManager
+    extends
+        RootTableManager<
+          _$UserDatabase,
+          Commitments,
+          CommitmentRow,
+          $CommitmentsFilterComposer,
+          $CommitmentsOrderingComposer,
+          $CommitmentsAnnotationComposer,
+          $CommitmentsCreateCompanionBuilder,
+          $CommitmentsUpdateCompanionBuilder,
+          (
+            CommitmentRow,
+            BaseReferences<_$UserDatabase, Commitments, CommitmentRow>,
+          ),
+          CommitmentRow,
+          PrefetchHooks Function()
+        > {
+  $CommitmentsTableManager(_$UserDatabase db, Commitments table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $CommitmentsFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $CommitmentsOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $CommitmentsAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> collectionRef = const Value.absent(),
+                Value<String> section = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CommitmentsCompanion(
+                collectionRef: collectionRef,
+                section: section,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String collectionRef,
+                required String section,
+                required int sortOrder,
+                required int createdAt,
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CommitmentsCompanion.insert(
+                collectionRef: collectionRef,
+                section: section,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $CommitmentsProcessedTableManager =
+    ProcessedTableManager<
+      _$UserDatabase,
+      Commitments,
+      CommitmentRow,
+      $CommitmentsFilterComposer,
+      $CommitmentsOrderingComposer,
+      $CommitmentsAnnotationComposer,
+      $CommitmentsCreateCompanionBuilder,
+      $CommitmentsUpdateCompanionBuilder,
+      (
+        CommitmentRow,
+        BaseReferences<_$UserDatabase, Commitments, CommitmentRow>,
+      ),
+      CommitmentRow,
+      PrefetchHooks Function()
+    >;
 
 class $UserDatabaseManager {
   final _$UserDatabase _db;
@@ -4200,4 +4818,6 @@ class $UserDatabaseManager {
       $ReadingPositionTableManager(_db, _db.readingPosition);
   $SettingsTableManager get settings =>
       $SettingsTableManager(_db, _db.settings);
+  $CommitmentsTableManager get commitments =>
+      $CommitmentsTableManager(_db, _db.commitments);
 }

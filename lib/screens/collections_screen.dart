@@ -3,23 +3,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../collections/collection_editing.dart';
 import '../domain/collection_id.dart';
+import '../domain/commitment.dart';
 import '../providers/collections.dart';
 import '../providers/editing.dart';
-import '../providers/settings.dart';
-import '../providers/streak.dart';
+import '../providers/home.dart';
 import '../routes.dart';
 import '../theme/theme.dart';
 import '../widgets/collection_dialogs.dart';
+import '../widgets/collection_row.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/failure_screen.dart';
-import '../widgets/streak_panel.dart';
-import '../widgets/voussoir_stripe.dart';
 
-/// The wirds: built-ins first, then the user's own.
+/// Every collection there is: the user's own first, then the built-ins.
 ///
-/// The app opens here. A wird is what somebody came to do; the mushaf is one
-/// tap away in the app bar, which is the right way round for an app whose
-/// centre is the counter.
+/// This is the tab about what the app *contains* — where collections are made,
+/// copied, edited, deleted, and committed to. Home is the tab about what today
+/// contains, and it shows only what was committed here.
+///
+/// A body rather than a screen with its own [Scaffold]: the app bar and the
+/// navigation bar belong to [AppShell], which swaps this body for another
+/// without either of them moving.
 class CollectionsScreen extends ConsumerWidget {
   const CollectionsScreen({super.key});
 
@@ -29,54 +32,22 @@ class CollectionsScreen extends ConsumerWidget {
       collectionListingsProvider,
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Wird'),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.add),
-            tooltip: 'New collection',
-            onPressed: () => newCollection(context, ref),
-          ),
-          IconButton(
-            icon: const Icon(Icons.menu_book_outlined),
-            tooltip: 'Quran',
-            onPressed: () => Navigator.pushNamed(context, Routes.surahList),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: 'Settings',
-            onPressed: () => Navigator.pushNamed(context, Routes.settings),
-          ),
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            tooltip: 'About',
-            onPressed: () => Navigator.pushNamed(context, Routes.about),
-          ),
-        ],
-        bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(VoussoirStripe.ruleHeight),
-          child: VoussoirStripe.rule(),
+    return switch (listings) {
+      AsyncError(:final Object error, :final StackTrace stackTrace) =>
+        FailureScreen(
+          title: 'Could not read the collections',
+          error: error,
+          stackTrace: stackTrace,
         ),
+      AsyncData(:final List<CollectionListing> value) => _CollectionList(
+        listings: value,
       ),
-      body: switch (listings) {
-        AsyncError(:final Object error, :final StackTrace stackTrace) =>
-          FailureScreen(
-            title: 'Could not read the collections',
-            error: error,
-            stackTrace: stackTrace,
-          ),
-        AsyncData(:final List<CollectionListing> value) => _CollectionList(
-          listings: value,
-        ),
-        _ => const Center(child: CircularProgressIndicator()),
-      },
-    );
+      _ => const Center(child: CircularProgressIndicator()),
+    };
   }
 }
 
-/// The streak, the rows, and whatever the list has to say when it is short of
-/// them.
+/// The two groups, and whatever the list has to say when it is short of rows.
 class _CollectionList extends ConsumerWidget {
   const _CollectionList({required this.listings});
 
@@ -97,48 +68,107 @@ class _CollectionList extends ConsumerWidget {
       );
     }
 
-    final bool hasOwn = listings.any(
-      (CollectionListing l) => !l.summary.isBuiltin,
-    );
+    final List<CollectionListing> mine = <CollectionListing>[
+      for (final CollectionListing l in listings)
+        if (!l.summary.isBuiltin) l,
+    ];
+    final List<CollectionListing> builtin = <CollectionListing>[
+      for (final CollectionListing l in listings)
+        if (l.summary.isBuiltin) l,
+    ];
 
     return ListView(
       padding: const EdgeInsets.only(bottom: WirdiMetrics.space6),
       children: <Widget>[
-        const _Streak(),
-        for (final CollectionListing listing in listings)
-          _CollectionRow(listing: listing),
-        if (!hasOwn) const _NoneOfYourOwn(),
+        // Yours first. What somebody made is what they are looking for; the
+        // built-ins are the shelf they took it off.
+        const _GroupLabel('Yours'),
+        if (mine.isEmpty) const _NoneOfYourOwn() else ..._rows(mine),
+        const _GroupLabel('Built-in'),
+        ..._rows(builtin),
       ],
+    );
+  }
+
+  /// Rows with a hairline between them — a division, not a bar, and none
+  /// before the first or after the last: the group label is the boundary
+  /// there.
+  List<Widget> _rows(List<CollectionListing> group) {
+    final List<Widget> rows = <Widget>[];
+    for (final CollectionListing listing in group) {
+      if (rows.isNotEmpty) rows.add(const _Hairline());
+      rows.add(_Row(listing: listing));
+    }
+    return rows;
+  }
+}
+
+class _GroupLabel extends StatelessWidget {
+  const _GroupLabel(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final WirdiTypography type = theme.extension<WirdiTypography>()!;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        WirdiMetrics.space4,
+        WirdiMetrics.space5,
+        WirdiMetrics.space4,
+        WirdiMetrics.space2,
+      ),
+      child: Text(
+        label,
+        style: type.caption.copyWith(color: theme.colorScheme.onSurfaceVariant),
+      ),
     );
   }
 }
 
-/// The streak, if it is wanted.
-///
-/// Hidden entirely when the setting is off — not greyed, not collapsed to a
-/// number. And absent while the settings load rather than appearing and then
-/// vanishing, which would show it to exactly the person who asked not to see
-/// it.
-class _Streak extends ConsumerWidget {
-  const _Streak();
+class _Hairline extends StatelessWidget {
+  const _Hairline();
+
+  @override
+  Widget build(BuildContext context) {
+    return Divider(
+      height: WirdiMetrics.hairline,
+      thickness: WirdiMetrics.hairline,
+      color: Theme.of(context).colorScheme.outlineVariant,
+    );
+  }
+}
+
+/// One collection, and the menu of what can be done to it.
+class _Row extends ConsumerWidget {
+  const _Row({required this.listing});
+
+  final CollectionListing listing;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool show = ref.watch(settingsProvider).value?.showStreak ?? false;
-    if (!show) return const SizedBox.shrink();
-
-    final AsyncValue<StreakView> view = ref.watch(streakViewProvider);
-    final StreakView? value = view.value;
-    // A streak that cannot be read is not worth a failure screen: the wirds
-    // are underneath it and they are what the screen is for.
-    if (value == null) return const SizedBox.shrink();
-
-    return Column(
-      children: <Widget>[
-        StreakPanel(view: value),
-        const VoussoirStripe.rule(),
-      ],
+    return CollectionRow(
+      listing: listing,
+      onTap: () => _open(context, ref),
+      trailing: _RowMenu(listing: listing),
     );
+  }
+
+  Future<void> _open(BuildContext context, WidgetRef ref) async {
+    await Navigator.pushNamed(
+      context,
+      Routes.player,
+      arguments: PlayerArguments(collectionId: listing.id),
+    );
+    // The player is where completions and progress happen, so the row that
+    // launched it is stale the moment it comes back — and so is the home
+    // screen behind this tab, if this collection is committed.
+    if (context.mounted) {
+      ref.invalidate(collectionListingsProvider);
+      ref.invalidate(homeViewProvider);
+    }
   }
 }
 
@@ -166,140 +196,14 @@ class _NoneOfYourOwn extends ConsumerWidget {
   }
 }
 
-/// One collection.
-///
-/// The completed-today mark is deliberately quiet — a small check in
-/// [ColorScheme.onSurfaceVariant], on the same line as the item count and in
-/// the same colour as it. Finishing a daily wird is the expected outcome, not
-/// an achievement, and a row that congratulates you every evening stops meaning
-/// anything by the third day.
-class _CollectionRow extends ConsumerWidget {
-  const _CollectionRow({required this.listing});
-
-  /// The most of a row the Arabic name may take before it starts wrapping.
-  static const double _arabicShare = 0.45;
-
-  final CollectionListing listing;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final ThemeData theme = Theme.of(context);
-    final WirdiTypography type = theme.extension<WirdiTypography>()!;
-    final Color quiet = theme.colorScheme.onSurfaceVariant;
-    final String? nameArabic = listing.summary.nameArabic;
-
-    final String items =
-        '${listing.itemCount} ${listing.itemCount == 1 ? 'item' : 'items'}';
-    final String state = listing.completedToday
-        ? 'done today'
-        : listing.inProgress
-        ? 'part-way through'
-        : 'not started today';
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Expanded(
-          child: Semantics(
-            container: true,
-            button: true,
-            label: '${listing.name}, $items, $state',
-            child: InkWell(
-              onTap: () => _open(context, ref),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  WirdiMetrics.space4,
-                  WirdiMetrics.space4,
-                  0,
-                  WirdiMetrics.space4,
-                ),
-                child: ExcludeSemantics(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      LayoutBuilder(
-                        builder:
-                            (
-                              BuildContext context,
-                              BoxConstraints constraints,
-                            ) => Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Expanded(
-                                  child: Text(
-                                    listing.name,
-                                    style: theme.textTheme.titleMedium,
-                                  ),
-                                ),
-                                if (nameArabic != null) ...<Widget>[
-                                  const SizedBox(width: WirdiMetrics.space4),
-                                  // Capped rather than given a flex share: an
-                                  // Arabic name that needs a third of the row
-                                  // should not take half of it and wrap the
-                                  // English name that would otherwise have
-                                  // fitted.
-                                  ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      maxWidth:
-                                          constraints.maxWidth * _arabicShare,
-                                    ),
-                                    child: Directionality(
-                                      textDirection: TextDirection.rtl,
-                                      child: Text(
-                                        nameArabic,
-                                        style: type.arabicTitle,
-                                        locale: const Locale('ar'),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                      ),
-                      const SizedBox(height: WirdiMetrics.space2),
-                      // On its own line under both names, so it has the width
-                      // to say what it has to say however long the collection
-                      // is called.
-                      _Meta(listing: listing, items: items, colour: quiet),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        // Outside the row's own semantics rather than inside it: a menu that
-        // opens the only way to copy a built-in should not be something a
-        // screen reader has to find inside a button.
-        _RowMenu(listing: listing),
-      ],
-    );
-  }
-
-  Future<void> _open(BuildContext context, WidgetRef ref) async {
-    await Navigator.pushNamed(
-      context,
-      Routes.player,
-      arguments: PlayerArguments(collectionId: listing.id),
-    );
-    // The player is where completions and progress happen, so the row that
-    // launched it is stale the moment it comes back.
-    if (context.mounted) {
-      ref.invalidate(collectionListingsProvider);
-      ref.invalidate(streakViewProvider);
-    }
-  }
-}
-
-enum _RowAction { edit, duplicate, delete }
+enum _RowAction { commit, uncommit, edit, duplicate, delete }
 
 /// What can be done to a collection without opening it.
 ///
-/// A built-in offers one thing: a copy you can edit. That is the path this
-/// phase is built around — somebody wants al-Haddad's wird with two more
-/// adhkar in it, or the morning adhkar at different counts — and it is here
-/// rather than behind the player because it is a thing you do to a collection,
-/// not a thing you do while reciting one.
+/// A built-in offers two things: a copy you can edit, and a place in your day.
+/// Committing is here rather than on Home because Home shows the result of the
+/// decision and this is where the decision is made — and because a built-in
+/// can be committed to without being copied first, which is the common case.
 class _RowMenu extends ConsumerWidget {
   const _RowMenu({required this.listing});
 
@@ -308,11 +212,20 @@ class _RowMenu extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final CollectionId id = listing.id;
+    // Absent means not committed. While the read is in flight the menu offers
+    // committing, which is the right guess for a collection nobody has
+    // committed yet and is corrected the moment the map arrives.
+    final Map<CollectionId, DailySection> committed =
+        ref.watch(commitmentsProvider).value ??
+        const <CollectionId, DailySection>{};
+    final DailySection? section = committed[id];
 
     return PopupMenuButton<_RowAction>(
       icon: const Icon(Icons.more_vert),
       tooltip: 'More',
       onSelected: (_RowAction action) => switch (action) {
+        _RowAction.commit => _commit(context, ref, id, current: section),
+        _RowAction.uncommit => ref.read(homeCommitmentsProvider).uncommit(id),
         _RowAction.edit => _edit(context, id),
         _RowAction.duplicate => duplicateCollectionFlow(
           context,
@@ -323,6 +236,21 @@ class _RowMenu extends ConsumerWidget {
         _RowAction.delete => _delete(context, ref, id),
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<_RowAction>>[
+        PopupMenuItem<_RowAction>(
+          value: _RowAction.commit,
+          // Committed already, this moves it. The label says which it is
+          // doing rather than leaving the user to find out.
+          child: Text(
+            section == null
+                ? 'Commit to daily practice'
+                : 'Move to another part of the day',
+          ),
+        ),
+        if (section != null)
+          const PopupMenuItem<_RowAction>(
+            value: _RowAction.uncommit,
+            child: Text('Remove from home'),
+          ),
         if (id is UserCollectionId)
           const PopupMenuItem<_RowAction>(
             value: _RowAction.edit,
@@ -339,6 +267,21 @@ class _RowMenu extends ConsumerWidget {
           ),
       ],
     );
+  }
+
+  Future<void> _commit(
+    BuildContext context,
+    WidgetRef ref,
+    CollectionId id, {
+    required DailySection? current,
+  }) async {
+    final DailySection? section = await showSectionPicker(
+      context,
+      name: listing.name,
+      current: current,
+    );
+    if (section == null || !context.mounted) return;
+    await ref.read(homeCommitmentsProvider).commit(id, section);
   }
 
   Future<void> _edit(BuildContext context, CollectionId id) async {
@@ -366,6 +309,10 @@ class _RowMenu extends ConsumerWidget {
       ref,
       () => ref.read(collectionEditorProvider).delete(id),
     );
+    // A deleted collection cannot stay committed: the home screen drops a
+    // commitment whose collection is gone, but the row should go with it
+    // rather than waiting for the next read.
+    await ref.read(homeCommitmentsProvider).uncommit(id);
   }
 }
 
@@ -438,55 +385,11 @@ Future<void> runCollectionEdit(
   try {
     await edit();
     ref.invalidate(collectionListingsProvider);
+    ref.invalidate(homeViewProvider);
   } on CollectionEditingError catch (error) {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(error.message)));
-  }
-}
-
-/// The item count, and what state the collection is in today.
-class _Meta extends StatelessWidget {
-  const _Meta({
-    required this.listing,
-    required this.items,
-    required this.colour,
-  });
-
-  final CollectionListing listing;
-  final String items;
-  final Color colour;
-
-  @override
-  Widget build(BuildContext context) {
-    final TextStyle? style = Theme.of(
-      context,
-    ).textTheme.bodySmall?.copyWith(color: colour);
-
-    // One paragraph rather than a row of boxes: the check is an inline glyph
-    // in the sentence, so a long name or a large accessibility text scale
-    // wraps the line instead of overflowing it.
-    return Text.rich(
-      TextSpan(
-        children: <InlineSpan>[
-          TextSpan(text: items),
-          if (listing.completedToday) ...<InlineSpan>[
-            const TextSpan(text: ' · '),
-            WidgetSpan(
-              alignment: PlaceholderAlignment.middle,
-              child: Icon(
-                Icons.check,
-                size: WirdiMetrics.space4,
-                color: colour,
-              ),
-            ),
-            const TextSpan(text: ' Done today'),
-          ] else if (listing.inProgress)
-            const TextSpan(text: ' · Part-way through'),
-        ],
-      ),
-      style: style,
-    );
   }
 }

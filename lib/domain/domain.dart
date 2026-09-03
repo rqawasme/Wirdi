@@ -6,6 +6,7 @@ library;
 
 export 'collection.dart';
 export 'collection_id.dart';
+export 'commitment.dart';
 export 'content.dart';
 export 'content_ref.dart';
 export 'date_key.dart';

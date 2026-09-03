@@ -9,6 +9,7 @@ import 'package:wirdi/providers/settings.dart';
 import 'package:wirdi/providers/streak.dart';
 import 'package:wirdi/routes.dart';
 import 'package:wirdi/theme/theme.dart';
+import 'package:wirdi/widgets/bottom_nav.dart';
 import 'package:wirdi/widgets/empty_state.dart';
 import 'package:wirdi/widgets/streak_panel.dart';
 
@@ -32,7 +33,13 @@ void main() {
     }
   }
 
-  Future<void> pumpApp(WidgetTester tester, {DateTime? now}) async {
+  /// Opens the shell on [tab]. The shell starts on Home, and every test here
+  /// is about one of the other three.
+  Future<void> pumpApp(
+    WidgetTester tester, {
+    DateTime? now,
+    WirdiTab tab = WirdiTab.collections,
+  }) async {
     tester.view.physicalSize = const Size(400, 1400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -46,16 +53,18 @@ void main() {
         child: MaterialApp(
           theme: WirdiTheme.light(),
           onGenerateRoute: WirdiRouter.onGenerateRoute,
-          initialRoute: Routes.collections,
+          initialRoute: Routes.shell,
         ),
       ),
     );
     await settle(tester);
+    await tester.tap(find.text(tab.label));
+    await settle(tester);
   }
 
   group('the streak', () {
-    testWidgets('is on the list by default', (WidgetTester tester) async {
-      await pumpApp(tester);
+    testWidgets('is on the tracker by default', (WidgetTester tester) async {
+      await pumpApp(tester, tab: WirdiTab.tracker);
 
       expect(find.byType(StreakPanel), findsOneWidget);
       expect(find.text('No days in a row'), findsOneWidget);
@@ -73,7 +82,7 @@ void main() {
         now.subtract(const Duration(days: 1)),
       );
 
-      await pumpApp(tester);
+      await pumpApp(tester, tab: WirdiTab.tracker);
 
       // Two days, counted back from today. A second collection completed on
       // the same day is still one day.
@@ -85,17 +94,20 @@ void main() {
     ) async {
       await dbs.userRepository().setSetting(SettingKeys.showStreak, 'false');
 
-      await pumpApp(tester);
+      await pumpApp(tester, tab: WirdiTab.tracker);
 
       // Not greyed out, not collapsed to a number: absent.
       expect(find.byType(StreakPanel), findsNothing);
       expect(find.textContaining('in a row'), findsNothing);
-      // And the wirds it sat above are still there.
+
+      // And the wirds are still where they were.
+      await tester.tap(find.text('Collections'));
+      await settle(tester);
       expect(find.text('PLACEHOLDER collection 1 english'), findsOneWidget);
     });
 
     testWidgets('is turned off from Settings', (WidgetTester tester) async {
-      await pumpApp(tester);
+      await pumpApp(tester, tab: WirdiTab.tracker);
       expect(find.byType(StreakPanel), findsOneWidget);
 
       await tester.tap(find.byTooltip('Settings'));

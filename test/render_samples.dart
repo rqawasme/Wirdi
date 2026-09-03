@@ -38,6 +38,7 @@ import 'package:wirdi/providers/data_providers.dart';
 import 'package:wirdi/providers/settings.dart';
 import 'package:wirdi/routes.dart';
 import 'package:wirdi/theme/theme.dart';
+import 'package:wirdi/widgets/bottom_nav.dart';
 import 'package:wirdi/wirdi_app.dart';
 
 /// Where the PNGs go. Under build/, which is gitignored.
@@ -143,11 +144,61 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
+    // What the home screen is for: a day with something committed to it. The
+    // three tiles between them cover the states the tile has — not started,
+    // part-way, and finished — plus a collection with no Arabic name beside
+    // one with a long one.
+    final CollectionId nawawi = const BuiltinCollectionId(2);
+    final UserCollectionId kursi = await data.collectionRepository.create(
+      'Ayat al-Kursi, three times',
+    );
+    await data.collectionRepository.addItem(
+      kursi,
+      ContentRef.ayahAt(2, 255),
+      count: 3,
+    );
+    final UserCollectionId istighfar = await data.collectionRepository.create(
+      'Istighfar, one hundred',
+    );
+    await data.collectionRepository.addItem(
+      istighfar,
+      const ContentRef.dhikr(2001),
+      count: 100,
+    );
+
+    await data.userRepository.commit(kursi, DailySection.daily);
+    await data.userRepository.commit(istighfar, DailySection.daily);
+    await data.userRepository.commit(nawawi, DailySection.morning);
+
+    // One finished, one part-way, one untouched.
+    await data.userRepository.logCompletion(kursi, DateTime.now());
+    final ResolvedCollection resolvedIstighfar = await data.collectionRepository
+        .resolve(istighfar);
+    await data.userRepository.saveProgress(
+      WirdProgress.atStep(
+        collectionId: istighfar,
+        step: resolvedIstighfar.steps.first,
+        currentCount: 40,
+      ),
+    );
+
     await tester.pumpWidget(
       const RepaintBoundary(key: shotKey, child: _Wrapped()),
     );
     await settle(tester);
-    await shoot(tester, '01-collections');
+    await shoot(tester, '01-home');
+
+    /// Taps a tab of the shell and shoots it.
+    Future<void> openTab(WirdiTab tab, String name) async {
+      await tester.tap(find.text(tab.label));
+      await settle(tester);
+      await shoot(tester, name);
+    }
+
+    await openTab(WirdiTab.collections, '01b-collections');
+    await openTab(WirdiTab.dhikr, '01c-dhikr');
+    await openTab(WirdiTab.tracker, '01d-tracker');
+    await openTab(WirdiTab.home, '01e-home-again');
 
     final ProviderContainer container = ProviderScope.containerOf(
       tester.element(find.byType(WirdiApp)),
@@ -231,6 +282,9 @@ void main() {
 
     await settings.setThemeMode(ThemeMode.dark);
     await settle(tester);
+    // Dark is designed on its own terms rather than inverted, and the home
+    // screen is where most of its surfaces are visible at once.
+    await shoot(tester, '06a-home-dark');
     await openPlayer(wird, '06-player-dark', stepIndex: 10, taps: 2);
     await settings.setThemeMode(ThemeMode.light);
     await settle(tester);

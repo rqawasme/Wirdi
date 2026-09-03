@@ -222,3 +222,52 @@ upsertSetting:
     ON CONFLICT ("key") DO UPDATE SET
         value = excluded.value,
         updated_at = excluded.updated_at;
+
+-- ---------------------------------------------------------------------------
+-- Commitments
+-- ---------------------------------------------------------------------------
+
+-- What the user has committed to doing, and when in the day. This is what the
+-- home screen shows; a collection that is not committed is still in the
+-- collections list, it just does not appear on Home.
+--
+-- collection_ref is CollectionId.canonical, so a built-in and a user
+-- collection are committed the same way, as everywhere else in this file.
+--
+-- collection_ref is the primary key rather than a plain column: a collection
+-- is committed to one part of the day or to none. Committing it to a second
+-- section is moving it, not adding it, and the upsert says so.
+--
+-- section is 'daily' | 'morning' | 'evening'. Stored as a string rather than
+-- an ordinal so a database opened by hand reads as what it is, and so
+-- inserting a fourth section later cannot silently renumber the three.
+CREATE TABLE commitments (
+    collection_ref TEXT    NOT NULL PRIMARY KEY,
+    section        TEXT    NOT NULL,
+    sort_order     INTEGER NOT NULL,
+    created_at     INTEGER NOT NULL,
+    updated_at     INTEGER NOT NULL
+) AS CommitmentRow;
+
+CREATE INDEX idx_commitments_section ON commitments (section, sort_order);
+
+-- Ordered the way the tiles are laid out: the order they were committed in,
+-- which is what sort_order records. Nothing reorders itself as the day goes on.
+allCommitments:
+    SELECT * FROM commitments ORDER BY sort_order, created_at, collection_ref;
+
+nextCommitmentSortOrder:
+    SELECT COALESCE(MAX(sort_order), 0) + 1 AS v FROM commitments;
+
+-- Moving a collection to another section keeps its sort_order and its
+-- created_at: it is the same commitment, in a different part of the day, and
+-- it should not jump to the end of the grid for having been moved.
+upsertCommitment:
+    INSERT INTO commitments
+        (collection_ref, section, sort_order, created_at, updated_at)
+    VALUES (:ref, :section, :sortOrder, :createdAt, :updatedAt)
+    ON CONFLICT (collection_ref) DO UPDATE SET
+        section = excluded.section,
+        updated_at = excluded.updated_at;
+
+deleteCommitment: DELETE FROM commitments WHERE collection_ref = :ref;

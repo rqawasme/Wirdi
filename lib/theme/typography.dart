@@ -155,6 +155,15 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
   static const double navLabelSize = 14;
   static const double captionSize = 12;
 
+  /// The name on a home-screen tile.
+  ///
+  /// The same 15 as [translationSize] and emphatically not the same style:
+  /// this is chrome, so it is fixed here and the translation multiplier does
+  /// not reach it. A tile is a fixed square, and a user who has turned reading
+  /// text up to read the Quran has not asked for the names of their
+  /// collections to stop fitting in it.
+  static const double tileNameSize = 15;
+
   // -- Line heights ----------------------------------------------------------
 
   /// Required, not stylistic. Voweled Arabic collides below this.
@@ -174,6 +183,11 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
   static const double translationLineHeight = 1.6;
   static const double dhikrCaptionLineHeight = 1.5;
   static const double chromeLineHeight = 1.4;
+
+  /// Tighter than [chromeLineHeight] because a tile name is the one piece of
+  /// chrome that routinely runs to three lines, in a box that cannot grow: the
+  /// leading that gives a single-line label air costs a wrapped name a line.
+  static const double tileNameLineHeight = 1.35;
 
   /// The range a stored multiplier is held to.
   ///
@@ -239,6 +253,7 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
   }) {
     return TextStyle(
       fontFamily: face.family,
+      fontFamilyFallback: _arabicFallback,
       fontSize: nominalSize * face.opticalMultiplier,
       fontWeight: weight,
       height: lineHeight,
@@ -290,6 +305,14 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
     lineHeight: chromeLineHeight,
   );
 
+  /// The name on a home-screen tile: the one thing on it that is read rather
+  /// than glanced at, so it carries the weight and the others stay quiet.
+  TextStyle get tileName => _latin(
+    size: tileNameSize,
+    weight: FontWeight.w500,
+    lineHeight: tileNameLineHeight,
+  );
+
   TextStyle get navLabel => _latin(
     size: navLabelSize,
     weight: FontWeight.w500,
@@ -326,6 +349,21 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
   /// `tool/check_font_coverage.py` records this as an accepted gap; adding a
   /// Latin codepoint Inter lacks will fail there rather than here.
   static const List<String> _latinFallback = <String>[WirdiFonts.naskh];
+
+  /// The same trick in the other direction, for one character: **U+2026**, the
+  /// ellipsis.
+  ///
+  /// Neither Noto Naskh Arabic nor Amiri Quran has a glyph for it, and an
+  /// Arabic name set on one line in a fixed-width tile is truncated with one.
+  /// Without this the mark comes out as an empty box where there is no
+  /// fallback chain, and out of whatever the platform picks where there is —
+  /// the same silent substitution `tool/check_font_coverage.py` exists to
+  /// catch, arriving through the ellipsis rather than through the text.
+  ///
+  /// Inter supplies nothing else here: it has no Arabic coverage at all, so a
+  /// genuinely missing Arabic mark still renders as the box it should, and
+  /// this cannot mask a gap in the Arabic faces.
+  static const List<String> _arabicFallback = <String>[WirdiFonts.latin];
 
   /// The Material roles, filled from the Latin chrome styles.
   ///

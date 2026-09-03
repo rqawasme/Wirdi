@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'
     show FilteringTextInputFormatter, TextInputFormatter;
 
+import '../domain/commitment.dart';
 import '../theme/theme.dart';
 
 /// What the name-and-description form came back with.
@@ -365,3 +366,64 @@ Future<bool> confirmDeleteCollection(
 }
 
 String? _emptyToNull(String value) => value.isEmpty ? null : value;
+
+/// Which part of the day a collection is being committed to.
+///
+/// A sheet rather than a menu, and for the same reason the item pickers are
+/// one: three equal choices, one of which is the answer. [current] marks the
+/// one it is committed to already, so moving it is a choice made with the
+/// present state in view rather than from memory.
+///
+/// The subtitles say what the section is for and nothing about what committing
+/// will do. Nobody needs telling that a thing they put in their morning will
+/// appear in their morning.
+Future<DailySection?> showSectionPicker(
+  BuildContext context, {
+  required String name,
+  DailySection? current,
+}) {
+  return showModalBottomSheet<DailySection>(
+    context: context,
+    builder: (BuildContext context) {
+      final ThemeData theme = Theme.of(context);
+      return SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                WirdiMetrics.space4,
+                WirdiMetrics.space5,
+                WirdiMetrics.space4,
+                WirdiMetrics.space2,
+              ),
+              child: Text(name, style: theme.textTheme.titleMedium),
+            ),
+            for (final DailySection section in DailySection.values)
+              ListTile(
+                title: Text(section.label),
+                subtitle: Text(_sectionSubtitle(section)),
+                // A check, in the same quiet ink as everything else that marks
+                // state in this app. Not a radio: the sheet closes on the tap,
+                // so there is no selection to hold.
+                trailing: section == current
+                    ? Icon(
+                        Icons.check,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      )
+                    : null,
+                onTap: () => Navigator.pop(context, section),
+              ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+String _sectionSubtitle(DailySection section) => switch (section) {
+  DailySection.daily => 'No particular time of day',
+  DailySection.morning => 'After fajr, until the sun is up',
+  DailySection.evening => 'From asr onwards',
+};

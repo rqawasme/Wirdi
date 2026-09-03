@@ -325,10 +325,14 @@ void main() {
           child: MaterialApp(
             theme: WirdiTheme.light(),
             onGenerateRoute: WirdiRouter.onGenerateRoute,
-            initialRoute: Routes.collections,
+            initialRoute: Routes.shell,
           ),
         ),
       );
+      await settle(tester);
+      // The shell opens on Home; this collection is reached from the
+      // collections list, which is a tab away.
+      await tester.tap(find.text('Collections'));
       await settle(tester);
       await tester.tap(find.text('PLACEHOLDER collection 1 english'));
       await settle(tester);

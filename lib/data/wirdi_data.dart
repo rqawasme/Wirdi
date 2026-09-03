@@ -14,13 +14,23 @@ import '../domain/repositories.dart';
 /// Built by [open] at startup, or by [WirdiData.new] from databases a test has
 /// already opened.
 class WirdiData {
-  WirdiData({required this.content, required this.user})
-    : contentRepository = DriftContentRepository(content),
-      collectionRepository = DriftCollectionRepository(
-        content: content,
-        user: user,
-      ),
-      userRepository = DriftUserRepository(user);
+  /// [clock] is what the repositories mean by "now": which local day a
+  /// completion lands on, and which day's progress is today's. It is threaded
+  /// in rather than defaulted per repository so that everything below this
+  /// point agrees about when it is — a test that moves the clock moves all of
+  /// it, and cannot end up with a completion logged on one day being read back
+  /// against another.
+  WirdiData({
+    required this.content,
+    required this.user,
+    DateTime Function()? clock,
+  }) : contentRepository = DriftContentRepository(content),
+       collectionRepository = DriftCollectionRepository(
+         content: content,
+         user: user,
+         clock: clock,
+       ),
+       userRepository = DriftUserRepository(user, clock: clock);
 
   /// Copies the bundled content asset if needed, opens both databases and
   /// checks that `content.db` was built by the schema version this code
