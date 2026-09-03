@@ -90,6 +90,18 @@ class SettingsScreen extends ConsumerWidget {
                   value: settings.haptics,
                   onChanged: controller.setHaptics,
                 ),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Show streak'),
+                  // Says what it shows, and nothing about what turning it off
+                  // would cost. Nothing is lost: completions are recorded
+                  // either way, and the count is here again if it is wanted.
+                  subtitle: const Text(
+                    'Days in a row, and a calendar of this month',
+                  ),
+                  value: settings.showStreak,
+                  onChanged: controller.setShowStreak,
+                ),
                 const SizedBox(height: WirdiMetrics.space4),
                 SettingChoice<ThemeMode>(
                   label: 'Theme',

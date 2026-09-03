@@ -16,6 +16,7 @@ abstract final class SettingKeys {
   static const String themeMode = 'theme.mode';
   static const String showTranslation = 'text.show_translation';
   static const String haptics = 'haptics.enabled';
+  static const String showStreak = 'streak.visible';
 
   static const String devQuranInGold = 'dev.quran_in_gold';
   static const String devArabicFace = 'dev.arabic_face';
@@ -34,6 +35,7 @@ final class WirdiSettings {
     this.themeMode = ThemeMode.light,
     this.showTranslation = true,
     this.haptics = true,
+    this.showStreak = true,
     this.quranInGold = false,
     this.arabicFace = ArabicFace.notoNaskh,
     this.dimBrackets = true,
@@ -62,6 +64,15 @@ final class WirdiSettings {
   /// buzzing phone is the problem.
   final bool haptics;
 
+  /// Whether the collections screen shows the streak count and the month's
+  /// calendar.
+  ///
+  /// Visible by default, and hideable without argument. A streak is a fact
+  /// about somebody's devotional life, and some people would rather not have
+  /// one counted at them — this switch turns it off and nothing anywhere asks
+  /// them to turn it back on.
+  final bool showStreak;
+
   /// Dev screen: Quran text in `tertiary` gold, or in `onSurface` cedar ink.
   ///
   /// Cedar ink by decision, after looking at both on a device. Which leaves
@@ -87,6 +98,7 @@ final class WirdiSettings {
     ThemeMode? themeMode,
     bool? showTranslation,
     bool? haptics,
+    bool? showStreak,
     bool? quranInGold,
     ArabicFace? arabicFace,
     bool? dimBrackets,
@@ -97,6 +109,7 @@ final class WirdiSettings {
       themeMode: themeMode ?? this.themeMode,
       showTranslation: showTranslation ?? this.showTranslation,
       haptics: haptics ?? this.haptics,
+      showStreak: showStreak ?? this.showStreak,
       quranInGold: quranInGold ?? this.quranInGold,
       arabicFace: arabicFace ?? this.arabicFace,
       dimBrackets: dimBrackets ?? this.dimBrackets,
@@ -135,6 +148,9 @@ class SettingsController extends AsyncNotifier<WirdiSettings> {
       haptics:
           _bool(await repository.setting(SettingKeys.haptics)) ??
           defaults.haptics,
+      showStreak:
+          _bool(await repository.setting(SettingKeys.showStreak)) ??
+          defaults.showStreak,
       quranInGold:
           _bool(await repository.setting(SettingKeys.devQuranInGold)) ??
           defaults.quranInGold,
@@ -186,6 +202,14 @@ class SettingsController extends AsyncNotifier<WirdiSettings> {
       SettingKeys.haptics,
       value.toString(),
       (WirdiSettings s) => s.copyWith(haptics: value),
+    );
+  }
+
+  Future<void> setShowStreak(bool value) {
+    return _set(
+      SettingKeys.showStreak,
+      value.toString(),
+      (WirdiSettings s) => s.copyWith(showStreak: value),
     );
   }
 

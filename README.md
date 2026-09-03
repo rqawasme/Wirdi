@@ -133,8 +133,10 @@ lib/
   wirdi_app.dart          MaterialApp, both themes, the settings-driven type scale
   routes.dart             named routes; a plain Navigator, no routing package
   screens/                collections, wird player, surah list, reading view,
-                          settings, about
+                          collection editor, settings, about
+  screens/pickers/        surah, ayah and dhikr, each popped with its answer
   player/                 the counter's state and its haptics — no widgets
+  collections/            editing and calendar logic, with no widgets in it
   widgets/                the pieces the screens share
   providers/              riverpod: the databases, the repositories, settings
   quran/                  text transformations on the Uthmani text
@@ -225,6 +227,87 @@ correctly up to three of them, which is measured rather than assumed —
 size is user-adjustable, so an offset points at a different verse the moment the
 slider moves. It is written debounced while scrolling and flushed when the surah
 closes.
+
+### Making and editing a collection
+
+Everything here is composition over the phase 2 `CollectionRepository`. Nothing
+in the data layer changed, with one exception noted at the end.
+
+**Two ways to make one.** From scratch — a name, an optional description, and an
+empty collection to fill. Or by copying an existing one, which is the path this
+is actually built around: somebody wants al-Haddad's wird with two more adhkar
+in it, or the morning adhkar at different counts. `duplicateCollection` walks
+the source's entries, appends each item with its count override and note, then
+puts the repeat blocks back over the runs they occupied.
+
+`addItem` does not return the id of the row it wrote and `setRepeatGroup` is
+addressed by item id, so the copy is resolved once after the items are in and
+the groups are formed against the ids that come back in position order.
+
+A resolved item's `count` has the fallbacks already applied — a dhikr's
+`default_count`, or 1 — so copying it back verbatim would write an override onto
+every row and freeze today's defaults into the copy. `countOverrideOf` writes
+one only where the source's count differs from its natural one.
+
+**Three pickers**, behind one add action. A whole surah, through the same
+`SurahRow` the mushaf list uses. One ayah or a contiguous range, added one item
+per ayah through `ContentRepository.ayahRange` so an over-long range comes back
+clamped rather than adding items that resolve to nothing. And a dhikr, browsed
+by the built-in collection it comes from — there is no tagging and no search in
+this content build, so the collections are the only structure a flat list of
+several hundred adhkar could be sorted by.
+
+**The reorder list is of entries, not items.** A `RepeatBlock` is one draggable
+row and one contiguous run of ids. That is what keeps a group whole:
+`CollectionRepository.reorder` validates that it was handed a full permutation
+and *nothing else*, so a list that could drag an item out of the middle of a
+block would be a list that could quietly split one — and a split group does not
+fail on read, it comes back from the resolver as two blocks sharing a number.
+`checkRepeatGroupsIntact` is the guard that stands there, and it runs before the
+write.
+
+**Refusals are sentences.** `setRepeatGroup` guards its invariants with
+`ArgumentError`, which is right for a programming error and wrong to put in
+front of somebody who has just dragged a row. `repeatGroupRefusal` asks the same
+questions first and answers in the app's voice; the repository's own checks stay
+where they are, as the backstop.
+
+**Removing an item renumbers the rest.** Not tidiness: `setRepeatGroup` refuses
+a run that is not contiguous *by position*, and `removeItem` leaves a gap, so a
+collection carrying one has items that look adjacent in the list and cannot be
+grouped.
+
+**Missing from the repository.** There is no way to change an item's
+`count_override` or note after it has been added — no `updateItem`, and no
+drift query behind one. So a count is set when the item is added, and changing
+it means removing the item and adding it again. Doing that in the UI would mean
+`removeItem` + `addItem` + `reorder`, which loses the item's repeat-group
+membership and its id silently, so it is not done. Phase 7 wants
+`CollectionRepository.updateItem(id, itemId, {count, note})`.
+
+### Streaks
+
+A count of consecutive days, and a calendar of the current month with completed
+days marked in `primary`.
+
+Deliberately nothing else. The standard streak component is engineered to be
+lost — a flame that grows, a tier that unlocks, a warning at the end of a day —
+because loss aversion is what makes the number keep somebody opening the app.
+That is defensible for a language learner. It is not defensible applied to
+somebody's relationship with their own devotional practice.
+
+So: the count is set in the same type as a collection's name and does not change
+appearance as it grows; a completed day is the same mark on day 2 as on day 200;
+a zero reads "No days in a row" and stops there; there is no notification of any
+kind. `test/app/streak_panel_test.dart` asserts that a 365-day streak renders
+identically to a 7-day one, and that no text on the panel matches the loss
+vocabulary.
+
+The calendar borrows no days from the months either side — a grid showing 31
+January in the same colour as 1 February invites the reader to count across a
+boundary it is not showing — so the corner cells are blank.
+
+The whole panel comes off in Settings, defaulting on.
 
 ### Measuring it
 

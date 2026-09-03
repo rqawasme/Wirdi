@@ -8,6 +8,7 @@ import '../providers/reading.dart';
 import '../routes.dart';
 import '../theme/theme.dart';
 import '../widgets/failure_screen.dart';
+import '../widgets/surah_row.dart';
 import '../widgets/voussoir_stripe.dart';
 
 /// All 114 surahs, and a way back to wherever you were.
@@ -80,7 +81,15 @@ class _SurahList extends ConsumerWidget {
         if (position != null && index == 0) {
           return _ResumeTile(position: position, surahs: surahs);
         }
-        return _SurahRow(surah: surahs[index - leading]);
+        final Surah surah = surahs[index - leading];
+        return SurahRow(
+          surah: surah,
+          onTap: () => Navigator.pushNamed(
+            context,
+            Routes.reading,
+            arguments: ReadingArguments(surahNumber: surah.number),
+          ),
+        );
       },
     );
   }
@@ -150,126 +159,6 @@ class _ResumeTile extends StatelessWidget {
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// One surah.
-///
-/// The Arabic name is given its own column on the trailing edge at
-/// [WirdiTypography.arabicTitle] rather than being appended to the Latin line:
-/// it is what the eye actually scans down the list for, and Arabic set at 2.0
-/// line height inside a dense row has nowhere to put its marks.
-class _SurahRow extends StatelessWidget {
-  const _SurahRow({required this.surah});
-
-  final Surah surah;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final WirdiTypography type = theme.extension<WirdiTypography>()!;
-    final Color quiet = theme.colorScheme.onSurfaceVariant;
-
-    final String place = switch (surah.revelationPlace) {
-      RevelationPlace.makkah => 'Makkah',
-      RevelationPlace.madinah => 'Madinah',
-    };
-    // Not `nameEnglish`: in this content build it is the transliteration with
-    // its diacritics dropped for all 114 surahs, not a meaning, so printing it
-    // under nameTransliterated says the same thing twice. English meanings —
-    // "The Opening", "The Cow" — are not in content.db at all.
-    final String meta =
-        '$place · ${surah.ayahCount} '
-        '${surah.ayahCount == 1 ? 'ayah' : 'ayahs'}';
-
-    return Semantics(
-      container: true,
-      button: true,
-      label:
-          'Surah ${surah.number}, ${surah.nameTransliterated}, '
-          'revealed in $place, ${surah.ayahCount} ayahs',
-      child: InkWell(
-        onTap: () => Navigator.pushNamed(
-          context,
-          Routes.reading,
-          arguments: ReadingArguments(surahNumber: surah.number),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: WirdiMetrics.space4,
-            vertical: WirdiMetrics.space3,
-          ),
-          child: ExcludeSemantics(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                _SurahNumber(number: surah.number),
-                const SizedBox(width: WirdiMetrics.space4),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        surah.nameTransliterated,
-                        style: theme.textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: WirdiMetrics.space1),
-                      Text(
-                        meta,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: quiet,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: WirdiMetrics.space4),
-                Directionality(
-                  textDirection: TextDirection.rtl,
-                  child: Text(
-                    surah.nameArabic,
-                    style: type.arabicTitle,
-                    locale: const Locale('ar'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// The surah number, on a squared plate rather than a circle — 4dp, the same
-/// radius as a counter, because that is what this is.
-class _SurahNumber extends StatelessWidget {
-  const _SurahNumber({required this.number});
-
-  final int number;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return Container(
-      width: WirdiMetrics.space6 + WirdiMetrics.space2,
-      height: WirdiMetrics.space6 + WirdiMetrics.space2,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainer,
-        borderRadius: WirdiMetrics.chip,
-        border: Border.all(
-          color: theme.colorScheme.outlineVariant,
-          width: WirdiMetrics.hairline,
-        ),
-      ),
-      child: Text(
-        '$number',
-        style: theme.textTheme.labelMedium?.copyWith(
-          color: theme.colorScheme.onSurfaceVariant,
         ),
       ),
     );
