@@ -18,6 +18,9 @@ import 'plate.dart';
 class SurahRow extends StatelessWidget {
   const SurahRow({super.key, required this.surah, required this.onTap});
 
+  /// The most of a row the Arabic name may take before it starts wrapping.
+  static const double _arabicShare = 0.45;
+
   final Surah surah;
   final VoidCallback onTap;
 
@@ -53,39 +56,52 @@ class SurahRow extends StatelessWidget {
             vertical: WirdiMetrics.space3,
           ),
           child: ExcludeSemantics(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                NumberPlate(number: surah.number),
-                const SizedBox(width: WirdiMetrics.space4),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            child: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) =>
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      Text(
-                        surah.nameTransliterated,
-                        style: theme.textTheme.titleMedium,
+                      NumberPlate(number: surah.number),
+                      const SizedBox(width: WirdiMetrics.space4),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              surah.nameTransliterated,
+                              style: theme.textTheme.titleMedium,
+                            ),
+                            const SizedBox(height: WirdiMetrics.space1),
+                            Text(
+                              meta,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: quiet,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: WirdiMetrics.space1),
-                      Text(
-                        meta,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: quiet,
+                      const SizedBox(width: WirdiMetrics.space4),
+                      // Capped rather than left to its intrinsic width, the
+                      // same way a collection row caps its Arabic name: the
+                      // 114 names are short, but a name that is not must wrap
+                      // inside its own column instead of pushing the row off
+                      // the screen.
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: constraints.maxWidth * _arabicShare,
+                        ),
+                        child: Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: Text(
+                            surah.nameArabic,
+                            style: type.arabicTitle,
+                            locale: const Locale('ar'),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(width: WirdiMetrics.space4),
-                Directionality(
-                  textDirection: TextDirection.rtl,
-                  child: Text(
-                    surah.nameArabic,
-                    style: type.arabicTitle,
-                    locale: const Locale('ar'),
-                  ),
-                ),
-              ],
             ),
           ),
         ),

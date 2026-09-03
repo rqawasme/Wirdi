@@ -61,27 +61,78 @@ class DhikrPickerScreen extends ConsumerWidget {
 class _SourceRow extends StatelessWidget {
   const _SourceRow({required this.summary});
 
+  /// The most of a row the Arabic name may take before it starts wrapping.
+  /// The same share the collections list gives it, for the same reason.
+  static const double _arabicShare = 0.45;
+
   final CollectionSummary summary;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final WirdiTypography type = theme.extension<WirdiTypography>()!;
     final String? nameArabic = summary.nameArabic;
+    final String? author = summary.author;
 
-    return ListTile(
-      title: Text(summary.name),
-      subtitle: summary.author == null ? null : Text(summary.author!),
-      trailing: nameArabic == null
-          ? null
-          : Directionality(
-              textDirection: TextDirection.rtl,
-              child: Text(
-                nameArabic,
-                style: theme.extension<WirdiTypography>()!.arabicTitle,
-                locale: const Locale('ar'),
-              ),
+    return Semantics(
+      container: true,
+      button: true,
+      label: author == null ? summary.name : '${summary.name}, $author',
+      child: InkWell(
+        onTap: () => _open(context),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: WirdiMetrics.space4,
+            vertical: WirdiMetrics.space4,
+          ),
+          child: ExcludeSemantics(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) =>
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              summary.name,
+                              style: theme.textTheme.titleMedium,
+                            ),
+                          ),
+                          if (nameArabic != null) ...<Widget>[
+                            const SizedBox(width: WirdiMetrics.space4),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth: constraints.maxWidth * _arabicShare,
+                              ),
+                              child: Directionality(
+                                textDirection: TextDirection.rtl,
+                                child: Text(
+                                  nameArabic,
+                                  style: type.arabicTitle,
+                                  locale: const Locale('ar'),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                ),
+                if (author != null) ...<Widget>[
+                  const SizedBox(height: WirdiMetrics.space2),
+                  Text(
+                    author,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ],
             ),
-      onTap: () => _open(context),
+          ),
+        ),
+      ),
     );
   }
 
