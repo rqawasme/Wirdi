@@ -38,7 +38,7 @@ CREATE TABLE user_collection_items (
     updated_at         INTEGER NOT NULL
 ) AS UserCollectionItemRow;
 
-CREATE INDEX idx_user_collection_items_position
+CREATE INDEX IF NOT EXISTS idx_user_collection_items_position
     ON user_collection_items (collection_id, position);
 
 -- collection_ref is CollectionId.canonical: 'b:12' or 'u:<uuid>'.
@@ -67,9 +67,9 @@ CREATE TABLE completions (
     completed_at   INTEGER NOT NULL
 ) AS CompletionRow;
 
-CREATE UNIQUE INDEX idx_completions_ref_date
+CREATE UNIQUE INDEX IF NOT EXISTS idx_completions_ref_date
     ON completions (collection_ref, date_key);
-CREATE INDEX idx_completions_date ON completions (date_key);
+CREATE INDEX IF NOT EXISTS idx_completions_date ON completions (date_key);
 
 -- Single row by construction.
 CREATE TABLE reading_position (
@@ -256,7 +256,7 @@ CREATE TABLE commitments (
     updated_at     INTEGER NOT NULL
 ) AS CommitmentRow;
 
-CREATE INDEX idx_commitments_section ON commitments (section, sort_order);
+CREATE INDEX IF NOT EXISTS idx_commitments_section ON commitments (section, sort_order);
 
 -- Ordered the way the tiles are laid out: the order they were committed in,
 -- which is what sort_order records. Nothing reorders itself as the day goes on.

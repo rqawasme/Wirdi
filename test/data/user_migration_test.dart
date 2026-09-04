@@ -125,4 +125,51 @@ void main() {
     expect(reopened.section, DailySection.evening);
     expect(reopened.days.weekdays, <int>[DateTime.monday]);
   });
+
+  group('a run that failed part way through', () {
+    // An upgrade does not run in a transaction, so a step that throws leaves
+    // user_version where it was and everything before it applied. The next
+    // launch runs the whole upgrade again over that half-migrated database,
+    // and it has to succeed rather than fail the same way forever.
+
+    test('version 1 that already created the table and its index', () async {
+      // Exactly what the first broken release left behind: the table and the
+      // index built by step one, and user_version still 1 because step two
+      // threw on a duplicate column.
+      windBackTo(1, <String>[]);
+
+      expect(await migrateAndRead(), isEmpty);
+      expect(versionOf(file), 3);
+    });
+
+    test('version 1 that created the table but not the index', () async {
+      windBackTo(1, <String>['DROP INDEX idx_commitments_section']);
+
+      expect(await migrateAndRead(), isEmpty);
+      expect(versionOf(file), 3);
+    });
+
+    test('version 2 that already added the column', () async {
+      windBackTo(2, <String>[
+        "INSERT INTO commitments (collection_ref, section, days, sort_order, "
+            "created_at, updated_at) VALUES ('b:1', 'daily', 127, 1, 0, 0)",
+      ]);
+
+      // The column is there; the rename had not happened yet.
+      final Commitment migrated = (await migrateAndRead()).single;
+      expect(migrated.section, DailySection.today);
+      expect(migrated.days, Weekdays.everyDay);
+      expect(versionOf(file), 3);
+    });
+
+    test('the whole upgrade is safe to run twice', () async {
+      windBackTo(1, <String>['DROP TABLE commitments']);
+      expect(await migrateAndRead(), isEmpty);
+
+      // Wound back again over the schema the first run produced.
+      windBackTo(1, <String>[]);
+      expect(await migrateAndRead(), isEmpty);
+      expect(versionOf(file), 3);
+    });
+  });
 }

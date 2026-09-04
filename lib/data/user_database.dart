@@ -43,18 +43,30 @@ class UserDatabase extends _$UserDatabase {
     // would parse as no section at all and its commitment would quietly stop
     // appearing, so it is rewritten here rather than tolerated as an alias
     // forever.
-    // Each step is written for the version it upgrades *from*, and not as
-    // `from < n`. A step that creates a table creates it from the current
-    // schema — `days` and all — so the step after it must not then add a
-    // column that is already there. `from == 2` is the only database that has
-    // a `commitments` table without one.
+    // Two rules hold every step here, and both were learned the hard way.
+    //
+    // A step is written for the version it upgrades *from*, not as `from < n`.
+    // A step that creates a table creates it from the current schema — `days`
+    // and all — so a later step must not add a column that is already there.
+    // `from == 2` is the only database with a `commitments` table and no
+    // `days`.
+    //
+    // And every step is idempotent, because this does not run in a
+    // transaction: a step that throws leaves `user_version` where it was and
+    // everything before it applied, so the next launch runs the whole upgrade
+    // again over a half-migrated database. `IF NOT EXISTS` on the indexes and
+    // the column check below are what make that second run succeed instead of
+    // failing the same way forever.
     onUpgrade: (Migrator m, int from, int to) async {
       if (from < 2) {
         await m.createTable(commitments);
         await m.createIndex(idxCommitmentsSection);
       }
-      if (from == 2) {
+      if (from == 2 && !await _hasColumn('commitments', 'days')) {
         await m.addColumn(commitments, commitments.days);
+      }
+      if (from < 3) {
+        // Idempotent on its own: a second run matches nothing.
         await customStatement(
           "UPDATE commitments SET section = 'today' WHERE section = 'daily'",
         );
@@ -64,4 +76,16 @@ class UserDatabase extends _$UserDatabase {
       await customStatement('PRAGMA foreign_keys = ON');
     },
   );
+
+  /// Whether [table] already has [column].
+  ///
+  /// `ALTER TABLE ... ADD COLUMN` is the one migration step with no
+  /// `IF NOT EXISTS` form, so asking first is the only way to make it safe to
+  /// run twice.
+  Future<bool> _hasColumn(String table, String column) async {
+    final List<QueryRow> columns = await customSelect(
+      'PRAGMA table_info($table)',
+    ).get();
+    return columns.any((QueryRow row) => row.read<String>('name') == column);
+  }
 }

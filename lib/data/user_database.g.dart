@@ -2748,24 +2748,24 @@ abstract class _$UserDatabase extends GeneratedDatabase {
   );
   late final Index idxUserCollectionItemsPosition = Index(
     'idx_user_collection_items_position',
-    'CREATE INDEX idx_user_collection_items_position ON user_collection_items (collection_id, position)',
+    'CREATE INDEX IF NOT EXISTS idx_user_collection_items_position ON user_collection_items (collection_id, position)',
   );
   late final Progress progress = Progress(this);
   late final Completions completions = Completions(this);
   late final Index idxCompletionsRefDate = Index(
     'idx_completions_ref_date',
-    'CREATE UNIQUE INDEX idx_completions_ref_date ON completions (collection_ref, date_key)',
+    'CREATE UNIQUE INDEX IF NOT EXISTS idx_completions_ref_date ON completions (collection_ref, date_key)',
   );
   late final Index idxCompletionsDate = Index(
     'idx_completions_date',
-    'CREATE INDEX idx_completions_date ON completions (date_key)',
+    'CREATE INDEX IF NOT EXISTS idx_completions_date ON completions (date_key)',
   );
   late final ReadingPosition readingPosition = ReadingPosition(this);
   late final Settings settings = Settings(this);
   late final Commitments commitments = Commitments(this);
   late final Index idxCommitmentsSection = Index(
     'idx_commitments_section',
-    'CREATE INDEX idx_commitments_section ON commitments (section, sort_order)',
+    'CREATE INDEX IF NOT EXISTS idx_commitments_section ON commitments (section, sort_order)',
   );
   Selectable<UserCollectionRow> activeUserCollections() {
     return customSelect(
