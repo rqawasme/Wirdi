@@ -132,14 +132,19 @@ class DriftUserRepository implements UserRepository {
   }
 
   @override
-  Future<void> commit(CollectionId id, DailySection section) async {
+  Future<void> commit(
+    CollectionId id,
+    DailySection section, {
+    Weekdays days = Weekdays.everyDay,
+  }) async {
     final int now = toEpochMs(_now());
     // Only read for an insert; the upsert leaves sort_order alone on a move,
-    // so a collection changing section keeps its place in the grid.
+    // so a collection changing section or days keeps its place in the grid.
     final int sortOrder = await _db.nextCommitmentSortOrder().getSingle();
     await _db.upsertCommitment(
       ref: id.canonical,
       section: section.sqlName,
+      days: days.mask,
       sortOrder: sortOrder,
       createdAt: now,
       updatedAt: now,

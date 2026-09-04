@@ -124,8 +124,8 @@ void main() {
       WidgetTester tester,
     ) async {
       final UserRepository user = dbs.userRepository(clock: () => now);
-      await user.commit(mixed, DailySection.daily);
-      await user.commit(simple, DailySection.daily);
+      await user.commit(mixed, DailySection.today);
+      await user.commit(simple, DailySection.today);
       await user.logCompletion(simple, now);
 
       await pumpApp(tester);
@@ -155,23 +155,23 @@ void main() {
       // No header, no placeholder, no empty state of its own: a header over
       // nothing is a promise the screen is not keeping.
       expect(find.text('Evening'), findsOneWidget);
-      expect(find.text('Daily'), findsNothing);
+      expect(find.text('Today'), findsNothing);
       expect(find.text('Morning'), findsNothing);
     });
 
     testWidgets(
-      'the order is Daily, Morning, Evening whatever the clock says',
+      'the order is Today, Morning, Evening whatever the clock says',
       (WidgetTester tester) async {
         final UserRepository user = dbs.userRepository(clock: () => now);
         // Committed in the reverse of the order they should render in.
         await user.commit(mixed, DailySection.evening);
-        await user.commit(simple, DailySection.daily);
+        await user.commit(simple, DailySection.today);
 
         await pumpApp(tester);
 
-        final double daily = tester.getTopLeft(find.text('Daily')).dy;
+        final double today = tester.getTopLeft(find.text('Today')).dy;
         final double evening = tester.getTopLeft(find.text('Evening')).dy;
-        expect(daily, lessThan(evening));
+        expect(today, lessThan(evening));
       },
     );
 
@@ -192,7 +192,7 @@ void main() {
     testWidgets('counts repetitions, not entries', (WidgetTester tester) async {
       await dbs
           .userRepository(clock: () => now)
-          .commit(mixed, DailySection.daily);
+          .commit(mixed, DailySection.today);
 
       await pumpApp(tester);
 
@@ -206,7 +206,7 @@ void main() {
       WidgetTester tester,
     ) async {
       final UserRepository user = dbs.userRepository(clock: () => now);
-      await user.commit(mixed, DailySection.daily);
+      await user.commit(mixed, DailySection.today);
       final ResolvedCollection resolved = await dbs
           .collectionRepository()
           .resolve(mixed);
@@ -239,7 +239,7 @@ void main() {
       WidgetTester tester,
     ) async {
       final UserRepository user = dbs.userRepository(clock: () => now);
-      await user.commit(mixed, DailySection.daily);
+      await user.commit(mixed, DailySection.today);
       await user.logCompletion(mixed, now);
 
       await pumpApp(tester);
@@ -269,8 +269,8 @@ void main() {
       WidgetTester tester,
     ) async {
       final UserRepository user = dbs.userRepository(clock: () => now);
-      await user.commit(mixed, DailySection.daily);
-      await user.commit(simple, DailySection.daily);
+      await user.commit(mixed, DailySection.today);
+      await user.commit(simple, DailySection.today);
       await user.logCompletion(mixed, now);
       await user.logCompletion(simple, now);
 
@@ -293,8 +293,8 @@ void main() {
       final UserCollectionId long = await dbs.collectionRepository().create(
         'Ayat al-Kursi, three times, every morning and evening',
       );
-      await user.commit(mixed, DailySection.daily);
-      await user.commit(long, DailySection.daily);
+      await user.commit(mixed, DailySection.today);
+      await user.commit(long, DailySection.today);
 
       await pumpApp(tester);
 
@@ -314,8 +314,8 @@ void main() {
         'Mine',
       );
       // The built-in carries an Arabic name; a user collection never does.
-      await user.commit(mixed, DailySection.daily);
-      await user.commit(mine, DailySection.daily);
+      await user.commit(mixed, DailySection.today);
+      await user.commit(mine, DailySection.today);
 
       await pumpApp(tester);
 
@@ -333,7 +333,7 @@ void main() {
     ) async {
       await dbs
           .userRepository(clock: () => now)
-          .commit(mixed, DailySection.daily);
+          .commit(mixed, DailySection.today);
 
       await pumpApp(tester);
       await tester.tap(find.byType(CollectionTile));
@@ -448,7 +448,7 @@ void main() {
         final UserCollectionId id = await dbs.collectionRepository().create(
           'Collection $i',
         );
-        await user.commit(id, DailySection.daily);
+        await user.commit(id, DailySection.today);
       }
 
       await pumpApp(tester, size: const Size(400, 700));
@@ -500,8 +500,8 @@ void main() {
       WidgetTester tester,
     ) async {
       final UserRepository user = dbs.userRepository(clock: () => now);
-      await user.commit(mixed, DailySection.daily);
-      await user.commit(simple, DailySection.daily);
+      await user.commit(mixed, DailySection.today);
+      await user.commit(simple, DailySection.today);
 
       await pumpApp(tester, direction: TextDirection.rtl);
 
@@ -528,7 +528,7 @@ void main() {
     ) async {
       await dbs
           .userRepository(clock: () => now)
-          .commit(mixed, DailySection.daily);
+          .commit(mixed, DailySection.today);
 
       await pumpApp(tester, theme: WirdiTheme.dark());
 
@@ -545,6 +545,100 @@ void main() {
       // Designed on its own terms, and still flat.
       expect(tile.elevation, 0);
       expect(tile.shadowColor, Colors.transparent);
+    });
+  });
+
+  group('the days a commitment falls on', () {
+    testWidgets('every day is the default, so it is on today', (
+      WidgetTester tester,
+    ) async {
+      await dbs
+          .userRepository(clock: () => now)
+          .commit(mixed, DailySection.today);
+
+      await pumpApp(tester);
+
+      expect(find.byType(CollectionTile), findsOneWidget);
+    });
+
+    testWidgets('a collection for another day is not on the screen at all', (
+      WidgetTester tester,
+    ) async {
+      // `now` is a Wednesday; this is committed to Fridays.
+      await dbs
+          .userRepository(clock: () => now)
+          .commit(
+            mixed,
+            DailySection.today,
+            days: Weekdays.of(<int>[DateTime.friday]),
+          );
+
+      await pumpApp(tester);
+
+      // Not a greyed-out tile and not an empty section: the screen is what
+      // today contains, and today does not contain this.
+      expect(find.byType(CollectionTile), findsNothing);
+      expect(find.text('Today'), findsNothing);
+      expect(find.text('Nothing committed yet'), findsOneWidget);
+    });
+
+    testWidgets('and is on the screen on the day it falls on', (
+      WidgetTester tester,
+    ) async {
+      await dbs
+          .userRepository(clock: () => now)
+          .commit(
+            mixed,
+            DailySection.today,
+            days: Weekdays.of(<int>[DateTime.wednesday]),
+          );
+
+      await pumpApp(tester);
+
+      expect(find.text('Today'), findsOneWidget);
+      expect(find.byType(CollectionTile), findsOneWidget);
+    });
+
+    testWidgets('the greeting counts today\'s commitments, not all of them', (
+      WidgetTester tester,
+    ) async {
+      final UserRepository user = dbs.userRepository(clock: () => now);
+      await user.commit(mixed, DailySection.today);
+      await user.commit(
+        simple,
+        DailySection.today,
+        days: Weekdays.of(<int>[DateTime.friday]),
+      );
+      await user.logCompletion(mixed, now);
+
+      await pumpApp(tester);
+
+      // One of one, not one of two: the Friday commitment is not part of
+      // today and saying otherwise would make the day look unfinished.
+      expect(find.textContaining('One of one finished today.'), findsOneWidget);
+    });
+
+    testWidgets('days are orthogonal to the section', (
+      WidgetTester tester,
+    ) async {
+      final UserRepository user = dbs.userRepository(clock: () => now);
+      await user.commit(
+        mixed,
+        DailySection.morning,
+        days: Weekdays.of(<int>[DateTime.wednesday]),
+      );
+      await user.commit(
+        simple,
+        DailySection.evening,
+        days: Weekdays.of(<int>[DateTime.friday]),
+      );
+
+      await pumpApp(tester);
+
+      // A Wednesday morning shows; a Friday evening does not. The section says
+      // where in the day, the days say whether at all.
+      expect(find.text('Morning'), findsOneWidget);
+      expect(find.text('Evening'), findsNothing);
     });
   });
 }

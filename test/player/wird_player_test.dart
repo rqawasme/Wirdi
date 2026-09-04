@@ -765,8 +765,11 @@ class CountingUserRepository implements UserRepository {
   Future<List<Commitment>> commitments() => _inner.commitments();
 
   @override
-  Future<void> commit(CollectionId id, DailySection section) =>
-      _inner.commit(id, section);
+  Future<void> commit(
+    CollectionId id,
+    DailySection section, {
+    Weekdays days = Weekdays.everyDay,
+  }) => _inner.commit(id, section, days: days);
 
   @override
   Future<void> uncommit(CollectionId id) => _inner.uncommit(id);

@@ -2353,6 +2353,16 @@ class Commitments extends Table with TableInfo<Commitments, CommitmentRow> {
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL',
   );
+  static const VerificationMeta _daysMeta = const VerificationMeta('days');
+  late final GeneratedColumn<int> days = GeneratedColumn<int>(
+    'days',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT 127',
+    defaultValue: const CustomExpression('127'),
+  );
   static const VerificationMeta _sortOrderMeta = const VerificationMeta(
     'sortOrder',
   );
@@ -2390,6 +2400,7 @@ class Commitments extends Table with TableInfo<Commitments, CommitmentRow> {
   List<GeneratedColumn> get $columns => [
     collectionRef,
     section,
+    days,
     sortOrder,
     createdAt,
     updatedAt,
@@ -2424,6 +2435,12 @@ class Commitments extends Table with TableInfo<Commitments, CommitmentRow> {
       );
     } else if (isInserting) {
       context.missing(_sectionMeta);
+    }
+    if (data.containsKey('days')) {
+      context.handle(
+        _daysMeta,
+        days.isAcceptableOrUnknown(data['days']!, _daysMeta),
+      );
     }
     if (data.containsKey('sort_order')) {
       context.handle(
@@ -2466,6 +2483,10 @@ class Commitments extends Table with TableInfo<Commitments, CommitmentRow> {
         DriftSqlType.string,
         data['${effectivePrefix}section'],
       )!,
+      days: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}days'],
+      )!,
       sortOrder: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}sort_order'],
@@ -2493,12 +2514,14 @@ class Commitments extends Table with TableInfo<Commitments, CommitmentRow> {
 class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
   final String collectionRef;
   final String section;
+  final int days;
   final int sortOrder;
   final int createdAt;
   final int updatedAt;
   const CommitmentRow({
     required this.collectionRef,
     required this.section,
+    required this.days,
     required this.sortOrder,
     required this.createdAt,
     required this.updatedAt,
@@ -2508,6 +2531,7 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
     final map = <String, Expression>{};
     map['collection_ref'] = Variable<String>(collectionRef);
     map['section'] = Variable<String>(section);
+    map['days'] = Variable<int>(days);
     map['sort_order'] = Variable<int>(sortOrder);
     map['created_at'] = Variable<int>(createdAt);
     map['updated_at'] = Variable<int>(updatedAt);
@@ -2522,6 +2546,7 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
     return CommitmentRow(
       collectionRef: serializer.fromJson<String>(json['collection_ref']),
       section: serializer.fromJson<String>(json['section']),
+      days: serializer.fromJson<int>(json['days']),
       sortOrder: serializer.fromJson<int>(json['sort_order']),
       createdAt: serializer.fromJson<int>(json['created_at']),
       updatedAt: serializer.fromJson<int>(json['updated_at']),
@@ -2533,6 +2558,7 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
     return <String, dynamic>{
       'collection_ref': serializer.toJson<String>(collectionRef),
       'section': serializer.toJson<String>(section),
+      'days': serializer.toJson<int>(days),
       'sort_order': serializer.toJson<int>(sortOrder),
       'created_at': serializer.toJson<int>(createdAt),
       'updated_at': serializer.toJson<int>(updatedAt),
@@ -2542,12 +2568,14 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
   CommitmentRow copyWith({
     String? collectionRef,
     String? section,
+    int? days,
     int? sortOrder,
     int? createdAt,
     int? updatedAt,
   }) => CommitmentRow(
     collectionRef: collectionRef ?? this.collectionRef,
     section: section ?? this.section,
+    days: days ?? this.days,
     sortOrder: sortOrder ?? this.sortOrder,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
@@ -2558,6 +2586,7 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
           ? data.collectionRef.value
           : this.collectionRef,
       section: data.section.present ? data.section.value : this.section,
+      days: data.days.present ? data.days.value : this.days,
       sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -2569,6 +2598,7 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
     return (StringBuffer('CommitmentRow(')
           ..write('collectionRef: $collectionRef, ')
           ..write('section: $section, ')
+          ..write('days: $days, ')
           ..write('sortOrder: $sortOrder, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -2577,14 +2607,21 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(collectionRef, section, sortOrder, createdAt, updatedAt);
+  int get hashCode => Object.hash(
+    collectionRef,
+    section,
+    days,
+    sortOrder,
+    createdAt,
+    updatedAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is CommitmentRow &&
           other.collectionRef == this.collectionRef &&
           other.section == this.section &&
+          other.days == this.days &&
           other.sortOrder == this.sortOrder &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -2593,6 +2630,7 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
 class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
   final Value<String> collectionRef;
   final Value<String> section;
+  final Value<int> days;
   final Value<int> sortOrder;
   final Value<int> createdAt;
   final Value<int> updatedAt;
@@ -2600,6 +2638,7 @@ class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
   const CommitmentsCompanion({
     this.collectionRef = const Value.absent(),
     this.section = const Value.absent(),
+    this.days = const Value.absent(),
     this.sortOrder = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -2608,6 +2647,7 @@ class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
   CommitmentsCompanion.insert({
     required String collectionRef,
     required String section,
+    this.days = const Value.absent(),
     required int sortOrder,
     required int createdAt,
     required int updatedAt,
@@ -2620,6 +2660,7 @@ class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
   static Insertable<CommitmentRow> custom({
     Expression<String>? collectionRef,
     Expression<String>? section,
+    Expression<int>? days,
     Expression<int>? sortOrder,
     Expression<int>? createdAt,
     Expression<int>? updatedAt,
@@ -2628,6 +2669,7 @@ class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
     return RawValuesInsertable({
       if (collectionRef != null) 'collection_ref': collectionRef,
       if (section != null) 'section': section,
+      if (days != null) 'days': days,
       if (sortOrder != null) 'sort_order': sortOrder,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -2638,6 +2680,7 @@ class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
   CommitmentsCompanion copyWith({
     Value<String>? collectionRef,
     Value<String>? section,
+    Value<int>? days,
     Value<int>? sortOrder,
     Value<int>? createdAt,
     Value<int>? updatedAt,
@@ -2646,6 +2689,7 @@ class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
     return CommitmentsCompanion(
       collectionRef: collectionRef ?? this.collectionRef,
       section: section ?? this.section,
+      days: days ?? this.days,
       sortOrder: sortOrder ?? this.sortOrder,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -2661,6 +2705,9 @@ class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
     }
     if (section.present) {
       map['section'] = Variable<String>(section.value);
+    }
+    if (days.present) {
+      map['days'] = Variable<int>(days.value);
     }
     if (sortOrder.present) {
       map['sort_order'] = Variable<int>(sortOrder.value);
@@ -2682,6 +2729,7 @@ class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
     return (StringBuffer('CommitmentsCompanion(')
           ..write('collectionRef: $collectionRef, ')
           ..write('section: $section, ')
+          ..write('days: $days, ')
           ..write('sortOrder: $sortOrder, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -3068,15 +3116,17 @@ abstract class _$UserDatabase extends GeneratedDatabase {
   Future<int> upsertCommitment({
     required String ref,
     required String section,
+    required int days,
     required int sortOrder,
     required int createdAt,
     required int updatedAt,
   }) {
     return customInsert(
-      'INSERT INTO commitments (collection_ref, section, sort_order, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5) ON CONFLICT (collection_ref) DO UPDATE SET section = excluded.section, updated_at = excluded.updated_at',
+      'INSERT INTO commitments (collection_ref, section, days, sort_order, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6) ON CONFLICT (collection_ref) DO UPDATE SET section = excluded.section, days = excluded.days, updated_at = excluded.updated_at',
       variables: [
         Variable<String>(ref),
         Variable<String>(section),
+        Variable<int>(days),
         Variable<int>(sortOrder),
         Variable<int>(createdAt),
         Variable<int>(updatedAt),
@@ -4605,6 +4655,7 @@ typedef $CommitmentsCreateCompanionBuilder =
     CommitmentsCompanion Function({
       required String collectionRef,
       required String section,
+      Value<int> days,
       required int sortOrder,
       required int createdAt,
       required int updatedAt,
@@ -4614,6 +4665,7 @@ typedef $CommitmentsUpdateCompanionBuilder =
     CommitmentsCompanion Function({
       Value<String> collectionRef,
       Value<String> section,
+      Value<int> days,
       Value<int> sortOrder,
       Value<int> createdAt,
       Value<int> updatedAt,
@@ -4635,6 +4687,11 @@ class $CommitmentsFilterComposer extends Composer<_$UserDatabase, Commitments> {
 
   ColumnFilters<String> get section => $composableBuilder(
     column: $table.section,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get days => $composableBuilder(
+    column: $table.days,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4673,6 +4730,11 @@ class $CommitmentsOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get days => $composableBuilder(
+    column: $table.days,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get sortOrder => $composableBuilder(
     column: $table.sortOrder,
     builder: (column) => ColumnOrderings(column),
@@ -4705,6 +4767,9 @@ class $CommitmentsAnnotationComposer
 
   GeneratedColumn<String> get section =>
       $composableBuilder(column: $table.section, builder: (column) => column);
+
+  GeneratedColumn<int> get days =>
+      $composableBuilder(column: $table.days, builder: (column) => column);
 
   GeneratedColumn<int> get sortOrder =>
       $composableBuilder(column: $table.sortOrder, builder: (column) => column);
@@ -4749,6 +4814,7 @@ class $CommitmentsTableManager
               ({
                 Value<String> collectionRef = const Value.absent(),
                 Value<String> section = const Value.absent(),
+                Value<int> days = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
                 Value<int> createdAt = const Value.absent(),
                 Value<int> updatedAt = const Value.absent(),
@@ -4756,6 +4822,7 @@ class $CommitmentsTableManager
               }) => CommitmentsCompanion(
                 collectionRef: collectionRef,
                 section: section,
+                days: days,
                 sortOrder: sortOrder,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -4765,6 +4832,7 @@ class $CommitmentsTableManager
               ({
                 required String collectionRef,
                 required String section,
+                Value<int> days = const Value.absent(),
                 required int sortOrder,
                 required int createdAt,
                 required int updatedAt,
@@ -4772,6 +4840,7 @@ class $CommitmentsTableManager
               }) => CommitmentsCompanion.insert(
                 collectionRef: collectionRef,
                 section: section,
+                days: days,
                 sortOrder: sortOrder,
                 createdAt: createdAt,
                 updatedAt: updatedAt,

@@ -160,10 +160,22 @@ void main() {
       count: 3,
     );
 
-    await data.userRepository.commit(kursi, DailySection.daily);
-    await data.userRepository.commit(nawawi, DailySection.daily);
+    await data.userRepository.commit(kursi, DailySection.today);
+    await data.userRepository.commit(nawawi, DailySection.today);
     await data.userRepository.commit(morning, DailySection.morning);
     await data.userRepository.commit(evening, DailySection.evening);
+    // Al-Kahf on a Friday: on the screen one day in seven, and absent from it
+    // the other six. Which of the two these shots catch depends on the day
+    // they are taken, which is the point.
+    final UserCollectionId kahf = await data.collectionRepository.create(
+      'Surah al-Kahf',
+    );
+    await data.collectionRepository.addItem(kahf, const ContentRef.surah(18));
+    await data.userRepository.commit(
+      kahf,
+      DailySection.today,
+      days: Weekdays.of(<int>[DateTime.friday]),
+    );
 
     // One finished, one part-way, the rest untouched: the three states a tile
     // has, on one screen.
@@ -192,6 +204,15 @@ void main() {
     }
 
     await openTab(WirdiTab.collections, '01b-collections');
+    // The sheet that decides all of the above, on the collection that uses
+    // the day picker for something: al-Kahf, on Fridays.
+    await tester.tap(find.byTooltip('More').at(1));
+    await settle(tester);
+    await tester.tap(find.text('Change when'));
+    await settle(tester);
+    await shoot(tester, '01b2-commit-sheet');
+    Navigator.of(tester.element(find.byType(SegmentedButton<int>))).pop();
+    await settle(tester);
     await openTab(WirdiTab.dhikr, '01c-dhikr');
     await openTab(WirdiTab.tracker, '01d-tracker');
     await openTab(WirdiTab.home, '01e-home-again');

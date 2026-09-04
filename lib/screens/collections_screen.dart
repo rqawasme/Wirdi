@@ -215,16 +215,16 @@ class _RowMenu extends ConsumerWidget {
     // Absent means not committed. While the read is in flight the menu offers
     // committing, which is the right guess for a collection nobody has
     // committed yet and is corrected the moment the map arrives.
-    final Map<CollectionId, DailySection> committed =
+    final Map<CollectionId, Commitment> committed =
         ref.watch(commitmentsProvider).value ??
-        const <CollectionId, DailySection>{};
-    final DailySection? section = committed[id];
+        const <CollectionId, Commitment>{};
+    final Commitment? commitment = committed[id];
 
     return PopupMenuButton<_RowAction>(
       icon: const Icon(Icons.more_vert),
       tooltip: 'More',
       onSelected: (_RowAction action) => switch (action) {
-        _RowAction.commit => _commit(context, ref, id, current: section),
+        _RowAction.commit => _commit(context, ref, id, current: commitment),
         _RowAction.uncommit => ref.read(homeCommitmentsProvider).uncommit(id),
         _RowAction.edit => _edit(context, id),
         _RowAction.duplicate => duplicateCollectionFlow(
@@ -241,12 +241,10 @@ class _RowMenu extends ConsumerWidget {
           // Committed already, this moves it. The label says which it is
           // doing rather than leaving the user to find out.
           child: Text(
-            section == null
-                ? 'Commit to daily practice'
-                : 'Move to another part of the day',
+            commitment == null ? 'Commit to my practice' : 'Change when',
           ),
         ),
-        if (section != null)
+        if (commitment != null)
           const PopupMenuItem<_RowAction>(
             value: _RowAction.uncommit,
             child: Text('Remove from home'),
@@ -273,15 +271,19 @@ class _RowMenu extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     CollectionId id, {
-    required DailySection? current,
+    required Commitment? current,
   }) async {
-    final DailySection? section = await showSectionPicker(
+    final CommitmentChoice? choice = await showCommitmentSheet(
       context,
       name: listing.name,
-      current: current,
+      current: current == null
+          ? null
+          : CommitmentChoice(section: current.section, days: current.days),
     );
-    if (section == null || !context.mounted) return;
-    await ref.read(homeCommitmentsProvider).commit(id, section);
+    if (choice == null || !context.mounted) return;
+    await ref
+        .read(homeCommitmentsProvider)
+        .commit(id, choice.section, days: choice.days);
   }
 
   Future<void> _edit(BuildContext context, CollectionId id) async {

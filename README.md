@@ -162,12 +162,23 @@ bar needs another slot, which is why the mushaf is an app-bar action rather than
 a tab.
 
 **Home is what today contains; Collections is what the app contains.** Home
-shows only the collections the user has *committed* to, grouped under Daily,
-Morning and Evening in that fixed order, as square tiles two to a row. A section
-with nothing in it is not rendered at all — no header, no placeholder — because
-a header over nothing is a promise the screen is not keeping. Committing happens
-in the collections list's row menu, which is where a collection is also copied,
-edited and deleted.
+shows only the collections the user has *committed* to and that fall on today,
+grouped under Today, Morning and Evening in that fixed order, as square tiles
+two to a row. A section with nothing in it is not rendered at all — no header,
+no placeholder — because a header over nothing is a promise the screen is not
+keeping. Committing happens in the collections list's row menu, which is where a
+collection is also copied, edited and deleted.
+
+**A commitment carries the days it comes round on, and they are orthogonal to
+the section.** The section says where in the day something sits; the days say
+whether it is due at all. Every day is the default and what almost every
+commitment is, so the day picker starts full and most people will never open
+it — it is there for the Friday reading of al-Kahf, and for the collections
+authored around a particular day of the week. A collection that does not fall on
+today is not on the screen at all: not a greyed-out tile, not an empty section,
+and not counted in the greeting's "one of four finished today". The days are a
+seven-bit mask on the commitment row, because a commitment is one row and a set
+of at most seven flags is not a relation worth joining.
 
 **A commitment is a row in `user.db`.** `commitments` is keyed by
 `collection_ref` like `progress` and `completions` are, so a built-in and a

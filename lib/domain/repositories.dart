@@ -133,12 +133,17 @@ abstract class UserRepository {
   /// resolve against the collection list and drop what no longer exists.
   Future<List<Commitment>> commitments();
 
-  /// Commits [id] to [section], or moves it there if it is committed already.
+  /// Commits [id] to [section] on [days], or moves it if it is committed
+  /// already.
   ///
   /// Moving keeps the commitment's place in the order: it is the same
-  /// commitment in a different part of the day, and it should not jump to the
-  /// end of the grid for having been moved.
-  Future<void> commit(CollectionId id, DailySection section);
+  /// commitment on a different day or in a different part of the day, and it
+  /// should not jump to the end of the grid for having been moved.
+  Future<void> commit(
+    CollectionId id,
+    DailySection section, {
+    Weekdays days = Weekdays.everyDay,
+  });
 
   /// Takes [id] off the home screen. The collection itself is untouched, as
   /// is anything it has completed. A no-op if it was not committed.

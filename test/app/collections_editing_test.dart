@@ -219,4 +219,121 @@ void main() {
       expect(resolved.steps.length, 14);
     });
   });
+
+  /// Taps one day of the picker, by the full name the segment carries for a
+  /// screen reader.
+  ///
+  /// Not by its visible label, which repeats — T is Tuesday and Thursday, S is
+  /// Saturday and Sunday — and not by its place among the button's `Text`
+  /// descendants either: SegmentedButton reorders those as the selection
+  /// changes, so an index taps a different day each time.
+  Future<void> tapDay(WidgetTester tester, String day) async {
+    await tester.tap(
+      find.byWidgetPredicate(
+        (Widget widget) => widget is Text && widget.semanticsLabel == day,
+      ),
+    );
+    await settle(tester);
+  }
+
+  group('committing', () {
+    testWidgets('the sheet asks where in the day and which days', (
+      WidgetTester tester,
+    ) async {
+      await pumpApp(tester);
+
+      await tester.tap(find.byTooltip('More').first);
+      await settle(tester);
+      await tester.tap(find.text('Commit to my practice'));
+      await settle(tester);
+
+      // Three sections, seven days, and a default that says so in words.
+      for (final DailySection section in DailySection.values) {
+        expect(find.text(section.label), findsWidgets);
+      }
+      expect(find.byType(SegmentedButton<int>), findsOneWidget);
+      expect(find.text('Every day.'), findsOneWidget);
+    });
+
+    testWidgets('it commits to today, every day, by default', (
+      WidgetTester tester,
+    ) async {
+      await pumpApp(tester);
+
+      await tester.tap(find.byTooltip('More').first);
+      await settle(tester);
+      await tester.tap(find.text('Commit to my practice'));
+      await settle(tester);
+      await tester.tap(find.text('Commit'));
+      await settle(tester);
+
+      final Commitment committed =
+          (await dbs.userRepository().commitments()).single;
+      expect(committed.section, DailySection.today);
+      expect(committed.days, Weekdays.everyDay);
+    });
+
+    testWidgets('a single day reads back as that day only', (
+      WidgetTester tester,
+    ) async {
+      await pumpApp(tester);
+
+      await tester.tap(find.byTooltip('More').first);
+      await settle(tester);
+      await tester.tap(find.text('Commit to my practice'));
+      await settle(tester);
+
+      // Turn six of the seven off, leaving Friday: al-Kahf on a Friday is the
+      // case the day picker exists for.
+      for (final String day in <String>[
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Saturday',
+        'Sunday',
+      ]) {
+        await tapDay(tester, day);
+      }
+      expect(find.text('Fridays only.'), findsOneWidget);
+
+      await tester.tap(find.text('Commit'));
+      await settle(tester);
+
+      final Commitment committed =
+          (await dbs.userRepository().commitments()).single;
+      expect(committed.days.weekdays, <int>[DateTime.friday]);
+    });
+
+    testWidgets('it refuses to commit to no days at all', (
+      WidgetTester tester,
+    ) async {
+      await pumpApp(tester);
+
+      await tester.tap(find.byTooltip('More').first);
+      await settle(tester);
+      await tester.tap(find.text('Commit to my practice'));
+      await settle(tester);
+
+      for (final String day in <String>[
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday',
+      ]) {
+        await tapDay(tester, day);
+      }
+
+      // A commitment on no days never comes round, which is a way of deleting
+      // it that does not look like one. The button says so by not working.
+      expect(find.text('No days yet. Pick at least one.'), findsOneWidget);
+      final FilledButton commit = tester.widget<FilledButton>(
+        find.widgetWithText(FilledButton, 'Commit'),
+      );
+      expect(commit.onPressed, isNull);
+    });
+  });
 }

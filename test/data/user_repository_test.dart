@@ -312,9 +312,9 @@ void main() {
 
     test('the order is the order they were committed in', () async {
       final CollectionId second = UserCollectionId(testUuid(2));
-      await user.commit(mine, DailySection.daily);
-      await user.commit(builtin, DailySection.daily);
-      await user.commit(second, DailySection.daily);
+      await user.commit(mine, DailySection.today);
+      await user.commit(builtin, DailySection.today);
+      await user.commit(second, DailySection.today);
 
       expect(
         (await user.commitments()).map((Commitment c) => c.collectionId),
@@ -338,8 +338,8 @@ void main() {
     });
 
     test('uncommitting takes it off, and leaves the rest alone', () async {
-      await user.commit(mine, DailySection.daily);
-      await user.commit(builtin, DailySection.daily);
+      await user.commit(mine, DailySection.today);
+      await user.commit(builtin, DailySection.today);
 
       await user.uncommit(mine);
 
@@ -355,7 +355,7 @@ void main() {
     });
 
     test('a row written by something else is dropped, not thrown on', () async {
-      await user.commit(mine, DailySection.daily);
+      await user.commit(mine, DailySection.today);
       await dbs.user.customStatement(
         "INSERT INTO commitments (collection_ref, section, sort_order, "
         "created_at, updated_at) VALUES ('x:nonsense', 'daily', 2, 0, 0), "
@@ -368,6 +368,90 @@ void main() {
         (await user.commitments()).map((Commitment c) => c.collectionId),
         <CollectionId>[mine],
       );
+    });
+  });
+
+  group('commitment days', () {
+    test('a commitment is every day unless it says otherwise', () async {
+      await user.commit(mine, DailySection.today);
+
+      final Commitment committed = (await user.commitments()).single;
+      expect(committed.days, Weekdays.everyDay);
+      expect(committed.days.isEveryDay, isTrue);
+      for (
+        int weekday = DateTime.monday;
+        weekday <= DateTime.sunday;
+        weekday++
+      ) {
+        expect(committed.days.contains(weekday), isTrue);
+      }
+    });
+
+    test('days are stored and read back', () async {
+      // Al-Kahf on a Friday: the case this exists for.
+      await user.commit(
+        mine,
+        DailySection.today,
+        days: Weekdays.of(<int>[DateTime.friday]),
+      );
+
+      final Commitment committed = (await user.commitments()).single;
+      expect(committed.days.weekdays, <int>[DateTime.friday]);
+      expect(committed.days.isEveryDay, isFalse);
+      expect(committed.fallsOn(DateTime(2026, 9, 4)), isTrue); // a Friday
+      expect(committed.fallsOn(DateTime(2026, 9, 5)), isFalse); // a Saturday
+    });
+
+    test('changing the days keeps the commitment in its place', () async {
+      await user.commit(mine, DailySection.today);
+      await user.commit(builtin, DailySection.today);
+
+      await user.commit(
+        mine,
+        DailySection.today,
+        days: Weekdays.of(<int>[DateTime.monday, DateTime.thursday]),
+      );
+
+      final List<Commitment> committed = await user.commitments();
+      expect(committed.first.collectionId, mine);
+      expect(committed.first.days.weekdays, <int>[
+        DateTime.monday,
+        DateTime.thursday,
+      ]);
+      expect(committed.last.collectionId, builtin);
+    });
+  });
+
+  group('the 2 -> 3 migration', () {
+    test('brings a v2 commitment forward as today, every day', () async {
+      // A row as version 2 wrote it: the section spelled 'daily', and no days
+      // column at all. Written through the raw connection because the current
+      // schema cannot express it.
+      await dbs.user.customStatement('DROP TABLE commitments');
+      await dbs.user.customStatement(
+        'CREATE TABLE commitments (collection_ref TEXT NOT NULL PRIMARY KEY, '
+        'section TEXT NOT NULL, sort_order INTEGER NOT NULL, '
+        'created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)',
+      );
+      await dbs.user.customStatement(
+        "INSERT INTO commitments VALUES ('u:${testUuid(1)}', 'daily', 1, 0, 0)",
+      );
+
+      // What onUpgrade does, in the order it does it.
+      await dbs.user.customStatement(
+        'ALTER TABLE commitments ADD COLUMN days INTEGER NOT NULL DEFAULT 127',
+      );
+      await dbs.user.customStatement(
+        "UPDATE commitments SET section = 'today' WHERE section = 'daily'",
+      );
+
+      final Commitment migrated = (await user.commitments()).single;
+      expect(migrated.collectionId, mine);
+      // 'daily' would parse as no section at all and the commitment would
+      // quietly stop appearing, which is why the rename is a data migration
+      // rather than a label change.
+      expect(migrated.section, DailySection.today);
+      expect(migrated.days, Weekdays.everyDay);
     });
   });
 }

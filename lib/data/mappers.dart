@@ -98,7 +98,7 @@ CollectionSummary userSummaryFromRow(UserCollectionRow row) =>
 /// The only place those strings exist; they do not escape the data layer.
 extension DailySectionSql on DailySection {
   String get sqlName => switch (this) {
-    DailySection.daily => 'daily',
+    DailySection.today => 'today',
     DailySection.morning => 'morning',
     DailySection.evening => 'evening',
   };
@@ -107,7 +107,7 @@ extension DailySectionSql on DailySection {
 /// Null for a value the app did not write, which lets a commitment be dropped
 /// from the home screen rather than throwing while building it.
 DailySection? dailySectionFromSql(String value) => switch (value) {
-  'daily' => DailySection.daily,
+  'today' => DailySection.today,
   'morning' => DailySection.morning,
   'evening' => DailySection.evening,
   _ => null,
@@ -124,6 +124,7 @@ Commitment? commitmentFromRow(CommitmentRow row) {
   return Commitment(
     collectionId: id,
     section: section,
+    days: Weekdays.fromMask(row.days),
     sortOrder: row.sortOrder,
     createdAt: fromEpochMs(row.createdAt),
     updatedAt: fromEpochMs(row.updatedAt),

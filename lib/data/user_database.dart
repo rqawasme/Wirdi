@@ -21,7 +21,7 @@ class UserDatabase extends _$UserDatabase {
   factory UserDatabase.memory() => UserDatabase(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -34,10 +34,25 @@ class UserDatabase extends _$UserDatabase {
     // correct starting state — committing is a decision the user makes, and
     // guessing it from what they happen to own would fill their home screen
     // with things they never chose.
+    // 2 -> 3 gives a commitment the days of the week it falls on, and renames
+    // the untimed section from 'daily' to 'today'. Existing rows come forward
+    // as every day, which is what they meant when there was no other option.
+    //
+    // The rename is a data migration and not only a label change, because the
+    // section is stored as the string it reads as. A row left saying 'daily'
+    // would parse as no section at all and its commitment would quietly stop
+    // appearing, so it is rewritten here rather than tolerated as an alias
+    // forever.
     onUpgrade: (Migrator m, int from, int to) async {
       if (from < 2) {
         await m.createTable(commitments);
         await m.createIndex(idxCommitmentsSection);
+      }
+      if (from < 3) {
+        await m.addColumn(commitments, commitments.days);
+        await customStatement(
+          "UPDATE commitments SET section = 'today' WHERE section = 'daily'",
+        );
       }
     },
     beforeOpen: (OpeningDetails details) async {

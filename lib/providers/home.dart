@@ -23,6 +23,7 @@ final class CommittedCollection {
   const CommittedCollection({
     required this.summary,
     required this.section,
+    required this.days,
     required this.totalCount,
     required this.doneCount,
     required this.completedToday,
@@ -31,6 +32,10 @@ final class CommittedCollection {
   final CollectionSummary summary;
 
   final DailySection section;
+
+  /// The days this comes round on. Every day for most of them; the tile says
+  /// nothing about it either way, because a tile only ever shows today.
+  final Weekdays days;
 
   /// Repetitions in the whole collection: every step's count, summed.
   final int totalCount;
@@ -91,12 +96,16 @@ final class HomeView {
       committed.where((CommittedCollection c) => c.completedToday).length;
 }
 
-/// The home screen's data: the committed collections, resolved, plus the
+/// The home screen's data: today's committed collections, resolved, plus the
 /// streak.
 ///
-/// A commitment whose collection no longer exists is dropped rather than
-/// rendered as a gap: `commitments` spans both databases and keeps rows for
-/// collections since deleted, exactly as completions do.
+/// Two things are filtered out before anything is resolved. A commitment whose
+/// collection no longer exists is dropped rather than rendered as a gap —
+/// `commitments` spans both databases and keeps rows for collections since
+/// deleted, exactly as completions do. And a commitment that does not fall on
+/// today's weekday is dropped too: the screen is what today contains, so a
+/// Friday reading is not on it on a Tuesday, and not as a greyed-out tile
+/// either.
 final FutureProvider<HomeView> homeViewProvider = FutureProvider<HomeView>((
   Ref ref,
 ) async {
@@ -105,6 +114,7 @@ final FutureProvider<HomeView> homeViewProvider = FutureProvider<HomeView>((
   );
   final UserRepository user = ref.watch(userRepositoryProvider);
 
+  final DateTime today = ref.watch(clockProvider)();
   final List<Commitment> commitments = await user.commitments();
   final Map<CollectionId, CollectionSummary> summaries =
       <CollectionId, CollectionSummary>{
@@ -113,6 +123,7 @@ final FutureProvider<HomeView> homeViewProvider = FutureProvider<HomeView>((
 
   final List<CommittedCollection> committed = <CommittedCollection>[];
   for (final Commitment commitment in commitments) {
+    if (!commitment.fallsOn(today)) continue;
     final CollectionSummary? summary = summaries[commitment.collectionId];
     if (summary == null) continue;
 
@@ -127,6 +138,7 @@ final FutureProvider<HomeView> homeViewProvider = FutureProvider<HomeView>((
       CommittedCollection(
         summary: summary,
         section: commitment.section,
+        days: commitment.days,
         totalCount: _repetitions(resolved.steps),
         doneCount: _repetitionsDone(resolved.steps, progress),
         completedToday: await user.isCompletedToday(summary.id),
@@ -137,19 +149,23 @@ final FutureProvider<HomeView> homeViewProvider = FutureProvider<HomeView>((
   return HomeView(
     committed: List<CommittedCollection>.unmodifiable(committed),
     streak: await user.currentStreak(),
-    today: ref.watch(clockProvider)(),
+    today: today,
   );
 }, name: 'homeView');
 
-/// Which section each collection is committed to, for the collections list's
-/// menu. Absent means not committed.
-final FutureProvider<Map<CollectionId, DailySection>> commitmentsProvider =
-    FutureProvider<Map<CollectionId, DailySection>>((Ref ref) async {
+/// Every commitment by collection, for the collections list's menu. Absent
+/// means not committed.
+///
+/// Unfiltered, unlike [homeViewProvider]: the list is about what the app
+/// contains, so a commitment for Fridays is still a commitment on a Tuesday
+/// and the menu has to be able to say so.
+final FutureProvider<Map<CollectionId, Commitment>> commitmentsProvider =
+    FutureProvider<Map<CollectionId, Commitment>>((Ref ref) async {
       final List<Commitment> commitments = await ref
           .watch(userRepositoryProvider)
           .commitments();
-      return <CollectionId, DailySection>{
-        for (final Commitment c in commitments) c.collectionId: c.section,
+      return <CollectionId, Commitment>{
+        for (final Commitment c in commitments) c.collectionId: c,
       };
     }, name: 'commitments');
 
@@ -170,8 +186,12 @@ final class HomeCommitments {
 
   final Ref _ref;
 
-  Future<void> commit(CollectionId id, DailySection section) async {
-    await _ref.read(userRepositoryProvider).commit(id, section);
+  Future<void> commit(
+    CollectionId id,
+    DailySection section, {
+    Weekdays days = Weekdays.everyDay,
+  }) async {
+    await _ref.read(userRepositoryProvider).commit(id, section, days: days);
     _invalidate();
   }
 
