@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import 'domain/collection_id.dart';
 import 'dev/dev_screen.dart';
-import 'screens/about_screen.dart';
 import 'screens/app_shell.dart';
 import 'screens/collection_edit_screen.dart';
 import 'screens/pickers/ayah_picker_screen.dart';
@@ -45,7 +44,6 @@ abstract final class Routes {
   static const String surahList = '/quran';
   static const String reading = '/reading';
   static const String settings = '/settings';
-  static const String about = '/about';
 
   /// The phase 3 rendering harness. Registered in debug builds only — see
   /// [WirdiRouter.onGenerateRoute].
@@ -154,9 +152,6 @@ abstract final class WirdiRouter {
 
       case Routes.settings:
         return _page(settings, (BuildContext _) => const SettingsScreen());
-
-      case Routes.about:
-        return _page(settings, (BuildContext _) => const AboutScreen());
 
       // Not registered in a release build, so a stray push cannot reach it even
       // if a debug-only entry point were ever left on screen by accident.

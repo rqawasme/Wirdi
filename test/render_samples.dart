@@ -334,8 +334,26 @@ void main() {
     await settings.setThemeMode(ThemeMode.light);
     await settle(tester);
 
-    await openRoute(Routes.settings, '15-settings');
-    await openRoute(Routes.about, '16-about');
+    // About is a sheet off the bottom of Settings now, so it is shot from
+    // there rather than pushed: the button is the only way in.
+    await openRoute(
+      Routes.settings,
+      '15-settings',
+      before: () async {
+        await tester.scrollUntilVisible(find.text('About Wirdi'), 200);
+        await settle(tester);
+      },
+    );
+    await openRoute(
+      Routes.settings,
+      '16-about',
+      before: () async {
+        await tester.scrollUntilVisible(find.text('About Wirdi'), 200);
+        await settle(tester);
+        await tester.tap(find.text('About Wirdi'));
+        await settle(tester);
+      },
+    );
     await openRoute(Routes.dev, '17-dev-screen');
   });
 }

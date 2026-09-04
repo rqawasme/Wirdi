@@ -133,7 +133,7 @@ lib/
   wirdi_app.dart          MaterialApp, both themes, the settings-driven type scale
   routes.dart             named routes; a plain Navigator, no routing package
   screens/                the four-tab shell and its tabs, wird player, surah
-                          list, reading view, collection editor, settings, about
+                          list, reading view, collection editor, settings
   screens/pickers/        surah, ayah and dhikr, each popped with its answer
   player/                 the counter's state and its haptics — no widgets
   collections/            editing and calendar logic, with no widgets in it
