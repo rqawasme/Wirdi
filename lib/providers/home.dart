@@ -7,6 +7,7 @@ import '../domain/commitment.dart';
 import '../domain/playback_step.dart';
 import '../domain/progress.dart';
 import '../domain/repositories.dart';
+import 'collections.dart';
 import 'data_providers.dart';
 import 'streak.dart';
 
@@ -113,6 +114,16 @@ final FutureProvider<HomeView> homeViewProvider = FutureProvider<HomeView>((
     collectionRepositoryProvider,
   );
   final UserRepository user = ref.watch(userRepositoryProvider);
+
+  // Watched for when it changes rather than for what it holds. Every edit that
+  // changes what a collection *is* — its name, its items, whether it exists —
+  // already invalidates the collections list, and a tile shows a collection's
+  // name and counts its items. Depending on it here is what stops Home from
+  // being a thing each of those call sites has to remember separately, which
+  // is exactly how a rename came to leave a stale name on the home screen: the
+  // two tabs are alive at once in the shell, so Home is never refreshed by
+  // being returned to.
+  await ref.watch(collectionListingsProvider.future);
 
   final DateTime today = ref.watch(clockProvider)();
   final List<Commitment> commitments = await user.commitments();
