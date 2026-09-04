@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 
 import 'domain/collection_id.dart';
 import 'dev/dev_screen.dart';
-import 'screens/about_screen.dart';
+import 'screens/app_shell.dart';
 import 'screens/collection_edit_screen.dart';
-import 'screens/collections_screen.dart';
 import 'screens/pickers/ayah_picker_screen.dart';
 import 'screens/pickers/dhikr_picker_screen.dart';
 import 'screens/pickers/surah_picker_screen.dart';
@@ -22,9 +21,14 @@ import 'screens/wird_player_screen.dart';
 /// requirement it will bring its own constraints, and choosing a router before
 /// then is choosing without them.
 abstract final class Routes {
-  /// Home. The app is for doing a wird; the mushaf is a tap away from here
-  /// rather than the other way round.
-  static const String collections = '/';
+  /// The four-tab shell: Home, Collections, Dhikr, Tracker. The app opens
+  /// here, on Home. Every top-level screen is a tab of this one rather than a
+  /// route of its own, so the navigation bar never appears over something
+  /// pushed on top of it.
+  ///
+  /// The mushaf is a tap away in the app bar rather than a fifth tab: the app
+  /// is for doing a wird, and four tabs is the ceiling.
+  static const String shell = '/';
 
   static const String player = '/player';
 
@@ -40,7 +44,6 @@ abstract final class Routes {
   static const String surahList = '/quran';
   static const String reading = '/reading';
   static const String settings = '/settings';
-  static const String about = '/about';
 
   /// The phase 3 rendering harness. Registered in debug builds only — see
   /// [WirdiRouter.onGenerateRoute].
@@ -85,8 +88,8 @@ abstract final class WirdiRouter {
   /// leaving a typo to be discovered by a user.
   static Route<Object?>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case Routes.collections:
-        return _page(settings, (BuildContext _) => const CollectionsScreen());
+      case Routes.shell:
+        return _page(settings, (BuildContext _) => const AppShell());
 
       case Routes.player:
         final Object? arguments = settings.arguments;
@@ -149,9 +152,6 @@ abstract final class WirdiRouter {
 
       case Routes.settings:
         return _page(settings, (BuildContext _) => const SettingsScreen());
-
-      case Routes.about:
-        return _page(settings, (BuildContext _) => const AboutScreen());
 
       // Not registered in a release build, so a stray push cannot reach it even
       // if a debug-only entry point were ever left on screen by accident.

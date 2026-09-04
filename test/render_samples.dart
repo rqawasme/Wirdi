@@ -38,6 +38,7 @@ import 'package:wirdi/providers/data_providers.dart';
 import 'package:wirdi/providers/settings.dart';
 import 'package:wirdi/routes.dart';
 import 'package:wirdi/theme/theme.dart';
+import 'package:wirdi/widgets/bottom_nav.dart';
 import 'package:wirdi/wirdi_app.dart';
 
 /// Where the PNGs go. Under build/, which is gitignored.
@@ -143,11 +144,84 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
+    // What the home screen is for: a day with something committed to it. The
+    // three built-ins the content build ships, in the parts of the day they
+    // belong to, plus one collection of the user's own — which has no Arabic
+    // name, so the row covers a tile with one beside a tile without.
+    final CollectionId nawawi = const BuiltinCollectionId(2);
+    final CollectionId morning = const BuiltinCollectionId(3);
+    final CollectionId evening = const BuiltinCollectionId(4);
+    final UserCollectionId kursi = await data.collectionRepository.create(
+      'Ayat al-Kursi, three times',
+    );
+    await data.collectionRepository.addItem(
+      kursi,
+      ContentRef.ayahAt(2, 255),
+      count: 3,
+    );
+
+    await data.userRepository.commit(kursi, DailySection.today);
+    await data.userRepository.commit(nawawi, DailySection.today);
+    await data.userRepository.commit(morning, DailySection.morning);
+    await data.userRepository.commit(evening, DailySection.evening);
+    // Al-Kahf on a Friday: on the screen one day in seven, and absent from it
+    // the other six. Which of the two these shots catch depends on the day
+    // they are taken, which is the point.
+    final UserCollectionId kahf = await data.collectionRepository.create(
+      'Surah al-Kahf',
+    );
+    await data.collectionRepository.addItem(kahf, const ContentRef.surah(18));
+    await data.userRepository.commit(
+      kahf,
+      DailySection.today,
+      days: Weekdays.of(<int>[DateTime.friday]),
+    );
+
+    // One finished, one part-way, the rest untouched: the three states a tile
+    // has, on one screen.
+    await data.userRepository.logCompletion(kursi, DateTime.now());
+    final ResolvedCollection resolvedMorning = await data.collectionRepository
+        .resolve(morning);
+    await data.userRepository.saveProgress(
+      WirdProgress.atStep(
+        collectionId: morning,
+        step: resolvedMorning.steps[2],
+        currentCount: 40,
+      ),
+    );
+
     await tester.pumpWidget(
       const RepaintBoundary(key: shotKey, child: _Wrapped()),
     );
     await settle(tester);
-    await shoot(tester, '01-collections');
+    await shoot(tester, '01-home');
+
+    /// Taps a tab of the shell and shoots it.
+    Future<void> openTab(WirdiTab tab, String name) async {
+      await tester.tap(find.text(tab.label));
+      await settle(tester);
+      await shoot(tester, name);
+    }
+
+    await openTab(WirdiTab.collections, '01b-collections');
+    // The sheet that decides all of the above, in both of its states: every
+    // day, which is the default and what most commitments are, and a single
+    // day, which is what the picker exists for.
+    Future<void> shootSheet(int row, String name) async {
+      await tester.tap(find.byTooltip('More').at(row));
+      await settle(tester);
+      await tester.tap(find.text('Change when'));
+      await settle(tester);
+      await shoot(tester, name);
+      Navigator.of(tester.element(find.byType(SegmentedButton<int>))).pop();
+      await settle(tester);
+    }
+
+    await shootSheet(0, '01b2-commit-sheet-every-day');
+    await shootSheet(1, '01b3-commit-sheet-one-day');
+    await openTab(WirdiTab.dhikr, '01c-dhikr');
+    await openTab(WirdiTab.tracker, '01d-tracker');
+    await openTab(WirdiTab.home, '01e-home-again');
 
     final ProviderContainer container = ProviderScope.containerOf(
       tester.element(find.byType(WirdiApp)),
@@ -220,6 +294,13 @@ void main() {
     // times over.
     const CollectionId wird = BuiltinCollectionId(2);
     await openPlayer(wird, '02-player-dhikr');
+
+    // The morning and evening adhkar, where the Arabic authored for them is
+    // actually set: the first dhikr of each, and a surah step from inside the
+    // morning collection.
+    await openPlayer(morning, '02a-morning-adhkar');
+    await openPlayer(morning, '02b-morning-surah', stepIndex: 5);
+    await openPlayer(evening, '02c-evening-adhkar', stepIndex: 11);
     // A step said three times, part-way counted, so the stripe has something
     // to show.
     await openPlayer(wird, '03-player-counting', stepIndex: 10, taps: 1);
@@ -231,6 +312,9 @@ void main() {
 
     await settings.setThemeMode(ThemeMode.dark);
     await settle(tester);
+    // Dark is designed on its own terms rather than inverted, and the home
+    // screen is where most of its surfaces are visible at once.
+    await shoot(tester, '06a-home-dark');
     await openPlayer(wird, '06-player-dark', stepIndex: 10, taps: 2);
     await settings.setThemeMode(ThemeMode.light);
     await settle(tester);
@@ -280,8 +364,26 @@ void main() {
     await settings.setThemeMode(ThemeMode.light);
     await settle(tester);
 
-    await openRoute(Routes.settings, '15-settings');
-    await openRoute(Routes.about, '16-about');
+    // About is a sheet off the bottom of Settings now, so it is shot from
+    // there rather than pushed: the button is the only way in.
+    await openRoute(
+      Routes.settings,
+      '15-settings',
+      before: () async {
+        await tester.scrollUntilVisible(find.text('About Wirdi'), 200);
+        await settle(tester);
+      },
+    );
+    await openRoute(
+      Routes.settings,
+      '16-about',
+      before: () async {
+        await tester.scrollUntilVisible(find.text('About Wirdi'), 200);
+        await settle(tester);
+        await tester.tap(find.text('About Wirdi'));
+        await settle(tester);
+      },
+    );
     await openRoute(Routes.dev, '17-dev-screen');
   });
 }

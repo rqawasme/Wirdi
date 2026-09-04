@@ -1,0 +1,27 @@
+{
+  "id": 3,
+  "name_arabic": "أذكار الصباح",
+  "name_english": "Morning adhkar",
+  "description": "Said in the morning, ideally between fajr and sunrise.",
+  "author": "Summarised from the works of Shaykh Abd al-Aziz al-Tarefe",
+  "type": "wird",
+  "sort_order": 10,
+  "items": [
+    { "dhikr": 3001 },
+    { "dhikr": 3002, "count": 10 },
+    { "dhikr": 3003, "count": 100 },
+    { "dhikr": 3004 },
+    { "dhikr": 3005 },
+    { "surah": 112, "count": 3 },
+    { "surah": 113, "count": 3 },
+    { "surah": 114, "count": 3, "note": "Recited three times each with al-Ikhlas and al-Falaq before it, morning and evening." },
+    { "dhikr": 3006, "count": 3 },
+    { "dhikr": 3007 },
+    { "dhikr": 3008 },
+    { "dhikr": 3009 },
+    { "dhikr": 3010 },
+    { "dhikr": 3011, "count": 3 },
+    { "dhikr": 3012 },
+    { "dhikr": 3013, "count": 7 }
+  ]
+}

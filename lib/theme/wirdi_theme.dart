@@ -141,10 +141,29 @@ abstract final class WirdiTheme {
       textButtonTheme: TextButtonThemeData(style: _buttonStyle(text)),
       // Its default is a stadium too, and it is the shape most likely to be
       // reached for by a settings row.
+      //
+      // A selected segment is brick, and not the tonal step Material fills it
+      // with. Depth in this app is tonal everywhere else, but selection is not
+      // depth: a tonal step against a tonal surface is a difference you have
+      // to hunt for, and on a row of seven days it is one you can get wrong
+      // without noticing — which is how a day picker came to be set to the
+      // opposite of what somebody meant. Brick is already what marks the
+      // selected tab in the navigation bar, so this is the same statement in
+      // the same colour.
       segmentedButtonTheme: SegmentedButtonThemeData(
         style: _buttonStyle(text).copyWith(
           side: WidgetStatePropertyAll<BorderSide>(
             BorderSide(color: scheme.outline, width: WirdiMetrics.hairline),
+          ),
+          backgroundColor: WidgetStateProperty.resolveWith<Color>(
+            (Set<WidgetState> states) => states.contains(WidgetState.selected)
+                ? scheme.primary
+                : scheme.surface,
+          ),
+          foregroundColor: WidgetStateProperty.resolveWith<Color>(
+            (Set<WidgetState> states) => states.contains(WidgetState.selected)
+                ? scheme.onPrimary
+                : scheme.onSurfaceVariant,
           ),
         ),
       ),

@@ -186,10 +186,51 @@ void main() {
       ),
     );
 
-    // A day later, nothing changed.
-    now = DateTime(2026, 3, 15, 9);
+    // Later the same day, nothing changed.
+    now = DateTime(2026, 3, 14, 21);
     final WirdProgress? resumed = await resume(id);
     expect(resumed!.currentCount, 5);
     expect(resumed.stepRef, const ContentRef.dhikr(1004));
+  });
+
+  test('progress made yesterday is not resumed today', () async {
+    const CollectionId id = BuiltinCollectionId(simpleCollectionId);
+    final ResolvedCollection resolved = await collections.resolve(id);
+    await user.saveProgress(
+      WirdProgress.atStep(
+        collectionId: id,
+        step: resolved.steps.single,
+        currentCount: 5,
+        updatedAt: now,
+      ),
+    );
+
+    // The next morning. Nothing about the collection changed and the stored
+    // row is still there — it is the day that moved. A wird left half done
+    // last night is not half done this morning, it is not done, so the day
+    // starts at the beginning rather than five repetitions in.
+    now = DateTime(2026, 3, 15, 9);
+    expect(await user.progress(id), isNull);
+    expect(await resume(id), isNull);
+  });
+
+  test('progress made earlier today survives midnight the other way', () async {
+    const CollectionId id = BuiltinCollectionId(simpleCollectionId);
+    final ResolvedCollection resolved = await collections.resolve(id);
+
+    // Written a minute past midnight, read at the end of the same day: the
+    // rule is about the local date, not about elapsed hours.
+    now = DateTime(2026, 3, 14, 0, 1);
+    await user.saveProgress(
+      WirdProgress.atStep(
+        collectionId: id,
+        step: resolved.steps.single,
+        currentCount: 5,
+        updatedAt: now,
+      ),
+    );
+
+    now = DateTime(2026, 3, 14, 23, 59);
+    expect((await user.progress(id))!.currentCount, 5);
   });
 }

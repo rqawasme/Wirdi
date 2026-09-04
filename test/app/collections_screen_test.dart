@@ -41,13 +41,22 @@ void main() {
         overrides: <Override>[wirdiDataProvider.overrideWithValue(data)],
         child: MaterialApp(
           theme: WirdiTheme.light(),
-          home: withRouter ? null : const CollectionsScreen(),
+          // The body on its own for what a row says, and the whole shell for
+          // where a row goes. CollectionsScreen has no Scaffold of its own any
+          // more — the app bar and the navigation bar belong to AppShell — so
+          // the bare pump supplies one.
+          home: withRouter ? null : const Scaffold(body: CollectionsScreen()),
           onGenerateRoute: withRouter ? WirdiRouter.onGenerateRoute : null,
-          initialRoute: withRouter ? Routes.collections : null,
+          initialRoute: withRouter ? Routes.shell : null,
         ),
       ),
     );
     await settle(tester);
+    if (withRouter) {
+      // The shell opens on Home. The collections list is a tab away.
+      await tester.tap(find.text('Collections'));
+      await settle(tester);
+    }
   }
 
   testWidgets('lists the built-ins with their item counts', (

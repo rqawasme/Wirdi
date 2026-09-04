@@ -5,6 +5,7 @@ import '../domain/content.dart';
 import '../providers/reading.dart';
 import '../providers/settings.dart';
 import '../theme/theme.dart';
+import '../widgets/about_sheet.dart';
 import '../widgets/ayah_block.dart';
 import '../widgets/text_size_slider.dart';
 import '../widgets/voussoir_stripe.dart';
@@ -111,6 +112,22 @@ class SettingsScreen extends ConsumerWidget {
                     ThemeMode.dark: 'Dark',
                   },
                   onChanged: controller.setThemeMode,
+                ),
+
+                // Last, and on its own. Sources, credits and licences are not
+                // a setting — nothing here changes when you read them — so this
+                // sits below the settings rather than among them, and opens a
+                // sheet rather than pushing a screen: About is read once and
+                // dismissed back to whatever you were doing.
+                const SizedBox(height: WirdiMetrics.space6),
+                const VoussoirStripe.rule(),
+                const SizedBox(height: WirdiMetrics.space4),
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: OutlinedButton(
+                    onPressed: () => showAboutSheet(context),
+                    child: const Text('About Wirdi'),
+                  ),
                 ),
               ],
             ),

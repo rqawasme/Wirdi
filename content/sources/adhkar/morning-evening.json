@@ -1,0 +1,148 @@
+{
+  "group": "morning-evening",
+  "description": "The adhkar of the morning and the evening, as summarised from the works of Shaykh Abd al-Aziz al-Tarefe (compiled by Yasser Peerun). Both collections draw on this one file: most of these are said at both ends of the day, and the four that are not (asbahna / amsayna and their pairs) sit here beside them rather than in a file of their own. The Quranic portions of those collections - al-Ikhlas, al-Falaq, al-Nas and the last two verses of al-Baqarah - are not here: they are referenced from content.db as surah and ayah items, so the mushaf text is never transcribed a second time.",
+  "adhkar": [
+    {
+      "id": 3001,
+      "text_arabic": "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ",
+      "translation": "O Allah, You are my Lord; there is no god but You. You created me and I am Your servant, and I hold to Your covenant and Your promise as far as I am able. I seek refuge in You from the evil of what I have done. I acknowledge before You Your favour upon me, and I confess my sin to You, so forgive me; for none forgives sins but You.",
+      "transliteration": "Allāhumma anta rabbī lā ilāha illā anta, khalaqtanī wa-anā ʿabduka, wa-anā ʿalā ʿahdika wa-waʿdika mā staṭaʿtu, aʿūdhu bika min sharri mā ṣanaʿtu, abūʾu laka bi-niʿmatika ʿalayya, wa-abūʾu bi-dhanbī fa-ghfir lī fa-innahu lā yaghfiru dh-dhunūba illā anta.",
+      "default_count": 1,
+      "source_id": 1,
+      "notes": "Sayyid al-istighfār, the foremost wording of seeking forgiveness."
+    },
+    {
+      "id": 3002,
+      "text_arabic": "لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      "translation": "There is no god but Allah alone, who has no partner. His is the dominion and His is the praise, and He has power over all things.",
+      "transliteration": "Lā ilāha illā Llāhu waḥdahu lā sharīka lahu, lahu l-mulku wa-lahu l-ḥamdu, wa-huwa ʿalā kulli shayʾin qadīr.",
+      "default_count": 10,
+      "source_id": 2,
+      "benefits": "Said a hundred times in a day it carries the reward of freeing ten slaves, a hundred good deeds written and a hundred bad deeds erased, and protection from the Shayṭān until the evening."
+    },
+    {
+      "id": 3003,
+      "text_arabic": "سُبْحَانَ اللهِ وَبِحَمْدِهِ",
+      "translation": "Glory be to Allah, and praise be to Him.",
+      "transliteration": "Subḥāna Llāhi wa-bi-ḥamdih.",
+      "default_count": 100,
+      "source_id": 3,
+      "benefits": "Said a hundred times in a day, one's sins are forgiven though they were as the foam of the sea."
+    },
+    {
+      "id": 3004,
+      "text_arabic": "بِسْمِ اللهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
+      "translation": "In the name of Allah, with whose name nothing in the earth or in the heaven can cause harm, and He is the All-Hearing, the All-Knowing.",
+      "transliteration": "Bismi Llāhi lladhī lā yaḍurru maʿa smihi shayʾun fī l-arḍi wa-lā fī s-samāʾi wa-huwa s-samīʿu l-ʿalīm.",
+      "default_count": 1,
+      "source_id": 4,
+      "benefits": "Said every morning and evening, nothing will harm the one who says it that day or that night."
+    },
+    {
+      "id": 3005,
+      "text_arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ، وَأَهْلِي وَمَالِي، اللَّهُمَّ اسْتُرْ عَوْرَتِي، وَآمِنْ رَوْعَاتِي، اللَّهُمَّ احْفَظْنِي مِنْ بَيْنِ يَدَيَّ، وَمِنْ خَلْفِي، وَعَنْ يَمِينِي، وَعَنْ شِمَالِي، وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي",
+      "translation": "O Allah, I ask You for well-being in this world and the next. O Allah, I ask You for pardon and well-being in my religion, my worldly affairs, my family and my wealth. O Allah, conceal my faults and calm my fears. O Allah, guard me from before me and behind me, from my right and my left, and from above me; and I seek refuge in Your greatness from being taken unawares from beneath me.",
+      "transliteration": "Allāhumma innī asʾaluka l-ʿāfiyata fī d-dunyā wa-l-ākhirah, Allāhumma innī asʾaluka l-ʿafwa wa-l-ʿāfiyata fī dīnī wa-dunyāya, wa-ahlī wa-mālī, Allāhumma stur ʿawratī, wa-āmin rawʿātī, Allāhumma ḥfaẓnī min bayni yadayya, wa-min khalfī, wa-ʿan yamīnī, wa-ʿan shimālī, wa-min fawqī, wa-aʿūdhu bi-ʿaẓamatika an ughtāla min taḥtī.",
+      "default_count": 1,
+      "source_id": 5,
+      "notes": "Ibn ʿUmar narrated that the Prophet would say this on entering the morning and the evening."
+    },
+    {
+      "id": 3006,
+      "text_arabic": "رَضِيتُ بِاللهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ نَبِيًّا",
+      "translation": "I am pleased with Allah as Lord, with Islam as religion, and with Muhammad, may Allah bless him and grant him peace, as Prophet.",
+      "transliteration": "Raḍītu bi-Llāhi rabban, wa-bi-l-islāmi dīnan, wa-bi-Muḥammadin ṣallā Llāhu ʿalayhi wa-sallama nabiyyan.",
+      "default_count": 3,
+      "source_id": 6,
+      "benefits": "Said three times on entering the morning and the evening, Allah has taken it upon Himself to please the one who says it on the Day of Resurrection."
+    },
+    {
+      "id": 3007,
+      "text_arabic": "اللَّهُمَّ فَاطِرَ السَّمَاوَاتِ وَالْأَرْضِ، عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي وَشَرِّ الشَّيْطَانِ وَشِرْكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءًا، أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ",
+      "translation": "O Allah, Originator of the heavens and the earth, Knower of the unseen and the seen, Lord and Sovereign of all things: I bear witness that there is no god but You. I seek refuge in You from the evil of my own soul, and from the evil of the Shayṭān and his call to associate others with You, and from bringing evil upon myself or drawing it onto any Muslim.",
+      "transliteration": "Allāhumma fāṭira s-samāwāti wa-l-arḍ, ʿālima l-ghaybi wa-sh-shahādah, rabba kulli shayʾin wa-malīkah, ashhadu an lā ilāha illā anta, aʿūdhu bika min sharri nafsī wa-sharri sh-shayṭāni wa-shirkih, wa-an aqtarifa ʿalā nafsī sūʾan, aw ajurrahu ilā muslim.",
+      "default_count": 1,
+      "source_id": 7,
+      "notes": "The Prophet taught this to Abū Bakr to say every morning and evening. The closing clause comes through al-Tirmidhī."
+    },
+    {
+      "id": 3008,
+      "text_arabic": "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ، أَصْلِحْ لِي شَأْنِي كُلَّهُ وَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ",
+      "translation": "O Ever-Living, O Sustainer of all, by Your mercy I seek relief. Set right for me all of my affairs, and do not leave me to myself for the blink of an eye.",
+      "transliteration": "Yā Ḥayyu yā Qayyūmu bi-raḥmatika astaghīth, aṣliḥ lī shaʾnī kullahu wa-lā takilnī ilā nafsī ṭarfata ʿayn.",
+      "default_count": 1,
+      "source_id": 8,
+      "notes": "The Prophet taught this to his daughter Fāṭima to say every morning and evening."
+    },
+    {
+      "id": 3009,
+      "text_arabic": "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذَا الْيَوْمِ، وَخَيْرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذَا الْيَوْمِ، وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ، وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ",
+      "translation": "We have entered the morning and the dominion has entered the morning belonging to Allah; praise be to Allah. There is no god but Allah alone, who has no partner. His is the dominion and His is the praise, and He has power over all things. My Lord, I ask You for the good of this day and the good of what follows it, and I seek refuge in You from the evil of this day and the evil of what follows it. My Lord, I seek refuge in You from idleness and the misery of old age. My Lord, I seek refuge in You from a punishment in the Fire and a punishment in the grave.",
+      "transliteration": "Aṣbaḥnā wa-aṣbaḥa l-mulku li-Llāh, wa-l-ḥamdu li-Llāh, lā ilāha illā Llāhu waḥdahu lā sharīka lah, lahu l-mulku wa-lahu l-ḥamdu wa-huwa ʿalā kulli shayʾin qadīr, rabbi asʾaluka khayra mā fī hādhā l-yawm, wa-khayra mā baʿdah, wa-aʿūdhu bika min sharri mā fī hādhā l-yawm, wa-sharri mā baʿdah, rabbi aʿūdhu bika mina l-kasal, wa-sūʾi l-kibar, rabbi aʿūdhu bika min ʿadhābin fī n-nāri wa-ʿadhābin fī l-qabr.",
+      "default_count": 1,
+      "source_id": 9,
+      "notes": "The morning wording. Its evening counterpart is a separate dhikr."
+    },
+    {
+      "id": 3010,
+      "text_arabic": "اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ",
+      "translation": "O Allah, by You we enter the morning and by You we enter the evening, by You we live and by You we die, and to You is the resurrection.",
+      "transliteration": "Allāhumma bika aṣbaḥnā, wa-bika amsaynā, wa-bika naḥyā, wa-bika namūtu wa-ilayka n-nushūr.",
+      "default_count": 1,
+      "source_id": 10,
+      "notes": "The morning wording, closing on the resurrection."
+    },
+    {
+      "id": 3011,
+      "text_arabic": "سُبْحَانَ اللهِ وَبِحَمْدِهِ، عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ",
+      "translation": "Glory be to Allah and praise be to Him: as many as the number of His creation, as much as pleases Him, as the weight of His throne, and as the ink of His words.",
+      "transliteration": "Subḥāna Llāhi wa-bi-ḥamdih, ʿadada khalqih, wa-riḍā nafsih, wa-zinata ʿarshih, wa-midāda kalimātih.",
+      "default_count": 3,
+      "source_id": 11
+    },
+    {
+      "id": 3012,
+      "text_arabic": "أَصْبَحْنَا عَلَى فِطْرَةِ الْإِسْلَامِ وَعَلَى كَلِمَةِ الْإِخْلَاصِ، وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ، وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ حَنِيفًا مُسْلِمًا وَمَا كَانَ مِنَ الْمُشْرِكِينَ",
+      "translation": "We have entered the morning upon the natural way of Islam, upon the word of sincerity, upon the religion of our Prophet Muhammad, may Allah bless him and grant him peace, and upon the creed of our father Ibrahim, who was upright and submitting and was not of those who associate others with Allah.",
+      "transliteration": "Aṣbaḥnā ʿalā fiṭrati l-islāmi wa-ʿalā kalimati l-ikhlāṣ, wa-ʿalā dīni nabiyyinā Muḥammadin ṣallā Llāhu ʿalayhi wa-sallam, wa-ʿalā millati abīnā Ibrāhīma ḥanīfan musliman wa-mā kāna mina l-mushrikīn.",
+      "default_count": 1,
+      "source_id": 12
+    },
+    {
+      "id": 3013,
+      "text_arabic": "حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
+      "translation": "Allah is sufficient for me; there is no god but Him. In Him I have put my trust, and He is the Lord of the Mighty Throne.",
+      "transliteration": "Ḥasbiya Llāhu lā ilāha illā huwa ʿalayhi tawakkaltu wa-huwa rabbu l-ʿarshi l-ʿaẓīm.",
+      "default_count": 7,
+      "source_id": 13,
+      "benefits": "Said seven times every morning and evening, Allah suffices the one who says it against whatever concerns him."
+    },
+    {
+      "id": 3014,
+      "text_arabic": "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ، وَخَيْرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذِهِ اللَّيْلَةِ، وَشَرِّ مَا بَعْدَهَا، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ، وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ",
+      "translation": "We have entered the evening and the dominion has entered the evening belonging to Allah; praise be to Allah. There is no god but Allah alone, who has no partner. His is the dominion and His is the praise, and He has power over all things. My Lord, I ask You for the good of this night and the good of what follows it, and I seek refuge in You from the evil of this night and the evil of what follows it. My Lord, I seek refuge in You from idleness and the misery of old age. My Lord, I seek refuge in You from a punishment in the Fire and a punishment in the grave.",
+      "transliteration": "Amsaynā wa-amsā l-mulku li-Llāh, wa-l-ḥamdu li-Llāh, lā ilāha illā Llāhu waḥdahu lā sharīka lah, lahu l-mulku wa-lahu l-ḥamdu wa-huwa ʿalā kulli shayʾin qadīr, rabbi asʾaluka khayra mā fī hādhihi l-laylah, wa-khayra mā baʿdahā, wa-aʿūdhu bika min sharri mā fī hādhihi l-laylah, wa-sharri mā baʿdahā, rabbi aʿūdhu bika mina l-kasal, wa-sūʾi l-kibar, rabbi aʿūdhu bika min ʿadhābin fī n-nāri wa-ʿadhābin fī l-qabr.",
+      "default_count": 1,
+      "source_id": 9,
+      "notes": "The evening wording. Its morning counterpart is a separate dhikr."
+    },
+    {
+      "id": 3015,
+      "text_arabic": "اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ الْمَصِيرُ",
+      "translation": "O Allah, by You we enter the evening and by You we enter the morning, by You we live and by You we die, and to You is the return.",
+      "transliteration": "Allāhumma bika amsaynā, wa-bika aṣbaḥnā, wa-bika naḥyā, wa-bika namūtu, wa-ilayka l-maṣīr.",
+      "default_count": 1,
+      "source_id": 14,
+      "notes": "The evening wording, closing on the return rather than the resurrection."
+    },
+    {
+      "id": 3016,
+      "text_arabic": "أَعُوذُ بِكَلِمَاتِ اللهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+      "translation": "I seek refuge in the perfect words of Allah from the evil of what He has created.",
+      "transliteration": "Aʿūdhu bi-kalimāti Llāhi t-tāmmāti min sharri mā khalaq.",
+      "default_count": 1,
+      "source_id": 15,
+      "notes": "Said in the evening only. Whoever says it on stopping at a place is not harmed there until they move on."
+    }
+  ]
+}
