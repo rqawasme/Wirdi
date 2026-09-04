@@ -204,15 +204,21 @@ void main() {
     }
 
     await openTab(WirdiTab.collections, '01b-collections');
-    // The sheet that decides all of the above, on the collection that uses
-    // the day picker for something: al-Kahf, on Fridays.
-    await tester.tap(find.byTooltip('More').at(1));
-    await settle(tester);
-    await tester.tap(find.text('Change when'));
-    await settle(tester);
-    await shoot(tester, '01b2-commit-sheet');
-    Navigator.of(tester.element(find.byType(SegmentedButton<int>))).pop();
-    await settle(tester);
+    // The sheet that decides all of the above, in both of its states: every
+    // day, which is the default and what most commitments are, and a single
+    // day, which is what the picker exists for.
+    Future<void> shootSheet(int row, String name) async {
+      await tester.tap(find.byTooltip('More').at(row));
+      await settle(tester);
+      await tester.tap(find.text('Change when'));
+      await settle(tester);
+      await shoot(tester, name);
+      Navigator.of(tester.element(find.byType(SegmentedButton<int>))).pop();
+      await settle(tester);
+    }
+
+    await shootSheet(0, '01b2-commit-sheet-every-day');
+    await shootSheet(1, '01b3-commit-sheet-one-day');
     await openTab(WirdiTab.dhikr, '01c-dhikr');
     await openTab(WirdiTab.tracker, '01d-tracker');
     await openTab(WirdiTab.home, '01e-home-again');

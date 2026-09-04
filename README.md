@@ -169,6 +169,15 @@ no placeholder — because a header over nothing is a promise the screen is not
 keeping. Committing happens in the collections list's row menu, which is where a
 collection is also copied, edited and deleted.
 
+**A selected segment is brick, not a tonal step.** Depth in this app is tonal
+and selection is not: a tonal step against a tonal surface is a difference you
+have to hunt for, and on a row of seven days it is one you can get wrong without
+noticing — which is exactly what happened, leaving a picker set to the opposite
+of what its user meant. Brick already marks the selected tab in the navigation
+bar, so the day picker and the theme control say it the same way.
+`test/theme/selection_contrast_test.dart` pins it, because the failure it
+prevents is one no behavioural test can see.
+
 **A commitment carries the days it comes round on, and they are orthogonal to
 the section.** The section says where in the day something sits; the days say
 whether it is due at all. Every day is the default and what almost every
