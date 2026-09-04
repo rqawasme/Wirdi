@@ -43,12 +43,17 @@ class UserDatabase extends _$UserDatabase {
     // would parse as no section at all and its commitment would quietly stop
     // appearing, so it is rewritten here rather than tolerated as an alias
     // forever.
+    // Each step is written for the version it upgrades *from*, and not as
+    // `from < n`. A step that creates a table creates it from the current
+    // schema — `days` and all — so the step after it must not then add a
+    // column that is already there. `from == 2` is the only database that has
+    // a `commitments` table without one.
     onUpgrade: (Migrator m, int from, int to) async {
       if (from < 2) {
         await m.createTable(commitments);
         await m.createIndex(idxCommitmentsSection);
       }
-      if (from < 3) {
+      if (from == 2) {
         await m.addColumn(commitments, commitments.days);
         await customStatement(
           "UPDATE commitments SET section = 'today' WHERE section = 'daily'",

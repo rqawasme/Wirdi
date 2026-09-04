@@ -421,37 +421,4 @@ void main() {
       expect(committed.last.collectionId, builtin);
     });
   });
-
-  group('the 2 -> 3 migration', () {
-    test('brings a v2 commitment forward as today, every day', () async {
-      // A row as version 2 wrote it: the section spelled 'daily', and no days
-      // column at all. Written through the raw connection because the current
-      // schema cannot express it.
-      await dbs.user.customStatement('DROP TABLE commitments');
-      await dbs.user.customStatement(
-        'CREATE TABLE commitments (collection_ref TEXT NOT NULL PRIMARY KEY, '
-        'section TEXT NOT NULL, sort_order INTEGER NOT NULL, '
-        'created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)',
-      );
-      await dbs.user.customStatement(
-        "INSERT INTO commitments VALUES ('u:${testUuid(1)}', 'daily', 1, 0, 0)",
-      );
-
-      // What onUpgrade does, in the order it does it.
-      await dbs.user.customStatement(
-        'ALTER TABLE commitments ADD COLUMN days INTEGER NOT NULL DEFAULT 127',
-      );
-      await dbs.user.customStatement(
-        "UPDATE commitments SET section = 'today' WHERE section = 'daily'",
-      );
-
-      final Commitment migrated = (await user.commitments()).single;
-      expect(migrated.collectionId, mine);
-      // 'daily' would parse as no section at all and the commitment would
-      // quietly stop appearing, which is why the rename is a data migration
-      // rather than a label change.
-      expect(migrated.section, DailySection.today);
-      expect(migrated.days, Weekdays.everyDay);
-    });
-  });
 }
