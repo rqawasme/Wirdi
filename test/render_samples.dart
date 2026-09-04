@@ -145,10 +145,12 @@ void main() {
     addTearDown(tester.view.reset);
 
     // What the home screen is for: a day with something committed to it. The
-    // three tiles between them cover the states the tile has — not started,
-    // part-way, and finished — plus a collection with no Arabic name beside
-    // one with a long one.
+    // three built-ins the content build ships, in the parts of the day they
+    // belong to, plus one collection of the user's own — which has no Arabic
+    // name, so the row covers a tile with one beside a tile without.
     final CollectionId nawawi = const BuiltinCollectionId(2);
+    final CollectionId morning = const BuiltinCollectionId(3);
+    final CollectionId evening = const BuiltinCollectionId(4);
     final UserCollectionId kursi = await data.collectionRepository.create(
       'Ayat al-Kursi, three times',
     );
@@ -157,27 +159,21 @@ void main() {
       ContentRef.ayahAt(2, 255),
       count: 3,
     );
-    final UserCollectionId istighfar = await data.collectionRepository.create(
-      'Istighfar, one hundred',
-    );
-    await data.collectionRepository.addItem(
-      istighfar,
-      const ContentRef.dhikr(2001),
-      count: 100,
-    );
 
     await data.userRepository.commit(kursi, DailySection.daily);
-    await data.userRepository.commit(istighfar, DailySection.daily);
-    await data.userRepository.commit(nawawi, DailySection.morning);
+    await data.userRepository.commit(nawawi, DailySection.daily);
+    await data.userRepository.commit(morning, DailySection.morning);
+    await data.userRepository.commit(evening, DailySection.evening);
 
-    // One finished, one part-way, one untouched.
+    // One finished, one part-way, the rest untouched: the three states a tile
+    // has, on one screen.
     await data.userRepository.logCompletion(kursi, DateTime.now());
-    final ResolvedCollection resolvedIstighfar = await data.collectionRepository
-        .resolve(istighfar);
+    final ResolvedCollection resolvedMorning = await data.collectionRepository
+        .resolve(morning);
     await data.userRepository.saveProgress(
       WirdProgress.atStep(
-        collectionId: istighfar,
-        step: resolvedIstighfar.steps.first,
+        collectionId: morning,
+        step: resolvedMorning.steps[2],
         currentCount: 40,
       ),
     );
@@ -271,6 +267,13 @@ void main() {
     // times over.
     const CollectionId wird = BuiltinCollectionId(2);
     await openPlayer(wird, '02-player-dhikr');
+
+    // The morning and evening adhkar, where the Arabic authored for them is
+    // actually set: the first dhikr of each, and a surah step from inside the
+    // morning collection.
+    await openPlayer(morning, '02a-morning-adhkar');
+    await openPlayer(morning, '02b-morning-surah', stepIndex: 5);
+    await openPlayer(evening, '02c-evening-adhkar', stepIndex: 11);
     // A step said three times, part-way counted, so the stripe has something
     // to show.
     await openPlayer(wird, '03-player-counting', stepIndex: 10, taps: 1);
