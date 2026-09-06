@@ -28,14 +28,16 @@ Only the raw QUL exports it was generated from are left out, and only because th
 are bulky and needed just to regenerate. See
 [`content/sources/quran/README.md`](content/sources/quran/README.md) for that.
 
-Three collections are authored and built in: the **wird of Imam al-Nawawi**, and
-the **morning** and **evening adhkar**, summarised from the works of Shaykh Abd
-al-Aziz al-Tarefe. The two adhkar collections share one file of dhikr text —
-most of what is said in the morning is said again in the evening, and the four
-wordings that differ (`asbahna` against `amsayna`, and their pairs) sit beside
-each other rather than being duplicated. Their Quranic portions are **not**
-transcribed: al-Ikhlas, al-Falaq, al-Nas and the last two verses of al-Baqarah
-are `surah` and `ayah` items resolved out of the imported mushaf, so that text
+Five collections are authored and built in: the **wird of Imam al-Nawawi**; the
+**morning** and **evening adhkar**, summarised from the works of Shaykh Abd
+al-Aziz al-Tarefe; and **al-Wird al-Latif** of Imam al-Haddad, morning and
+evening. Each morning/evening pair shares one file of dhikr text — most of what
+is said in the morning is said again in the evening, and the wordings that
+differ (`asbahna` against `amsayna`, and their pairs) sit beside each other
+rather than being duplicated. Their Quranic portions are **not** transcribed:
+al-Ikhlas, al-Falaq, al-Nas, the last two verses of al-Baqarah and the passages
+al-Wird al-Latif draws from al-Muminun, al-Rum, al-Hashr and al-Saffat are
+`surah` and `ayah` items resolved out of the imported mushaf, so that text
 exists in exactly one place in the database.
 
 Every id in the database is either computed by a fixed rule or written by hand in
