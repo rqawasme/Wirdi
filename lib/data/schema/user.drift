@@ -49,11 +49,18 @@ CREATE INDEX IF NOT EXISTS idx_user_collection_items_position
 -- on resume, a step_ref that no longer matches means a content update or a
 -- reorder moved things underneath, and the progress is discarded rather than
 -- resumed at the wrong dhikr.
+--
+-- unit_index is how far into the current repetition the reciter is, in the
+-- units that step is made of: the ayah of a surah being read one verse at a
+-- time, and 0 for every step whose unit is the whole item. It defaults to 0 so
+-- a row written before this column existed comes forward as the start of its
+-- repetition, which is where a step with one unit always is.
 CREATE TABLE progress (
     collection_ref TEXT    NOT NULL PRIMARY KEY,
     step_index     INTEGER NOT NULL,
     step_ref       TEXT    NOT NULL,
     current_count  INTEGER NOT NULL,
+    unit_index     INTEGER NOT NULL DEFAULT 0,
     updated_at     INTEGER NOT NULL
 ) AS ProgressRow;
 
@@ -166,12 +173,14 @@ progressFor: SELECT * FROM progress WHERE collection_ref = :ref;
 
 upsertProgress:
     INSERT INTO progress
-        (collection_ref, step_index, step_ref, current_count, updated_at)
-    VALUES (:ref, :stepIndex, :stepRef, :currentCount, :updatedAt)
+        (collection_ref, step_index, step_ref, current_count, unit_index,
+         updated_at)
+    VALUES (:ref, :stepIndex, :stepRef, :currentCount, :unitIndex, :updatedAt)
     ON CONFLICT (collection_ref) DO UPDATE SET
         step_index = excluded.step_index,
         step_ref = excluded.step_ref,
         current_count = excluded.current_count,
+        unit_index = excluded.unit_index,
         updated_at = excluded.updated_at;
 
 deleteProgress: DELETE FROM progress WHERE collection_ref = :ref;

@@ -18,6 +18,7 @@ final class WirdProgress {
     required this.stepIndex,
     required this.stepRef,
     required this.currentCount,
+    this.unitIndex = 0,
     DateTime? updatedAt,
   }) : updatedAt = updatedAt ?? DateTime.now();
 
@@ -27,6 +28,7 @@ final class WirdProgress {
     required this.collectionId,
     required PlaybackStep step,
     required this.currentCount,
+    this.unitIndex = 0,
     DateTime? updatedAt,
   }) : stepIndex = step.index,
        stepRef = step.ref,
@@ -47,12 +49,22 @@ final class WirdProgress {
   /// Repetitions completed of the step at [stepIndex].
   final int currentCount;
 
+  /// How far into the current repetition, in units: the ayah of a surah being
+  /// recited, and always 0 for a step whose unit is the whole item.
+  ///
+  /// Stored so that backgrounding half way through Al-Mulk comes back to the
+  /// verse it was left on rather than to the top of the surah. Clamped against
+  /// the step's `unitCount` on resume, exactly as [currentCount] is: it is a
+  /// plain integer in a row this app is not the only possible writer of.
+  final int unitIndex;
+
   final DateTime updatedAt;
 
   WirdProgress copyWith({
     int? stepIndex,
     ContentRef? stepRef,
     int? currentCount,
+    int? unitIndex,
     DateTime? updatedAt,
   }) {
     return WirdProgress(
@@ -60,6 +72,7 @@ final class WirdProgress {
       stepIndex: stepIndex ?? this.stepIndex,
       stepRef: stepRef ?? this.stepRef,
       currentCount: currentCount ?? this.currentCount,
+      unitIndex: unitIndex ?? this.unitIndex,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
@@ -67,7 +80,7 @@ final class WirdProgress {
   @override
   String toString() =>
       'WirdProgress(${collectionId.canonical} step $stepIndex '
-      '${stepRef.canonical}, count $currentCount)';
+      '${stepRef.canonical}, count $currentCount, unit $unitIndex)';
 }
 
 /// Where the user last was in the mushaf. A single row by construction.

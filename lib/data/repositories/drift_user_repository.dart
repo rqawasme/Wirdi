@@ -64,6 +64,7 @@ class DriftUserRepository implements UserRepository {
       stepIndex: progress.stepIndex,
       stepRef: progress.stepRef.canonical,
       currentCount: progress.currentCount,
+      unitIndex: progress.unitIndex,
       updatedAt: toEpochMs(progress.updatedAt),
     );
   }

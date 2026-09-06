@@ -20,6 +20,9 @@ import '../support/fixtures.dart';
 /// in one collection, with a repeat block in the middle of it. Nothing here
 /// asserts on Quranic or dhikr text, because the fixtures contain none — the
 /// strings are labels saying which row they are.
+///
+/// One mechanic across all three: the content area counts, the band names the
+/// gesture, and there is no advance button anywhere.
 void main() {
   late TestDatabases dbs;
   late WirdiData data;
@@ -92,8 +95,33 @@ void main() {
       // Step one of fourteen: four loose items, nine steps of the repeat
       // block, and the trailing dhikr.
       expect(find.text('1 of 14'), findsOneWidget);
-      // A count of one says "left", not "left of 1".
+      // The header says what this is, and the plate says how many times —
+      // including at one, where a plate that vanished would be worse.
+      expect(find.text('Dhikr'), findsOneWidget);
+      expect(find.text('×1'), findsOneWidget);
+      // One unit said once and no repeat block: there is no position to state.
+      expect(find.textContaining('Repeat'), findsNothing);
+      // The band: the count, the word, and the gesture in words.
+      expect(find.text('1'), findsWidgets);
       expect(find.text('left'), findsOneWidget);
+      expect(find.text('Tap anywhere above to count'), findsOneWidget);
+    });
+
+    testWidgets('the position line counts the repetitions of the step', (
+      WidgetTester tester,
+    ) async {
+      // Step two is the dhikr with a count override of 100.
+      await openAt(tester, 1);
+
+      expect(find.text('×100'), findsOneWidget);
+      expect(find.text('Repeat 1 of 100'), findsOneWidget);
+
+      await tester.tap(find.text('PLACEHOLDER dhikr 1002 translation'));
+      await tester.pump();
+
+      expect(find.text('Repeat 2 of 100'), findsOneWidget);
+      // The count is stated once, in the band. The plate never carries it.
+      expect(find.text('99'), findsOneWidget);
     });
 
     testWidgets('counts down on a tap anywhere in the content', (
@@ -102,7 +130,6 @@ void main() {
       // Step two is the dhikr with a count override of 100.
       await openAt(tester, 1);
       expect(find.text('100'), findsOneWidget);
-      expect(find.text('left of 100'), findsOneWidget);
 
       // The translation is not a button; the tap lands on the content area
       // that wraps it.
@@ -113,19 +140,18 @@ void main() {
       expect(find.text('2 of 14'), findsOneWidget, reason: 'same step');
     });
 
-    testWidgets('counts from the button as well as the content', (
+    testWidgets('has no advance button: the band names the gesture instead', (
       WidgetTester tester,
     ) async {
       await openAt(tester, 1);
-      expect(find.text('100'), findsOneWidget);
 
-      // The content area counts, but nothing about it says so. The button is
-      // how a reader finds that out, and it counts the same one.
-      await tester.tap(find.widgetWithText(FilledButton, 'Count'));
-      await tester.pump();
-
-      expect(find.text('99'), findsOneWidget);
-      expect(find.text('2 of 14'), findsOneWidget, reason: 'same step');
+      // The content area counts and the band says so in words. A second
+      // control for the same thing is a second place for the count to
+      // disagree with itself.
+      expect(find.byType(FilledButton), findsNothing);
+      expect(find.text('Tap anywhere above to count'), findsOneWidget);
+      // Undo stays where it is, outside the counting area.
+      expect(find.widgetWithText(OutlinedButton, 'Undo'), findsOneWidget);
     });
 
     testWidgets('the source and the per-collection note are shown', (
@@ -190,10 +216,12 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('PLACEHOLDER ayah 2:255 translation'), findsOneWidget);
+      // The reference is the step's name, in the header, and said once.
       expect(
-        find.textContaining('PLACEHOLDER surah 2 transliterated 2:255'),
+        find.text('PLACEHOLDER surah 2 transliterated 2:255'),
         findsOneWidget,
       );
+      expect(find.text('Single ayah'), findsOneWidget);
       expect(find.text('3 of 14'), findsOneWidget);
     });
 
@@ -209,37 +237,44 @@ void main() {
   });
 
   group('a surah step', () {
-    testWidgets('renders as a reading block with a done action', (
+    testWidgets('shows one ayah at a time, under the surah it belongs to', (
       WidgetTester tester,
     ) async {
-      // Step five is the first pass of the repeat block: surah 112.
+      // Step five is the first pass of the repeat block: surah 112, of four
+      // ayahs, recited three times.
       await openAt(tester, 4);
 
       expect(find.text('5 of 14'), findsOneWidget);
-      // The phase 4 verse rendering, virtualised, with the basmala heading the
-      // database says this surah has.
-      expect(find.byType(AyahBlock), findsWidgets);
+      expect(find.text('PLACEHOLDER surah 112 transliterated'), findsOneWidget);
+      expect(find.text('Surah 112 · 4 ayahs'), findsOneWidget);
+      // Said once each time round the block, so the plate is x1 and the round
+      // in the position line is the block's.
+      expect(find.text('×1'), findsOneWidget);
+      expect(find.text('Ayah 1 of 4 · round 1 of 3'), findsOneWidget);
+
+      // One verse, not the whole surah.
+      expect(find.byType(AyahBlock), findsOneWidget);
       expect(
         find.textContaining('PLACEHOLDER ayah 112:1 uthmani'),
         findsOneWidget,
       );
       expect(
-        find.textContaining('PLACEHOLDER surah 112 transliterated'),
-        findsWidgets,
+        find.textContaining('PLACEHOLDER ayah 112:2 uthmani'),
+        findsNothing,
       );
-      expect(find.widgetWithText(FilledButton, 'Done'), findsOneWidget);
+
+      // And it counts the same way everything else does.
+      expect(find.byType(FilledButton), findsNothing);
+      expect(
+        find.text('Tap anywhere above to go to the next ayah'),
+        findsOneWidget,
+      );
+      // One reading left, never four ayahs: what is left of a step is always
+      // repetitions of it.
+      expect(find.text('1'), findsOneWidget);
     });
 
-    testWidgets('shows which round of the block it is', (
-      WidgetTester tester,
-    ) async {
-      // Step eight is the second surah of the second pass.
-      await openAt(tester, 7);
-
-      expect(find.text('Round 2 of 3'), findsOneWidget);
-    });
-
-    testWidgets('does not count when the text is tapped', (
+    testWidgets('a tap on the text moves to the next ayah', (
       WidgetTester tester,
     ) async {
       await openAt(tester, 4);
@@ -247,13 +282,95 @@ void main() {
       await tester.tap(find.text('PLACEHOLDER ayah 112:1 translation'));
       await settle(tester);
 
-      // "Read Al-Mulk" is a reading, not a thirty-tap interaction: the text is
-      // there to be read, and only the done action advances.
+      // The same step, one unit further in.
+      expect(find.text('5 of 14'), findsOneWidget);
+      expect(find.text('Ayah 2 of 4 · round 1 of 3'), findsOneWidget);
+      expect(
+        find.textContaining('PLACEHOLDER ayah 112:2 uthmani'),
+        findsOneWidget,
+      );
+      // Still one reading of the surah left: it is not finished until the
+      // last ayah of it is.
+      expect(find.text('1'), findsOneWidget);
+    });
+
+    testWidgets('the last ayah of the reading finishes the step', (
+      WidgetTester tester,
+    ) async {
+      await openAt(tester, 4);
+
+      for (int tap = 0; tap < 3; tap++) {
+        await tester.tap(find.byType(AyahBlock));
+        await settle(tester);
+      }
+      expect(find.text('Ayah 4 of 4 · round 1 of 3'), findsOneWidget);
       expect(find.text('5 of 14'), findsOneWidget);
 
-      await tester.tap(find.widgetWithText(FilledButton, 'Done'));
+      // The tap that consumes the last unit completes the step and moves on by
+      // itself, exactly as the tap that reaches a dhikr's count does.
+      await tester.tap(find.byType(AyahBlock));
       await settle(tester);
       expect(find.text('6 of 14'), findsOneWidget);
+    });
+
+    testWidgets('undo steps back to the previous ayah', (
+      WidgetTester tester,
+    ) async {
+      await openAt(tester, 4);
+
+      await tester.tap(find.byType(AyahBlock));
+      await settle(tester);
+      expect(find.text('Ayah 2 of 4 · round 1 of 3'), findsOneWidget);
+
+      await tester.tap(find.widgetWithText(OutlinedButton, 'Undo'));
+      await settle(tester);
+
+      expect(find.text('Ayah 1 of 4 · round 1 of 3'), findsOneWidget);
+    });
+
+    testWidgets('the basmala heads the reading, and only its first ayah', (
+      WidgetTester tester,
+    ) async {
+      await openAt(tester, 4);
+
+      // Taken from 1:1 with its verse number stripped, which is why the
+      // fixture's surah 1 is seeded in full.
+      expect(find.byType(BismillahHeading), findsOneWidget);
+
+      await tester.tap(find.byType(AyahBlock));
+      await settle(tester);
+
+      // It heads a reading, not every verse of one.
+      expect(find.byType(BismillahHeading), findsNothing);
+      expect(find.text('Ayah 2 of 4 · round 1 of 3'), findsOneWidget);
+    });
+
+    testWidgets('the gesture and the position are both announced', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle handle = tester.ensureSemantics();
+      await openAt(tester, 4);
+
+      // The band is the live region, and it carries the unit as well as the
+      // count and the step.
+      expect(
+        find.bySemanticsLabel('1 left, ayah 1 of 4, step 5 of 14'),
+        findsOneWidget,
+      );
+      // And the content area says what tapping it does, rather than only
+      // offering the tap.
+      expect(find.bySemanticsLabel('Next ayah'), findsOneWidget);
+
+      handle.dispose();
+    });
+
+    testWidgets('in a repeat block the round is the block\'s', (
+      WidgetTester tester,
+    ) async {
+      // Step eight is surah 112 again, on the second pass of the block.
+      await openAt(tester, 7);
+
+      expect(find.text('Ayah 1 of 4 · round 2 of 3'), findsOneWidget);
     });
   });
 
@@ -264,6 +381,7 @@ void main() {
       // A short screen, so the verse overflows and there is something to
       // scroll.
       await openAt(tester, 2, height: 380);
+      expect(find.byType(SingleChildScrollView), findsWidgets);
       await tester.drag(
         find.byType(SingleChildScrollView),
         const Offset(0, -120),
@@ -352,6 +470,7 @@ void main() {
       await tester.tap(find.text('PLACEHOLDER collection 1 english'));
       await settle(tester);
       expect(find.text('14 of 14'), findsOneWidget);
+      expect(find.text('Repeat 1 of 3'), findsOneWidget);
 
       final Finder text = find.text('PLACEHOLDER dhikr 1003 translation');
       await tester.tap(text);

@@ -28,8 +28,43 @@ DhikrItem itemOf(int id, {required int position, int count = 1}) => DhikrItem(
   dhikr: dhikrOf(id),
 );
 
+SurahItem surahOf(int number, {required int position, required int ayahCount}) {
+  return SurahItem(
+    entryId: 'entry-surah-$number',
+    position: position,
+    count: 3,
+    surah: Surah(
+      number: number,
+      nameArabic: 'PLACEHOLDER surah $number arabic',
+      nameTransliterated: 'PLACEHOLDER surah $number transliterated',
+      nameEnglish: 'PLACEHOLDER surah $number english',
+      revelationPlace: RevelationPlace.makkah,
+      ayahCount: ayahCount,
+      hasBismillah: true,
+    ),
+  );
+}
+
 void main() {
   group('steps', () {
+    test('a surah is one step, of as many units as it has ayahs', () {
+      final ResolvedCollection resolved = collectionOf(<CollectionEntry>[
+        itemOf(1001, position: 1, count: 33),
+        surahOf(2, position: 2, ayahCount: 286),
+      ]);
+
+      // Al-Baqarah recited three times is one step, not 858: `steps.length` is
+      // what the stripe is cut by and what "2 of 2" counts.
+      expect(resolved.steps, hasLength(2));
+      expect(resolved.steps[1].count, 3);
+      expect(resolved.steps[1].unitCount, 286);
+      expect(resolved.steps[1].isMultiUnit, isTrue);
+
+      // Everything else is one unit said whole.
+      expect(resolved.steps[0].unitCount, 1);
+      expect(resolved.steps[0].isMultiUnit, isFalse);
+    });
+
     test('a collection with no repeat groups is one step per entry', () {
       final ResolvedCollection resolved = collectionOf(<CollectionEntry>[
         itemOf(1001, position: 1),

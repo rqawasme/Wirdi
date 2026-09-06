@@ -1128,6 +1128,18 @@ class Progress extends Table with TableInfo<Progress, ProgressRow> {
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL',
   );
+  static const VerificationMeta _unitIndexMeta = const VerificationMeta(
+    'unitIndex',
+  );
+  late final GeneratedColumn<int> unitIndex = GeneratedColumn<int>(
+    'unit_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT 0',
+    defaultValue: const CustomExpression('0'),
+  );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
   );
@@ -1145,6 +1157,7 @@ class Progress extends Table with TableInfo<Progress, ProgressRow> {
     stepIndex,
     stepRef,
     currentCount,
+    unitIndex,
     updatedAt,
   ];
   @override
@@ -1197,6 +1210,12 @@ class Progress extends Table with TableInfo<Progress, ProgressRow> {
     } else if (isInserting) {
       context.missing(_currentCountMeta);
     }
+    if (data.containsKey('unit_index')) {
+      context.handle(
+        _unitIndexMeta,
+        unitIndex.isAcceptableOrUnknown(data['unit_index']!, _unitIndexMeta),
+      );
+    }
     if (data.containsKey('updated_at')) {
       context.handle(
         _updatedAtMeta,
@@ -1230,6 +1249,10 @@ class Progress extends Table with TableInfo<Progress, ProgressRow> {
         DriftSqlType.int,
         data['${effectivePrefix}current_count'],
       )!,
+      unitIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}unit_index'],
+      )!,
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}updated_at'],
@@ -1251,12 +1274,14 @@ class ProgressRow extends DataClass implements Insertable<ProgressRow> {
   final int stepIndex;
   final String stepRef;
   final int currentCount;
+  final int unitIndex;
   final int updatedAt;
   const ProgressRow({
     required this.collectionRef,
     required this.stepIndex,
     required this.stepRef,
     required this.currentCount,
+    required this.unitIndex,
     required this.updatedAt,
   });
   @override
@@ -1266,6 +1291,7 @@ class ProgressRow extends DataClass implements Insertable<ProgressRow> {
     map['step_index'] = Variable<int>(stepIndex);
     map['step_ref'] = Variable<String>(stepRef);
     map['current_count'] = Variable<int>(currentCount);
+    map['unit_index'] = Variable<int>(unitIndex);
     map['updated_at'] = Variable<int>(updatedAt);
     return map;
   }
@@ -1280,6 +1306,7 @@ class ProgressRow extends DataClass implements Insertable<ProgressRow> {
       stepIndex: serializer.fromJson<int>(json['step_index']),
       stepRef: serializer.fromJson<String>(json['step_ref']),
       currentCount: serializer.fromJson<int>(json['current_count']),
+      unitIndex: serializer.fromJson<int>(json['unit_index']),
       updatedAt: serializer.fromJson<int>(json['updated_at']),
     );
   }
@@ -1291,6 +1318,7 @@ class ProgressRow extends DataClass implements Insertable<ProgressRow> {
       'step_index': serializer.toJson<int>(stepIndex),
       'step_ref': serializer.toJson<String>(stepRef),
       'current_count': serializer.toJson<int>(currentCount),
+      'unit_index': serializer.toJson<int>(unitIndex),
       'updated_at': serializer.toJson<int>(updatedAt),
     };
   }
@@ -1300,12 +1328,14 @@ class ProgressRow extends DataClass implements Insertable<ProgressRow> {
     int? stepIndex,
     String? stepRef,
     int? currentCount,
+    int? unitIndex,
     int? updatedAt,
   }) => ProgressRow(
     collectionRef: collectionRef ?? this.collectionRef,
     stepIndex: stepIndex ?? this.stepIndex,
     stepRef: stepRef ?? this.stepRef,
     currentCount: currentCount ?? this.currentCount,
+    unitIndex: unitIndex ?? this.unitIndex,
     updatedAt: updatedAt ?? this.updatedAt,
   );
   ProgressRow copyWithCompanion(ProgressCompanion data) {
@@ -1318,6 +1348,7 @@ class ProgressRow extends DataClass implements Insertable<ProgressRow> {
       currentCount: data.currentCount.present
           ? data.currentCount.value
           : this.currentCount,
+      unitIndex: data.unitIndex.present ? data.unitIndex.value : this.unitIndex,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -1329,14 +1360,21 @@ class ProgressRow extends DataClass implements Insertable<ProgressRow> {
           ..write('stepIndex: $stepIndex, ')
           ..write('stepRef: $stepRef, ')
           ..write('currentCount: $currentCount, ')
+          ..write('unitIndex: $unitIndex, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(collectionRef, stepIndex, stepRef, currentCount, updatedAt);
+  int get hashCode => Object.hash(
+    collectionRef,
+    stepIndex,
+    stepRef,
+    currentCount,
+    unitIndex,
+    updatedAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1345,6 +1383,7 @@ class ProgressRow extends DataClass implements Insertable<ProgressRow> {
           other.stepIndex == this.stepIndex &&
           other.stepRef == this.stepRef &&
           other.currentCount == this.currentCount &&
+          other.unitIndex == this.unitIndex &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -1353,6 +1392,7 @@ class ProgressCompanion extends UpdateCompanion<ProgressRow> {
   final Value<int> stepIndex;
   final Value<String> stepRef;
   final Value<int> currentCount;
+  final Value<int> unitIndex;
   final Value<int> updatedAt;
   final Value<int> rowid;
   const ProgressCompanion({
@@ -1360,6 +1400,7 @@ class ProgressCompanion extends UpdateCompanion<ProgressRow> {
     this.stepIndex = const Value.absent(),
     this.stepRef = const Value.absent(),
     this.currentCount = const Value.absent(),
+    this.unitIndex = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -1368,6 +1409,7 @@ class ProgressCompanion extends UpdateCompanion<ProgressRow> {
     required int stepIndex,
     required String stepRef,
     required int currentCount,
+    this.unitIndex = const Value.absent(),
     required int updatedAt,
     this.rowid = const Value.absent(),
   }) : collectionRef = Value(collectionRef),
@@ -1380,6 +1422,7 @@ class ProgressCompanion extends UpdateCompanion<ProgressRow> {
     Expression<int>? stepIndex,
     Expression<String>? stepRef,
     Expression<int>? currentCount,
+    Expression<int>? unitIndex,
     Expression<int>? updatedAt,
     Expression<int>? rowid,
   }) {
@@ -1388,6 +1431,7 @@ class ProgressCompanion extends UpdateCompanion<ProgressRow> {
       if (stepIndex != null) 'step_index': stepIndex,
       if (stepRef != null) 'step_ref': stepRef,
       if (currentCount != null) 'current_count': currentCount,
+      if (unitIndex != null) 'unit_index': unitIndex,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -1398,6 +1442,7 @@ class ProgressCompanion extends UpdateCompanion<ProgressRow> {
     Value<int>? stepIndex,
     Value<String>? stepRef,
     Value<int>? currentCount,
+    Value<int>? unitIndex,
     Value<int>? updatedAt,
     Value<int>? rowid,
   }) {
@@ -1406,6 +1451,7 @@ class ProgressCompanion extends UpdateCompanion<ProgressRow> {
       stepIndex: stepIndex ?? this.stepIndex,
       stepRef: stepRef ?? this.stepRef,
       currentCount: currentCount ?? this.currentCount,
+      unitIndex: unitIndex ?? this.unitIndex,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -1426,6 +1472,9 @@ class ProgressCompanion extends UpdateCompanion<ProgressRow> {
     if (currentCount.present) {
       map['current_count'] = Variable<int>(currentCount.value);
     }
+    if (unitIndex.present) {
+      map['unit_index'] = Variable<int>(unitIndex.value);
+    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<int>(updatedAt.value);
     }
@@ -1442,6 +1491,7 @@ class ProgressCompanion extends UpdateCompanion<ProgressRow> {
           ..write('stepIndex: $stepIndex, ')
           ..write('stepRef: $stepRef, ')
           ..write('currentCount: $currentCount, ')
+          ..write('unitIndex: $unitIndex, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -2977,15 +3027,17 @@ abstract class _$UserDatabase extends GeneratedDatabase {
     required int stepIndex,
     required String stepRef,
     required int currentCount,
+    required int unitIndex,
     required int updatedAt,
   }) {
     return customInsert(
-      'INSERT INTO progress (collection_ref, step_index, step_ref, current_count, updated_at) VALUES (?1, ?2, ?3, ?4, ?5) ON CONFLICT (collection_ref) DO UPDATE SET step_index = excluded.step_index, step_ref = excluded.step_ref, current_count = excluded.current_count, updated_at = excluded.updated_at',
+      'INSERT INTO progress (collection_ref, step_index, step_ref, current_count, unit_index, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6) ON CONFLICT (collection_ref) DO UPDATE SET step_index = excluded.step_index, step_ref = excluded.step_ref, current_count = excluded.current_count, unit_index = excluded.unit_index, updated_at = excluded.updated_at',
       variables: [
         Variable<String>(ref),
         Variable<int>(stepIndex),
         Variable<String>(stepRef),
         Variable<int>(currentCount),
+        Variable<int>(unitIndex),
         Variable<int>(updatedAt),
       ],
       updates: {progress},
@@ -3972,6 +4024,7 @@ typedef $ProgressCreateCompanionBuilder =
       required int stepIndex,
       required String stepRef,
       required int currentCount,
+      Value<int> unitIndex,
       required int updatedAt,
       Value<int> rowid,
     });
@@ -3981,6 +4034,7 @@ typedef $ProgressUpdateCompanionBuilder =
       Value<int> stepIndex,
       Value<String> stepRef,
       Value<int> currentCount,
+      Value<int> unitIndex,
       Value<int> updatedAt,
       Value<int> rowid,
     });
@@ -4010,6 +4064,11 @@ class $ProgressFilterComposer extends Composer<_$UserDatabase, Progress> {
 
   ColumnFilters<int> get currentCount => $composableBuilder(
     column: $table.currentCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get unitIndex => $composableBuilder(
+    column: $table.unitIndex,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4047,6 +4106,11 @@ class $ProgressOrderingComposer extends Composer<_$UserDatabase, Progress> {
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get unitIndex => $composableBuilder(
+    column: $table.unitIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
@@ -4076,6 +4140,9 @@ class $ProgressAnnotationComposer extends Composer<_$UserDatabase, Progress> {
     column: $table.currentCount,
     builder: (column) => column,
   );
+
+  GeneratedColumn<int> get unitIndex =>
+      $composableBuilder(column: $table.unitIndex, builder: (column) => column);
 
   GeneratedColumn<int> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
@@ -4113,6 +4180,7 @@ class $ProgressTableManager
                 Value<int> stepIndex = const Value.absent(),
                 Value<String> stepRef = const Value.absent(),
                 Value<int> currentCount = const Value.absent(),
+                Value<int> unitIndex = const Value.absent(),
                 Value<int> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ProgressCompanion(
@@ -4120,6 +4188,7 @@ class $ProgressTableManager
                 stepIndex: stepIndex,
                 stepRef: stepRef,
                 currentCount: currentCount,
+                unitIndex: unitIndex,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),
@@ -4129,6 +4198,7 @@ class $ProgressTableManager
                 required int stepIndex,
                 required String stepRef,
                 required int currentCount,
+                Value<int> unitIndex = const Value.absent(),
                 required int updatedAt,
                 Value<int> rowid = const Value.absent(),
               }) => ProgressCompanion.insert(
@@ -4136,6 +4206,7 @@ class $ProgressTableManager
                 stepIndex: stepIndex,
                 stepRef: stepRef,
                 currentCount: currentCount,
+                unitIndex: unitIndex,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),

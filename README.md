@@ -302,11 +302,22 @@ it, and a tap goes from the gesture straight to the object holding the count.
 
 **Playback runs on `steps`, never `entries`.** A repeat block arrives already
 flattened, with `repetition` and `repetitionsTotal` on each step, so the player
-never has to know what a block is. Position is `stepIndex` plus `currentCount`,
-which is exactly what the `progress` row stores.
+never has to know what a block is. Position is `stepIndex`, `currentCount` and
+`unitIndex`, which is exactly what the `progress` row stores.
 
-**Nothing animates.** Not the count, not the stripe. At thirty-three
-repetitions a counter that eases into position is a counter running behind the
+**A step is a sequence of units, repeated a number of times.** A tap consumes
+one unit. For a dhikr or a single ayah a unit is the whole item — `unitCount` is
+1 and a tap is a repetition, as it always was. For a surah a unit is one ayah,
+so Al-Ikhlas x3 is four ayahs over three rounds: twelve taps, with the verses
+shown one at a time. The kind of a step decides only what a unit is; it never
+decides how you advance. A surah still flattens to **one** `PlaybackStep`
+however many ayahs it has — the cursor is inside a step, not a new step, because
+`steps.length` is what the stripe is cut by and what "3 of 12" counts, and
+Al-Baqarah would otherwise turn a twelve-step wird into a three-hundred-step
+one.
+
+**Nothing animates.** Not the count, not the stripe, not the band. At
+thirty-three repetitions a counter that eases into position is a counter running behind the
 thumb, and the lag is the whole experience. Feedback is haptic instead: a
 `selectionClick` on each tap, throttled to one per 60ms and **dropped** rather
 than queued, because some Android devices buffer rapid vibration calls and play
@@ -322,12 +333,24 @@ counted rather than leaving it parked. The step's own indicator is the count
 below it. One stripe measuring two things measures neither, and the thing worth
 measuring across the top of the screen is how much of the wird is left.
 
-**A dhikr or an ayah is tap-to-count over the whole content area**, margins and
-empty space included, because at speed the thumb lands wherever it lands. A
-surah is not: "read Al-Mulk" is a reading, so it renders as the same verse
-blocks the reading view uses, in a virtualised list, with one done action in
-the controls. Undo, the skips and start over all live outside that area for the
-same reason — the area is one large increment button.
+**Every step is tap-to-count over the whole content area**, margins and empty
+space included, because at speed the thumb lands wherever it lands. One
+mechanic, whatever the step is: a surah is not a reading with a Done button any
+more, it is a step whose unit is an ayah, and the tap that consumes its last
+ayah completes the round exactly as the tap that reaches a dhikr's count
+completes it. Undo, the skips and start over all live outside that area,
+because the area is one large increment button.
+
+**The band names the gesture.** An area that responds to a tap without ever
+inviting one is a rule the reader has to be told about, and the 88dp band above
+the controls is where they find it out: the remaining count in brick at 40, the
+word `left`, and one line saying `Tap anywhere above to count` — or `to go to
+the next ayah` where the step has ayahs to walk. It is `surfaceContainerHigh`
+over a hairline, squared and flush to both edges, and it does not move, animate
+or comment as the count runs down. The count it shows is **repetitions**: "3
+left" of a surah is three readings of it, never twelve ayahs. The step header
+above carries the other half — the name, the kind, the `x3` plate, and one
+position line, smaller unit first: `Ayah 2 of 4 · round 4 of 7`.
 
 **Resume is silent.** On open the stored position goes through
 `ResolvedCollection.resumableFrom`; a position that survives is resumed without

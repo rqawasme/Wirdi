@@ -14,6 +14,7 @@ final class PlaybackStep {
     required this.entryId,
     required this.repetition,
     required this.repetitionsTotal,
+    this.unitCount = 1,
   });
 
   /// Index of this step in [ResolvedCollection.steps].
@@ -23,6 +24,19 @@ final class PlaybackStep {
 
   /// How many times this item is recited within this step.
   final int count;
+
+  /// How many units one repetition of this step is made of.
+  ///
+  /// A step is a sequence of units, repeated [count] times, and a tap consumes
+  /// one unit. For a dhikr or a single ayah the unit is the whole item, so this
+  /// is 1 and a tap is a repetition. For a surah the unit is one ayah, so
+  /// Al-Ikhlas x3 is four ayahs over three rounds: twelve taps, with the verses
+  /// shown one at a time.
+  ///
+  /// The cursor over these lives in the player, not in the step list: a surah
+  /// is one [PlaybackStep] however many ayahs it has, because `steps.length`
+  /// is what the stripe is cut by and what "3 of 12" counts.
+  final int unitCount;
 
   /// The structural entry this step came from, so the player can highlight the
   /// right row without knowing anything about block structure.
@@ -37,8 +51,12 @@ final class PlaybackStep {
 
   bool get isInRepeatBlock => repetitionsTotal > 1;
 
+  /// More than one unit to a repetition, so advancing moves through the item
+  /// before it counts a repetition of it.
+  bool get isMultiUnit => unitCount > 1;
+
   @override
   String toString() =>
       'PlaybackStep($index ${ref.canonical} x$count '
-      'round $repetition/$repetitionsTotal)';
+      'of $unitCount unit(s) round $repetition/$repetitionsTotal)';
 }

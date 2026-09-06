@@ -146,10 +146,10 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
   /// 15 x 0.87 = 13.
   static const double dhikrCaptionRatio = 0.87;
 
-  /// The wird player's remaining-count readout. Chrome, and the largest thing
-  /// on that screen by a distance: it is what the eye returns to between
-  /// repetitions without reading.
-  static const double counterSize = 44;
+  /// The wird player's remaining-count readout, in the advance band. Chrome,
+  /// and the largest thing on that screen by a distance: it is what the eye
+  /// returns to between repetitions without reading.
+  static const double counterSize = 40;
 
   static const double sectionHeaderSize = 17;
   static const double navLabelSize = 14;
@@ -292,7 +292,7 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
   /// [sectionHeader]. Inter's proportional `1` is narrower than its `7`, so a
   /// count changing on every tap would shift sideways as it went — the exact
   /// movement the zero-animation rule on the counter exists to prevent, and
-  /// far more visible at 44px than anywhere else in the app.
+  /// far more visible at 40px than anywhere else in the app.
   TextStyle get counter => _latin(
     size: counterSize,
     weight: FontWeight.w500,

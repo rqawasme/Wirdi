@@ -17,7 +17,16 @@ import 'player_haptics.dart';
 /// boundaries, resume, completion, when a write happens — is testable without
 /// pumping a frame. The screen is a [ListenableBuilder] over this.
 ///
-/// Position is [stepIndex] plus [currentCount] over
+/// ## The model
+///
+/// A step is a sequence of units, repeated a number of times, and a tap
+/// consumes one unit. For a dhikr or a single ayah a unit is the whole item,
+/// so a tap is a repetition and nothing here is visible. For a surah a unit is
+/// one ayah, so Al-Ikhlas x3 is four ayahs over three rounds — twelve taps,
+/// with the verses shown one at a time. The kind of the step decides only what
+/// a unit is; it never decides how you advance.
+///
+/// Position is [stepIndex], [currentCount] and [unitIndex] over
 /// [ResolvedCollection.steps], which is exactly what [WirdProgress] stores.
 /// Playback never looks at [ResolvedCollection.entries] except to fetch the
 /// text for the step it is on, so a repeat block is nothing special here: it
@@ -49,7 +58,8 @@ class WirdPlayer extends ChangeNotifier {
        _haptics = haptics,
        _now = clock ?? DateTime.now,
        _stepIndex = 0,
-       _currentCount = 0 {
+       _currentCount = 0,
+       _unitIndex = 0 {
     if (resumeFrom != null && collection.resumableFrom(resumeFrom) != null) {
       _stepIndex = resumeFrom.stepIndex;
       // Clamped rather than trusted: the count is a plain integer in a row
@@ -58,6 +68,12 @@ class WirdPlayer extends ChangeNotifier {
       _currentCount = resumeFrom.currentCount.clamp(
         0,
         collection.steps[_stepIndex].count,
+      );
+      // The same reason, and one more: a surah that lost an ayah between
+      // sessions would otherwise resume on a verse the reading no longer has.
+      _unitIndex = resumeFrom.unitIndex.clamp(
+        0,
+        collection.steps[_stepIndex].unitCount - 1,
       );
     }
   }
@@ -119,6 +135,7 @@ class WirdPlayer extends ChangeNotifier {
 
   int _stepIndex;
   int _currentCount;
+  int _unitIndex;
   bool _finished = false;
 
   Timer? _saveTimer;
@@ -153,14 +170,33 @@ class WirdPlayer extends ChangeNotifier {
   /// The step being counted. Only valid when [isEmpty] is false.
   PlaybackStep get step => steps[_stepIndex];
 
-  /// What is left of the current step.
+  /// Where in the current repetition the next tap lands: the 0-based ayah of a
+  /// surah step, and always 0 where a repetition is one unit.
+  int get unitIndex => _unitIndex;
+
+  /// How many units one repetition of this step is made of.
+  int get unitCount => step.unitCount;
+
+  /// The step is recited a unit at a time — a surah, ayah by ayah.
+  bool get isMultiUnit => step.isMultiUnit;
+
+  /// What is left of the current step, in **repetitions**.
+  ///
+  /// The number the band shows. It stays repetitions on a multi-unit step:
+  /// "3 left" of a surah recited three times is three readings of it, and a
+  /// number that counted ayahs would say twelve and mean something else.
   int get remaining => math.max(0, step.count - _currentCount);
 
-  /// How far into the current step, 0 to 1.
+  /// How far into the current step, 0 to 1. Counts units, so a surah moves the
+  /// stripe on every ayah rather than once per reading.
   double get stepProgress {
     if (isEmpty) return 0;
-    if (step.count <= 0) return 1;
-    return (_currentCount / step.count).clamp(0.0, 1.0);
+    final int units = step.count * step.unitCount;
+    if (units <= 0) return 1;
+    return ((_currentCount * step.unitCount + _unitIndex) / units).clamp(
+      0.0,
+      1.0,
+    );
   }
 
   /// How far through the whole collection, 0 to 1. What the stripe shows.
@@ -188,7 +224,9 @@ class WirdPlayer extends ChangeNotifier {
       _itemsByEntryId[step.entryId];
 
   bool get canUndo =>
-      !isEmpty && !_finished && (_currentCount > 0 || _stepIndex > 0);
+      !isEmpty &&
+      !_finished &&
+      (_unitIndex > 0 || _currentCount > 0 || _stepIndex > 0);
 
   bool get canSkipForward =>
       !isEmpty && !_finished && _stepIndex < steps.length - 1;
@@ -206,13 +244,30 @@ class WirdPlayer extends ChangeNotifier {
 
   // -- Counting --------------------------------------------------------------
 
-  /// One repetition of the current step.
+  /// One unit of the current step.
+  ///
+  /// A repetition completes only when the unit cursor wraps, so a tap on a
+  /// dhikr is a repetition and a tap on a surah is an ayah. Everything from
+  /// there — the repetition, the step advance, finishing the wird — is
+  /// unchanged.
   ///
   /// The tap that finishes a step advances to the next one on its own: asking
   /// for a separate "next" tap at the end of every step means thirty-four taps
   /// for a tasbih of thirty-three, and the extra one is always a surprise.
   void increment() {
     if (isEmpty || _finished) return;
+
+    if (_unitIndex + 1 < step.unitCount) {
+      _unitIndex++;
+      _haptics.tick();
+      _scheduleSave();
+      notifyListeners();
+      return;
+    }
+    // The last unit of the repetition: the cursor wraps and a repetition is
+    // counted. One click for it and no second effect — a unit boundary and a
+    // round boundary are the same tap, and one tap is one click.
+    _unitIndex = 0;
 
     final int next = _currentCount + 1;
     if (next < step.count) {
@@ -236,22 +291,30 @@ class WirdPlayer extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Takes one repetition back, across the step boundary if need be.
+  /// Takes one unit back, across both boundaries if need be.
   ///
   /// People lose count during dhikr, and a counter that only goes up makes
-  /// them start the step again. At zero this steps back to the previous step
-  /// at its *final* count — the state the advancing tap moved off — so undo
-  /// undoes that tap rather than throwing away the step it completed.
+  /// them start the step again. Undo undoes the *tap*, not the step, which is
+  /// what decides both boundaries: at unit zero it steps back to the last unit
+  /// of the previous repetition, and at unit zero with nothing counted it
+  /// steps back to the previous step at its final count *and* its final unit —
+  /// the state the advancing tap moved off.
   void decrement() {
     if (isEmpty || _finished) return;
 
-    if (_currentCount > 0) {
+    if (_unitIndex > 0) {
+      _unitIndex--;
+      _haptics.tick();
+      _scheduleSave();
+    } else if (_currentCount > 0) {
       _currentCount--;
+      _unitIndex = step.unitCount - 1;
       _haptics.tick();
       _scheduleSave();
     } else if (_stepIndex > 0) {
       _stepIndex--;
       _currentCount = step.count;
+      _unitIndex = step.unitCount - 1;
       _haptics.tick();
       _saveNow();
     } else {
@@ -273,6 +336,7 @@ class WirdPlayer extends ChangeNotifier {
     if (!canSkipForward) return;
     _stepIndex++;
     _currentCount = 0;
+    _unitIndex = 0;
     _haptics.tick();
     _saveNow();
     notifyListeners();
@@ -287,6 +351,7 @@ class WirdPlayer extends ChangeNotifier {
     if (!canSkipBackward) return;
     _stepIndex--;
     _currentCount = 0;
+    _unitIndex = 0;
     _haptics.tick();
     _saveNow();
     notifyListeners();
@@ -301,6 +366,7 @@ class WirdPlayer extends ChangeNotifier {
     _cancelPendingSave();
     _stepIndex = 0;
     _currentCount = 0;
+    _unitIndex = 0;
     _finished = false;
     _enqueue(() => _user.clearProgress(id));
     notifyListeners();
@@ -383,6 +449,7 @@ class WirdPlayer extends ChangeNotifier {
         collectionId: id,
         step: step,
         currentCount: _currentCount,
+        unitIndex: _unitIndex,
         updatedAt: _now(),
       ),
     );

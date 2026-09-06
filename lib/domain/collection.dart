@@ -240,6 +240,15 @@ final class ResolvedCollection {
           entryId: item.entryId,
           repetition: repetition,
           repetitionsTotal: total,
+          // What one repetition of this item is made of. A surah is recited
+          // ayah by ayah, so its units are its verses; everything else is one
+          // unit said whole. The surah still flattens to a single step —
+          // expanding Al-Baqarah into 286 of them would turn a twelve-step
+          // wird into a three-hundred-step one and cut the stripe to match.
+          unitCount: switch (item) {
+            SurahItem(:final Surah surah) => surah.ayahCount,
+            DhikrItem() || AyahItem() => 1,
+          },
         ),
       );
     }

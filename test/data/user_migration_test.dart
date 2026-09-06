@@ -69,7 +69,7 @@ void main() {
     windBackTo(1, <String>['DROP TABLE commitments']);
 
     expect(await migrateAndRead(), isEmpty);
-    expect(versionOf(file), 3);
+    expect(versionOf(file), 4);
 
     // And the table it created has the days column, so committing works.
     final UserDatabase db = UserDatabase.openFile(file);
@@ -97,7 +97,7 @@ void main() {
     expect(migrated.section, DailySection.morning);
     // Every day is what a commitment meant when there was no other option.
     expect(migrated.days, Weekdays.everyDay);
-    expect(versionOf(file), 3);
+    expect(versionOf(file), 4);
   });
 
   test('version 2 rewrites the section that was called daily', () async {
@@ -110,6 +110,30 @@ void main() {
     // Left as 'daily' it would parse as no section and the commitment would
     // quietly stop appearing, which is why the rename is a data migration.
     expect((await migrateAndRead()).single.section, DailySection.today);
+  });
+
+  test('version 3 gains the unit cursor and keeps its progress', () async {
+    windBackTo(3, <String>[
+      'ALTER TABLE progress DROP COLUMN unit_index',
+      "INSERT INTO progress (collection_ref, step_index, step_ref, "
+          "current_count, updated_at) VALUES ('b:1', 4, 'surah:112', 2, "
+          '${DateTime(2026, 3, 14, 9).millisecondsSinceEpoch})',
+    ]);
+
+    final UserDatabase db = UserDatabase.openFile(file);
+    final WirdProgress? migrated = await DriftUserRepository(
+      db,
+      clock: () => DateTime(2026, 3, 14, 21),
+    ).progress(const BuiltinCollectionId(1));
+    await db.close();
+
+    expect(migrated, isNotNull);
+    expect(migrated!.currentCount, 2);
+    // The start of the repetition, which is where a step whose unit is the
+    // whole item always is — and where a surah left mid-reading resumes from
+    // when it was written before the column existed.
+    expect(migrated.unitIndex, 0);
+    expect(versionOf(file), 4);
   });
 
   test('a database already at the current version is left alone', () async {
@@ -139,14 +163,14 @@ void main() {
       windBackTo(1, <String>[]);
 
       expect(await migrateAndRead(), isEmpty);
-      expect(versionOf(file), 3);
+      expect(versionOf(file), 4);
     });
 
     test('version 1 that created the table but not the index', () async {
       windBackTo(1, <String>['DROP INDEX idx_commitments_section']);
 
       expect(await migrateAndRead(), isEmpty);
-      expect(versionOf(file), 3);
+      expect(versionOf(file), 4);
     });
 
     test('version 2 that already added the column', () async {
@@ -159,7 +183,16 @@ void main() {
       final Commitment migrated = (await migrateAndRead()).single;
       expect(migrated.section, DailySection.today);
       expect(migrated.days, Weekdays.everyDay);
-      expect(versionOf(file), 3);
+      expect(versionOf(file), 4);
+    });
+
+    test('version 3 that already added the unit column', () async {
+      // The column is there and user_version is still 3, which is what a step
+      // that threw after adding it would leave behind.
+      windBackTo(3, <String>[]);
+
+      expect(await migrateAndRead(), isEmpty);
+      expect(versionOf(file), 4);
     });
 
     test('the whole upgrade is safe to run twice', () async {
@@ -169,7 +202,7 @@ void main() {
       // Wound back again over the schema the first run produced.
       windBackTo(1, <String>[]);
       expect(await migrateAndRead(), isEmpty);
-      expect(versionOf(file), 3);
+      expect(versionOf(file), 4);
     });
   });
 }

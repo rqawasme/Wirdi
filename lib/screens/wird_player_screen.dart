@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,6 +17,7 @@ import '../theme/theme.dart';
 import '../widgets/ayah_block.dart';
 import '../widgets/dhikr_block.dart';
 import '../widgets/failure_screen.dart';
+import '../widgets/plate.dart';
 import '../widgets/translation_text.dart';
 import '../widgets/voussoir_stripe.dart';
 
@@ -26,11 +28,16 @@ import '../widgets/voussoir_stripe.dart';
 /// the object that holds the count and back out as a repaint. Nothing on the
 /// counting path goes through a provider, a stream or an animation.
 ///
-/// **Nothing here animates.** Not the count, not the stripe. That is the one
-/// rule the whole screen is built around: at thirty-three repetitions a
-/// counter that eases into position is a counter running behind the thumb, and
-/// the lag is the entire experience. Feedback is haptic instead — see
-/// [PlayerHaptics].
+/// **Nothing here animates.** Not the count, not the stripe, not the band. That
+/// is the one rule the whole screen is built around: at thirty-three
+/// repetitions a counter that eases into position is a counter running behind
+/// the thumb, and the lag is the entire experience. Feedback is haptic instead
+/// — see [PlayerHaptics].
+///
+/// **One mechanic.** Every step counts the same way: the content area is the
+/// tap target, whatever kind of step it is, and the band above the controls
+/// says so in words. A surah is not an exception to that — it is a step whose
+/// unit is one ayah, shown one at a time.
 class WirdPlayerScreen extends ConsumerStatefulWidget {
   const WirdPlayerScreen({super.key, required this.collectionId});
 
@@ -214,22 +221,22 @@ class _Player extends StatelessWidget {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                _CountHeader(player: player),
+                _StepHeader(player: player, item: item),
                 Expanded(
-                  // Keyed, so each step gets a fresh subtree: without it the
-                  // scroll position and an opened benefits panel carry over
-                  // from the step before, and the next dhikr arrives already
-                  // scrolled half way down. A surah is keyed on the pass as
-                  // well — each "done" starts a reading, and a reading starts
-                  // at the top.
+                  // Keyed on the whole position, so each step, each round and
+                  // each unit gets a fresh subtree: without it the scroll
+                  // position and an opened benefits panel carry over, and the
+                  // next ayah arrives already scrolled half way down. A round
+                  // is a reading of the item from the start, so it starts at
+                  // the top the same way a new step does.
                   key: ValueKey<String>(
-                    item is SurahItem
-                        ? 'surah-${player.stepIndex}-${player.currentCount}'
-                        : 'step-${player.stepIndex}',
+                    'step-${player.stepIndex}-${player.currentCount}'
+                    '-${player.unitIndex}',
                   ),
                   child: _StepContent(player: player, item: item),
                 ),
-                _Controls(player: player, item: item),
+                _AdvanceBand(player: player),
+                _Controls(player: player),
               ],
             ),
     );
@@ -257,13 +264,197 @@ class _EmptyCollection extends StatelessWidget {
   }
 }
 
-/// The remaining count, and which round of a repeat block this is.
+/// What this step is, and where in it the reciter is.
 ///
 /// Fixed above the content rather than scrolling with it: it is what the eye
-/// comes back to between repetitions, and a count you have to scroll to find is
-/// a count you stop looking at.
-class _CountHeader extends StatelessWidget {
-  const _CountHeader({required this.player});
+/// comes back to between repetitions, and a line you have to scroll to find is
+/// a line you stop looking at. The count itself is not here — it lives in the
+/// band, under the thumb — so this is purely "what am I on".
+class _StepHeader extends ConsumerWidget {
+  const _StepHeader({required this.player, required this.item});
+
+  final WirdPlayer player;
+  final CollectionItemEntry? item;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ThemeData theme = Theme.of(context);
+    final Color quiet = theme.colorScheme.onSurfaceVariant;
+    final PlaybackStep step = player.step;
+    final (String name, String? kind) = _title(ref, item);
+    final String? position = _positionLine(player);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        WirdiMetrics.readingColumnPadding,
+        WirdiMetrics.space4,
+        WirdiMetrics.readingColumnPadding,
+        WirdiMetrics.space3,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      name,
+                      style: theme.textTheme.titleMedium,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (kind != null)
+                      Padding(
+                        // Two lines of one label rather than two labels: the
+                        // gap is optical, and the 4dp step would read as a
+                        // separate line of chrome.
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(
+                          kind,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: quiet,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: WirdiMetrics.space3),
+              // Always, including at one: a step that repeats once still says
+              // so, and a plate that comes and goes is worse than a quiet x1.
+              Plate(label: '×${step.count}'),
+            ],
+          ),
+          if (position != null)
+            Padding(
+              padding: const EdgeInsets.only(top: WirdiMetrics.space3),
+              child: Text(
+                position,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: quiet,
+                  fontFeatures: const <FontFeature>[
+                    // The line changes on every tap, and a proportional 1 is
+                    // narrower than a 7: without this it shifts sideways as it
+                    // counts.
+                    FontFeature.tabularFigures(),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// What this step is called, and what kind of thing it is under that.
+  ///
+  /// A dhikr has neither: `adhkar` has no title column, and the nearest things
+  /// to one — the transliteration, the translation — are both already on the
+  /// screen underneath, where they are being recited from. So it is named by
+  /// its kind and the second line goes, rather than printing the dhikr twice.
+  (String, String?) _title(WidgetRef ref, CollectionItemEntry? item) =>
+      switch (item) {
+        SurahItem(:final Surah surah) => (
+          surah.nameTransliterated,
+          'Surah ${surah.number} · ${surah.ayahCount} ayahs',
+        ),
+        AyahItem(:final Ayah ayah) => (
+          '${_surahName(ref, ayah.surahNumber)} '
+              '${ayah.surahNumber}:${ayah.ayahNumber}',
+          'Single ayah',
+        ),
+        DhikrItem() => ('Dhikr', null),
+        null => ('Unavailable', null),
+      };
+
+  /// The transliterated surah name, for an ayah that names its surah.
+  ///
+  /// Already loaded for the surah list, and only wanted for the name.
+  String _surahName(WidgetRef ref, int number) {
+    final Surah? surah = ref
+        .watch(surahsProvider)
+        .value
+        ?.where((Surah s) => s.number == number)
+        .firstOrNull;
+    return surah?.nameTransliterated ?? 'Surah $number';
+  }
+}
+
+/// Every position this step is in, on one line, smaller unit first.
+///
+/// One line and one place: the plate carries the step's count and nothing
+/// else, so there is never a second number to reconcile it with.
+String? _positionLine(WirdPlayer player) {
+  final PlaybackStep step = player.step;
+  // The repetition being recited now rather than the ones behind it, and never
+  // past the target: the completing tap holds the last step at its full count
+  // for the beat the screen stays.
+  final int round = math.min(player.currentCount + 1, step.count);
+
+  if (step.isMultiUnit) {
+    final String ayah = 'Ayah ${player.unitIndex + 1} of ${step.unitCount}';
+    return step.isInRepeatBlock
+        ? '$ayah · round ${step.repetition} of ${step.repetitionsTotal}'
+        : '$ayah · round $round of ${step.count}';
+  }
+  if (step.count > 1) return 'Repeat $round of ${step.count}';
+  if (step.isInRepeatBlock) {
+    final (int item, int items) = _itemInRound(player);
+    return 'Round ${step.repetition} of ${step.repetitionsTotal} '
+        '· item $item of $items';
+  }
+  // One unit, said once, on its own: there is no position to state.
+  return null;
+}
+
+/// Where this step sits among the items of one pass through its repeat block,
+/// as (which item, how many).
+///
+/// Read off the flattened list rather than stored on the step: a block emits
+/// its items consecutively, one whole pass at a time, so the run of steps
+/// around this one that share its round number is that pass.
+(int, int) _itemInRound(WirdPlayer player) {
+  final List<PlaybackStep> steps = player.steps;
+  final PlaybackStep step = player.step;
+  bool sameRound(PlaybackStep other) =>
+      other.repetition == step.repetition &&
+      other.repetitionsTotal == step.repetitionsTotal;
+
+  int first = step.index;
+  while (first > 0 && sameRound(steps[first - 1])) {
+    first--;
+  }
+  int last = step.index;
+  while (last < steps.length - 1 && sameRound(steps[last + 1])) {
+    last++;
+  }
+  return (step.index - first + 1, last - first + 1);
+}
+
+/// The count, and the gesture that changes it, named in words.
+///
+/// The screen's one affordance. The content area above has counted since the
+/// app had a counter and nothing on it ever said so; this is where a reader
+/// finds that out — a fixed band, never scrolled past, never hidden, and not
+/// itself a target, because the target is the whole area above it.
+///
+/// No icon: the glyph set has nothing that means "tap the page", and inventing
+/// one would say less than the sentence does. Nothing here animates, the
+/// numeral least of all, and the number is stated rather than commented on —
+/// there is no "last one" and no colour change as it runs down.
+class _AdvanceBand extends StatelessWidget {
+  const _AdvanceBand({required this.player});
+
+  /// Fixed, and deep enough to read as a part of the screen rather than a
+  /// strip of chrome. It does not move as the count runs down.
+  static const double height = 88;
 
   final WirdPlayer player;
 
@@ -271,105 +462,104 @@ class _CountHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final WirdiTypography type = theme.extension<WirdiTypography>()!;
-    final Color quiet = theme.colorScheme.onSurfaceVariant;
-    final PlaybackStep step = player.step;
-
-    final String label = step.count > 1 ? 'left of ${step.count}' : 'left';
+    final ColorScheme colors = theme.colorScheme;
 
     return Semantics(
       container: true,
       liveRegion: true,
-      label: player.finished
-          ? 'Wird complete'
-          : '${player.remaining} $label, step ${player.stepIndex + 1} of '
-                '${player.steps.length}',
+      label: _semanticLabel(),
       child: ExcludeSemantics(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            WirdiMetrics.readingColumnPadding,
-            WirdiMetrics.space4,
-            WirdiMetrics.readingColumnPadding,
-            WirdiMetrics.space3,
+        child: Container(
+          // A floor rather than a fixed height: 88 at every ordinary text
+          // size, and room to grow instead of overflow for a reader who has
+          // turned the OS scale all the way up.
+          constraints: const BoxConstraints(minHeight: height),
+          padding: const EdgeInsets.symmetric(
+            horizontal: WirdiMetrics.readingColumnPadding,
+            vertical: WirdiMetrics.space3,
+          ),
+          decoration: BoxDecoration(
+            // A tonal step and a hairline, squared and flush to both edges.
+            // No shadow, and no radius: it is a part of the screen, not a
+            // card lying on it.
+            color: colors.surfaceContainerHigh,
+            border: Border(
+              top: BorderSide(
+                color: colors.outlineVariant,
+                width: WirdiMetrics.hairline,
+              ),
+            ),
           ),
           child: player.finished
               // The mark, for the beat the screen holds: the stripe solid and
-              // this. The count line would say "0 done" otherwise, which reads
-              // as nothing having been done at all.
-              ? Text(
-                  'Wird complete',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: theme.colorScheme.primary,
+              // this. The band would say "0 left" otherwise, which reads as
+              // nothing having been done at all.
+              ? Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
+                    'Wird complete',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: colors.primary,
+                    ),
                   ),
                 )
               : Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Text(
                       '${player.remaining}',
-                      style: type.counter.copyWith(
-                        color: theme.colorScheme.primary,
-                      ),
+                      style: type.counter.copyWith(color: colors.primary),
                     ),
                     const SizedBox(width: WirdiMetrics.space3),
                     Expanded(
-                      child: Text(
-                        label,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: quiet,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Text(
+                            'left',
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: colors.onSurface,
+                            ),
+                          ),
+                          Text(
+                            player.isMultiUnit
+                                ? 'Tap anywhere above to go to the next ayah'
+                                : 'Tap anywhere above to count',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colors.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    if (step.isInRepeatBlock)
-                      _Plate(
-                        label:
-                            'Round ${step.repetition} of '
-                            '${step.repetitionsTotal}',
-                      ),
                   ],
                 ),
         ),
       ),
     );
   }
-}
 
-/// A squared plate — the same 4dp radius the surah number uses. Not a pill.
-class _Plate extends StatelessWidget {
-  const _Plate({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: WirdiMetrics.space2,
-        vertical: WirdiMetrics.space1,
-      ),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainer,
-        borderRadius: WirdiMetrics.chip,
-        border: Border.all(
-          color: theme.colorScheme.outlineVariant,
-          width: WirdiMetrics.hairline,
-        ),
-      ),
-      child: Text(
-        label,
-        style: theme.textTheme.labelMedium?.copyWith(
-          color: theme.colorScheme.onSurfaceVariant,
-        ),
-      ),
-    );
+  /// The live region: the count, where in the item the reciter is, and where
+  /// in the wird. Announced on every tap, so it is the whole position.
+  String _semanticLabel() {
+    if (player.finished) return 'Wird complete';
+    final PlaybackStep step = player.step;
+    final String left = step.count > 1
+        ? '${player.remaining} left of ${step.count}'
+        : '${player.remaining} left';
+    final String unit = player.isMultiUnit
+        ? ', ayah ${player.unitIndex + 1} of ${player.unitCount}'
+        : '';
+    return '$left$unit, step ${player.stepIndex + 1} of '
+        '${player.steps.length}';
   }
 }
 
-/// The step itself, in the kind of container its content deserves.
+/// The step itself, in the tap target every kind of step shares.
 ///
-/// A dhikr or an ayah is tap-to-count and the whole area counts. A surah is
-/// not: "read Al-Mulk" is a reading, not a thirty-tap interaction, so it gets
-/// the phase 4 verse rendering and a single done action in the controls.
+/// One branch, not three. The kind decides what is drawn and what a unit is —
+/// a dhikr whole, an ayah whole, a surah one verse at a time — and never how
+/// the reciter advances, so every kind is wrapped in the same [_TapToCount].
 class _StepContent extends StatelessWidget {
   const _StepContent({required this.player, required this.item});
 
@@ -380,16 +570,25 @@ class _StepContent extends StatelessWidget {
   Widget build(BuildContext context) {
     // Bound to a local so the patterns promote: a field cannot be.
     final CollectionItemEntry? entry = item;
+    // Named for what the tap does here, so a screen reader announces the
+    // gesture rather than only offering it.
+    final String label = player.isMultiUnit ? 'Next ayah' : 'Count';
     return switch (entry) {
       DhikrItem() => _TapToCount(
         player: player,
+        label: label,
         child: _DhikrStep(item: entry),
       ),
       AyahItem() => _TapToCount(
         player: player,
+        label: label,
         child: _AyahStep(item: entry),
       ),
-      SurahItem() => _SurahStep(item: entry),
+      SurahItem() => _TapToCount(
+        player: player,
+        label: label,
+        child: _SurahStep(player: player, item: entry),
+      ),
       // The step's entry is not in the collection any more. Resolution drops
       // items whose content has gone, so this is only reachable if the two
       // views of the collection disagree — worth saying rather than blanking.
@@ -430,15 +629,24 @@ class _MissingStep extends StatelessWidget {
 /// No ripple, deliberately. An ink splash on every tap is animation, on the
 /// one surface that must not have any.
 class _TapToCount extends StatelessWidget {
-  const _TapToCount({required this.player, required this.child});
+  const _TapToCount({
+    required this.player,
+    required this.label,
+    required this.child,
+  });
 
   final WirdPlayer player;
+
+  /// What the tap does, in the same words the band uses.
+  final String label;
+
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
+      label: label,
       onTap: player.increment,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -481,8 +689,8 @@ class _DhikrStep extends ConsumerWidget {
   }
 }
 
-/// An ayah step: the same verse rendering the reading view uses, under a line
-/// saying which verse it is.
+/// An ayah step: the same verse rendering the reading view uses. Which verse
+/// it is is the step header's line, not a second one here.
 class _AyahStep extends ConsumerWidget {
   const _AyahStep({required this.item});
 
@@ -502,11 +710,11 @@ class _AyahStep extends ConsumerWidget {
     final String name =
         surah?.nameTransliterated ?? 'Surah ${ayah.surahNumber}';
 
+    // No reference line: the header above names the verse, and saying it twice
+    // is saying it once too often.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        _Reference('$name ${ayah.surahNumber}:${ayah.ayahNumber}'),
-        const SizedBox(height: WirdiMetrics.space3),
         AyahBlock(
           ayah: ayah,
           surahName: name,
@@ -518,15 +726,15 @@ class _AyahStep extends ConsumerWidget {
   }
 }
 
-/// A surah step: a reading block, not a counter.
+/// A surah step: one ayah of it, the one the unit cursor is on.
 ///
-/// The verses are the phase 4 [AyahBlock] in a [ListView.builder], for the same
-/// reason the reading view uses one — Al-Baqarah is 286 rows, and building all
-/// of them to show ten is the cost that matters. Counting happens on the done
-/// action in the controls below, not by tapping the text.
+/// Not a scroll of the whole surah any more. A surah is a sequence of units
+/// recited a number of times, so the screen shows the unit — Al-Baqarah is 286
+/// of them and a wall of them was never what was being recited from.
 class _SurahStep extends ConsumerWidget {
-  const _SurahStep({required this.item});
+  const _SurahStep({required this.player, required this.item});
 
+  final WirdPlayer player;
   final SurahItem item;
 
   @override
@@ -538,14 +746,14 @@ class _SurahStep extends ConsumerWidget {
         ref.watch(settingsProvider).value?.showTranslation ?? true;
 
     return switch (reading) {
-      AsyncError(:final Object error, :final StackTrace stackTrace) =>
-        FailureScreen(
-          title: 'Could not read surah ${item.surah.number}',
-          error: error,
-          stackTrace: stackTrace,
-        ),
-      AsyncData(:final SurahReading value) => _SurahVerses(
+      // Said in the content area rather than as a [FailureScreen], which is a
+      // Scaffold and cannot be laid out inside the scrolling tap target.
+      AsyncError(:final Object error) => _ContentMessage(
+        'Could not read surah ${item.surah.number}. $error',
+      ),
+      AsyncData(:final SurahReading value) => _SurahVerse(
         reading: value,
+        unitIndex: player.unitIndex,
         note: item.note,
         showTranslation: showTranslation,
       ),
@@ -554,49 +762,66 @@ class _SurahStep extends ConsumerWidget {
   }
 }
 
-class _SurahVerses extends StatelessWidget {
-  const _SurahVerses({
+/// The ayah the cursor is on, with the basmala above it at the start of a
+/// reading.
+class _SurahVerse extends StatelessWidget {
+  const _SurahVerse({
     required this.reading,
+    required this.unitIndex,
     required this.note,
     required this.showTranslation,
   });
 
   final SurahReading reading;
+  final int unitIndex;
   final String? note;
   final bool showTranslation;
 
   @override
   Widget build(BuildContext context) {
-    // The heading is item 0; the basmala, where the database says there is one,
-    // is item 1. Everything after that is a verse.
-    final int leading = reading.hasBismillahHeading ? 2 : 1;
-    final String name = reading.surah.nameTransliterated;
+    final List<Ayah> ayahs = reading.ayahs;
+    // The content build verifies that every surah has the verses its ayah
+    // count claims, so this is a guard on an index rather than a state with
+    // anything to say.
+    if (ayahs.isEmpty) return const SizedBox.shrink();
+    final int index = unitIndex.clamp(0, ayahs.length - 1);
 
-    return ListView.builder(
-      padding: const EdgeInsets.only(bottom: WirdiMetrics.space6),
-      itemCount: reading.ayahs.length + leading,
-      itemBuilder: (BuildContext context, int index) {
-        final Widget child;
-        if (index == 0) {
-          child = Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              _Reference('$name · ${reading.surah.ayahCount} ayahs'),
-              _Note(note: note),
-              const SizedBox(height: WirdiMetrics.space5),
-            ],
-          );
-        } else if (leading == 2 && index == 1) {
-          child = BismillahHeading(text: reading.bismillah!);
-        } else {
-          child = AyahBlock(
-            ayah: reading.ayahs[index - leading],
-            surahName: name,
-            showTranslation: showTranslation,
-          );
-        }
-        return Padding(padding: WirdiMetrics.readingColumn, child: child);
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        // It belongs to the start of a reading, not to the surah, so it comes
+        // back on every round. At-Tawbah has none, which the flag carries.
+        if (reading.hasBismillahHeading && index == 0)
+          BismillahHeading(text: reading.bismillah!),
+        AyahBlock(
+          ayah: ayahs[index],
+          surahName: reading.surah.nameTransliterated,
+          showTranslation: showTranslation,
+        ),
+        _Note(note: note),
+      ],
+    );
+  }
+}
+
+/// Something to say where the content should be, inside the scrolling tap
+/// target.
+class _ContentMessage extends StatelessWidget {
+  const _ContentMessage(this.message);
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: WirdiMetrics.space6),
+      child: Text(
+        message,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+      ),
     );
   }
 }
@@ -728,55 +953,24 @@ class _BenefitsState extends State<_Benefits> {
   }
 }
 
-/// A quiet line naming what is on screen.
-class _Reference extends StatelessWidget {
-  const _Reference(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return Text(
-      text,
-      style: theme.textTheme.labelMedium?.copyWith(
-        color: theme.colorScheme.onSurfaceVariant,
-      ),
-    );
-  }
-}
-
-/// The step's own action, undo, and manual movement between steps.
+/// Undo, and manual movement between steps.
 ///
-/// All of it lives down here, outside the counting area, because the counting
-/// area is one large increment button. Undo in particular has to be somewhere
+/// No advance button. Advancing is the content area, and the band above says
+/// so; a second control for the same thing would be a second thing to hit by
+/// accident and a second place for the count to disagree with itself.
+///
+/// Undo stays here, outside the counting area, because it has to be somewhere
 /// a thumb counting at speed cannot reach by accident, and a labelled button in
 /// its own bar is that place.
-///
-/// Every step has the button, not only a surah. Tapping the content counts a
-/// dhikr and an ayah, and nothing on the screen says so: an area that responds
-/// to a tap without ever inviting one is a rule the reader has to be told
-/// about, and the button is where they find it out instead. The tap area stays
-/// — at thirty-three repetitions the thumb wants the whole screen, not a
-/// target — so the button is the second way in rather than the replacement.
 class _Controls extends StatelessWidget {
-  const _Controls({required this.player, required this.item});
+  const _Controls({required this.player});
 
   final WirdPlayer player;
-  final CollectionItemEntry? item;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final Color quiet = theme.colorScheme.onSurfaceVariant;
-    // A surah is read once and marked read; a dhikr or an ayah is counted, and
-    // the button is one repetition of it rather than the end of the step.
-    // Nothing to act on at all when the step's item has gone.
-    final String? action = switch (item) {
-      SurahItem() => 'Done',
-      DhikrItem() || AyahItem() => 'Count',
-      null => null,
-    };
 
     return Container(
       decoration: BoxDecoration(
@@ -800,17 +994,6 @@ class _Controls extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              if (action != null) ...<Widget>[
-                const SizedBox(height: WirdiMetrics.space1),
-                // One word, and no number on it. The count header above says
-                // how many are left; a button that says it too says it twice
-                // and disagrees with itself the moment it is pressed.
-                FilledButton(
-                  onPressed: player.finished ? null : player.increment,
-                  child: Text(action),
-                ),
-                const SizedBox(height: WirdiMetrics.space2),
-              ],
               Row(
                 children: <Widget>[
                   OutlinedButton.icon(

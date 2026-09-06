@@ -142,6 +142,7 @@ WirdProgress? progressFromRow(ProgressRow row, CollectionId id) {
     stepIndex: row.stepIndex,
     stepRef: ref,
     currentCount: row.currentCount,
+    unitIndex: row.unitIndex,
     updatedAt: fromEpochMs(row.updatedAt),
   );
 }

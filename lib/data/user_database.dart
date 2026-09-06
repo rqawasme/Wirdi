@@ -21,7 +21,7 @@ class UserDatabase extends _$UserDatabase {
   factory UserDatabase.memory() => UserDatabase(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -43,6 +43,11 @@ class UserDatabase extends _$UserDatabase {
     // would parse as no section at all and its commitment would quietly stop
     // appearing, so it is rewritten here rather than tolerated as an alias
     // forever.
+    // 3 -> 4 gives progress a unit cursor: which ayah of a surah step the
+    // reciter is on, so backgrounding half way through Al-Mulk resumes at the
+    // verse it was left on. Existing rows come forward at 0, the start of the
+    // repetition, which is where every step with a single unit always is.
+    //
     // Two rules hold every step here, and both were learned the hard way.
     //
     // A step is written for the version it upgrades *from*, not as `from < n`.
@@ -70,6 +75,9 @@ class UserDatabase extends _$UserDatabase {
         await customStatement(
           "UPDATE commitments SET section = 'today' WHERE section = 'daily'",
         );
+      }
+      if (from < 4 && !await _hasColumn('progress', 'unit_index')) {
+        await m.addColumn(progress, progress.unitIndex);
       }
     },
     beforeOpen: (OpeningDetails details) async {

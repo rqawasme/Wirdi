@@ -168,6 +168,235 @@ void main() {
     });
   });
 
+  group('the unit cursor', () {
+    test('a dhikr step is one unit, and behaves exactly as it did', () {
+      final WirdPlayer player = playerFor(
+        collectionOf(<CollectionEntry>[
+          dhikrItem(1001, position: 1, count: 3),
+          dhikrItem(1002, position: 2, count: 1),
+        ]),
+      );
+
+      // The regression that matters most: a step whose unit is the whole item
+      // never shows the cursor at all, and one tap is still one repetition.
+      expect(player.unitCount, 1);
+      expect(player.isMultiUnit, isFalse);
+
+      player.increment();
+      expect(player.unitIndex, 0);
+      expect(player.currentCount, 1);
+      expect(player.remaining, 2);
+
+      player.increment();
+      player.increment();
+      expect(player.stepIndex, 1);
+      expect(player.currentCount, 0);
+      expect(player.unitIndex, 0);
+    });
+
+    test('a surah of 4 said 3 times takes 12 taps, counting every 4th', () {
+      final WirdPlayer player = playerFor(
+        collectionOf(<CollectionEntry>[
+          surahItem(112, position: 1, ayahCount: 4, count: 3),
+          dhikrItem(1002, position: 2, count: 1),
+        ]),
+      );
+
+      expect(player.unitCount, 4);
+      expect(player.isMultiUnit, isTrue);
+
+      final List<String> visited = <String>[];
+      for (int tap = 0; tap < 12; tap++) {
+        visited.add('${player.currentCount}.${player.unitIndex}');
+        // Still three readings left until the third round is under way: what
+        // is left of a step is repetitions, never ayahs.
+        expect(player.remaining, 3 - player.currentCount);
+        player.increment();
+      }
+
+      expect(visited, <String>[
+        '0.0', '0.1', '0.2', '0.3', //
+        '1.0', '1.1', '1.2', '1.3', //
+        '2.0', '2.1', '2.2', '2.3', //
+      ]);
+      // The twelfth tap completed the step and moved on by itself.
+      expect(player.stepIndex, 1);
+      expect(player.unitIndex, 0);
+      expect(player.currentCount, 0);
+    });
+
+    test('one click a tap, and the knock only where it fired before', () {
+      final WirdPlayer player = playerFor(
+        collectionOf(<CollectionEntry>[
+          surahItem(112, position: 1, ayahCount: 4, count: 2),
+          dhikrItem(1002, position: 2, count: 1),
+        ]),
+      );
+
+      for (int tap = 0; tap < 7; tap++) {
+        player.increment();
+      }
+      // Seven taps in: four ayahs, a round boundary and three more. Nothing
+      // has ended yet, so nothing has knocked — a round is not a step.
+      expect(haptics.selections, 7);
+      expect(haptics.impacts, 0);
+
+      player.increment();
+      expect(haptics.impacts, 1);
+      expect(haptics.selections, 7, reason: 'one effect on the ending tap');
+    });
+
+    test('undo at unit 0 lands on the previous round\'s last unit', () {
+      final WirdPlayer player = playerFor(
+        collectionOf(<CollectionEntry>[
+          surahItem(112, position: 1, ayahCount: 4, count: 3),
+        ]),
+      );
+
+      for (int tap = 0; tap < 4; tap++) {
+        player.increment();
+      }
+      expect(player.currentCount, 1);
+      expect(player.unitIndex, 0);
+
+      player.decrement();
+
+      // The state the advancing tap moved off: the last ayah of the round it
+      // finished, not the start of it.
+      expect(player.currentCount, 0);
+      expect(player.unitIndex, 3);
+    });
+
+    test('undo at unit 0 and count 0 lands on the previous step\'s final '
+        'count and final unit', () {
+      final WirdPlayer player = playerFor(
+        collectionOf(<CollectionEntry>[
+          surahItem(112, position: 1, ayahCount: 4, count: 2),
+          dhikrItem(1002, position: 2, count: 10),
+        ]),
+      );
+
+      for (int tap = 0; tap < 8; tap++) {
+        player.increment();
+      }
+      expect(player.stepIndex, 1);
+      expect(player.currentCount, 0);
+      expect(player.unitIndex, 0);
+
+      player.decrement();
+
+      expect(player.stepIndex, 0);
+      expect(player.currentCount, 2);
+      expect(player.unitIndex, 3);
+      expect(player.remaining, 0);
+
+      // And one more tap completes it again, exactly as it did.
+      player.increment();
+      expect(player.stepIndex, 1);
+      expect(player.currentCount, 0);
+      expect(player.unitIndex, 0);
+    });
+
+    test(
+      'skipping and starting over put the cursor back to the first unit',
+      () async {
+        final WirdPlayer player = playerFor(
+          collectionOf(<CollectionEntry>[
+            surahItem(112, position: 1, ayahCount: 4, count: 2),
+            surahItem(113, position: 2, ayahCount: 5, count: 2),
+          ]),
+        );
+
+        player.increment();
+        player.increment();
+        expect(player.unitIndex, 2);
+
+        player.skipForward();
+        expect(player.stepIndex, 1);
+        expect(player.unitIndex, 0);
+
+        player.increment();
+        player.skipBackward();
+        expect(player.stepIndex, 0);
+        expect(player.unitIndex, 0);
+
+        player.increment();
+        player.startOver();
+        await player.writes;
+        expect(player.stepIndex, 0);
+        expect(player.currentCount, 0);
+        expect(player.unitIndex, 0);
+      },
+    );
+
+    test('progress climbs a unit at a time and never goes backwards', () {
+      final WirdPlayer player = playerFor(
+        collectionOf(<CollectionEntry>[
+          surahItem(112, position: 1, ayahCount: 4, count: 3),
+          dhikrItem(1002, position: 2, count: 1),
+        ]),
+      );
+
+      double step = -1;
+      double collection = -1;
+      for (int tap = 0; tap < 12; tap++) {
+        expect(player.stepProgress, greaterThan(step));
+        expect(player.collectionProgress, greaterThan(collection));
+        step = player.stepProgress;
+        collection = player.collectionProgress;
+        player.increment();
+      }
+
+      // A twelfth of a step per tap, and the step is half the wird.
+      expect(step, closeTo(11 / 12, 0.0001));
+      expect(collection, closeTo(11 / 24, 0.0001));
+      // The step is done and the stripe is half way, as it was before units.
+      expect(player.stepIndex, 1);
+      expect(player.collectionProgress, 0.5);
+    });
+
+    test('a stored unit past the end of the step is clamped', () {
+      final ResolvedCollection collection = collectionOf(<CollectionEntry>[
+        surahItem(112, position: 1, ayahCount: 4, count: 3),
+      ]);
+      final WirdPlayer player = playerFor(
+        collection,
+        resumeFrom: WirdProgress.atStep(
+          collectionId: collection.id,
+          step: collection.steps.first,
+          currentCount: 1,
+          unitIndex: 99,
+          updatedAt: now,
+        ),
+      );
+
+      expect(player.currentCount, 1);
+      expect(player.unitIndex, 3);
+    });
+
+    test(
+      'the cursor is written with the position, behind the rate limiter',
+      () async {
+        final WirdPlayer player = playerFor(
+          collectionOf(<CollectionEntry>[
+            surahItem(112, position: 1, ayahCount: 4, count: 3),
+          ]),
+        );
+
+        player.increment();
+        player.increment();
+        // A unit change is a count change: rate limited, not written on the tap.
+        expect(user.saves, 0);
+        expect(player.hasPendingSave, isTrue);
+
+        await player.flush();
+        final WirdProgress? stored = await user.progress(player.id);
+        expect(stored!.currentCount, 0);
+        expect(stored.unitIndex, 2);
+      },
+    );
+  });
+
   group('undo', () {
     test('takes back one repetition', () {
       final WirdPlayer player = playerFor(
@@ -692,6 +921,29 @@ DhikrItem dhikrItem(
       textArabic: 'PLACEHOLDER dhikr $id arabic',
       translation: 'PLACEHOLDER dhikr $id translation',
       defaultCount: count,
+    ),
+  );
+}
+
+/// A surah item, whose unit is one ayah: [ayahCount] taps to one repetition.
+SurahItem surahItem(
+  int number, {
+  required int position,
+  required int ayahCount,
+  int count = 1,
+}) {
+  return SurahItem(
+    entryId: 'entry-surah-$number-$position',
+    position: position,
+    count: count,
+    surah: Surah(
+      number: number,
+      nameArabic: 'PLACEHOLDER surah $number arabic',
+      nameTransliterated: 'PLACEHOLDER surah $number transliterated',
+      nameEnglish: 'PLACEHOLDER surah $number english',
+      revelationPlace: RevelationPlace.makkah,
+      ayahCount: ayahCount,
+      hasBismillah: true,
     ),
   );
 }
