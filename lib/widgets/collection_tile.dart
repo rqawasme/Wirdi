@@ -45,9 +45,11 @@ class CollectionTile extends StatelessWidget {
 
   final String name;
 
-  /// Set in Naskh at chrome size, right-aligned in its own line box. Optional:
-  /// a user's own collection has no Arabic name, and the line box is kept
-  /// either way so tiles with and without one line up across a row.
+  /// Set in Naskh at chrome size, right-aligned on its own line. Optional:
+  /// a user's own collection has no Arabic name, and the line is then not
+  /// drawn at all — an empty line box held open for an absent name is a gap
+  /// the tile has no explanation for, and reads as something missing rather
+  /// than as alignment.
   final String? nameArabic;
 
   /// Repetitions in the whole collection.
@@ -106,13 +108,15 @@ class CollectionTile extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
-                        _ArabicLine(
-                          name: nameArabic,
-                          style: type.arabicChrome.copyWith(
-                            color: scheme.onSurfaceVariant,
+                        if (nameArabic != null) ...<Widget>[
+                          _ArabicLine(
+                            name: nameArabic,
+                            style: type.arabicChrome.copyWith(
+                              color: scheme.onSurfaceVariant,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: WirdiMetrics.space2),
+                          const SizedBox(height: WirdiMetrics.space2),
+                        ],
                         // Takes what height is left and clips: the tile does
                         // not grow for a long name, and a name too long for
                         // the square is cut rather than pushing the meta line
@@ -168,52 +172,42 @@ class CollectionTile extends StatelessWidget {
   }
 }
 
-/// The Arabic name, in a line box that is there whether or not there is a name
-/// to put in it.
+/// The Arabic name, right-aligned on its own line above the English one.
 ///
-/// Fixed height, so a collection without an Arabic name and one with a long
-/// one produce the same tile: the English names of two tiles in a row start at
-/// the same distance from the top, which is the alignment the grid is read by.
+/// The line is sized by the text it holds, and is only built when there is a
+/// name to put in it.
 class _ArabicLine extends StatelessWidget {
   const _ArabicLine({required this.name, required this.style});
 
-  final String? name;
+  final String name;
   final TextStyle style;
 
   @override
   Widget build(BuildContext context) {
-    final String? name = this.name;
-    // Scaled through the OS text scaler rather than multiplied by a factor:
-    // the platform scale is not necessarily linear, and asking the scaler for
-    // this size is the only way to get the height the text will actually take.
-    final double height =
-        MediaQuery.textScalerOf(context).scale(style.fontSize!) * style.height!;
-
-    return SizedBox(
-      height: height,
-      child: name == null
-          ? null
-          : Directionality(
-              textDirection: TextDirection.rtl,
-              child: Text(
-                name,
-                style: style,
-                locale: const Locale('ar'),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.end,
-              ),
-            ),
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Text(
+        name,
+        style: style,
+        locale: const Locale('ar'),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        // Right, not [TextAlign.end]: end inside this right-to-left box is
+        // the *left* edge, which is where an earlier draft put the name.
+        textAlign: TextAlign.right,
+      ),
     );
   }
 }
 
 /// What the tile says about today, in one quiet line.
 ///
-/// Not started, it is the count of what is in there. Part-way, it is how far
-/// through. Done, it is a check and two words — and the check is an inline
-/// glyph in the sentence rather than a badge, so a large accessibility text
-/// scale wraps the line instead of overflowing the tile.
+/// Until it is done, it is how far through today's repetitions the user is,
+/// over how many there are — at zero as much as at forty, so the line does not
+/// change shape the moment the first tap lands. Done, it is a check and two
+/// words, and the check is an inline glyph in the sentence rather than a
+/// badge, so a large accessibility text scale wraps the line instead of
+/// overflowing the tile.
 class _Meta extends StatelessWidget {
   const _Meta({
     required this.totalCount,
@@ -254,9 +248,10 @@ class _Meta extends StatelessWidget {
       );
     }
 
-    final String text = doneCount > 0
-        ? '$doneCount of $totalCount'
-        : '$totalCount ${totalCount == 1 ? 'item' : 'items'}';
+    // Always the fraction, including at zero. "140 items" and "41 of 140" are
+    // two different sentences about the same tile, and reading a row of tiles
+    // means reading the same shape in the same place on each of them.
+    final String text = '$doneCount/$totalCount';
 
     // The minutes estimate the design shows is deliberately absent: nothing in
     // the content pipeline produces one, and the tile reads correctly without

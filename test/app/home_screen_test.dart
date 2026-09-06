@@ -198,8 +198,9 @@ void main() {
 
       // Six entries and fourteen steps, but what the user has to say is the
       // repetitions — and that is what the stripe measures, so it is what the
-      // count beside it has to be.
-      expect(find.text('${await repetitions(mixed)} items'), findsOneWidget);
+      // count beside it has to be. Nothing done yet, so the fraction opens at
+      // zero rather than saying what is in there.
+      expect(find.text('0/${await repetitions(mixed)}'), findsOneWidget);
     });
 
     testWidgets('part-way through says how far, and lights the stripe', (
@@ -223,7 +224,7 @@ void main() {
       await pumpApp(tester);
 
       final int total = await repetitions(mixed);
-      expect(find.text('41 of $total'), findsOneWidget);
+      expect(find.text('41/$total'), findsOneWidget);
 
       final VoussoirStripe stripe = tester.widget<VoussoirStripe>(
         find.descendant(
@@ -306,7 +307,7 @@ void main() {
       }
     });
 
-    testWidgets('a name with no Arabic aligns with one that has it', (
+    testWidgets('a name with no Arabic leaves no line box behind', (
       WidgetTester tester,
     ) async {
       final UserRepository user = dbs.userRepository(clock: () => now);
@@ -319,13 +320,24 @@ void main() {
 
       await pumpApp(tester);
 
-      // The Arabic line box is there whether or not there is a name in it, so
-      // the English names start at the same height across the row.
+      // No Arabic name, no line held open for one: the English name starts at
+      // the top of the tile rather than under an empty gap.
+      final Finder arabic = find.text('PLACEHOLDER collection 1 arabic');
       final double withArabic = tester
           .getTopLeft(find.text('PLACEHOLDER collection 1 english'))
           .dy;
       final double without = tester.getTopLeft(find.text('Mine')).dy;
-      expect(withArabic, closeTo(without, 0.5));
+      expect(without, lessThan(withArabic));
+      expect(without, closeTo(tester.getTopLeft(arabic).dy, 0.5));
+
+      // And the Arabic that is there sits against the right edge of its tile.
+      final Rect tile = tester.getRect(
+        find.ancestor(of: arabic, matching: find.byType(CollectionTile)),
+      );
+      expect(
+        tester.getRect(arabic).right,
+        closeTo(tile.right - WirdiMetrics.space3, 1),
+      );
     });
 
     testWidgets('opens the player, and is stale when it comes back', (

@@ -113,6 +113,21 @@ void main() {
       expect(find.text('2 of 14'), findsOneWidget, reason: 'same step');
     });
 
+    testWidgets('counts from the button as well as the content', (
+      WidgetTester tester,
+    ) async {
+      await openAt(tester, 1);
+      expect(find.text('100'), findsOneWidget);
+
+      // The content area counts, but nothing about it says so. The button is
+      // how a reader finds that out, and it counts the same one.
+      await tester.tap(find.widgetWithText(FilledButton, 'Count'));
+      await tester.pump();
+
+      expect(find.text('99'), findsOneWidget);
+      expect(find.text('2 of 14'), findsOneWidget, reason: 'same step');
+    });
+
     testWidgets('the source and the per-collection note are shown', (
       WidgetTester tester,
     ) async {

@@ -746,12 +746,19 @@ class _Reference extends StatelessWidget {
   }
 }
 
-/// Undo, the done action for a surah, and manual movement between steps.
+/// The step's own action, undo, and manual movement between steps.
 ///
 /// All of it lives down here, outside the counting area, because the counting
 /// area is one large increment button. Undo in particular has to be somewhere
 /// a thumb counting at speed cannot reach by accident, and a labelled button in
 /// its own bar is that place.
+///
+/// Every step has the button, not only a surah. Tapping the content counts a
+/// dhikr and an ayah, and nothing on the screen says so: an area that responds
+/// to a tap without ever inviting one is a rule the reader has to be told
+/// about, and the button is where they find it out instead. The tap area stays
+/// — at thirty-three repetitions the thumb wants the whole screen, not a
+/// target — so the button is the second way in rather than the replacement.
 class _Controls extends StatelessWidget {
   const _Controls({required this.player, required this.item});
 
@@ -762,7 +769,14 @@ class _Controls extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final Color quiet = theme.colorScheme.onSurfaceVariant;
-    final bool isSurah = item is SurahItem;
+    // A surah is read once and marked read; a dhikr or an ayah is counted, and
+    // the button is one repetition of it rather than the end of the step.
+    // Nothing to act on at all when the step's item has gone.
+    final String? action = switch (item) {
+      SurahItem() => 'Done',
+      DhikrItem() || AyahItem() => 'Count',
+      null => null,
+    };
 
     return Container(
       decoration: BoxDecoration(
@@ -786,14 +800,14 @@ class _Controls extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              if (isSurah) ...<Widget>[
+              if (action != null) ...<Widget>[
                 const SizedBox(height: WirdiMetrics.space1),
-                // Just "Done". The count header above says how many passes are
-                // left, and repeating it on the button says it twice and
-                // disagrees with itself the moment the button is pressed.
+                // One word, and no number on it. The count header above says
+                // how many are left; a button that says it too says it twice
+                // and disagrees with itself the moment it is pressed.
                 FilledButton(
                   onPressed: player.finished ? null : player.increment,
-                  child: const Text('Done'),
+                  child: Text(action),
                 ),
                 const SizedBox(height: WirdiMetrics.space2),
               ],
