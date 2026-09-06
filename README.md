@@ -220,9 +220,12 @@ language survived it — was ornament that carried nothing, and looked it. The
 card lost its height when the opening text went: a card with air in it is a
 card with nothing in it, whatever is drawn behind the air.
 
-**Seven marks say what the last week held.** One per day, oldest first and today
-last, filled where this collection was completed — the same squared 4dp plate
-the tracker's calendar uses, at 12dp. It is this collection's own history, where
+**Seven marks say what the last week held, in brick and stone.** One per day, oldest first and today
+last, filled in `primary` where this collection was completed and in `outline`
+where it was not — the same squared 4dp plate the tracker's calendar uses, at
+12dp. Brick and stone alternating across a row is the Mezquita's own pattern and
+the reason the stripe looks the way it does; here the days decide where the
+joints fall rather than a constant deciding it. It is this collection's own history, where
 the streak on the greeting spans everything. Today is not marked out from the
 six behind it: a calendar of thirty-one cells has to say where you are, a row of
 seven says it by ending, and pointing at today's empty square is the app leaning
@@ -242,16 +245,21 @@ out of. And nothing is negative: a broken run is an invitation to start, never
 a warning, a countdown, or a remark about the days that were missed. A test on
 the home screen fails any text that leans.
 
-**Finished, a tile goes quiet.** The background steps one tonally to
-`surfaceContainerHigh`, the name goes to `onSurfaceVariant`, the meta line
-becomes a check and "Done today", and the stripe is not drawn at all. The week
-strip's filled marks go from brick to `onSurfaceVariant` with it, so a finished
-tile carries no brick anywhere, and the line above the count stops saying "Done
-today" because the line below it already does. An earlier draft kept a full
-brick stripe on a completed tile, which made the expected outcome the loudest
-thing on the screen. There is no badge and no colour change anywhere on it: the
-one thing this screen now does say out loud is the line about the run of days,
-and it says it in the same 12pt caption as everything else around it.
+**Finished, a tile fills its stripe and quiets everything else.** The
+background steps one tonally to `surfaceContainerHigh`, the name goes to
+`onSurfaceVariant`, the meta line becomes a check and "Done today", and the
+line above the count stops saying "Done today" because the line below it
+already does. The stripe goes solid brick — set from the completion and not
+from the counts, since finishing clears the progress row.
+
+That full band went back and forth. It was there, then it came off on the
+argument that a finished wird is the expected outcome and should not be the
+loudest thing on the screen, and it is back: a card that marks nothing at the
+end of a wird ends on a shrug. What keeps it from being a celebration is that
+the mark is the app's own material rather than a new one — the same stripe,
+filled — so what changes at the end of a wird is how much of it is lit and
+never what it is. No badge, no confetti, no strike-through, and the week's
+marks stay brick too, because history does not change because today is over.
 
 **The bar is built from `Row` and `InkWell`, not `NavigationBar`.** Material 3
 marks the selected destination with a stadium-shaped pill behind its icon, and

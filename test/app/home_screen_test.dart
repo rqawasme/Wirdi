@@ -236,7 +236,7 @@ void main() {
       expect(stripe.value, closeTo(41 / total, 0.001));
     });
 
-    testWidgets('done today goes quiet, and drops the stripe', (
+    testWidgets('done today fills the stripe, and quiets everything else', (
       WidgetTester tester,
     ) async {
       final UserRepository user = dbs.userRepository(clock: () => now);
@@ -247,16 +247,17 @@ void main() {
 
       expect(find.textContaining('Done today'), findsOneWidget);
 
-      // A finished tile is the quietest object in its section. A full band of
-      // brick would make the expected outcome the loudest thing on the screen,
-      // which is what an earlier draft did.
+      // A full band of brick, and off the completion rather than off the
+      // counts: finishing clears the progress row, so a stripe reading the
+      // counts here would be empty.
       final Finder tile = find.byType(CollectionTile);
-      expect(
+      final VoussoirStripe stripe = tester.widget<VoussoirStripe>(
         find.descendant(of: tile, matching: find.byType(VoussoirStripe)),
-        findsNothing,
       );
+      expect(stripe.value, 1);
 
-      // One tonal step down, not a colour change.
+      // Everything else on the tile still steps down: one tonal step, and no
+      // shadow, no badge and no second mark arriving to say the same thing.
       final ColorScheme scheme = WirdiTheme.light().colorScheme;
       final Material material = tester.widget<Material>(
         find.descendant(of: tile, matching: find.byType(Material)).first,
@@ -264,9 +265,14 @@ void main() {
       expect(material.color, scheme.surfaceContainerHigh);
       expect(material.elevation, 0);
       expect(material.shadowColor, Colors.transparent);
+      expect(
+        find.descendant(of: tile, matching: find.byType(Icon)),
+        findsOneWidget,
+        reason: 'the check in the meta line, and nothing else',
+      );
     });
 
-    testWidgets('every tile done leaves nothing brighter than the rest', (
+    testWidgets('every tile done leaves them all the same, not one louder', (
       WidgetTester tester,
     ) async {
       final UserRepository user = dbs.userRepository(clock: () => now);
@@ -278,13 +284,16 @@ void main() {
       await pumpApp(tester);
 
       expect(find.textContaining('Done today'), findsNWidgets(2));
-      expect(
-        find.descendant(
-          of: find.byType(CollectionTile),
-          matching: find.byType(VoussoirStripe),
-        ),
-        findsNothing,
-      );
+      // Both full, and neither one more finished than the other.
+      final Iterable<VoussoirStripe> stripes = tester
+          .widgetList<VoussoirStripe>(
+            find.descendant(
+              of: find.byType(CollectionTile),
+              matching: find.byType(VoussoirStripe),
+            ),
+          );
+      expect(stripes, hasLength(2));
+      expect(stripes.map((VoussoirStripe s) => s.value).toSet(), <double>{1});
     });
 
     testWidgets('every tile is the same shape, whatever its name', (
@@ -416,7 +425,7 @@ void main() {
       ]);
     });
 
-    testWidgets('a finished tile carries no brick anywhere', (
+    testWidgets('a finished tile keeps its days in brick', (
       WidgetTester tester,
     ) async {
       final UserRepository user = dbs.userRepository(clock: () => now);
@@ -426,10 +435,8 @@ void main() {
 
       await pumpApp(tester);
 
-      // Two days of history, and neither of them is drawn in brick: the tile
-      // drops its stripe when it is finished, and the strip goes quiet with
-      // it. An earlier draft made the expected outcome the loudest thing in
-      // the section, and this is the same mistake in a smaller mark.
+      // Yesterday and today, both still brick. The marks are history, and
+      // what a week held does not change because today is over.
       final ColorScheme scheme = WirdiTheme.light().colorScheme;
       final Iterable<Container> brick = tester
           .widgetList<Container>(
@@ -443,7 +450,7 @@ void main() {
                 c.decoration is BoxDecoration &&
                 (c.decoration! as BoxDecoration).color == scheme.primary,
           );
-      expect(brick, isEmpty);
+      expect(brick, hasLength(2));
     });
 
     testWidgets('says something about the run of days, and never a warning', (

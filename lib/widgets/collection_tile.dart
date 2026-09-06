@@ -19,14 +19,19 @@ import 'voussoir_stripe.dart';
 /// down by the stripe itself — ninety-six percent of the way through must not
 /// look finished.
 ///
-/// Finished for the day, the tile steps *down*: the background goes one tonal
-/// step to [ColorScheme.surfaceContainerHigh], the name goes to quiet ink, the
-/// meta line becomes a check and "Done today", and the stripe is not drawn at
-/// all. A completed tile is the quietest object in its section rather than the
-/// loudest — a full band of brick across the strongest colour in the palette
-/// would make the expected outcome the most emphatic thing on the screen, and
-/// finishing a daily wird is expected. No badge, no colour change, no
-/// strike-through, no celebration.
+/// Finished for the day, the tile steps *down* everywhere except the stripe:
+/// the background goes one tonal step to [ColorScheme.surfaceContainerHigh],
+/// the name goes to quiet ink, and the meta line becomes a check and "Done
+/// today". The stripe fills solid brick and stays.
+///
+/// That full band is a reversal, and it is worth knowing which way. An earlier
+/// draft had it, and it came off on the argument that a finished wird is the
+/// expected outcome and should not be the loudest thing on the screen. It has
+/// gone back on: a card that marks nothing at the end of the wird ends on a
+/// shrug. The mark is the app's own material rather than a new one — the same
+/// stripe, filled — so what changes at the end of a wird is how much of it is
+/// lit and never what it is. There is still no badge, no confetti and no
+/// strike-through.
 class CollectionTile extends StatelessWidget {
   const CollectionTile({
     super.key,
@@ -169,13 +174,7 @@ class CollectionTile extends StatelessWidget {
                           const SizedBox(height: WirdiMetrics.space2),
                           _WeekStrip(
                             days: week,
-                            // No brick on a finished card, anywhere. It
-                            // drops its stripe for the same reason: an
-                            // earlier draft made the expected outcome the
-                            // loudest thing in the section.
-                            done: completedToday
-                                ? scheme.onSurfaceVariant
-                                : scheme.primary,
+                            done: scheme.primary,
                             notDone: scheme.outline,
                           ),
                         ],
@@ -191,8 +190,14 @@ class CollectionTile extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (!completedToday)
-                  VoussoirStripe.progress(value: _value, segments: _segments),
+                // Solid when the day is done, and not off the counts:
+                // finishing clears the progress row, so `_value` is back at
+                // zero by the time the tile rebuilds. What the stripe says
+                // here is that the wird is finished, not how much is left.
+                VoussoirStripe.progress(
+                  value: completedToday ? 1 : _value,
+                  segments: _segments,
+                ),
               ],
             ),
           ),
@@ -274,6 +279,15 @@ class _ArabicLine extends StatelessWidget {
 /// `outline` and not the fainter `outlineVariant`, because that role is the
 /// same colour as a finished card's own ground in dark, and a mark that
 /// vanishes reads as a missing day rather than as an unfinished one.
+///
+/// Brick and stone alternating across a row is the Mezquita's own pattern, and
+/// the reason the stripe looks the way it does. The pair is the same one the
+/// stripe uses, so a week of days and a bar of progress are visibly the same
+/// material — and here the days decide where the joints fall rather than a
+/// constant deciding it.
+///
+/// The marks stay brick on a finished card. They are history, and what a week
+/// held does not change because today is over.
 ///
 /// Today is not marked out from the six behind it. A calendar of thirty-one
 /// cells has to say where you are; a row of seven says it by ending, and
