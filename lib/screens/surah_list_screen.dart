@@ -34,11 +34,6 @@ class SurahListScreen extends ConsumerWidget {
             tooltip: 'Settings',
             onPressed: () => Navigator.pushNamed(context, Routes.settings),
           ),
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            tooltip: 'About',
-            onPressed: () => Navigator.pushNamed(context, Routes.about),
-          ),
         ],
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(VoussoirStripe.ruleHeight),

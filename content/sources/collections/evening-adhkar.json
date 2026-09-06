@@ -1,0 +1,27 @@
+{
+  "id": 4,
+  "name_arabic": "أذكار المساء",
+  "name_english": "Evening adhkar",
+  "description": "Said in the evening, ideally between asr and maghrib. The two verses at the end are said after the sun has set.",
+  "author": "Summarised from the works of Shaykh Abd al-Aziz al-Tarefe",
+  "type": "wird",
+  "sort_order": 11,
+  "items": [
+    { "dhikr": 3001 },
+    { "dhikr": 3002, "count": 10 },
+    { "dhikr": 3003, "count": 100 },
+    { "dhikr": 3004 },
+    { "dhikr": 3005 },
+    { "surah": 112, "count": 3 },
+    { "surah": 113, "count": 3 },
+    { "surah": 114, "count": 3, "note": "Recited three times each with al-Ikhlas and al-Falaq before it, morning and evening." },
+    { "dhikr": 3006, "count": 3 },
+    { "dhikr": 3007 },
+    { "dhikr": 3008 },
+    { "dhikr": 3014 },
+    { "dhikr": 3015 },
+    { "dhikr": 3013, "count": 7 },
+    { "dhikr": 3016 },
+    { "ayah": "2:285-286", "note": "Said after the sun has set, unlike the rest of the evening adhkar." }
+  ]
+}

@@ -6,7 +6,26 @@ import '../app_version.dart';
 import '../domain/content.dart';
 import '../providers/reading.dart';
 import '../theme/theme.dart';
-import '../widgets/voussoir_stripe.dart';
+import 'voussoir_stripe.dart';
+
+/// Opens the about sheet.
+///
+/// A sheet rather than a screen. About is read once, on the way to nothing:
+/// pushing a route for it puts it in the back stack of whatever the reader was
+/// actually doing, and a sheet dismisses back to where they were.
+Future<void> showAboutSheet(BuildContext context) {
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    builder: (BuildContext context) => DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: 0.85,
+      maxChildSize: 0.95,
+      builder: (BuildContext context, ScrollController controller) =>
+          AboutContent(controller: controller),
+    ),
+  );
+}
 
 /// Sources, credits and licences.
 ///
@@ -15,9 +34,13 @@ import '../widgets/voussoir_stripe.dart';
 /// table rather than written here, so a credit cannot drift from the database it
 /// is crediting. The font licences are the actual bundled OFL files — the
 /// licence requires that they travel with the fonts, so they are assets and
-/// this screen shows them verbatim rather than paraphrasing.
-class AboutScreen extends ConsumerWidget {
-  const AboutScreen({super.key});
+/// this shows them verbatim rather than paraphrasing.
+class AboutContent extends ConsumerWidget {
+  const AboutContent({super.key, this.controller});
+
+  /// The sheet's own scroll controller, so dragging the list past its top
+  /// drags the sheet rather than overscrolling inside it.
+  final ScrollController? controller;
 
   /// The bundled licences, by the family they cover.
   static const Map<String, String> fontLicences = <String, String>{
@@ -32,67 +55,62 @@ class AboutScreen extends ConsumerWidget {
       contentMetadataProvider,
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('About'),
-        bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(VoussoirStripe.ruleHeight),
-          child: VoussoirStripe.rule(),
-        ),
+    return ListView(
+      controller: controller,
+      padding: const EdgeInsets.fromLTRB(
+        WirdiMetrics.space5,
+        WirdiMetrics.space5,
+        WirdiMetrics.space5,
+        WirdiMetrics.space6,
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          WirdiMetrics.space5,
-          WirdiMetrics.space5,
-          WirdiMetrics.space5,
-          WirdiMetrics.space6,
-        ),
-        children: <Widget>[
-          const _Section(title: 'Wirdi'),
-          _Entry(label: 'App version', value: appVersion),
-          if (metadata.value case final ContentMetadata meta) ...<Widget>[
-            _Entry(label: 'Content version', value: meta.contentVersion),
-            _Entry(
-              label: 'Content build',
-              // The first eight characters are enough to tell two builds apart
-              // and short enough to read out over a support conversation.
-              value: meta.contentChecksum.isEmpty
-                  ? 'unknown'
-                  : meta.contentChecksum.substring(0, 8),
-            ),
-          ],
-
-          const SizedBox(height: WirdiMetrics.space6),
-          const _Section(title: 'Quran text'),
-          if (metadata.value case final ContentMetadata meta)
-            _Entry(label: 'Source', value: meta.quranSource),
-          const _Body(
-            'The Uthmani text and its juz, hizb and sajdah metadata are '
-            'imported from the Quranic Universal Library (qul.tarteel.ai) and '
-            'normalised without alteration. Consult QUL for the terms covering '
-            'redistribution of the text.',
+      children: <Widget>[
+        const _Section(title: 'Wirdi'),
+        _Entry(label: 'App version', value: appVersion),
+        // Stated the same way as the versions above it, because it is the same
+        // kind of fact. No logo, no link, no thanks-for-using-our-app.
+        const _Entry(label: 'Developed by', value: 'Safi Solutions'),
+        if (metadata.value case final ContentMetadata meta) ...<Widget>[
+          _Entry(label: 'Content version', value: meta.contentVersion),
+          _Entry(
+            label: 'Content build',
+            // The first eight characters are enough to tell two builds apart
+            // and short enough to read out over a support conversation.
+            value: meta.contentChecksum.isEmpty
+                ? 'unknown'
+                : meta.contentChecksum.substring(0, 8),
           ),
-
-          const SizedBox(height: WirdiMetrics.space6),
-          const _Section(title: 'Translation'),
-          if (metadata.value case final ContentMetadata meta)
-            _Entry(label: 'Edition', value: meta.translationEdition),
-          // The name itself comes from the database above, which spells it
-          // "Saheeh"; printing it again here in the other spelling would just
-          // look like an error.
-          const _Body('Published by Abul-Qasim Publishing House.'),
-
-          const SizedBox(height: WirdiMetrics.space6),
-          const _Section(title: 'Fonts'),
-          const _Body(
-            'All three are bundled with the app and licensed under the SIL Open '
-            'Font License. Nothing is fetched at runtime.',
-          ),
-          const SizedBox(height: WirdiMetrics.space2),
-          for (final MapEntry<String, String> entry in fontLicences.entries)
-            _LicenceTile(family: entry.key, asset: entry.value),
         ],
-      ),
+
+        const SizedBox(height: WirdiMetrics.space6),
+        const _Section(title: 'Quran text'),
+        if (metadata.value case final ContentMetadata meta)
+          _Entry(label: 'Source', value: meta.quranSource),
+        const _Body(
+          'The Uthmani text and its juz, hizb and sajdah metadata are '
+          'imported from the Quranic Universal Library (qul.tarteel.ai) and '
+          'normalised without alteration. Consult QUL for the terms covering '
+          'redistribution of the text.',
+        ),
+
+        const SizedBox(height: WirdiMetrics.space6),
+        const _Section(title: 'Translation'),
+        if (metadata.value case final ContentMetadata meta)
+          _Entry(label: 'Edition', value: meta.translationEdition),
+        // The name itself comes from the database above, which spells it
+        // "Saheeh"; printing it again here in the other spelling would just
+        // look like an error.
+        const _Body('Published by Abul-Qasim Publishing House.'),
+
+        const SizedBox(height: WirdiMetrics.space6),
+        const _Section(title: 'Fonts'),
+        const _Body(
+          'All three are bundled with the app and licensed under the SIL Open '
+          'Font License. Nothing is fetched at runtime.',
+        ),
+        const SizedBox(height: WirdiMetrics.space2),
+        for (final MapEntry<String, String> entry in fontLicences.entries)
+          _LicenceTile(family: entry.key, asset: entry.value),
+      ],
     );
   }
 }

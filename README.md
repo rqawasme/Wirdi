@@ -28,6 +28,16 @@ Only the raw QUL exports it was generated from are left out, and only because th
 are bulky and needed just to regenerate. See
 [`content/sources/quran/README.md`](content/sources/quran/README.md) for that.
 
+Three collections are authored and built in: the **wird of Imam al-Nawawi**, and
+the **morning** and **evening adhkar**, summarised from the works of Shaykh Abd
+al-Aziz al-Tarefe. The two adhkar collections share one file of dhikr text —
+most of what is said in the morning is said again in the evening, and the four
+wordings that differ (`asbahna` against `amsayna`, and their pairs) sit beside
+each other rather than being duplicated. Their Quranic portions are **not**
+transcribed: al-Ikhlas, al-Falaq, al-Nas and the last two verses of al-Baqarah
+are `surah` and `ayah` items resolved out of the imported mushaf, so that text
+exists in exactly one place in the database.
+
 Every id in the database is either computed by a fixed rule or written by hand in
 the source files. Nothing autoincrements. The database is rebuilt from source
 regularly, and users' saved collections point at these ids, so an id that shifted
@@ -61,7 +71,7 @@ Two SQLite databases, kept separate. They are never joined in SQL; there is no
 |---|---|---|
 | Access | read-only | read-write |
 | Location | bundled asset, copied to app support on first run | app **documents** directory |
-| Contents | Quran, adhkar, sources, built-in collections | user collections, progress, completions, settings |
+| Contents | Quran, adhkar, sources, built-in collections | user collections, commitments, progress, completions, settings |
 | Updates | replaced wholesale on app update | migrated, never replaced |
 
 `user.db` is in the documents directory specifically so iOS iCloud backup and
@@ -132,8 +142,8 @@ lib/
   main.dart               opens both databases, then runs the app
   wirdi_app.dart          MaterialApp, both themes, the settings-driven type scale
   routes.dart             named routes; a plain Navigator, no routing package
-  screens/                collections, wird player, surah list, reading view,
-                          collection editor, settings, about
+  screens/                the four-tab shell and its tabs, wird player, surah
+                          list, reading view, collection editor, settings
   screens/pickers/        surah, ayah and dhikr, each popped with its answer
   player/                 the counter's state and its haptics — no widgets
   collections/            editing and calendar logic, with no widgets in it
@@ -144,10 +154,93 @@ lib/
   dev/                    throwaway — deleted before release
 ```
 
+### The app shell and the home screen
+
+Four destinations — Home, Collections, Dhikr, Tracker — and four is the ceiling.
+A fifth would mean the information architecture is wrong rather than that the
+bar needs another slot, which is why the mushaf is an app-bar action rather than
+a tab.
+
+**Home is what today contains; Collections is what the app contains.** Home
+shows only the collections the user has *committed* to and that fall on today,
+grouped under Today, Morning and Evening in that fixed order, as square tiles
+two to a row. A section with nothing in it is not rendered at all — no header,
+no placeholder — because a header over nothing is a promise the screen is not
+keeping. Committing happens in the collections list's row menu, which is where a
+collection is also copied, edited and deleted.
+
+**A selected segment is brick, not a tonal step.** Depth in this app is tonal
+and selection is not: a tonal step against a tonal surface is a difference you
+have to hunt for, and on a row of seven days it is one you can get wrong without
+noticing — which is exactly what happened, leaving a picker set to the opposite
+of what its user meant. Brick already marks the selected tab in the navigation
+bar, so the day picker and the theme control say it the same way.
+`test/theme/selection_contrast_test.dart` pins it, because the failure it
+prevents is one no behavioural test can see.
+
+**A commitment carries the days it comes round on, and they are orthogonal to
+the section.** The section says where in the day something sits; the days say
+whether it is due at all. Every day is the default and what almost every
+commitment is, so the day picker starts full and most people will never open
+it — it is there for the Friday reading of al-Kahf, and for the collections
+authored around a particular day of the week. A collection that does not fall on
+today is not on the screen at all: not a greyed-out tile, not an empty section,
+and not counted in the greeting's "one of four finished today". The days are a
+seven-bit mask on the commitment row, because a commitment is one row and a set
+of at most seven flags is not a relation worth joining.
+
+**A commitment is a row in `user.db`.** `commitments` is keyed by
+`collection_ref` like `progress` and `completions` are, so a built-in and a
+user collection are committed the same way, and a collection is committed to one
+part of the day or to none. Committing it somewhere else is a move, and it keeps
+its place in the grid: tiles sit in the order they were committed and nothing
+reorders itself as the day goes on.
+
+**A tile counts repetitions, not entries.** A collection of one dhikr said a
+hundred times reads `40 of 100` and its stripe advances as it is said; counted
+as entries it would be `0 of 1` and the stripe would go from empty to full in a
+single tap. The stripe is cut into `min(repetitions, 12)` segments and quantised
+down, so ninety-six percent of the way through does not look finished.
+
+**Finished, a tile goes quiet.** The background steps one tonally to
+`surfaceContainerHigh`, the name goes to `onSurfaceVariant`, the meta line
+becomes a check and "Done today", and the stripe is not drawn at all. An earlier
+draft kept a full brick stripe on a completed tile, which made the expected
+outcome the loudest thing on the screen. There is no badge, no colour change and
+no celebration anywhere on this screen.
+
+**The bar is built from `Row` and `InkWell`, not `NavigationBar`.** Material 3
+marks the selected destination with a stadium-shaped pill behind its icon, and
+this app drops the stadium everywhere. The selected tab is marked by a 4dp
+length of brick across its top edge instead — the one place brick acts as a
+plain bar rather than as the voussoir rhythm — plus `onSurface` ink and Inter
+Medium. Icons stay chrome, never brick and never gold, and nothing swaps between
+filled and outline to signal selection. No tab carries a badge, dot or count,
+because the app has no notifications.
+
+**Each tab keeps its own scroll position.** The four bodies live in an
+`IndexedStack`, and each gets its own `ScrollController` — a vertical `ListView`
+with no controller attaches to the nearest `PrimaryScrollController`, so
+otherwise all four would share the Scaffold's one and read each other's offsets.
+Switching tabs swaps the body and its app bar instantly: no cross-fade, no
+slide.
+
+**Progress belongs to the day it was made on.** `UserRepository.progress`
+returns null for a row it did not write today, so a wird left half done last
+night is not half done this morning — it has not been started. That rule lives
+in one place, which is what keeps a tile, the collections list and the player
+from disagreeing about where the day begins.
+
+The Dhikr tab is deliberately empty. Nothing in either database describes a
+standalone single-dhikr counter yet — `content.db` has adhkar and it has
+collections, and a dhikr on its own is neither — so the tab says so rather than
+being filled by listing every dhikr in the database, which would be a product
+decision made by whoever was nearest the keyboard.
+
 ### The wird player
 
-The counter, and the screen the app is for. It opens from the collections list,
-which is home.
+The counter, and the screen the app is for. It opens from a tile on Home, or
+from a row in the collections list.
 
 **Its state is a plain object.** `lib/player/wird_player.dart` is a
 `ChangeNotifier` and knows nothing about widgets, so counting, undo across a
@@ -307,7 +400,9 @@ The calendar borrows no days from the months either side — a grid showing 31
 January in the same colour as 1 February invites the reader to count across a
 boundary it is not showing — so the corner cells are blank.
 
-The whole panel comes off in Settings, defaulting on.
+The whole panel comes off in Settings, defaulting on. It lives on the Tracker
+tab; the one sentence Home says about a streak is the third line of the greeting,
+in 12dp quiet ink, and it reads the same at 365 days as at 2.
 
 ### Measuring it
 

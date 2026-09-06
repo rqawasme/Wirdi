@@ -1,6 +1,7 @@
 import 'package:uuid/uuid.dart';
 
 import '../../domain/collection_id.dart';
+import '../../domain/commitment.dart';
 import '../../domain/date_key.dart';
 import '../../domain/progress.dart';
 import '../../domain/repositories.dart';
@@ -42,7 +43,18 @@ class DriftUserRepository implements UserRepository {
     final ProgressRow? row = await _db
         .progressFor(ref: id.canonical)
         .getSingleOrNull();
-    return row == null ? null : progressFromRow(row, id);
+    if (row == null) return null;
+
+    // Progress belongs to the day it was made on. A row written before today
+    // is yesterday's half-finished wird, and this morning that wird has not
+    // been started — so it reads as nothing rather than resuming into the
+    // middle of it.
+    //
+    // The stale row is left where it is rather than deleted: a read is not a
+    // place to write from, and the next tap overwrites it anyway.
+    if (dateKey(fromEpochMs(row.updatedAt)) != dateKey(_now())) return null;
+
+    return progressFromRow(row, id);
   }
 
   @override
@@ -108,6 +120,40 @@ class DriftUserRepository implements UserRepository {
       offset++;
     }
     return streak;
+  }
+
+  @override
+  Future<List<Commitment>> commitments() async {
+    final List<CommitmentRow> rows = await _db.allCommitments().get();
+    return <Commitment>[
+      for (final CommitmentRow row in rows)
+        if (commitmentFromRow(row) case final Commitment commitment) commitment,
+    ];
+  }
+
+  @override
+  Future<void> commit(
+    CollectionId id,
+    DailySection section, {
+    Weekdays days = Weekdays.everyDay,
+  }) async {
+    final int now = toEpochMs(_now());
+    // Only read for an insert; the upsert leaves sort_order alone on a move,
+    // so a collection changing section or days keeps its place in the grid.
+    final int sortOrder = await _db.nextCommitmentSortOrder().getSingle();
+    await _db.upsertCommitment(
+      ref: id.canonical,
+      section: section.sqlName,
+      days: days.mask,
+      sortOrder: sortOrder,
+      createdAt: now,
+      updatedAt: now,
+    );
+  }
+
+  @override
+  Future<void> uncommit(CollectionId id) async {
+    await _db.deleteCommitment(ref: id.canonical);
   }
 
   @override

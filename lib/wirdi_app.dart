@@ -51,9 +51,9 @@ class WirdiApp extends ConsumerWidget {
       themeMode: resolved.themeMode,
       // A plain Navigator, no routing package — see Routes. There is no
       // loading gate: the theme falls back to the default typography for the
-      // one frame the settings read takes, and the collections list shows its
-      // own progress while the rows arrive.
-      initialRoute: Routes.collections,
+      // one frame the settings read takes, and each tab shows its own progress
+      // while its rows arrive.
+      initialRoute: Routes.shell,
       onGenerateRoute: WirdiRouter.onGenerateRoute,
     );
   }

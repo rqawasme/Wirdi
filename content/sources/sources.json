@@ -1,0 +1,80 @@
+{
+  "sources": [
+    {
+      "id": 1,
+      "collection": "Ṣaḥīḥ al-Bukhārī",
+      "reference": "6306"
+    },
+    {
+      "id": 2,
+      "collection": "Ṣaḥīḥ al-Bukhārī and Ṣaḥīḥ Muslim",
+      "reference": "al-Bukhārī 3293, Muslim 2691"
+    },
+    {
+      "id": 3,
+      "collection": "Ṣaḥīḥ al-Bukhārī and Ṣaḥīḥ Muslim",
+      "reference": "al-Bukhārī 6405, Muslim 2691"
+    },
+    {
+      "id": 4,
+      "collection": "Musnad Aḥmad and Sunan al-Tirmidhī",
+      "reference": "Aḥmad 446, al-Tirmidhī 3388"
+    },
+    {
+      "id": 5,
+      "collection": "Sunan Abī Dāwūd",
+      "reference": "5074"
+    },
+    {
+      "id": 6,
+      "collection": "Musnad Aḥmad",
+      "reference": "18968"
+    },
+    {
+      "id": 7,
+      "collection": "Sunan Abī Dāwūd and Sunan al-Tirmidhī",
+      "reference": "Abū Dāwūd 5067; the closing addition, al-Tirmidhī 3529"
+    },
+    {
+      "id": 8,
+      "collection": "al-Sunan al-Kubrā of al-Nasāʾī",
+      "reference": "10405"
+    },
+    {
+      "id": 9,
+      "collection": "Ṣaḥīḥ Muslim",
+      "reference": "2723"
+    },
+    {
+      "id": 10,
+      "collection": "Sunan Abī Dāwūd",
+      "reference": "5068"
+    },
+    {
+      "id": 11,
+      "collection": "Ṣaḥīḥ Muslim",
+      "reference": "2726"
+    },
+    {
+      "id": 12,
+      "collection": "Musnad Aḥmad",
+      "reference": "15360"
+    },
+    {
+      "id": 13,
+      "collection": "Sunan Abī Dāwūd",
+      "reference": "5081",
+      "grading": "Mawqūf, from Abū l-Dardāʾ"
+    },
+    {
+      "id": 14,
+      "collection": "Sunan Ibn Mājah",
+      "reference": "3868"
+    },
+    {
+      "id": 15,
+      "collection": "Ṣaḥīḥ Muslim",
+      "reference": "2708, 2709"
+    }
+  ]
+}

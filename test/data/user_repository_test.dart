@@ -290,4 +290,135 @@ void main() {
       expect(await user.setting('arabic_font_scale'), '1.4');
     });
   });
+
+  group('commitments', () {
+    test('nothing is committed to begin with', () async {
+      expect(await user.commitments(), isEmpty);
+    });
+
+    test('a built-in and a user collection commit the same way', () async {
+      await user.commit(builtin, DailySection.morning);
+      await user.commit(mine, DailySection.evening);
+
+      final List<Commitment> committed = await user.commitments();
+      expect(committed, hasLength(2));
+      expect(committed.map((Commitment c) => c.collectionId), <CollectionId>[
+        builtin,
+        mine,
+      ]);
+      expect(committed.first.section, DailySection.morning);
+      expect(committed.last.section, DailySection.evening);
+    });
+
+    test('the order is the order they were committed in', () async {
+      final CollectionId second = UserCollectionId(testUuid(2));
+      await user.commit(mine, DailySection.today);
+      await user.commit(builtin, DailySection.today);
+      await user.commit(second, DailySection.today);
+
+      expect(
+        (await user.commitments()).map((Commitment c) => c.collectionId),
+        <CollectionId>[mine, builtin, second],
+      );
+    });
+
+    test('committing again moves it and keeps its place', () async {
+      await user.commit(mine, DailySection.morning);
+      await user.commit(builtin, DailySection.morning);
+
+      // Moving the first one to the evening must not send it to the end of
+      // the grid: it is the same commitment, in a different part of the day.
+      await user.commit(mine, DailySection.evening);
+
+      final List<Commitment> committed = await user.commitments();
+      expect(committed, hasLength(2));
+      expect(committed.first.collectionId, mine);
+      expect(committed.first.section, DailySection.evening);
+      expect(committed.last.collectionId, builtin);
+    });
+
+    test('uncommitting takes it off, and leaves the rest alone', () async {
+      await user.commit(mine, DailySection.today);
+      await user.commit(builtin, DailySection.today);
+
+      await user.uncommit(mine);
+
+      expect(
+        (await user.commitments()).map((Commitment c) => c.collectionId),
+        <CollectionId>[builtin],
+      );
+    });
+
+    test('uncommitting something never committed is a no-op', () async {
+      await user.uncommit(mine);
+      expect(await user.commitments(), isEmpty);
+    });
+
+    test('a row written by something else is dropped, not thrown on', () async {
+      await user.commit(mine, DailySection.today);
+      await dbs.user.customStatement(
+        "INSERT INTO commitments (collection_ref, section, sort_order, "
+        "created_at, updated_at) VALUES ('x:nonsense', 'daily', 2, 0, 0), "
+        "('b:99', 'afternoon', 3, 0, 0)",
+      );
+
+      // The unparseable id and the unknown section both fall out; the real
+      // commitment is still there.
+      expect(
+        (await user.commitments()).map((Commitment c) => c.collectionId),
+        <CollectionId>[mine],
+      );
+    });
+  });
+
+  group('commitment days', () {
+    test('a commitment is every day unless it says otherwise', () async {
+      await user.commit(mine, DailySection.today);
+
+      final Commitment committed = (await user.commitments()).single;
+      expect(committed.days, Weekdays.everyDay);
+      expect(committed.days.isEveryDay, isTrue);
+      for (
+        int weekday = DateTime.monday;
+        weekday <= DateTime.sunday;
+        weekday++
+      ) {
+        expect(committed.days.contains(weekday), isTrue);
+      }
+    });
+
+    test('days are stored and read back', () async {
+      // Al-Kahf on a Friday: the case this exists for.
+      await user.commit(
+        mine,
+        DailySection.today,
+        days: Weekdays.of(<int>[DateTime.friday]),
+      );
+
+      final Commitment committed = (await user.commitments()).single;
+      expect(committed.days.weekdays, <int>[DateTime.friday]);
+      expect(committed.days.isEveryDay, isFalse);
+      expect(committed.fallsOn(DateTime(2026, 9, 4)), isTrue); // a Friday
+      expect(committed.fallsOn(DateTime(2026, 9, 5)), isFalse); // a Saturday
+    });
+
+    test('changing the days keeps the commitment in its place', () async {
+      await user.commit(mine, DailySection.today);
+      await user.commit(builtin, DailySection.today);
+
+      await user.commit(
+        mine,
+        DailySection.today,
+        days: Weekdays.of(<int>[DateTime.monday, DateTime.thursday]),
+      );
+
+      final List<Commitment> committed = await user.commitments();
+      expect(committed.first.collectionId, mine);
+      expect(committed.first.days.weekdays, <int>[
+        DateTime.monday,
+        DateTime.thursday,
+      ]);
+      expect(committed.last.collectionId, builtin);
+    });
+  });
 }

@@ -1,5 +1,6 @@
 import 'collection.dart';
 import 'collection_id.dart';
+import 'commitment.dart';
 import 'content.dart';
 import 'content_ref.dart';
 import 'progress.dart';
@@ -90,9 +91,16 @@ abstract class CollectionRepository {
 /// Everything the user accumulates: progress, completions, reading position
 /// and settings.
 abstract class UserRepository {
-  /// The stored progress, as written. Validate it through
-  /// `ResolvedCollection.resumableFrom` before resuming from it — a bare
-  /// index outlives the content it pointed at.
+  /// The stored progress, as written, or null when there is none for today.
+  ///
+  /// Progress belongs to the local day it was made on: a wird left half done
+  /// last night is not half done this morning, it is not done. An
+  /// implementation returns null for a row it did not write today, so the
+  /// home screen's tiles and the player agree about where the day starts.
+  ///
+  /// Validate what comes back through `ResolvedCollection.resumableFrom`
+  /// before resuming from it — a bare index outlives the content it pointed
+  /// at.
   Future<WirdProgress?> progress(CollectionId id);
 
   Future<void> saveProgress(WirdProgress progress);
@@ -117,6 +125,29 @@ abstract class UserRepository {
   /// A day with no completion yet does not break the streak until it is over,
   /// so this counts back from yesterday when today is still empty.
   Future<int> currentStreak();
+
+  /// What the user has committed to doing, in the order they committed it.
+  ///
+  /// Spans both databases, like progress and completions do. A commitment
+  /// whose collection has since been deleted is still a row here; callers
+  /// resolve against the collection list and drop what no longer exists.
+  Future<List<Commitment>> commitments();
+
+  /// Commits [id] to [section] on [days], or moves it if it is committed
+  /// already.
+  ///
+  /// Moving keeps the commitment's place in the order: it is the same
+  /// commitment on a different day or in a different part of the day, and it
+  /// should not jump to the end of the grid for having been moved.
+  Future<void> commit(
+    CollectionId id,
+    DailySection section, {
+    Weekdays days = Weekdays.everyDay,
+  });
+
+  /// Takes [id] off the home screen. The collection itself is untouched, as
+  /// is anything it has completed. A no-op if it was not committed.
+  Future<void> uncommit(CollectionId id);
 
   Future<ReadingPosition?> lastPosition();
 

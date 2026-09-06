@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'
     show FilteringTextInputFormatter, TextInputFormatter;
 
+import '../domain/commitment.dart';
 import '../theme/theme.dart';
 
 /// What the name-and-description form came back with.
@@ -365,3 +366,217 @@ Future<bool> confirmDeleteCollection(
 }
 
 String? _emptyToNull(String value) => value.isEmpty ? null : value;
+
+/// What the commit sheet came back with.
+@immutable
+final class CommitmentChoice {
+  const CommitmentChoice({required this.section, required this.days});
+
+  final DailySection section;
+  final Weekdays days;
+}
+
+/// When a collection is to be done: which part of the day, and which days.
+///
+/// A sheet rather than a menu, and for the same reason the item pickers are
+/// one: the choices are the answer. It holds its selection rather than closing
+/// on the first tap, because there are now two answers to give and closing on
+/// the first would mean opening it again for the second.
+///
+/// The two questions are independent on purpose. The section says where in the
+/// day something sits; the days say whether it comes round at all. Every day
+/// is the default and the great majority of cases, so the day row starts full
+/// and most people will never touch it — it is there for al-Kahf on Friday and
+/// for the collections authored around a particular day.
+Future<CommitmentChoice?> showCommitmentSheet(
+  BuildContext context, {
+  required String name,
+  CommitmentChoice? current,
+}) {
+  return showModalBottomSheet<CommitmentChoice>(
+    context: context,
+    isScrollControlled: true,
+    builder: (BuildContext context) =>
+        _CommitmentSheet(name: name, current: current),
+  );
+}
+
+class _CommitmentSheet extends StatefulWidget {
+  const _CommitmentSheet({required this.name, this.current});
+
+  final String name;
+  final CommitmentChoice? current;
+
+  @override
+  State<_CommitmentSheet> createState() => _CommitmentSheetState();
+}
+
+class _CommitmentSheetState extends State<_CommitmentSheet> {
+  late DailySection _section = widget.current?.section ?? DailySection.today;
+  late Weekdays _days = widget.current?.days ?? Weekdays.everyDay;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                WirdiMetrics.space4,
+                WirdiMetrics.space5,
+                WirdiMetrics.space4,
+                WirdiMetrics.space2,
+              ),
+              child: Text(widget.name, style: theme.textTheme.titleMedium),
+            ),
+            for (final DailySection section in DailySection.values)
+              ListTile(
+                title: Text(section.label),
+                subtitle: Text(_sectionSubtitle(section)),
+                // A check, in the same quiet ink as everything else that marks
+                // state in this app. Not a radio: the ink is the app's way of
+                // saying which one is on, everywhere else too.
+                trailing: section == _section
+                    ? Icon(
+                        Icons.check,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      )
+                    : null,
+                onTap: () => setState(() => _section = section),
+              ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                WirdiMetrics.space4,
+                WirdiMetrics.space4,
+                WirdiMetrics.space4,
+                0,
+              ),
+              child: _DayPicker(
+                days: _days,
+                onChanged: (Weekdays days) => setState(() => _days = days),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(WirdiMetrics.space4),
+              child: FilledButton(
+                // Refused rather than disabled while nothing is selected: a
+                // commitment on no days never comes round, which is a way of
+                // deleting it that does not look like one.
+                onPressed: _days.isEmpty
+                    ? null
+                    : () => Navigator.pop(
+                        context,
+                        CommitmentChoice(section: _section, days: _days),
+                      ),
+                child: Text(widget.current == null ? 'Commit' : 'Save'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The seven days, as a row of toggles.
+///
+/// Monday first, matching the calendar on the tracker rather than the storage
+/// order it happens to share. The label under it states what is selected in
+/// words, because seven initials are a thing to decode and a sentence is not.
+class _DayPicker extends StatelessWidget {
+  const _DayPicker({required this.days, required this.onChanged});
+
+  final Weekdays days;
+  final ValueChanged<Weekdays> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final MaterialLocalizations l10n = MaterialLocalizations.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text('Days', style: theme.textTheme.labelLarge),
+        const SizedBox(height: WirdiMetrics.space2),
+        SizedBox(
+          width: double.infinity,
+          child: SegmentedButton<int>(
+            showSelectedIcon: false,
+            multiSelectionEnabled: true,
+            emptySelectionAllowed: true,
+            segments: <ButtonSegment<int>>[
+              for (
+                int weekday = DateTime.monday;
+                weekday <= DateTime.sunday;
+                weekday++
+              )
+                ButtonSegment<int>(
+                  value: weekday,
+                  // The narrow weekday name from the platform's own
+                  // localisations — "M", "T" — so the row fits seven of them
+                  // at 390dp. narrowWeekdays is indexed Sunday-first.
+                  //
+                  // The full name goes to the screen reader rather than to a
+                  // tooltip: three of the seven initials are ambiguous, and a
+                  // tooltip is a hover affordance on an app that has no hover.
+                  label: Text(
+                    l10n.narrowWeekdays[weekday % 7],
+                    semanticsLabel: _dayNames[weekday - 1],
+                  ),
+                ),
+            ],
+            selected: days.weekdays.toSet(),
+            onSelectionChanged: (Set<int> selection) =>
+                onChanged(Weekdays.of(selection)),
+          ),
+        ),
+        const SizedBox(height: WirdiMetrics.space2),
+        Text(
+          describeDays(days),
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// What a set of days reads as in a sentence.
+///
+/// Every day says so and stops; anything else is named. Nothing here counts
+/// or congratulates — it is the same statement of fact the rest of the app
+/// makes.
+String describeDays(Weekdays days) {
+  if (days.isEveryDay) return 'Every day.';
+  if (days.isEmpty) return 'No days yet. Pick at least one.';
+
+  final List<String> names = <String>[
+    for (final int weekday in days.weekdays) _dayNames[weekday - 1],
+  ];
+  if (names.length == 1) return '${names.single}s only.';
+  return '${names.sublist(0, names.length - 1).join(', ')} '
+      'and ${names.last}.';
+}
+
+const List<String> _dayNames = <String>[
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+];
+
+String _sectionSubtitle(DailySection section) => switch (section) {
+  DailySection.today => 'No particular time of day',
+  DailySection.morning => 'After fajr, until the sun is up',
+  DailySection.evening => 'From asr onwards',
+};
