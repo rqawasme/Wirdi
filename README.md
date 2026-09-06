@@ -603,3 +603,37 @@ test:
 ```bash
 flutter test test/render_samples.dart
 ```
+
+## Versioning and releases
+
+The version lives in `pubspec.yaml`, which is where Flutter reads it from for
+both platforms: the Android `versionName` and the iOS
+`CFBundleShortVersionString` are both wired to it through the generated build
+config, so there is no third place to keep in step. `lib/app_version.dart` holds
+a copy for the About sheet to display, and `test/app_version_test.dart` fails if
+the copy ever drifts from the pubspec.
+
+Bump both together:
+
+```bash
+tool/bump_version.sh 0.2.0
+```
+
+Pushing that to `main` is what cuts a release. `.github/workflows/release.yml`
+notices the version changed, runs the test suite — by calling `ci.yml`, the same
+workflow that runs on every pull request, rather than a copy of its steps that
+would drift from it — and only then builds the Android APK and the iOS app,
+publishes a release and tags it `v0.2.0`. The tag is created at the end, at the
+tested commit, which is what stops a tag ever naming a commit whose tests did
+not pass. A push that does not change the version builds nothing.
+
+The build numbers behind those versions — the Android `versionCode`, the iOS
+`CFBundleVersion` — come from the CI run number rather than from `pubspec.yaml`.
+Stores reject a build number they have seen before, and a number that only ever
+goes up is one less thing to remember at bump time.
+
+The APK is signed with the Android debug keys until a release keystore is
+configured through repository secrets, and the iOS build is unsigned, because
+signing it needs an Apple Developer certificate this repository does not hold.
+Both facts are stated on the release itself rather than left to be discovered.
+[`docs/RELEASING.md`](docs/RELEASING.md) has the details and the setup.

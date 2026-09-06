@@ -1,0 +1,48 @@
+name: Prepare Flutter build
+description: >-
+  Builds content.db from the committed sources, bundles it as the app asset and
+  installs the pinned Flutter toolchain, leaving the tree ready for
+  `flutter build`.
+
+inputs:
+  flutter-version:
+    description: >-
+      The Flutter version to install. Pinned by the caller rather than defaulted
+      here so that a toolchain bump is one deliberate edit in one place.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install pipeline dependencies
+      shell: bash
+      run: pip install -r content/requirements.txt
+
+    # assets/content.db is gitignored — it is a build artifact of the content
+    # pipeline, several megabytes, reproducible from content/sources at any
+    # time. pubspec.yaml names it explicitly, so an asset bundle cannot be
+    # built until it exists: without this the release build fails with "unable
+    # to locate asset" rather than shipping an app with no content in it.
+    # --require-quran fails the build if the Quran source has gone missing,
+    # instead of quietly producing a database without it.
+    - name: Build content.db
+      shell: bash
+      run: python3 content/scripts/build_content.py --require-quran
+
+    - name: Bundle content.db as the app asset
+      shell: bash
+      run: tool/sync_content_asset.sh
+
+    - uses: subosito/flutter-action@v2
+      with:
+        channel: stable
+        flutter-version: ${{ inputs.flutter-version }}
+        cache: true
+
+    - name: Fetch packages
+      shell: bash
+      run: flutter pub get
