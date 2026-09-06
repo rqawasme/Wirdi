@@ -164,16 +164,6 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
   /// collections to stop fitting in it.
   static const double tileNameSize = 15;
 
-  /// The line of the wird itself on a home-screen tile.
-  ///
-  /// A step down from [tileNameSize], and the smallest Arabic the app sets:
-  /// this is an opening, not a reading. Anything actually read — the player,
-  /// the mushaf — is [quranVerse] or [dhikr] at 24 nominal and follows the
-  /// user's Arabic multiplier, which this deliberately does not. A card is a
-  /// fixed shape and the words on it are an identifier, in the same way the
-  /// collection's name is.
-  static const double tileOpeningSize = 13;
-
   // -- Line heights ----------------------------------------------------------
 
   /// Required, not stylistic. Voweled Arabic collides below this.
@@ -198,12 +188,6 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
   /// chrome that routinely runs to three lines, in a box that cannot grow: the
   /// leading that gives a single-line label air costs a wrapped name a line.
   static const double tileNameLineHeight = 1.35;
-
-  /// Tighter than [arabicLineHeight]'s 2.0, which exists so that voweled
-  /// Arabic can be *read* at length. Two lines of an opening set that loose
-  /// would take a third of the card; at 1.7 the harakat still clear, because
-  /// Noto Naskh's ink is about 1.30 em and the tile never sets the Quran face.
-  static const double tileOpeningLineHeight = 1.7;
 
   /// The range a stored multiplier is held to.
   ///
@@ -259,19 +243,6 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
     nominalSize: navLabelSize,
     weight: FontWeight.w700,
     lineHeight: chromeLineHeight,
-  );
-
-  /// The opening words of a collection, on its home-screen tile.
-  ///
-  /// Regular weight, unlike [arabicChrome]: the tile's Arabic *name* is a
-  /// label and is set bold to be scanned, and this is the text itself, which
-  /// is read. Two weights of Naskh on one card is what keeps the two from
-  /// reading as one paragraph.
-  TextStyle get arabicTileOpening => _arabic(
-    face: ArabicFace.notoNaskh,
-    nominalSize: tileOpeningSize,
-    weight: FontWeight.w400,
-    lineHeight: tileOpeningLineHeight,
   );
 
   TextStyle _arabic({

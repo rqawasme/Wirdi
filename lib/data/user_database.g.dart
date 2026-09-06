@@ -3049,6 +3049,16 @@ abstract class _$UserDatabase extends GeneratedDatabase {
     ).map((QueryRow row) => row.read<String>('date_key'));
   }
 
+  Selectable<String> collectionCompletionDatesDescending({
+    required String ref,
+  }) {
+    return customSelect(
+      'SELECT date_key FROM completions WHERE collection_ref = ?1 ORDER BY date_key DESC',
+      variables: [Variable<String>(ref)],
+      readsFrom: {completions},
+    ).map((QueryRow row) => row.read<String>('date_key'));
+  }
+
   Selectable<String> collectionCompletionDatesBetween({
     required String ref,
     required String from,

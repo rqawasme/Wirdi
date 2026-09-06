@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../theme/theme.dart';
-import 'voussoir_arch.dart';
 import 'voussoir_stripe.dart';
 
 /// One committed collection on the home screen, as a square tile.
@@ -33,25 +32,27 @@ class CollectionTile extends StatelessWidget {
     super.key,
     required this.name,
     this.nameArabic,
-    this.opening,
     required this.totalCount,
     this.doneCount = 0,
     this.completedToday = false,
     this.week = const <bool>[],
+    this.streak = 0,
     this.onTap,
   });
 
   /// Width over height, and the same for every tile on the screen.
   ///
-  /// Taller than wide, and a fixed ratio rather than a fixed height. The
-  /// square this replaces had nothing in its middle: it held a name and a
-  /// count, which is a label, and a label does not need height. This holds a
-  /// name, the words the wird opens with, a week of history and a count, and
-  /// the ratio is what buys room for the words.
+  /// A fixed ratio rather than a fixed height, so a two-word name and a
+  /// six-word one make the same object. Square, because the card holds a name,
+  /// a line about the run of days, a week of marks and a count — four short
+  /// things and not a page, and at this width they come to almost exactly a
+  /// square's height with two lines left for the name.
   ///
-  /// Taller rather than wider because the grid stays two up. A third column
-  /// on a phone makes the names unreadable before it makes the grid denser.
-  static const double aspectRatio = 0.72;
+  /// An earlier draft ran to 3:4 to fit two lines of the wird's opening text.
+  /// When the opening text came off the card the height went with it: a card
+  /// with air in it is a card with nothing in it, whatever is drawn behind the
+  /// air.
+  static const double aspectRatio = 1;
 
   /// The most segments the stripe is cut into. Past this the segments are
   /// thinner than the rhythm reads at, and the stripe stops being countable
@@ -67,16 +68,6 @@ class CollectionTile extends StatelessWidget {
   /// than as alignment.
   final String? nameArabic;
 
-  /// The first thing the collection asks you to say, in Arabic — a dhikr's
-  /// words, an ayah, a surah's name.
-  ///
-  /// This is what fills the card. A name and a count describe a collection
-  /// from outside it; the words are the thing itself, they differ on every
-  /// card, and they are the only part of a grid of these that is worth
-  /// looking at rather than reading. Null for an empty collection, and then
-  /// the line is not drawn.
-  final String? opening;
-
   /// Repetitions in the whole collection.
   final int totalCount;
 
@@ -89,6 +80,10 @@ class CollectionTile extends StatelessWidget {
   /// Empty to draw no strip at all.
   final List<bool> week;
 
+  /// Consecutive days up to today on which *this* collection was completed.
+  /// Zero when today is the first day, or when the run was broken.
+  final int streak;
+
   final VoidCallback? onTap;
 
   @override
@@ -97,7 +92,6 @@ class CollectionTile extends StatelessWidget {
     final ColorScheme scheme = theme.colorScheme;
     final WirdiTypography type = theme.extension<WirdiTypography>()!;
     final String? nameArabic = this.nameArabic;
-    final String? opening = this.opening;
 
     final Color ink = completedToday
         ? scheme.onSurfaceVariant
@@ -125,107 +119,80 @@ class CollectionTile extends StatelessWidget {
               width: WirdiMetrics.hairline,
             ),
           ),
-          // So the stripe's square ends and the arch's legs are cut by the
-          // card's corners.
+          // So the stripe's square ends are cut by the card's corners.
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: onTap,
-            child: Stack(
-              fit: StackFit.passthrough,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                // Behind everything, bleeding past the padding to the card's
-                // own edges: the card is a wall the text is set on, not a box
-                // with a picture in it.
-                const Positioned.fill(child: VoussoirArch()),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(WirdiMetrics.space3),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: <Widget>[
-                            if (nameArabic != null) ...<Widget>[
-                              _ArabicLine(
-                                name: nameArabic,
-                                style: type.arabicChrome.copyWith(
-                                  color: scheme.onSurfaceVariant,
-                                ),
-                              ),
-                              const SizedBox(height: WirdiMetrics.space2),
-                            ],
-                            // The name and the opening take what height is
-                            // left, together, and are clipped where they run
-                            // out of it: the card does not grow for a long
-                            // name, and neither of them may push the strip or
-                            // the meta line off the bottom of it.
-                            Expanded(
-                              child: ClipRect(
-                                child: Align(
-                                  alignment: AlignmentDirectional.topStart,
-                                  heightFactor: 1,
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: <Widget>[
-                                      Text(
-                                        name,
-                                        style: type.tileName.copyWith(
-                                          color: ink,
-                                        ),
-                                      ),
-                                      if (opening != null) ...<Widget>[
-                                        const SizedBox(
-                                          height: WirdiMetrics.space2,
-                                        ),
-                                        _OpeningLine(
-                                          text: opening,
-                                          style: type.arabicTileOpening
-                                              .copyWith(
-                                                color: scheme.onSurfaceVariant,
-                                              ),
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(WirdiMetrics.space3),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        if (nameArabic != null) ...<Widget>[
+                          _ArabicLine(
+                            name: nameArabic,
+                            style: type.arabicChrome.copyWith(
+                              color: scheme.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: WirdiMetrics.space2),
+                        ],
+                        // Takes what height is left and clips: the card
+                        // does not grow for a long name, and a name too
+                        // long for it is cut rather than pushing the lines
+                        // below off the bottom of it.
+                        Expanded(
+                          child: ClipRect(
+                            child: Align(
+                              alignment: AlignmentDirectional.topStart,
+                              heightFactor: 1,
+                              child: Text(
+                                name,
+                                style: type.tileName.copyWith(color: ink),
                               ),
                             ),
-                            if (week.isNotEmpty) ...<Widget>[
-                              const SizedBox(height: WirdiMetrics.space2),
-                              _WeekStrip(
-                                days: week,
-                                // No brick on a finished card, anywhere. It
-                                // drops its stripe for the same reason: an
-                                // earlier draft made the expected outcome the
-                                // loudest thing in the section.
-                                done: completedToday
-                                    ? scheme.onSurfaceVariant
-                                    : scheme.primary,
-                                notDone: scheme.outline,
-                              ),
-                            ],
-                            const SizedBox(height: WirdiMetrics.space2),
-                            _Meta(
-                              totalCount: totalCount,
-                              doneCount: doneCount,
-                              completedToday: completedToday,
-                              colour: scheme.onSurfaceVariant,
-                              style: type.caption,
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: WirdiMetrics.space2),
+                        _Encouragement(
+                          streak: streak,
+                          completedToday: completedToday,
+                          style: type.caption.copyWith(
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ),
+                        if (week.isNotEmpty) ...<Widget>[
+                          const SizedBox(height: WirdiMetrics.space2),
+                          _WeekStrip(
+                            days: week,
+                            // No brick on a finished card, anywhere. It
+                            // drops its stripe for the same reason: an
+                            // earlier draft made the expected outcome the
+                            // loudest thing in the section.
+                            done: completedToday
+                                ? scheme.onSurfaceVariant
+                                : scheme.primary,
+                            notDone: scheme.outline,
+                          ),
+                        ],
+                        const SizedBox(height: WirdiMetrics.space2),
+                        _Meta(
+                          totalCount: totalCount,
+                          doneCount: doneCount,
+                          completedToday: completedToday,
+                          colour: scheme.onSurfaceVariant,
+                          style: type.caption,
+                        ),
+                      ],
                     ),
-                    if (!completedToday)
-                      VoussoirStripe.progress(
-                        value: _value,
-                        segments: _segments,
-                      ),
-                  ],
+                  ),
                 ),
+                if (!completedToday)
+                  VoussoirStripe.progress(value: _value, segments: _segments),
               ],
             ),
           ),
@@ -297,36 +264,6 @@ class _ArabicLine extends StatelessWidget {
   }
 }
 
-/// The opening words of the wird, right-aligned under the name.
-///
-/// Two lines at most and ellipsised, so a hundred-word dhikr and a four-word
-/// one make the same card. It is deliberately not the whole text: a card is
-/// not somewhere anybody recites from, and the words are here to be
-/// recognised — this is the one that starts *subhanallahi wa bihamdih* — which
-/// happens inside the first few words or not at all.
-class _OpeningLine extends StatelessWidget {
-  const _OpeningLine({required this.text, required this.style});
-
-  final String text;
-  final TextStyle style;
-
-  @override
-  Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Text(
-        text,
-        style: style,
-        locale: const Locale('ar'),
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-        // Right, not end: see [_ArabicLine].
-        textAlign: TextAlign.right,
-      ),
-    );
-  }
-}
-
 /// The last seven days of this collection, as seven marks.
 ///
 /// A day is the same mark the tracker's calendar uses — a filled square in
@@ -383,6 +320,74 @@ class _WeekStrip extends StatelessWidget {
         ],
       ],
     );
+  }
+}
+
+/// A word about the run of days, above the count.
+///
+/// **This is the one place in the app that encourages.** Everywhere else —
+/// the greeting, the tracker, `StreakPanel`, which argues the case at length
+/// — a streak is a number stated flatly and never commented on, because the
+/// standard streak component is engineered around loss aversion and pointing
+/// that at somebody's devotional life is a different thing from pointing it at
+/// a language app. A card that says "keep it going" is a deliberate departure
+/// from that, made knowingly and after the argument was put; if the position
+/// is ever restored, this widget is the whole of what has to go.
+///
+/// Two rules it does keep, because they are what stops encouragement becoming
+/// pressure. Nothing here escalates: the line reads the same at three hundred
+/// days as at three, so there is no tier to reach and none to fall out of. And
+/// nothing here is negative — a broken run is an invitation to start, never a
+/// warning, a countdown, or a remark about the days that were missed.
+class _Encouragement extends StatelessWidget {
+  const _Encouragement({
+    required this.streak,
+    required this.completedToday,
+    required this.style,
+  });
+
+  /// Consecutive days up to today, this collection's own.
+  final int streak;
+
+  final bool completedToday;
+
+  final TextStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      _line,
+      style: style,
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+
+  /// The four states a run can be in, and one sentence each.
+  ///
+  /// Done today is past tense and closes; not yet is present tense and opens.
+  /// Neither says how many days are left in anything, because nothing here is
+  /// running out.
+  ///
+  /// A finished card says "Done today" on the meta line below this one, so
+  /// this one does not say it again: two lines saying the same three words is
+  /// how a card starts reading as filler.
+  ///
+  /// Every one of them fits on one line of a card at the default text scale,
+  /// which is not a coincidence — the card is sized for one, and a sentence
+  /// that wraps to two costs the name a line of its own.
+  String get _line {
+    if (completedToday) {
+      return switch (streak) {
+        1 => 'A day begun.',
+        _ => '$streak days and counting.',
+      };
+    }
+    return switch (streak) {
+      0 => 'A good day to begin.',
+      1 => 'Day one. Keep going.',
+      _ => '$streak days. Keep going.',
+    };
   }
 }
 

@@ -33,7 +33,7 @@ final class CommittedCollection {
     required this.doneCount,
     required this.completedToday,
     required this.week,
-    this.opening,
+    required this.streak,
   });
 
   final CollectionSummary summary;
@@ -64,9 +64,9 @@ final class CommittedCollection {
   /// about one collection can honestly ask.
   final List<bool> week;
 
-  /// The first thing the collection asks you to say, in Arabic. Null when the
-  /// collection is empty.
-  final String? opening;
+  /// Consecutive days up to today on which this collection was completed.
+  /// Its own run, not the app's — see [UserRepository.currentStreakFor].
+  final int streak;
 
   CollectionId get id => summary.id;
 
@@ -173,7 +173,7 @@ final FutureProvider<HomeView> homeViewProvider = FutureProvider<HomeView>((
         doneCount: _repetitionsDone(resolved.steps, progress),
         completedToday: await user.isCompletedToday(summary.id),
         week: await _week(user, summary.id, today),
-        opening: resolved.opening,
+        streak: await user.currentStreakFor(summary.id),
       ),
     );
   }

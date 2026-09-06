@@ -118,8 +118,17 @@ class DriftUserRepository implements UserRepository {
   }
 
   @override
-  Future<int> currentStreak() async {
-    final List<String> days = await _db.completionDatesDescending().get();
+  Future<int> currentStreak() async =>
+      _streakThrough(await _db.completionDatesDescending().get());
+
+  @override
+  Future<int> currentStreakFor(CollectionId id) async => _streakThrough(
+    await _db.collectionCompletionDatesDescending(ref: id.canonical).get(),
+  );
+
+  /// Consecutive days up to today inside [days], which is every day something
+  /// was completed — everything, or one collection's own.
+  int _streakThrough(List<String> days) {
     if (days.isEmpty) return 0;
 
     final Set<String> completed = days.toSet();

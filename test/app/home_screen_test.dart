@@ -12,7 +12,6 @@ import 'package:wirdi/theme/theme.dart';
 import 'package:wirdi/widgets/bottom_nav.dart';
 import 'package:wirdi/widgets/collection_tile.dart';
 import 'package:wirdi/widgets/empty_state.dart';
-import 'package:wirdi/widgets/voussoir_arch.dart';
 import 'package:wirdi/widgets/voussoir_stripe.dart';
 
 import '../support/fixtures.dart';
@@ -361,56 +360,6 @@ void main() {
       );
     });
 
-    testWidgets('shows the words the wird opens with, right-aligned', (
-      WidgetTester tester,
-    ) async {
-      await dbs
-          .userRepository(clock: () => now)
-          .commit(mixed, DailySection.today);
-
-      await pumpApp(tester);
-
-      // The first item of the mixed collection, in its own words rather than
-      // a description of them.
-      final Finder opening = find.text('PLACEHOLDER dhikr 1001 arabic');
-      expect(opening, findsOneWidget);
-
-      // Against the trailing edge of the tile, like the Arabic name above it.
-      final Rect tile = tester.getRect(find.byType(CollectionTile));
-      expect(
-        tester.getRect(opening).right,
-        closeTo(tile.right - WirdiMetrics.space3, 1),
-      );
-
-      // Quieter than the name it sits under, and not the same style: the name
-      // is a bold label, this is the text itself.
-      final TextStyle style = tester.widget<Text>(opening).style!;
-      final TextStyle name = tester
-          .widget<Text>(find.text('PLACEHOLDER collection 1 english'))
-          .style!;
-      expect(style.fontWeight, FontWeight.w400);
-      expect(style.fontSize, lessThan(name.fontSize!));
-      expect(style.color, WirdiTheme.light().colorScheme.onSurfaceVariant);
-    });
-
-    testWidgets('a collection with nothing in it opens with nothing', (
-      WidgetTester tester,
-    ) async {
-      final UserCollectionId empty = await dbs.collectionRepository().create(
-        'Empty',
-      );
-      await dbs
-          .userRepository(clock: () => now)
-          .commit(empty, DailySection.today);
-
-      await pumpApp(tester);
-
-      // No line, and no line box held open for one either — the same rule the
-      // Arabic name follows. The count still sits at the foot of the tile.
-      expect(find.textContaining('PLACEHOLDER'), findsNothing);
-      expect(find.text('0/0'), findsOneWidget);
-    });
-
     testWidgets('the strip marks the days this collection was done', (
       WidgetTester tester,
     ) async {
@@ -497,24 +446,75 @@ void main() {
       expect(brick, isEmpty);
     });
 
-    testWidgets('the arch is behind every tile, and says nothing', (
+    testWidgets('says something about the run of days, and never a warning', (
       WidgetTester tester,
     ) async {
       final UserRepository user = dbs.userRepository(clock: () => now);
       await user.commit(mixed, DailySection.today);
       await user.commit(simple, DailySection.today);
+      // Three days up to yesterday, and not yet today: a run in progress.
+      for (final int back in <int>[1, 2, 3]) {
+        await user.logCompletion(mixed, now.subtract(Duration(days: back)));
+      }
 
       await pumpApp(tester);
 
-      expect(find.byType(VoussoirArch), findsNWidgets(2));
-      // A watermark is not a thing a screen reader stops on.
-      expect(
-        find.descendant(
-          of: find.byType(VoussoirArch),
-          matching: find.byType(ExcludeSemantics),
-        ),
-        findsNWidgets(2),
+      expect(find.text('3 days. Keep going.'), findsOneWidget);
+      // Nothing done ever, and it reads as an opening rather than as a zero.
+      expect(find.text('A good day to begin.'), findsOneWidget);
+
+      // The line encourages, which is a departure from the rest of the app,
+      // but it never leans: no countdown, no warning, nothing about what a
+      // missed day costs. This is the half of `StreakPanel`'s argument that
+      // still holds here.
+      final RegExp pressure = RegExp(
+        r"don't|do not|risk|lose|lost|broke|about to|"
+        r'before midnight|hours left|come back',
+        caseSensitive: false,
       );
+      for (final Text text in tester.widgetList<Text>(find.byType(Text))) {
+        expect(text.data ?? '', isNot(matches(pressure)));
+      }
+    });
+
+    testWidgets('a finished run says so, and does not say it twice', (
+      WidgetTester tester,
+    ) async {
+      final UserRepository user = dbs.userRepository(clock: () => now);
+      await user.commit(mixed, DailySection.today);
+      await user.logCompletion(mixed, now.subtract(const Duration(days: 1)));
+      await user.logCompletion(mixed, now);
+
+      await pumpApp(tester);
+
+      // Two days, counting today. The meta line below already says "Done
+      // today", so the line above it does not.
+      expect(find.text('2 days and counting.'), findsOneWidget);
+      expect(find.textContaining('Done today'), findsOneWidget);
+    });
+
+    testWidgets('the run is this collection\'s own, not the app\'s', (
+      WidgetTester tester,
+    ) async {
+      final UserRepository user = dbs.userRepository(clock: () => now);
+      await user.commit(mixed, DailySection.today);
+      await user.commit(simple, DailySection.today);
+      // Something was completed on each of the last three days, so the app's
+      // streak is three — but neither collection has a run of its own.
+      await user.logCompletion(mixed, now.subtract(const Duration(days: 3)));
+      await user.logCompletion(simple, now.subtract(const Duration(days: 2)));
+      await user.logCompletion(mixed, now.subtract(const Duration(days: 1)));
+
+      await pumpApp(tester);
+
+      // The greeting counts everything; the cards count themselves.
+      expect(
+        find.text('3 days in a row. Nothing finished today.'),
+        findsOneWidget,
+      );
+      expect(find.text('One day. Keep going.'), findsNothing);
+      expect(find.text('Day one. Keep going.'), findsOneWidget);
+      expect(find.text('A good day to begin.'), findsOneWidget);
     });
 
     testWidgets('opens the player, and is stale when it comes back', (

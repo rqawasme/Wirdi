@@ -297,6 +297,38 @@ void main() {
     });
   });
 
+  group('currentStreakFor', () {
+    test('counts one collection\'s own run, not the app\'s', () async {
+      now = DateTime(2026, 3, 14, 9);
+      // Something was done on each of the last three days, so the app-wide
+      // run is three — but only one of the two collections kept it up, and
+      // the other one's run ended the day before yesterday.
+      await user.logCompletion(mine, DateTime(2026, 3, 12, 8));
+      await user.logCompletion(builtin, DateTime(2026, 3, 13, 8));
+      await user.logCompletion(builtin, DateTime(2026, 3, 14, 8));
+
+      expect(await user.currentStreak(), 3);
+      expect(await user.currentStreakFor(builtin), 2);
+      expect(await user.currentStreakFor(mine), 0);
+    });
+
+    test('a day still in progress does not break a run', () async {
+      now = DateTime(2026, 3, 14, 9);
+      await user.logCompletion(builtin, DateTime(2026, 3, 12, 8));
+      await user.logCompletion(builtin, DateTime(2026, 3, 13, 8));
+
+      // Nothing today yet, and the day is not over.
+      expect(await user.currentStreakFor(builtin), 2);
+
+      await user.logCompletion(builtin, now);
+      expect(await user.currentStreakFor(builtin), 3);
+    });
+
+    test('a collection that was never completed is at zero', () async {
+      expect(await user.currentStreakFor(mine), 0);
+    });
+  });
+
   group('reading position', () {
     test('is null before anything is saved', () async {
       expect(await user.lastPosition(), isNull);

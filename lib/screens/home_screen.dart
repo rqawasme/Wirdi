@@ -243,11 +243,11 @@ class _Section extends ConsumerWidget {
                 CollectionTile(
                   name: tile.name,
                   nameArabic: tile.nameArabic,
-                  opening: tile.opening,
                   totalCount: tile.totalCount,
                   doneCount: tile.doneCount,
                   completedToday: tile.completedToday,
                   week: tile.week,
+                  streak: tile.streak,
                   onTap: () => _open(context, ref, tile),
                 ),
             ],

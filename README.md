@@ -204,19 +204,21 @@ so ninety-six percent of the way through does not look finished. The count is
 the fraction at rest too — `0/100`, not "100 items" — because a row of tiles is
 read at a glance and a line that changes shape on the first tap cannot be.
 
-**A tile shows the words, not just the name.** Under the name are the first
-words of the wird itself in Naskh, two lines and then ellipsised: a dhikr's own
-text, an ayah's Uthmani text, or a surah's Arabic name. It costs no query —
-the home screen already resolves every committed collection to count its
-repetitions — and it is what makes a grid of tiles worth looking at rather than
-reading. A collection with nothing in it draws no line, and neither does a
-collection with no Arabic name draw an empty box where one would go.
+**A tile is square, and every tile is the same shape.** It holds four short
+things — a name, a line about the run of days, a week of marks and a count —
+and at the width two of them take on a phone, those come to almost exactly a
+square with two lines left over for the name. A name too long for that is
+clipped rather than growing the card; nothing a name does can push the strip or
+the count off the bottom of it.
 
-**A tile is 3:4, and every tile is the same shape.** It was square when it held
-a name and a count, which is a label, and a label does not need height. A name
-too long for the space is clipped rather than growing the card, and what a long
-name costs is its own opening line — never the week strip or the count, which
-are pinned to the foot of the card.
+Two things were tried on the card and taken off again. **The wird's opening
+words** in Naskh under the name, which cost no query and made every tile
+visibly different, read as a second name rather than as an opening and were
+more confusing than blank space. **A voussoir arch watermark** behind the card,
+in `outlineVariant` at 45% — drawn as straight-edged blocks so the app's shape
+language survived it — was ornament that carried nothing, and looked it. The
+card lost its height when the opening text went: a card with air in it is a
+card with nothing in it, whatever is drawn behind the air.
 
 **Seven marks say what the last week held.** One per day, oldest first and today
 last, filled where this collection was completed — the same squared 4dp plate
@@ -227,25 +229,29 @@ seven says it by ending, and pointing at today's empty square is the app leaning
 on somebody about a day they are still in. It costs one indexed query per tile
 against `idx_completions_ref_date`.
 
-**Behind it all, a voussoir arch.** The same Córdoba motif as the stripe, bent:
-thirteen straight-edged blocks around a horseshoe, standing on the bottom edge
-of the card, in `outlineVariant` at 45% — the faintest role in the scheme, taken
-down again because it sits behind text. Nothing about it is curved; the curve is
-in the arrangement and never in a block, which is what keeps it inside a shape
-language that is otherwise squared radii and hairlines. It is the one piece of
-ornament in the app besides the stripe fragment on an empty state, and it is
-allowed because it is quieter than everything it sits behind.
+**One line above the count speaks to the run of days, and it is the only place
+in the app that does.** "A good day to begin.", "3 days. Keep going.", "2 days
+and counting." — this collection's own run, encouraged rather than reported.
+That is a deliberate reversal of the position the rest of the app takes, and
+`StreakPanel` still takes: see the Streaks section, which argues that streak
+pressure aimed at somebody's devotional life is not defensible. The reversal
+was made knowingly, after the argument was put, and it keeps the two halves of
+that argument that survive it. Nothing escalates — the line reads the same at
+three hundred days as at three, so there is no tier to reach and none to fall
+out of. And nothing is negative: a broken run is an invitation to start, never
+a warning, a countdown, or a remark about the days that were missed. A test on
+the home screen fails any text that leans.
 
 **Finished, a tile goes quiet.** The background steps one tonally to
 `surfaceContainerHigh`, the name goes to `onSurfaceVariant`, the meta line
 becomes a check and "Done today", and the stripe is not drawn at all. The week
 strip's filled marks go from brick to `onSurfaceVariant` with it, so a finished
-tile carries no brick anywhere; the arch fades on its own, because the ground
-moved under it — to nothing at all in dark, where `outlineVariant` and
-`surfaceContainerHigh` are the same colour. An earlier draft kept a full brick
-stripe on a completed tile, which made the expected outcome the loudest thing on
-the screen. There is no badge, no colour change and no celebration anywhere on
-this screen.
+tile carries no brick anywhere, and the line above the count stops saying "Done
+today" because the line below it already does. An earlier draft kept a full
+brick stripe on a completed tile, which made the expected outcome the loudest
+thing on the screen. There is no badge and no colour change anywhere on it: the
+one thing this screen now does say out loud is the line about the run of days,
+and it says it in the same 12pt caption as everything else around it.
 
 **The bar is built from `Row` and `InkWell`, not `NavigationBar`.** Material 3
 marks the selected destination with a stadium-shaped pill behind its icon, and
@@ -439,8 +445,18 @@ January in the same colour as 1 February invites the reader to count across a
 boundary it is not showing — so the corner cells are blank.
 
 The whole panel comes off in Settings, defaulting on. It lives on the Tracker
-tab; the one sentence Home says about a streak is the third line of the greeting,
-in 12dp quiet ink, and it reads the same at 365 days as at 2.
+tab; the greeting's third line says the same thing about the app-wide run, in
+12dp quiet ink, and reads the same at 365 days as at 2.
+
+**Home's cards are the exception, and they are an exception on purpose.** Each
+one carries a line about that collection's own run which encourages rather than
+reports — "3 days. Keep going." That contradicts the argument above, and it was
+made anyway, knowingly: the case was put and the call was to encourage on the
+card. What the argument still buys is the shape of the sentence. Nothing on a
+card escalates, so there is no tier to reach and none to fall out of, and
+nothing on a card is negative, so a broken run reads as an invitation to begin
+rather than as a loss to be warned about. If the position is ever restored,
+`_Encouragement` in `collection_tile.dart` is the whole of what has to go.
 
 ### Measuring it
 

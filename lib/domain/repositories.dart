@@ -140,6 +140,15 @@ abstract class UserRepository {
   /// so this counts back from yesterday when today is still empty.
   Future<int> currentStreak();
 
+  /// The same count for [id] alone: consecutive days up to today on which
+  /// this collection in particular was completed.
+  ///
+  /// The app-wide streak answers "have I kept at it"; this answers "have I
+  /// kept at *this*", which is the only one a card about one collection can
+  /// honestly ask. Same rule about today: a day still in progress does not
+  /// break a run.
+  Future<int> currentStreakFor(CollectionId id);
+
   /// What the user has committed to doing, in the order they committed it.
   ///
   /// Spans both databases, like progress and completions do. A commitment

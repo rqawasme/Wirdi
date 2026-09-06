@@ -202,6 +202,12 @@ completionDatesDescending:
 -- home card's week strip is drawn from. No DISTINCT — idx_completions_ref_date
 -- is unique on (collection_ref, date_key), so a day appears at most once, and
 -- that index covers this query exactly.
+-- One collection's whole history, newest first: what its own streak is walked
+-- back through, the way completionDatesDescending serves the app-wide one.
+collectionCompletionDatesDescending:
+    SELECT date_key FROM completions
+    WHERE collection_ref = :ref ORDER BY date_key DESC;
+
 collectionCompletionDatesBetween:
     SELECT date_key FROM completions
     WHERE collection_ref = :ref AND date_key >= :from AND date_key <= :to
