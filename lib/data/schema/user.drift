@@ -198,6 +198,15 @@ completionDatesBetween:
 completionDatesDescending:
     SELECT DISTINCT date_key FROM completions ORDER BY date_key DESC;
 
+-- The same window as completionDatesBetween, for one collection: what the
+-- home card's week strip is drawn from. No DISTINCT — idx_completions_ref_date
+-- is unique on (collection_ref, date_key), so a day appears at most once, and
+-- that index covers this query exactly.
+collectionCompletionDatesBetween:
+    SELECT date_key FROM completions
+    WHERE collection_ref = :ref AND date_key >= :from AND date_key <= :to
+    ORDER BY date_key;
+
 -- ---------------------------------------------------------------------------
 -- Reading position and settings
 -- ---------------------------------------------------------------------------

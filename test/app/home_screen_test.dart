@@ -12,6 +12,7 @@ import 'package:wirdi/theme/theme.dart';
 import 'package:wirdi/widgets/bottom_nav.dart';
 import 'package:wirdi/widgets/collection_tile.dart';
 import 'package:wirdi/widgets/empty_state.dart';
+import 'package:wirdi/widgets/voussoir_arch.dart';
 import 'package:wirdi/widgets/voussoir_stripe.dart';
 
 import '../support/fixtures.dart';
@@ -287,7 +288,7 @@ void main() {
       );
     });
 
-    testWidgets('a tile is square, and stays square under a long name', (
+    testWidgets('every tile is the same shape, whatever its name', (
       WidgetTester tester,
     ) async {
       final UserRepository user = dbs.userRepository(clock: () => now);
@@ -300,11 +301,31 @@ void main() {
       await pumpApp(tester);
 
       // Both of them, side by side: a name that wraps to three lines makes the
-      // same object as one that fits on one.
-      for (final Element element in find.byType(CollectionTile).evaluate()) {
-        final Size size = element.size!;
-        expect(size.width, closeTo(size.height, 0.5));
-      }
+      // same object as one that fits on one. Taller than wide, and one shape
+      // rather than merely one ratio.
+      final Set<Size> shapes = find
+          .byType(CollectionTile)
+          .evaluate()
+          .map((Element element) => element.size!)
+          .toSet();
+      expect(shapes, hasLength(1));
+      expect(
+        shapes.single.width / shapes.single.height,
+        closeTo(CollectionTile.aspectRatio, 0.01),
+      );
+
+      // And what a long name costs is its own opening line, not the strip or
+      // the count: those sit at the same height on both tiles.
+      final List<double> metaTops = find
+          .textContaining('/')
+          .evaluate()
+          .map(
+            (Element element) =>
+                tester.getTopLeft(find.byWidget(element.widget)).dy,
+          )
+          .toList();
+      expect(metaTops, hasLength(2));
+      expect(metaTops.first, closeTo(metaTops.last, 0.5));
     });
 
     testWidgets('a name with no Arabic leaves no line box behind', (
@@ -337,6 +358,162 @@ void main() {
       expect(
         tester.getRect(arabic).right,
         closeTo(tile.right - WirdiMetrics.space3, 1),
+      );
+    });
+
+    testWidgets('shows the words the wird opens with, right-aligned', (
+      WidgetTester tester,
+    ) async {
+      await dbs
+          .userRepository(clock: () => now)
+          .commit(mixed, DailySection.today);
+
+      await pumpApp(tester);
+
+      // The first item of the mixed collection, in its own words rather than
+      // a description of them.
+      final Finder opening = find.text('PLACEHOLDER dhikr 1001 arabic');
+      expect(opening, findsOneWidget);
+
+      // Against the trailing edge of the tile, like the Arabic name above it.
+      final Rect tile = tester.getRect(find.byType(CollectionTile));
+      expect(
+        tester.getRect(opening).right,
+        closeTo(tile.right - WirdiMetrics.space3, 1),
+      );
+
+      // Quieter than the name it sits under, and not the same style: the name
+      // is a bold label, this is the text itself.
+      final TextStyle style = tester.widget<Text>(opening).style!;
+      final TextStyle name = tester
+          .widget<Text>(find.text('PLACEHOLDER collection 1 english'))
+          .style!;
+      expect(style.fontWeight, FontWeight.w400);
+      expect(style.fontSize, lessThan(name.fontSize!));
+      expect(style.color, WirdiTheme.light().colorScheme.onSurfaceVariant);
+    });
+
+    testWidgets('a collection with nothing in it opens with nothing', (
+      WidgetTester tester,
+    ) async {
+      final UserCollectionId empty = await dbs.collectionRepository().create(
+        'Empty',
+      );
+      await dbs
+          .userRepository(clock: () => now)
+          .commit(empty, DailySection.today);
+
+      await pumpApp(tester);
+
+      // No line, and no line box held open for one either — the same rule the
+      // Arabic name follows. The count still sits at the foot of the tile.
+      expect(find.textContaining('PLACEHOLDER'), findsNothing);
+      expect(find.text('0/0'), findsOneWidget);
+    });
+
+    testWidgets('the strip marks the days this collection was done', (
+      WidgetTester tester,
+    ) async {
+      final UserRepository user = dbs.userRepository(clock: () => now);
+      await user.commit(mixed, DailySection.today);
+      await user.commit(simple, DailySection.today);
+
+      // Not today, so the marks stay brick: yesterday, three days ago and six
+      // days ago for one collection, and one other day for the other.
+      for (final int back in <int>[1, 3, 6]) {
+        await user.logCompletion(mixed, now.subtract(Duration(days: back)));
+      }
+      await user.logCompletion(simple, now.subtract(const Duration(days: 2)));
+
+      await pumpApp(tester);
+
+      final ColorScheme scheme = WirdiTheme.light().colorScheme;
+
+      /// The marks of one tile, oldest first: true where it is brick.
+      List<bool> strip(String name) => tester
+          .widgetList<Container>(
+            find.descendant(
+              of: find.ancestor(
+                of: find.text(name),
+                matching: find.byType(CollectionTile),
+              ),
+              matching: find.byType(Container),
+            ),
+          )
+          .map(
+            (Container c) =>
+                (c.decoration! as BoxDecoration).color == scheme.primary,
+          )
+          .toList();
+
+      // Seven marks each, and the last of them is today.
+      expect(strip('PLACEHOLDER collection 1 english'), <bool>[
+        true, // six days ago
+        false,
+        false,
+        true, // three days ago
+        false,
+        true, // yesterday
+        false, // today
+      ]);
+      expect(strip('PLACEHOLDER collection 2 english'), <bool>[
+        false,
+        false,
+        false,
+        false,
+        true, // two days ago
+        false,
+        false,
+      ]);
+    });
+
+    testWidgets('a finished tile carries no brick anywhere', (
+      WidgetTester tester,
+    ) async {
+      final UserRepository user = dbs.userRepository(clock: () => now);
+      await user.commit(mixed, DailySection.today);
+      await user.logCompletion(mixed, now.subtract(const Duration(days: 1)));
+      await user.logCompletion(mixed, now);
+
+      await pumpApp(tester);
+
+      // Two days of history, and neither of them is drawn in brick: the tile
+      // drops its stripe when it is finished, and the strip goes quiet with
+      // it. An earlier draft made the expected outcome the loudest thing in
+      // the section, and this is the same mistake in a smaller mark.
+      final ColorScheme scheme = WirdiTheme.light().colorScheme;
+      final Iterable<Container> brick = tester
+          .widgetList<Container>(
+            find.descendant(
+              of: find.byType(CollectionTile),
+              matching: find.byType(Container),
+            ),
+          )
+          .where(
+            (Container c) =>
+                c.decoration is BoxDecoration &&
+                (c.decoration! as BoxDecoration).color == scheme.primary,
+          );
+      expect(brick, isEmpty);
+    });
+
+    testWidgets('the arch is behind every tile, and says nothing', (
+      WidgetTester tester,
+    ) async {
+      final UserRepository user = dbs.userRepository(clock: () => now);
+      await user.commit(mixed, DailySection.today);
+      await user.commit(simple, DailySection.today);
+
+      await pumpApp(tester);
+
+      expect(find.byType(VoussoirArch), findsNWidgets(2));
+      // A watermark is not a thing a screen reader stops on.
+      expect(
+        find.descendant(
+          of: find.byType(VoussoirArch),
+          matching: find.byType(ExcludeSemantics),
+        ),
+        findsNWidgets(2),
       );
     });
 

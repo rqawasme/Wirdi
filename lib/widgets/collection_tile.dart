@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/theme.dart';
+import 'voussoir_arch.dart';
 import 'voussoir_stripe.dart';
 
 /// One committed collection on the home screen, as a square tile.
@@ -32,11 +33,25 @@ class CollectionTile extends StatelessWidget {
     super.key,
     required this.name,
     this.nameArabic,
+    this.opening,
     required this.totalCount,
     this.doneCount = 0,
     this.completedToday = false,
+    this.week = const <bool>[],
     this.onTap,
   });
+
+  /// Width over height, and the same for every tile on the screen.
+  ///
+  /// Taller than wide, and a fixed ratio rather than a fixed height. The
+  /// square this replaces had nothing in its middle: it held a name and a
+  /// count, which is a label, and a label does not need height. This holds a
+  /// name, the words the wird opens with, a week of history and a count, and
+  /// the ratio is what buys room for the words.
+  ///
+  /// Taller rather than wider because the grid stays two up. A third column
+  /// on a phone makes the names unreadable before it makes the grid denser.
+  static const double aspectRatio = 0.72;
 
   /// The most segments the stripe is cut into. Past this the segments are
   /// thinner than the rhythm reads at, and the stripe stops being countable
@@ -52,6 +67,16 @@ class CollectionTile extends StatelessWidget {
   /// than as alignment.
   final String? nameArabic;
 
+  /// The first thing the collection asks you to say, in Arabic — a dhikr's
+  /// words, an ayah, a surah's name.
+  ///
+  /// This is what fills the card. A name and a count describe a collection
+  /// from outside it; the words are the thing itself, they differ on every
+  /// card, and they are the only part of a grid of these that is worth
+  /// looking at rather than reading. Null for an empty collection, and then
+  /// the line is not drawn.
+  final String? opening;
+
   /// Repetitions in the whole collection.
   final int totalCount;
 
@@ -59,6 +84,10 @@ class CollectionTile extends StatelessWidget {
   final int doneCount;
 
   final bool completedToday;
+
+  /// The last seven days, oldest first: true on a day this was completed.
+  /// Empty to draw no strip at all.
+  final List<bool> week;
 
   final VoidCallback? onTap;
 
@@ -68,6 +97,7 @@ class CollectionTile extends StatelessWidget {
     final ColorScheme scheme = theme.colorScheme;
     final WirdiTypography type = theme.extension<WirdiTypography>()!;
     final String? nameArabic = this.nameArabic;
+    final String? opening = this.opening;
 
     final Color ink = completedToday
         ? scheme.onSurfaceVariant
@@ -95,58 +125,107 @@ class CollectionTile extends StatelessWidget {
               width: WirdiMetrics.hairline,
             ),
           ),
-          // So the stripe's square ends are cut by the card's corners.
+          // So the stripe's square ends and the arch's legs are cut by the
+          // card's corners.
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: onTap,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            child: Stack(
+              fit: StackFit.passthrough,
               children: <Widget>[
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(WirdiMetrics.space3),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        if (nameArabic != null) ...<Widget>[
-                          _ArabicLine(
-                            name: nameArabic,
-                            style: type.arabicChrome.copyWith(
-                              color: scheme.onSurfaceVariant,
-                            ),
-                          ),
-                          const SizedBox(height: WirdiMetrics.space2),
-                        ],
-                        // Takes what height is left and clips: the tile does
-                        // not grow for a long name, and a name too long for
-                        // the square is cut rather than pushing the meta line
-                        // off the bottom of it.
-                        Expanded(
-                          child: ClipRect(
-                            child: Align(
-                              alignment: AlignmentDirectional.topStart,
-                              heightFactor: 1,
-                              child: Text(
-                                name,
-                                style: type.tileName.copyWith(color: ink),
+                // Behind everything, bleeding past the padding to the card's
+                // own edges: the card is a wall the text is set on, not a box
+                // with a picture in it.
+                const Positioned.fill(child: VoussoirArch()),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(WirdiMetrics.space3),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            if (nameArabic != null) ...<Widget>[
+                              _ArabicLine(
+                                name: nameArabic,
+                                style: type.arabicChrome.copyWith(
+                                  color: scheme.onSurfaceVariant,
+                                ),
+                              ),
+                              const SizedBox(height: WirdiMetrics.space2),
+                            ],
+                            // The name and the opening take what height is
+                            // left, together, and are clipped where they run
+                            // out of it: the card does not grow for a long
+                            // name, and neither of them may push the strip or
+                            // the meta line off the bottom of it.
+                            Expanded(
+                              child: ClipRect(
+                                child: Align(
+                                  alignment: AlignmentDirectional.topStart,
+                                  heightFactor: 1,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: <Widget>[
+                                      Text(
+                                        name,
+                                        style: type.tileName.copyWith(
+                                          color: ink,
+                                        ),
+                                      ),
+                                      if (opening != null) ...<Widget>[
+                                        const SizedBox(
+                                          height: WirdiMetrics.space2,
+                                        ),
+                                        _OpeningLine(
+                                          text: opening,
+                                          style: type.arabicTileOpening
+                                              .copyWith(
+                                                color: scheme.onSurfaceVariant,
+                                              ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                            if (week.isNotEmpty) ...<Widget>[
+                              const SizedBox(height: WirdiMetrics.space2),
+                              _WeekStrip(
+                                days: week,
+                                // No brick on a finished card, anywhere. It
+                                // drops its stripe for the same reason: an
+                                // earlier draft made the expected outcome the
+                                // loudest thing in the section.
+                                done: completedToday
+                                    ? scheme.onSurfaceVariant
+                                    : scheme.primary,
+                                notDone: scheme.outline,
+                              ),
+                            ],
+                            const SizedBox(height: WirdiMetrics.space2),
+                            _Meta(
+                              totalCount: totalCount,
+                              doneCount: doneCount,
+                              completedToday: completedToday,
+                              colour: scheme.onSurfaceVariant,
+                              style: type.caption,
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: WirdiMetrics.space2),
-                        _Meta(
-                          totalCount: totalCount,
-                          doneCount: doneCount,
-                          completedToday: completedToday,
-                          colour: scheme.onSurfaceVariant,
-                          style: type.caption,
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+                    if (!completedToday)
+                      VoussoirStripe.progress(
+                        value: _value,
+                        segments: _segments,
+                      ),
+                  ],
                 ),
-                if (!completedToday)
-                  VoussoirStripe.progress(value: _value, segments: _segments),
               ],
             ),
           ),
@@ -164,11 +243,29 @@ class CollectionTile extends StatelessWidget {
 
   /// Read aloud as a sentence, because the tile is a paragraph of quiet facts
   /// and reading it out field by field is not how it is meant to land.
+  ///
+  /// The opening words are not in it. They are Arabic scripture inside an
+  /// English sentence, and a screen reader set to English says them as
+  /// mojibake or says nothing; the card is still fully identified by its name.
+  /// The arch is not in it either — it is a watermark, and it says nothing.
   String get _semanticLabel {
     final String items = '$totalCount ${totalCount == 1 ? 'item' : 'items'}';
-    if (completedToday) return '$name, $items, done today';
-    if (doneCount > 0) return '$name, $doneCount of $totalCount done today';
-    return '$name, $items, not started today';
+    final String today = completedToday
+        ? '$name, $items, done today'
+        : doneCount > 0
+        ? '$name, $doneCount of $totalCount done today'
+        : '$name, $items, not started today';
+    if (week.isEmpty) return today;
+    return '$today. $_weekLabel';
+  }
+
+  /// The strip, as a count rather than seven read-out days. "Four of the last
+  /// seven days" is what the row is for; which four is not something anybody
+  /// listens through seven words to learn.
+  String get _weekLabel {
+    final int done = week.where((bool day) => day).length;
+    if (done == 0) return 'None of the last ${week.length} days';
+    return '$done of the last ${week.length} days';
   }
 }
 
@@ -196,6 +293,95 @@ class _ArabicLine extends StatelessWidget {
         // the *left* edge, which is where an earlier draft put the name.
         textAlign: TextAlign.right,
       ),
+    );
+  }
+}
+
+/// The opening words of the wird, right-aligned under the name.
+///
+/// Two lines at most and ellipsised, so a hundred-word dhikr and a four-word
+/// one make the same card. It is deliberately not the whole text: a card is
+/// not somewhere anybody recites from, and the words are here to be
+/// recognised — this is the one that starts *subhanallahi wa bihamdih* — which
+/// happens inside the first few words or not at all.
+class _OpeningLine extends StatelessWidget {
+  const _OpeningLine({required this.text, required this.style});
+
+  final String text;
+  final TextStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Text(
+        text,
+        style: style,
+        locale: const Locale('ar'),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        // Right, not end: see [_ArabicLine].
+        textAlign: TextAlign.right,
+      ),
+    );
+  }
+}
+
+/// The last seven days of this collection, as seven marks.
+///
+/// A day is the same mark the tracker's calendar uses — a filled square in
+/// [ColorScheme.primary] at the 4dp plate radius, not a circle and not a badge
+/// — shrunk to the size a card can hold. A day that was not done is the same
+/// square in [ColorScheme.outline] rather than an absence, so the row reads as
+/// seven days of which some are done, not as a variable number of dots.
+/// `outline` and not the fainter `outlineVariant`, because that role is the
+/// same colour as a finished card's own ground in dark, and a mark that
+/// vanishes reads as a missing day rather than as an unfinished one.
+///
+/// Today is not marked out from the six behind it. A calendar of thirty-one
+/// cells has to say where you are; a row of seven says it by ending, and
+/// pointing at today's empty square is the app leaning on somebody about a
+/// day they are still in.
+///
+/// It states what happened and stops. There is no number, no "best", nothing
+/// that gets louder as the row fills, and a row of seven blanks says seven
+/// blanks — the app's position on streaks is in `StreakPanel`, and a card is
+/// not the place to start hedging it.
+class _WeekStrip extends StatelessWidget {
+  const _WeekStrip({
+    required this.days,
+    required this.done,
+    required this.notDone,
+  });
+
+  /// The side of one mark. Three base units, and not two: at 8dp the 4dp
+  /// plate radius is half the side, which is a circle, and this app does not
+  /// have circles in it. Seven of these and their gaps come to 108dp, inside
+  /// the narrowest card the grid makes.
+  static const double markSize = WirdiMetrics.space3;
+
+  /// Oldest first, today last.
+  final List<bool> days;
+
+  final Color done;
+  final Color notDone;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        for (final (int i, bool day) in days.indexed) ...<Widget>[
+          if (i > 0) const SizedBox(width: WirdiMetrics.space1),
+          Container(
+            width: markSize,
+            height: markSize,
+            decoration: BoxDecoration(
+              color: day ? done : notDone,
+              borderRadius: WirdiMetrics.chip,
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

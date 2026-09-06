@@ -120,6 +120,20 @@ abstract class UserRepository {
   /// are kept deliberately, so a `collection_ref` here may not resolve.
   Future<List<String>> completionDates({DateTime? from, DateTime? to});
 
+  /// The local days [id] itself was completed on, ascending, within an
+  /// inclusive window.
+  ///
+  /// Unlike [completionDates], which spans everything: this is one
+  /// collection's own history, which is what a home card's week strip is
+  /// drawn from. Bounded rather than open-ended because every caller wants a
+  /// window — nothing needs a collection's whole history yet, and asking for
+  /// it would read the table.
+  Future<List<String>> completionDatesFor(
+    CollectionId id, {
+    required DateTime from,
+    required DateTime to,
+  });
+
   /// Consecutive days up to today on which anything was completed.
   ///
   /// A day with no completion yet does not break the streak until it is over,

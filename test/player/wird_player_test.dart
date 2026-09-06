@@ -759,6 +759,13 @@ class CountingUserRepository implements UserRepository {
       _inner.completionDates(from: from, to: to);
 
   @override
+  Future<List<String>> completionDatesFor(
+    CollectionId id, {
+    required DateTime from,
+    required DateTime to,
+  }) => _inner.completionDatesFor(id, from: from, to: to);
+
+  @override
   Future<int> currentStreak() => _inner.currentStreak();
 
   @override

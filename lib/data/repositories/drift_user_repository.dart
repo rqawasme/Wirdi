@@ -103,6 +103,21 @@ class DriftUserRepository implements UserRepository {
   }
 
   @override
+  Future<List<String>> completionDatesFor(
+    CollectionId id, {
+    required DateTime from,
+    required DateTime to,
+  }) {
+    return _db
+        .collectionCompletionDatesBetween(
+          ref: id.canonical,
+          from: dateKey(from),
+          to: dateKey(to),
+        )
+        .get();
+  }
+
+  @override
   Future<int> currentStreak() async {
     final List<String> days = await _db.completionDatesDescending().get();
     if (days.isEmpty) return 0;

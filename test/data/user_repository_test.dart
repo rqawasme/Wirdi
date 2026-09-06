@@ -170,6 +170,59 @@ void main() {
     });
   });
 
+  group('completionDatesFor', () {
+    test('is one collection\'s own history, not everything\'s', () async {
+      await user.logCompletion(builtin, DateTime(2026, 3, 12, 8));
+      await user.logCompletion(mine, DateTime(2026, 3, 13, 8));
+      await user.logCompletion(builtin, DateTime(2026, 3, 14, 8));
+
+      expect(
+        await user.completionDatesFor(
+          builtin,
+          from: DateTime(2026, 3, 10),
+          to: DateTime(2026, 3, 16),
+        ),
+        <String>['2026-03-12', '2026-03-14'],
+      );
+      expect(
+        await user.completionDatesFor(
+          mine,
+          from: DateTime(2026, 3, 10),
+          to: DateTime(2026, 3, 16),
+        ),
+        <String>['2026-03-13'],
+      );
+    });
+
+    test('honours inclusive bounds at both ends', () async {
+      for (int day = 10; day <= 14; day++) {
+        await user.logCompletion(builtin, DateTime(2026, 3, day, 8));
+      }
+
+      expect(
+        await user.completionDatesFor(
+          builtin,
+          from: DateTime(2026, 3, 11),
+          to: DateTime(2026, 3, 13),
+        ),
+        <String>['2026-03-11', '2026-03-12', '2026-03-13'],
+      );
+    });
+
+    test('a collection with nothing in the window comes back empty', () async {
+      await user.logCompletion(builtin, DateTime(2026, 3, 1, 8));
+
+      expect(
+        await user.completionDatesFor(
+          builtin,
+          from: DateTime(2026, 3, 10),
+          to: DateTime(2026, 3, 16),
+        ),
+        isEmpty,
+      );
+    });
+  });
+
   group('isCompletedToday', () {
     test('follows the local day, not the elapsed time', () async {
       now = DateTime(2026, 3, 14, 23, 59);

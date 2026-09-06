@@ -212,6 +212,30 @@ final class ResolvedCollection {
 
   CollectionId get id => collection.id;
 
+  /// The first thing this collection asks you to say, in Arabic, or null when
+  /// there is nothing in it.
+  ///
+  /// A dhikr's own words and an ayah's Uthmani text; a surah's name, because a
+  /// surah is a reading and its first verse is not what "Al-Mulk" opens with
+  /// from the reader's side. Enough of it to fill two lines of a home card is
+  /// all any caller wants, so no caller trims it here — the text is returned
+  /// whole and the widget that shows it decides where to stop.
+  String? get opening => switch (_firstItem) {
+    DhikrItem(:final Dhikr dhikr) => dhikr.textArabic,
+    AyahItem(:final Ayah ayah) => ayah.textUthmani,
+    SurahItem(:final Surah surah) => surah.nameArabic,
+    null => null,
+  };
+
+  CollectionItemEntry? get _firstItem => switch (entries.firstOrNull) {
+    final CollectionItemEntry item => item,
+    // A collection can open on a repeat block, and what it opens with is that
+    // block's first item.
+    RepeatBlock(:final List<CollectionItemEntry> entries) =>
+      entries.firstOrNull,
+    null => null,
+  };
+
   /// The progress to resume from, or null to start at the beginning.
   ///
   /// Returns null when [progress] points outside [steps], or when the step it

@@ -237,15 +237,17 @@ class _Section extends ConsumerWidget {
             crossAxisCount: 2,
             crossAxisSpacing: WirdiMetrics.space3,
             mainAxisSpacing: WirdiMetrics.space3,
-            childAspectRatio: 1,
+            childAspectRatio: CollectionTile.aspectRatio,
             children: <Widget>[
               for (final CommittedCollection tile in tiles)
                 CollectionTile(
                   name: tile.name,
                   nameArabic: tile.nameArabic,
+                  opening: tile.opening,
                   totalCount: tile.totalCount,
                   doneCount: tile.doneCount,
                   completedToday: tile.completedToday,
+                  week: tile.week,
                   onTap: () => _open(context, ref, tile),
                 ),
             ],

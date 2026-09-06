@@ -4,12 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../domain/collection.dart';
 import '../domain/collection_id.dart';
 import '../domain/commitment.dart';
+import '../domain/date_key.dart';
 import '../domain/playback_step.dart';
 import '../domain/progress.dart';
 import '../domain/repositories.dart';
 import 'collections.dart';
 import 'data_providers.dart';
 import 'streak.dart';
+
+/// How many days of history a card's week strip shows.
+const int weekStripDays = 7;
 
 /// One committed collection, as its tile on the home screen shows it.
 ///
@@ -28,6 +32,8 @@ final class CommittedCollection {
     required this.totalCount,
     required this.doneCount,
     required this.completedToday,
+    required this.week,
+    this.opening,
   });
 
   final CollectionSummary summary;
@@ -48,6 +54,19 @@ final class CommittedCollection {
   /// Finished today. The tile steps down tonally and drops its stripe; it does
   /// not celebrate.
   final bool completedToday;
+
+  /// The last seven days, oldest first and today last: true on a day this
+  /// collection was completed.
+  ///
+  /// This collection's own history, not the app's. The streak on the greeting
+  /// spans everything and answers "have I kept at it"; this answers "have I
+  /// kept at *this*", which is a different question and the only one a card
+  /// about one collection can honestly ask.
+  final List<bool> week;
+
+  /// The first thing the collection asks you to say, in Arabic. Null when the
+  /// collection is empty.
+  final String? opening;
 
   CollectionId get id => summary.id;
 
@@ -153,6 +172,8 @@ final FutureProvider<HomeView> homeViewProvider = FutureProvider<HomeView>((
         totalCount: _repetitions(resolved.steps),
         doneCount: _repetitionsDone(resolved.steps, progress),
         completedToday: await user.isCompletedToday(summary.id),
+        week: await _week(user, summary.id, today),
+        opening: resolved.opening,
       ),
     );
   }
@@ -215,6 +236,29 @@ final class HomeCommitments {
     _ref.invalidate(homeViewProvider);
     _ref.invalidate(commitmentsProvider);
   }
+}
+
+/// The last seven days for one collection, oldest first.
+///
+/// One query per committed collection, inside the loop that already resolves
+/// each of them: the resolve is many reads and this is one index seek on
+/// `idx_completions_ref_date`, so batching the seven-day window across every
+/// collection into a single scan would be optimising the cheap half. If Home
+/// ever gets slow, the resolve is where to look.
+Future<List<bool>> _week(
+  UserRepository user,
+  CollectionId id,
+  DateTime today,
+) async {
+  final Set<String> done = (await user.completionDatesFor(
+    id,
+    from: today.subtract(const Duration(days: weekStripDays - 1)),
+    to: today,
+  )).toSet();
+  return <bool>[
+    for (int back = weekStripDays - 1; back >= 0; back--)
+      done.contains(dateKeyDaysBefore(today, back)),
+  ];
 }
 
 /// Every repetition in the collection: each step's own count, summed.

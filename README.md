@@ -197,17 +197,55 @@ its place in the grid: tiles sit in the order they were committed and nothing
 reorders itself as the day goes on.
 
 **A tile counts repetitions, not entries.** A collection of one dhikr said a
-hundred times reads `40 of 100` and its stripe advances as it is said; counted
-as entries it would be `0 of 1` and the stripe would go from empty to full in a
-single tap. The stripe is cut into `min(repetitions, 12)` segments and quantised
-down, so ninety-six percent of the way through does not look finished.
+hundred times reads `40/100` and its stripe advances as it is said; counted as
+entries it would be `0/1` and the stripe would go from empty to full in a single
+tap. The stripe is cut into `min(repetitions, 12)` segments and quantised down,
+so ninety-six percent of the way through does not look finished. The count is
+the fraction at rest too — `0/100`, not "100 items" — because a row of tiles is
+read at a glance and a line that changes shape on the first tap cannot be.
+
+**A tile shows the words, not just the name.** Under the name are the first
+words of the wird itself in Naskh, two lines and then ellipsised: a dhikr's own
+text, an ayah's Uthmani text, or a surah's Arabic name. It costs no query —
+the home screen already resolves every committed collection to count its
+repetitions — and it is what makes a grid of tiles worth looking at rather than
+reading. A collection with nothing in it draws no line, and neither does a
+collection with no Arabic name draw an empty box where one would go.
+
+**A tile is 3:4, and every tile is the same shape.** It was square when it held
+a name and a count, which is a label, and a label does not need height. A name
+too long for the space is clipped rather than growing the card, and what a long
+name costs is its own opening line — never the week strip or the count, which
+are pinned to the foot of the card.
+
+**Seven marks say what the last week held.** One per day, oldest first and today
+last, filled where this collection was completed — the same squared 4dp plate
+the tracker's calendar uses, at 12dp. It is this collection's own history, where
+the streak on the greeting spans everything. Today is not marked out from the
+six behind it: a calendar of thirty-one cells has to say where you are, a row of
+seven says it by ending, and pointing at today's empty square is the app leaning
+on somebody about a day they are still in. It costs one indexed query per tile
+against `idx_completions_ref_date`.
+
+**Behind it all, a voussoir arch.** The same Córdoba motif as the stripe, bent:
+thirteen straight-edged blocks around a horseshoe, standing on the bottom edge
+of the card, in `outlineVariant` at 45% — the faintest role in the scheme, taken
+down again because it sits behind text. Nothing about it is curved; the curve is
+in the arrangement and never in a block, which is what keeps it inside a shape
+language that is otherwise squared radii and hairlines. It is the one piece of
+ornament in the app besides the stripe fragment on an empty state, and it is
+allowed because it is quieter than everything it sits behind.
 
 **Finished, a tile goes quiet.** The background steps one tonally to
 `surfaceContainerHigh`, the name goes to `onSurfaceVariant`, the meta line
-becomes a check and "Done today", and the stripe is not drawn at all. An earlier
-draft kept a full brick stripe on a completed tile, which made the expected
-outcome the loudest thing on the screen. There is no badge, no colour change and
-no celebration anywhere on this screen.
+becomes a check and "Done today", and the stripe is not drawn at all. The week
+strip's filled marks go from brick to `onSurfaceVariant` with it, so a finished
+tile carries no brick anywhere; the arch fades on its own, because the ground
+moved under it — to nothing at all in dark, where `outlineVariant` and
+`surfaceContainerHigh` are the same colour. An earlier draft kept a full brick
+stripe on a completed tile, which made the expected outcome the loudest thing on
+the screen. There is no badge, no colour change and no celebration anywhere on
+this screen.
 
 **The bar is built from `Row` and `InkWell`, not `NavigationBar`.** Material 3
 marks the selected destination with a stadium-shaped pill behind its icon, and
