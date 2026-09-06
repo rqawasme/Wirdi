@@ -90,4 +90,92 @@ void _tests(File file) {
       }
     }
   });
+
+  test('the three authored collections are the ones that ship', () async {
+    final CollectionRepository repo = DriftCollectionRepository(
+      content: content,
+      user: user,
+    );
+
+    // By id and by name: an id is what a user's commitment points at, and a
+    // name is what they look for. Renumbering one silently repoints saved
+    // commitments at different content, which is the whole reason ids here are
+    // authored rather than generated.
+    expect(<String>[
+      for (final CollectionSummary s in await repo.all()) s.id.canonical,
+    ], containsAll(<String>['b:2', 'b:3', 'b:4']));
+    expect(
+      <String>[for (final CollectionSummary s in await repo.all()) s.name],
+      containsAll(<String>[
+        'Wird of Imam al-Nawawi',
+        'Morning adhkar',
+        'Evening adhkar',
+      ]),
+    );
+  });
+
+  test('the adhkar collections reference the Quran rather than repeat it', () {
+    return Future<void>(() async {
+      final CollectionRepository repo = DriftCollectionRepository(
+        content: content,
+        user: user,
+      );
+
+      for (final int id in <int>[3, 4]) {
+        final ResolvedCollection resolved = await repo.resolve(
+          BuiltinCollectionId(id),
+        );
+        final Set<ContentType> kinds = <ContentType>{
+          for (final CollectionEntry entry in resolved.entries)
+            if (entry is CollectionItemEntry) entry.ref.type,
+        };
+
+        // Al-Ikhlas, al-Falaq and al-Nas are surah items in both; the evening
+        // adds the last two verses of al-Baqarah. Transcribing any of that a
+        // second time is what these assert against.
+        expect(
+          kinds,
+          contains(ContentType.surah),
+          reason: 'collection $id lost its surah items',
+        );
+        expect(kinds, contains(ContentType.dhikr));
+      }
+
+      // The evening ends on 2:285-286, which the authored range expands to two
+      // ayah items at build time.
+      final ResolvedCollection evening = await repo.resolve(
+        const BuiltinCollectionId(4),
+      );
+      expect(
+        <int>[
+          for (final CollectionEntry entry in evening.entries)
+            if (entry is AyahItem) entry.ref.id,
+        ],
+        <int>[2285, 2286],
+      );
+    });
+  });
+
+  test('every dhikr of the adhkar collections cites a source', () async {
+    final CollectionRepository repo = DriftCollectionRepository(
+      content: content,
+      user: user,
+    );
+
+    for (final int id in <int>[3, 4]) {
+      final ResolvedCollection resolved = await repo.resolve(
+        BuiltinCollectionId(id),
+      );
+      for (final CollectionEntry entry in resolved.entries) {
+        if (entry is! DhikrItem) continue;
+        // Sourcing is copy: a reference you have to go looking for is a
+        // reference nobody reads, so every one of these carries its own.
+        expect(
+          entry.source,
+          isNotNull,
+          reason: 'dhikr ${entry.dhikr.id} in collection $id has no source',
+        );
+      }
+    }
+  });
 }
