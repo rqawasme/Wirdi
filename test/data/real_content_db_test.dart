@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wirdi/data/content_database.dart';
+import 'package:wirdi/data/content_stamp.dart';
 import 'package:wirdi/data/repositories/drift_collection_repository.dart';
 import 'package:wirdi/data/repositories/drift_content_repository.dart';
 import 'package:wirdi/data/user_database.dart';
@@ -60,6 +61,23 @@ void _tests(File file) {
     }
 
     expect(await repo.ayahRange(2, 285, 999), hasLength(2));
+  });
+
+  test('bundledContentStamp describes the content that was built', () async {
+    final ContentRepository repo = DriftContentRepository(content);
+    final ContentMetadata meta = await repo.metadata();
+
+    // `tool/sync_content_asset.sh` writes lib/data/content_stamp.dart when it
+    // copies the database into the asset bundle, and the app trusts it to
+    // decide whether an update brought new content. Left stale it would decide
+    // wrongly and silently: the copy in application support would be kept, and
+    // the release would land with the user still reading the old content.
+    expect(
+      bundledContentStamp,
+      '${meta.contentVersion} ${meta.contentChecksum}',
+      reason: 'lib/data/content_stamp.dart is stale — '
+          'run tool/sync_content_asset.sh',
+    );
   });
 
   test('every built-in collection resolves', () async {

@@ -544,6 +544,22 @@ flutter run                                # iOS or Android; there is no web or 
 names it explicitly. A build without it fails with `unable to locate asset`
 rather than producing an app with no content in it.
 
+`sync_content_asset.sh` also writes `lib/data/content_stamp.dart`, which *is*
+committed — it is a Dart source file `lib/data/database_files.dart` imports, and
+a fresh clone would not compile without it. It holds the content version and the
+checksum of the database in the bundle, and it is how the app decides, on the
+first launch after an update, whether to replace the copy it made in application
+support.
+
+That used to be a comparison of the copy's byte length against the asset's,
+which was wrong in the direction that hurts. SQLite allocates in 4 KB pages, so
+a corrected translation, an added note, or a dhikr merged onto another id all
+leave a file of exactly the same size: the copy would be kept and the release
+would land with the user still reading the previous one's content, silently.
+Comparing the stamp instead catches any change to the content, and skips
+reading the 4.6 MB asset entirely when there is nothing to do — so it is also
+the faster path. CI fails if the committed stamp is stale.
+
 ### The theme
 
 Both themes are written out by hand in `lib/theme/color_schemes.dart`. Neither

@@ -293,6 +293,13 @@ always produce the same checksum, and it is stored in `meta.content_checksum`.
 
 Same checksum, same content. Different checksum, something really changed.
 
+It is not only diagnostic. `tool/sync_content_asset.sh` writes the checksum, and
+the content version beside it, into `lib/data/content_stamp.dart`, and that is
+what the app compares against on the first launch after an update to decide
+whether to replace its copy of the database. Bump `sources/VERSION` when the
+content changes in a way worth naming; the checksum covers the rest, including
+every change too small to think to bump a version for.
+
 ## Never invent religious text
 
 No Quranic text, hadith text or dhikr text may be written from memory — not as an

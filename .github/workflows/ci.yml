@@ -93,6 +93,20 @@ jobs:
       - name: Bundle content.db as the app asset
         run: tool/sync_content_asset.sh
 
+      # The step above also writes lib/data/content_stamp.dart, which is
+      # committed because it is a Dart source file the app imports — a fresh
+      # clone would not compile without it, unlike the gitignored asset beside
+      # it. The release build regenerates it too, so a stale commit could not
+      # ship; it would only mean everyone's local `flutter test` disagreed with
+      # CI about what the bundled content is. This is the step that says so.
+      - name: Check the content stamp is up to date
+        run: |
+          if ! git diff --quiet -- lib/data/content_stamp.dart; then
+            echo '::error::lib/data/content_stamp.dart is stale. Run: tool/sync_content_asset.sh'
+            git --no-pager diff -- lib/data/content_stamp.dart
+            exit 1
+          fi
+
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
