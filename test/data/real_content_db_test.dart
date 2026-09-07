@@ -75,7 +75,8 @@ void _tests(File file) {
     expect(
       bundledContentStamp,
       '${meta.contentVersion} ${meta.contentChecksum}',
-      reason: 'lib/data/content_stamp.dart is stale — '
+      reason:
+          'lib/data/content_stamp.dart is stale — '
           'run tool/sync_content_asset.sh',
     );
   });
