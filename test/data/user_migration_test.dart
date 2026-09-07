@@ -69,7 +69,7 @@ void main() {
     windBackTo(1, <String>['DROP TABLE commitments']);
 
     expect(await migrateAndRead(), isEmpty);
-    expect(versionOf(file), 4);
+    expect(versionOf(file), 5);
 
     // And the table it created has the days column, so committing works.
     final UserDatabase db = UserDatabase.openFile(file);
@@ -97,7 +97,7 @@ void main() {
     expect(migrated.section, DailySection.morning);
     // Every day is what a commitment meant when there was no other option.
     expect(migrated.days, Weekdays.everyDay);
-    expect(versionOf(file), 4);
+    expect(versionOf(file), 5);
   });
 
   test('version 2 rewrites the section that was called daily', () async {
@@ -133,7 +133,7 @@ void main() {
     // whole item always is — and where a surah left mid-reading resumes from
     // when it was written before the column existed.
     expect(migrated.unitIndex, 0);
-    expect(versionOf(file), 4);
+    expect(versionOf(file), 5);
   });
 
   test('a database already at the current version is left alone', () async {
@@ -163,14 +163,14 @@ void main() {
       windBackTo(1, <String>[]);
 
       expect(await migrateAndRead(), isEmpty);
-      expect(versionOf(file), 4);
+      expect(versionOf(file), 5);
     });
 
     test('version 1 that created the table but not the index', () async {
       windBackTo(1, <String>['DROP INDEX idx_commitments_section']);
 
       expect(await migrateAndRead(), isEmpty);
-      expect(versionOf(file), 4);
+      expect(versionOf(file), 5);
     });
 
     test('version 2 that already added the column', () async {
@@ -183,7 +183,7 @@ void main() {
       final Commitment migrated = (await migrateAndRead()).single;
       expect(migrated.section, DailySection.today);
       expect(migrated.days, Weekdays.everyDay);
-      expect(versionOf(file), 4);
+      expect(versionOf(file), 5);
     });
 
     test('version 3 that already added the unit column', () async {
@@ -192,7 +192,7 @@ void main() {
       windBackTo(3, <String>[]);
 
       expect(await migrateAndRead(), isEmpty);
-      expect(versionOf(file), 4);
+      expect(versionOf(file), 5);
     });
 
     test('the whole upgrade is safe to run twice', () async {
@@ -202,7 +202,99 @@ void main() {
       // Wound back again over the schema the first run produced.
       windBackTo(1, <String>[]);
       expect(await migrateAndRead(), isEmpty);
-      expect(versionOf(file), 4);
+      expect(versionOf(file), 5);
+    });
+  });
+
+  group('4 -> 5, the merged adhkar', () {
+    /// A user collection holding one item that points at [dhikrId], with
+    /// progress parked on that item.
+    ///
+    /// Clears what a previous call left behind, so a test can seed more than
+    /// one id without colliding on the primary keys.
+    void seedPointingAt(int dhikrId) {
+      windBackTo(4, <String>[
+        'DELETE FROM progress',
+        'DELETE FROM user_collection_items',
+        'DELETE FROM user_collections',
+        'INSERT INTO user_collections (id, name, sort_order, created_at, '
+            "updated_at) VALUES ('u1', 'Mine', 1, 0, 0)",
+        'INSERT INTO user_collection_items (id, collection_id, item_type, '
+            "item_id, position, updated_at) VALUES ('i1', 'u1', 'dhikr', "
+            '$dhikrId, 1, 0)',
+        'INSERT INTO progress (collection_ref, step_index, step_ref, '
+            "current_count, unit_index, updated_at) VALUES ('u:u1', 0, "
+            "'dhikr:$dhikrId', 2, 0, 0)",
+      ]);
+    }
+
+    /// Opens the database, which is what runs the migration, then reads the
+    /// column back off the file the way [versionOf] does.
+    Future<Object?> migrated(String sql) async {
+      final UserDatabase db = UserDatabase.openFile(file);
+      await db.customSelect('SELECT 1').get();
+      await db.close();
+
+      final sqlite3.Database raw = sqlite3.sqlite3.open(file.path);
+      final Object? value = raw.select(sql).single.values.first;
+      raw.close();
+      return value;
+    }
+
+    Future<Object?> migratedItemId() =>
+        migrated('SELECT item_id FROM user_collection_items');
+
+    Future<Object?> migratedStepRef() =>
+        migrated('SELECT step_ref FROM progress');
+
+    test('a saved item pointing at a retired dhikr follows it', () async {
+      // 5003 was the second copy of 2011: the same bismi Llāhi lladhī lā
+      // yaḍurru, authored once for al-Wird al-Latif and once for the wird of
+      // Imam al-Nawawi. Left alone the item would resolve to nothing and
+      // disappear from the user's collection.
+      seedPointingAt(5003);
+
+      expect(await migratedItemId(), 2011);
+      expect(await migratedStepRef(), 'dhikr:2011');
+      expect(versionOf(file), 5);
+    });
+
+    test('progress follows too, so a half-finished wird resumes', () async {
+      // step_ref is compared against the step being resumed at. Left pointing
+      // at the retired id it would no longer match, and the reciter would
+      // silently lose their place.
+      seedPointingAt(5011);
+
+      expect(await migratedStepRef(), 'dhikr:3013');
+    });
+
+    test('every retired id has somewhere to go', () async {
+      for (final int retired in <int>[3004, 5002, 5003, 5011, 5014, 5038]) {
+        seedPointingAt(retired);
+        expect(
+          await migratedItemId(),
+          isNot(retired),
+          reason: 'dhikr $retired was left pointing at a row that is gone',
+        );
+      }
+    });
+
+    test('an item pointing at a surviving dhikr is left alone', () async {
+      seedPointingAt(2011);
+
+      expect(await migratedItemId(), 2011);
+      expect(await migratedStepRef(), 'dhikr:2011');
+    });
+
+    test('the merge is safe to run twice', () async {
+      seedPointingAt(5003);
+      expect(await migratedItemId(), 2011);
+
+      // A retired id never appears as a replacement, so a second pass over an
+      // already-merged database matches nothing rather than chaining on.
+      windBackTo(4, <String>[]);
+      expect(await migratedItemId(), 2011);
+      expect(versionOf(file), 5);
     });
   });
 }

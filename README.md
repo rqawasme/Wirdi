@@ -35,20 +35,34 @@ and **Hizb al-Bahr** of Imam Abu al-Hasan al-Shadhili. Each morning/evening pair
 shares one file of dhikr text — most of what is said in the morning is said
 again in the evening, and the wordings that differ (`asbahna` against
 `amsayna`, and their pairs) sit beside each other rather than being duplicated.
-Their Quranic portions are **not** transcribed: al-Ikhlas, al-Falaq, al-Nas, the
-last two verses of al-Baqarah, the passages al-Wird al-Latif draws from
-al-Muminun, al-Rum, al-Hashr and al-Saffat, and the passages Hizb al-Bahr draws
-from Maryam, Ya Sin, Ta Ha, al-Rahman, Ghafir, al-Buruj and al-Araf are `surah`
-and `ayah` items resolved out of the imported mushaf, so that text exists in
-exactly one place in the database.
 
-Hizb al-Bahr also quotes four passages only in part — the tail of 2:137, of
-12:64 and of 9:129, and 33:11-12 opened on `fa-qadi` in place of the verse's own
+**A dhikr is authored once and reused.** Wirds overlap heavily: the same
+istiʿadha, the same `hasbiya Llah`, the same salawat closing half the litanies.
+Every one of those is one row with one id that each collection points at, with
+a per-item `count` where they disagree on repetitions — dhikr 2011 is recited
+by six of the six collections, at one repetition in the morning and evening
+adhkar and three everywhere else. Counting the same dhikr as two unrelated
+things, and letting two copies of a translation drift apart, is what that
+avoids. `verify_content.py` fails the build if a second copy is ever authored;
+it compares consonantal skeletons, so a copy that merely spells `Allah`
+differently or moves a comma does not slip past.
+
+The collections' Quranic portions are **not** transcribed either: al-Ikhlas,
+al-Falaq, al-Nas, the last two verses of al-Baqarah, the passages al-Wird
+al-Latif draws from al-Muminun, al-Rum, al-Hashr and al-Saffat, and the passages
+Hizb al-Bahr draws from Maryam, Ya Sin, Ta Ha, al-Rahman, Ghafir, al-Buruj and
+al-Araf are `surah` and `ayah` items resolved out of the imported mushaf, so
+that text exists in exactly one place in the database.
+
+Hizb al-Bahr also quotes three passages only in part — the tail of 2:137, the
+tail of 12:64, and 33:11-12 opened on `fa-qadi` in place of the verse's own
 `hunalika`. Reciting the whole verse instead would not be the litany, so those
 are adhkar rather than `ayah` items; their text is nonetheless **sliced out of
 `sources/quran/ayahs.json`** rather than typed, so every Quranic character in
 the database still comes from the imported mushaf, and each carries a `notes`
-naming the verse it is drawn from.
+naming the verse it is drawn from. Its fourth partial quotation, the tail of
+9:129, is dhikr 3013 — the morning and evening adhkar recite the same words, so
+it is that one shared row rather than a fourth slice.
 
 Every id in the database is either computed by a fixed rule or written by hand in
 the source files. Nothing autoincrements. The database is rebuilt from source

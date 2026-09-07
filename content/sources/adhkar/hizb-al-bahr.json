@@ -3,13 +3,6 @@
   "description": "Hizb al-Bahr of Imam Abu al-Hasan al-Shadhili, in the order of the recitation. The Qur'anic passages the litany recites in full are collection items, not adhkar; the fragments here — where the wird recites only part of a verse — are sliced verbatim out of sources/quran/ayahs.json, so no Qur'anic text is transcribed by hand.",
   "adhkar": [
     {
-      "id": 7001,
-      "text_arabic": "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
-      "translation": "In the name of Allah, the Most Compassionate, the Most Merciful.",
-      "default_count": 1,
-      "transliteration": "Bismi Llāhi r-Raḥmāni r-Raḥīm."
-    },
-    {
       "id": 7002,
       "text_arabic": "يَا اللهُ يَاعَلِيُّ يَاعَظِيمُ يَاحَلِيمُ يَاعَلِيمُ، أَنْتَ رَبِّي وَعِلْمُكَ حَسْبِي، فَنِعْمَ الرَّبُّ رَبِّي وَنِعْمَ الْحَسْبُ حَسْبِي، تَنْصُرُ مَنْ تَشَاءُ وَأَنْتَ الْعَزِيزُ الرَّحِيمُ",
       "translation": "O Allah, O High, O Great, O Clement, O All-Knowing; You are my Lord and Your knowledge is my sufficiency; how perfect, then, is my Lord, how perfect my sufficiency! You give victory to whom You will, and You are the Almighty, the Merciful.",
@@ -152,42 +145,6 @@
       "default_count": 3,
       "transliteration": "Fa-Llāhu khayrun ḥāfiẓan wa-Huwa Arḥamu r-rāḥimīn.",
       "notes": "The closing portion of Qur’an 12:64, recited on its own."
-    },
-    {
-      "id": 7022,
-      "text_arabic": "حَسۡبِيَ ٱللَّهُ لَآ إِلَٰهَ إِلَّا هُوَۖ عَلَيۡهِ تَوَكَّلۡتُۖ وَهُوَ رَبُّ ٱلۡعَرۡشِ ٱلۡعَظِيمِ",
-      "translation": "Allah is my sufficiency; there is no god but He. On Him I rely, and He is the Lord of the Mighty Throne.",
-      "default_count": 3,
-      "transliteration": "Ḥasbiya Llāhu lā ilāha illā Huwa, ʿalayhi tawakkaltu wa-Huwa Rabbu l-ʿArshi l-ʿAẓīm.",
-      "notes": "The closing portion of Qur’an 9:129, recited on its own."
-    },
-    {
-      "id": 7023,
-      "text_arabic": "بِسْمِ اللهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
-      "translation": "In the name of Allah, against whose name nothing can cause harm in the earth nor in the sky; and He is the All-Hearing, the All-Knowing.",
-      "default_count": 3,
-      "transliteration": "Bismi Llāhi lladhī lā yaḍurru maʿa smihi shayʾun fi l-arḍi wa-lā fi s-samāʾi wa-Huwa s-Samīʿu l-ʿAlīm."
-    },
-    {
-      "id": 7024,
-      "text_arabic": "أَعُوذُ بِكَلِمَاتِ اللهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
-      "translation": "I seek refuge in the perfect words of Allah from the evil of what He has created.",
-      "default_count": 3,
-      "transliteration": "Aʿūdhu bi-kalimāti Llāhi t-tāmmāti min sharri mā khalaq."
-    },
-    {
-      "id": 7025,
-      "text_arabic": "وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ الْعَلِيِّ الْعَظِيمِ",
-      "translation": "And there is no power and no strength save by Allah, the High, the Great.",
-      "default_count": 3,
-      "transliteration": "Wa-lā ḥawla wa-lā quwwata illā bi-Llāhi l-ʿAliyyi l-ʿAẓīm."
-    },
-    {
-      "id": 7026,
-      "text_arabic": "وَصَلَّى اللهُ عَلَى سَيِّدِنَا مُحَمَّدٍ وَعَلَى آلِهِ وَصَحْبِهِ وَسَلَّمَ",
-      "translation": "And may Allah bless our master Muhammad, and his family and his companions, and grant them peace.",
-      "default_count": 1,
-      "transliteration": "Wa-ṣalla Llāhu ʿalā sayyidinā Muḥammadin wa-ʿalā ālihi wa-ṣaḥbihi wa-sallam."
     }
   ]
 }

@@ -10,7 +10,7 @@
     { "dhikr": 3001 },
     { "dhikr": 3002, "count": 10 },
     { "dhikr": 3003, "count": 100 },
-    { "dhikr": 3004 },
+    { "dhikr": 2011, "count": 1 },
     { "dhikr": 3005 },
     { "surah": 112, "count": 3 },
     { "surah": 113, "count": 3 },
@@ -21,7 +21,7 @@
     { "dhikr": 3014 },
     { "dhikr": 3015 },
     { "dhikr": 3013, "count": 7 },
-    { "dhikr": 3016 },
+    { "dhikr": 3016, "note": "Said in the evening only." },
     { "ayah": "2:285-286", "note": "Said after the sun has set, unlike the rest of the evening adhkar." }
   ]
 }

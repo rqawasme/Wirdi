@@ -104,6 +104,39 @@ Optional, and **omitted entirely when unused**: `transliteration`, `source_id`,
 `benefits`, `notes`. Every `source_id` must resolve against
 `sources/sources.json`.
 
+## One dhikr, one id
+
+Before authoring a dhikr, look for it. Wirds overlap: the same istiʿadha, the
+same `hasbiya Llah`, the same salawat close half of them, and each of those is
+**one** row that every collection reciting it points at. Where two collections
+disagree on repetitions, the row carries the commoner `default_count` and the
+odd one out sets `count` on its item; where a rubric belongs to one collection
+rather than to the dhikr ("said in the evening only"), it goes in the item's
+`note`.
+
+```bash
+# does this dhikr already exist?
+grep -l 'الْعَظِيمِ' content/sources/adhkar/*.json
+```
+
+`verify_content.py` fails the build on a second copy. It compares consonantal
+skeletons — every haraka, every alef and hamza variant and all punctuation
+folded away — so a copy that only spells `Allah` differently or moves a comma
+is still caught:
+
+```
+  no dhikr text appears under two ids                       FAIL  (1 problem(s))
+
+    - dhikr 2011, 5003 are the same text: keep 2011, point the collections
+      using 5003 at it instead
+```
+
+Retiring an id is not free. A user's own collections point at these ids, so
+dropping one means a matching step in `UserDatabase.migration` to move their
+saved rows onto the surviving id — see `_retiredAdhkar` in
+`lib/data/user_database.dart`. Not authoring the duplicate in the first place is
+much cheaper.
+
 ## Authoring collections
 
 One file per collection in `sources/collections/`. Items are listed inline, in
