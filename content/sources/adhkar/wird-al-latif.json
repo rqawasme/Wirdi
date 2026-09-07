@@ -9,20 +9,6 @@
       "transliteration": "Aʿūdhu bi-Llāhi s-samīʿi l-ʿalīmi mina sh-shayṭāni r-rajīm."
     },
     {
-      "id": 5002,
-      "text_arabic": "أَعُوذُ بِكَلِمَاتِ اللهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
-      "translation": "I seek refuge in the perfect words of Allah from the evil of what He has created.",
-      "default_count": 3,
-      "transliteration": "Aʿūdhu bi-kalimāti Llāhi t-tāmmāti min sharri mā khalaq."
-    },
-    {
-      "id": 5003,
-      "text_arabic": "بِسْمِ اللهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
-      "translation": "In the name of Allah, with whose name nothing in the earth or in the heaven can cause harm, and He is the All-Hearing, the All-Knowing.",
-      "default_count": 3,
-      "transliteration": "Bismi Llāhi lladhī lā yaḍurru maʿa smihi shayʾun fī l-arḍi wa-lā fī s-samāʾi wa-huwa s-samīʿu l-ʿalīm."
-    },
-    {
       "id": 5004,
       "text_arabic": "اللَّهُمَّ إِنِّي أَصْبَحْتُ مِنْكَ فِي نِعْمَةٍ وَعَافِيَةٍ وَسِتْرٍ، فَأَتْمِمْ نِعْمَتَكَ عَلَيَّ وَعَافِيَتَكَ وَسِتْرَكَ فِي الدُّنْيَا وَالْآخِرَةِ",
       "translation": "O Allah, I have entered the morning from You in blessing, well-being and covering; so complete Your blessing upon me, and Your well-being, and Your covering, in this world and the next.",
@@ -76,13 +62,6 @@
       "transliteration": "Raḍītu bi-Llāhi rabbā, wa-bi-l-islāmi dīnā, wa-bi-sayyidinā Muḥammadin ṣalla Llāhu ʿalayhi wa-ālihi wa-sallama nabiyyan wa-rasūlā."
     },
     {
-      "id": 5011,
-      "text_arabic": "حَسْبِيَ اللهُ لَا إِلَهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
-      "translation": "Allah is sufficient for me; there is no god but He. In Him I place my trust, and He is the Lord of the mighty throne.",
-      "default_count": 7,
-      "transliteration": "Ḥasbiya Llāhu lā ilāha illā huwa ʿalayhi tawakkaltu wa-huwa rabbu l-ʿarshi l-ʿaẓīm."
-    },
-    {
       "id": 5012,
       "text_arabic": "اللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ وَعَلَى آلِهِ وَصَحْبِهِ وَسَلِّمْ",
       "translation": "O Allah, bless our master Muhammad, and his family and his companions, and grant them peace.",
@@ -95,14 +74,6 @@
       "translation": "O Allah, I ask You for good that comes suddenly, and I seek refuge in You from evil that comes suddenly.",
       "default_count": 1,
       "transliteration": "Allāhumma innī asʾaluka min fujāʾati l-khayr, wa-aʿūdhu bika min fujāʾati sh-sharr."
-    },
-    {
-      "id": 5014,
-      "text_arabic": "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ",
-      "translation": "O Allah, You are my Lord; there is no god but You. You created me and I am Your servant, and I hold to Your covenant and Your promise as far as I am able. I seek refuge in You from the evil of what I have done. I acknowledge before You Your favour upon me, and I confess my sin to You, so forgive me; for none forgives sins but You.",
-      "default_count": 1,
-      "transliteration": "Allāhumma anta rabbī lā ilāha illā anta khalaqtanī wa-anā ʿabduka, wa-anā ʿalā ʿahdika wa-waʿdika mā staṭaʿtu, aʿūdhu bika min sharri mā ṣanaʿtu, abūʾu laka bi-niʿmatika ʿalayya wa-abūʾu bi-dhanbī fa-ghfir lī fa-innahu lā yaghfiru dh-dhunūba illā anta.",
-      "notes": "Sayyid al-istighfār, the foremost wording of seeking forgiveness."
     },
     {
       "id": 5015,
@@ -276,13 +247,6 @@
       "default_count": 1,
       "transliteration": "Allāhumma mā amsā bī min niʿmatin aw bi-aḥadin min khalqika fa-minka waḥdaka lā sharīka lak, fa-laka l-ḥamdu wa-laka sh-shukru ʿalā dhālik.",
       "notes": "The evening wording. Its morning counterpart is a separate dhikr."
-    },
-    {
-      "id": 5038,
-      "text_arabic": "سُبْحَانَ اللهِ وَبِحَمْدِهِ عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ",
-      "translation": "Glory be to Allah and praise be to Him: as many as the number of His creation, as much as pleases Him, as the weight of His throne, and as the ink of His words.",
-      "default_count": 3,
-      "transliteration": "Subḥāna Llāhi wa-bi-ḥamdihi ʿadada khalqih, wa-riḍā nafsih, wa-zinata ʿarshih, wa-midāda kalimātih."
     },
     {
       "id": 5039,

@@ -21,7 +21,7 @@ class UserDatabase extends _$UserDatabase {
   factory UserDatabase.memory() => UserDatabase(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -47,6 +47,14 @@ class UserDatabase extends _$UserDatabase {
     // reciter is on, so backgrounding half way through Al-Mulk resumes at the
     // verse it was left on. Existing rows come forward at 0, the start of the
     // repetition, which is where every step with a single unit always is.
+    // 4 -> 5 follows a content change rather than a schema one. Six adhkar in
+    // content.db were second copies of a dhikr that already had an id — the
+    // same istiʿādha and ḥasbiya Llāh authored once per wird — and collapsing
+    // them onto one id each is what lets a dhikr recited in two wirds be one
+    // thing rather than two. The copies are gone as of this version, so a
+    // user collection still pointing at one would resolve to nothing and the
+    // item would quietly vanish from their collection. This repoints those
+    // rows at the id that survived. See [_retiredAdhkar].
     //
     // Two rules hold every step here, and both were learned the hard way.
     //
@@ -79,11 +87,63 @@ class UserDatabase extends _$UserDatabase {
       if (from < 4 && !await _hasColumn('progress', 'unit_index')) {
         await m.addColumn(progress, progress.unitIndex);
       }
+      if (from < 5) {
+        await _mergeRetiredAdhkar();
+      }
     },
     beforeOpen: (OpeningDetails details) async {
       await customStatement('PRAGMA foreign_keys = ON');
     },
   );
+
+  /// Adhkar that content.db no longer has, and the id that replaced each.
+  ///
+  /// Every one of these was a duplicate: the same words authored a second time
+  /// under a second id because two wirds each carried their own copy. The
+  /// survivor is the lowest id of the group, which is the oldest and so the
+  /// one a user collection is likeliest to be pointing at already.
+  ///
+  /// `content/scripts/verify_content.py` fails the build if a duplicate is
+  /// ever authored again, so this map is a record of one clean-up rather than
+  /// something expected to grow.
+  static const Map<int, int> _retiredAdhkar = <int, int>{
+    3004: 2011,
+    5002: 3016,
+    5003: 2011,
+    5011: 3013,
+    5014: 3001,
+    5038: 3011,
+  };
+
+  /// Repoints saved rows at the surviving id of each merged dhikr.
+  ///
+  /// Idempotent, as every step in the ladder has to be: a retired id appears
+  /// on the left of [_retiredAdhkar] and never on the right, so a second run
+  /// matches nothing.
+  ///
+  /// `progress.step_ref` is rewritten alongside the collection items because
+  /// a resume compares it against the step it is about to resume at: left
+  /// alone it would no longer match, and the reciter would silently lose their
+  /// place in a wird they were half way through.
+  Future<void> _mergeRetiredAdhkar() async {
+    // The item_type guard is not decoration. ayahs.id is
+    // surah_number * 1000 + ayah_number, so every retired dhikr id here is
+    // also a perfectly valid ayah id — 3004 is 3:4 — and an update without it
+    // would repoint ayah items at whatever verse the replacement id names.
+    const String repointItem =
+        'UPDATE user_collection_items SET item_id = ? '
+        "WHERE item_type = 'dhikr' AND item_id = ?";
+    const String repointProgress =
+        'UPDATE progress SET step_ref = ? WHERE step_ref = ?';
+
+    for (final MapEntry<int, int> entry in _retiredAdhkar.entries) {
+      await customStatement(repointItem, <Object>[entry.value, entry.key]);
+      await customStatement(repointProgress, <Object>[
+        'dhikr:${entry.value}',
+        'dhikr:${entry.key}',
+      ]);
+    }
+  }
 
   /// Whether [table] already has [column].
   ///

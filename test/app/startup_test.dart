@@ -110,20 +110,105 @@ void main() {
     );
   });
 
-  test('a stale copy is replaced when the asset changes size', () async {
+  test('a stale copy is replaced when the content changes', () async {
     if (!await assetIsBundled()) {
       markTestSkipped('assets/content.db not built — see the file comment');
       return;
     }
 
     final File target = File(p.join(support.path, 'content.db'));
-    // Stand in for an app update whose content.db is a different size.
     await target.writeAsBytes(<int>[1, 2, 3], flush: true);
 
     final File refreshed = await files.ensureContentDatabase();
 
     expect(
       await refreshed.length(),
+      (await rootBundle.load(files.contentAsset)).lengthInBytes,
+    );
+  });
+
+  test('a copy made by an older install, which left no stamp, is '
+      'replaced', () async {
+    if (!await assetIsBundled()) {
+      markTestSkipped('assets/content.db not built — see the file comment');
+      return;
+    }
+
+    // What upgrading from a release before the stamp existed looks like: the
+    // copy is there and is perfectly valid, and nothing beside it says which
+    // content it holds.
+    await files.ensureContentDatabase();
+    final File stamp = File(p.join(support.path, 'content.stamp'));
+    await stamp.delete();
+    final File target = File(p.join(support.path, 'content.db'));
+    await files.ensureContentDatabase();
+
+    expect(
+      stamp.existsSync(),
+      isTrue,
+      reason: 'the refreshed copy must leave a stamp for the next launch',
+    );
+    expect(await stamp.readAsString(), files.contentStamp);
+    expect(
+      await target.length(),
+      (await rootBundle.load(files.contentAsset)).lengthInBytes,
+    );
+  });
+
+  test('new content of the same size still replaces the copy', () async {
+    if (!await assetIsBundled()) {
+      markTestSkipped('assets/content.db not built — see the file comment');
+      return;
+    }
+
+    // The regression this check exists for. Comparing byte lengths, which is
+    // what it used to do, this is indistinguishable from an up-to-date copy:
+    // SQLite allocates in 4 KB pages, so correcting a translation or merging a
+    // dhikr onto another id leaves a file of exactly the same length, and the
+    // release would land with the user still reading the old content.
+    await files.ensureContentDatabase();
+    final File target = File(p.join(support.path, 'content.db'));
+    final int sizeBefore = await target.length();
+
+    // The same files, told that the update they ship carries different
+    // content — the asset itself cannot be swapped inside a test.
+    final WirdiDatabaseFiles updated = WirdiDatabaseFiles(
+      supportDirectory: () async => support,
+      documentsDirectory: () async => documents,
+      contentStamp: '9.9.9 ${'0' * 64}',
+    );
+
+    await updated.ensureContentDatabase();
+
+    expect(
+      await target.length(),
+      sizeBefore,
+      reason: 'the asset is the same size, which is the whole point',
+    );
+    expect(
+      await File(p.join(support.path, 'content.stamp')).readAsString(),
+      updated.contentStamp,
+      reason: 'the copy was not refreshed for content of an identical size',
+    );
+  });
+
+  test('the stamp is written after the database, never before', () async {
+    if (!await assetIsBundled()) {
+      markTestSkipped('assets/content.db not built — see the file comment');
+      return;
+    }
+
+    // A stamp left over from a previous copy must not vouch for a database
+    // that was only half written before the process died.
+    final File stamp = File(p.join(support.path, 'content.stamp'));
+    await stamp.parent.create(recursive: true);
+    await stamp.writeAsString(files.contentStamp, flush: true);
+
+    // No content.db beside it: the stamp alone must not be taken as proof.
+    final File copied = await files.ensureContentDatabase();
+
+    expect(
+      await copied.length(),
       (await rootBundle.load(files.contentAsset)).lengthInBytes,
     );
   });

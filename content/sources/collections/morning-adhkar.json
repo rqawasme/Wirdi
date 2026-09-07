@@ -10,7 +10,7 @@
     { "dhikr": 3001 },
     { "dhikr": 3002, "count": 10 },
     { "dhikr": 3003, "count": 100 },
-    { "dhikr": 3004 },
+    { "dhikr": 2011, "count": 1 },
     { "dhikr": 3005 },
     { "surah": 112, "count": 3 },
     { "surah": 113, "count": 3 },

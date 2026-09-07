@@ -38,6 +38,48 @@ ITEM_TARGETS = {
 
 MAX_DETAIL_LINES = 10
 
+# The sentinel content/examples/ uses in place of religious text, which no real
+# dhikr may be written from memory to stand in for. Every example dhikr carries
+# it, so it is the one string that is legitimately repeated across ids — see
+# content/examples/README.md.
+PLACEHOLDER_TEXT = "PLACEHOLDER — to be filled by Rashid"
+
+# Two adhkar are the same dhikr when they are the same words, and the source
+# texts they are copied out of do not agree on how to spell those words: one
+# writes ٱللَّه with alef wasla and another الله, one vocalises a madda and
+# another does not, one puts a comma where another puts none. Comparing raw
+# text would call those distinct and let the duplicate through, which is the
+# whole failure this check exists to catch — so the comparison is made on the
+# consonantal skeleton, with every mark, every alef and hamza variant, and
+# every punctuation mark folded away.
+#
+# It is deliberately aggressive. Two adhkar that survive this normalisation
+# identical really are the same words, and belong to one id that every
+# collection reciting them points at.
+_ALEF_FORMS = str.maketrans({"أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا",
+                             "ة": "ه", "ى": "ي"})
+
+
+def _skeleton(text: str) -> str:
+    """`text` reduced to bare letters and single spaces."""
+    stripped = "".join(
+        ch
+        for ch in text
+        # Combining marks: harakat and tanwin, the Quranic annotation and waqf
+        # signs QUL's Uthmani text carries, and the superscript alef.
+        if not (
+            0x0610 <= ord(ch) <= 0x061A
+            or 0x064B <= ord(ch) <= 0x065F
+            or ord(ch) == 0x0670
+            or 0x06D6 <= ord(ch) <= 0x06ED
+        )
+    )
+    letters = "".join(
+        ch if ("\u0620" <= ch <= "\u064A" or ch.isspace()) else " "
+        for ch in stripped.translate(_ALEF_FORMS)
+    )
+    return " ".join(letters.split())
+
 
 class Check:
     """One named invariant and whatever went wrong with it."""
@@ -196,6 +238,35 @@ class Verifier:
         for row in rows:
             check.fail(f"dhikr {row['id']} references missing source_id {row['source_id']}")
 
+    def no_duplicate_adhkar(self) -> None:
+        """One dhikr, one id.
+
+        Wirds overlap: the same istiʿādha, the same ḥasbiya Llāh, the same
+        ṣalawāt close half the litanies in the corpus. Every one of them is
+        meant to be authored once and pointed at from each collection that
+        recites it, with a per-item `count` where they differ on repetitions.
+
+        A second copy under a second id is not a cosmetic problem. A user who
+        recites the same dhikr in two wirds has it counted as two unrelated
+        things; correcting a translation fixes it in one collection and not the
+        other; and the copies drift apart over time, which is how a corpus of
+        religious text quietly stops agreeing with itself.
+        """
+        check = self.check("no dhikr text appears under two ids")
+        seen: dict[str, list[int]] = {}
+        for row in self.q("SELECT id, text_arabic FROM adhkar ORDER BY id"):
+            if row["text_arabic"] == PLACEHOLDER_TEXT:
+                continue
+            seen.setdefault(_skeleton(row["text_arabic"]), []).append(row["id"])
+        for ids in seen.values():
+            if len(ids) > 1:
+                keep, *drop = ids
+                check.fail(
+                    f"dhikr {', '.join(str(i) for i in ids)} are the same text: "
+                    f"keep {keep}, point the collections using "
+                    f"{', '.join(str(i) for i in drop)} at it instead"
+                )
+
     def legal_enums(self) -> None:
         check = self.check("every item_type and collection type is legal")
         placeholders = ", ".join("?" for _ in ITEM_TYPES)
@@ -257,6 +328,7 @@ class Verifier:
         self.unique_positions()
         self.repeat_groups()
         self.adhkar_sources()
+        self.no_duplicate_adhkar()
         self.legal_enums()
         self.meta_keys()
         self.no_autoincrement()
