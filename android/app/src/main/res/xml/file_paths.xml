@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- `cache-path` is Context.getCacheDir(), which is exactly what
+         path_provider's getTemporaryDirectory() returns on Android, and
+         `updates/` is the subdirectory UpdateClient.downloadAndInstall writes
+         into. The two have to agree: FileProvider.getUriForFile throws
+         IllegalArgumentException for a file outside the paths declared here.
+         test/app/update_manifest_test.dart is what keeps them honest. -->
+    <cache-path name="updates" path="updates/" />
+</paths>

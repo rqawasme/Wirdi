@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../domain/content.dart';
 import '../providers/reading.dart';
 import '../providers/settings.dart';
+import '../providers/updates.dart';
 import '../theme/theme.dart';
 import '../widgets/about_sheet.dart';
 import '../widgets/ayah_block.dart';
@@ -103,6 +104,24 @@ class SettingsScreen extends ConsumerWidget {
                   value: settings.showStreak,
                   onChanged: controller.setShowStreak,
                 ),
+                // Absent on iOS and in a build with no updater compiled in,
+                // rather than present and inert: a switch that cannot do
+                // anything is worse than no switch.
+                if (ref.watch(selfUpdateSupportedProvider))
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Check for updates'),
+                    // Says what it does and what it costs, in that order. The
+                    // second sentence is the one worth reading: this switch is
+                    // the only thing in the app that opens a socket.
+                    subtitle: const Text(
+                      'Asks GitHub once a launch whether a newer version has '
+                      'been released. Off, the app makes no network calls at '
+                      'all',
+                    ),
+                    value: settings.checkForUpdates,
+                    onChanged: controller.setCheckForUpdates,
+                  ),
                 const SizedBox(height: WirdiMetrics.space4),
                 SettingChoice<ThemeMode>(
                   label: 'Theme',

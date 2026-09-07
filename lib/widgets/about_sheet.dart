@@ -102,10 +102,23 @@ class AboutContent extends ConsumerWidget {
         const _Body('Published by Abul-Qasim Publishing House.'),
 
         const SizedBox(height: WirdiMetrics.space6),
+        const _Section(title: 'Updates'),
+        // Here because the sheet is where somebody looks to find out what the
+        // app is doing, and "it opens a socket, sometimes" is exactly that
+        // kind of fact. Stated whether or not the setting is on: what matters
+        // is that the default is off and that this is the only exception.
+        const _Body(
+          'Off unless you turn it on in Settings. On, Wirdi asks GitHub once a '
+          'launch which version was published most recently, and downloads it '
+          'only when you tap the notice. It sends nothing about you, and '
+          'nothing else in the app touches the network.',
+        ),
+
+        const SizedBox(height: WirdiMetrics.space6),
         const _Section(title: 'Fonts'),
         const _Body(
           'All three are bundled with the app and licensed under the SIL Open '
-          'Font License. Nothing is fetched at runtime.',
+          'Font License. No font, and no content, is fetched at runtime.',
         ),
         const SizedBox(height: WirdiMetrics.space2),
         for (final MapEntry<String, String> entry in fontLicences.entries)

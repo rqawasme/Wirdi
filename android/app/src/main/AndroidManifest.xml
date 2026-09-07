@@ -1,4 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The self-updater, and nothing else in this app, needs either of these.
+         Wirdi is otherwise a zero-permission app and the release manifest
+         declared nothing at all before this feature.
+
+         Both come out again before this app is submitted to Play:
+         REQUEST_INSTALL_PACKAGES gets an app rejected unless installing
+         packages is a core advertised feature. Turning the Dart off with the
+         WIRDI_SELF_UPDATE dart-define is only half of that removal: a
+         dart-define cannot reach this file. See docs/SELF_UPDATE.md. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+
     <application
         android:label="Wirdi"
         android:name="${applicationName}"
@@ -30,6 +42,22 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- Hands the downloaded APK to the system installer as a content://
+             URI. Since API 24 a file:// URI in an Intent throws
+             FileUriExposedException, so there is no way to start an install
+             without a provider. Scoped to exactly one directory: `updates/`
+             under the app's cache, which is where UpdateClient writes the
+             download and all that res/xml/file_paths.xml permits. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.updates"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
