@@ -4,11 +4,21 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Called by the release workflow, so that the gate in front of a release is
+  # this exact suite rather than a copy of it that drifts.
+  workflow_call:
 
-# A second push to a PR makes the first run's answer irrelevant.
+# A second push to a PR makes the first run's answer irrelevant. A second push
+# to main does not: a push to main can be the one a release is being cut from,
+# and cancelling that run would cancel the release's gate. So cancellation is
+# for pull requests only — which is the case it was ever wanted for.
+#
+# The group is scoped by workflow name as well, so that a release run's call
+# into this workflow and the ordinary CI run for the same commit on main do not
+# queue behind one another.
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   checks:
@@ -75,6 +85,8 @@ jobs:
           channel: stable
           # Pinned: drift's generated code is committed, and a toolchain bump
           # should be a deliberate commit rather than a surprise red build.
+          # Keep in step with the pin in .github/workflows/release.yml, so the
+          # toolchain that tests a release is the one that builds it.
           flutter-version: 3.47.2
           cache: true
 

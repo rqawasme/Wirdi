@@ -1,0 +1,269 @@
+name: Release
+
+# The trigger is a version change on main, not a tag push: the version lives in
+# pubspec.yaml, which is the one place Flutter reads it from for both platforms,
+# so bumping it there is the whole ceremony. The tag is an output of a release
+# rather than the thing that starts one, which keeps a tag from ever naming a
+# commit whose tests never ran.
+on:
+  push:
+    branches: [main]
+  # Re-runs a release for the current pubspec version — for when the version
+  # bump landed but the release itself failed on something unrelated, and a
+  # second bump would be a lie about what changed. Still refuses to overwrite a
+  # version already tagged.
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  # Deliberately not cancel-in-progress: a half-finished release that has
+  # already created the tag is worse than a queued one.
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  # Keep in step with the pin in .github/workflows/ci.yml.
+  FLUTTER_VERSION: 3.47.2
+
+jobs:
+  detect:
+    name: detect a version change
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.detect.outputs.version }}
+      release: ${{ steps.detect.outputs.release }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # HEAD^ is what the current version is compared against, and the tags
+          # are what stops an already-released version being released twice.
+          fetch-depth: 2
+          fetch-tags: true
+
+      - name: Read the version and decide
+        id: detect
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+
+          # `version: 0.1.0` or `version: 0.1.0+7`, with an optional trailing
+          # comment. The build number is not part of the release identity — CI
+          # supplies its own, monotonically — so only the part before the `+`
+          # is read here.
+          read_version() {
+            sed -n 's/^version:[[:space:]]*\([^[:space:]#]*\).*/\1/p' | head -n1
+          }
+
+          version="$(read_version < pubspec.yaml)"
+          version="${version%%+*}"
+
+          if [ -z "$version" ]; then
+            echo "::error file=pubspec.yaml::pubspec.yaml has no version: line."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Version at HEAD: $version"
+
+          if git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
+            echo "release=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::v$version is already tagged — nothing to release. Bump the version in pubspec.yaml."
+            exit 0
+          fi
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "release=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Manual run — releasing v$version."
+            exit 0
+          fi
+
+          # `git show` against a missing parent (the very first commit) is not
+          # an error here: no previous version means this one is new.
+          previous="$(git show HEAD^:pubspec.yaml 2>/dev/null | read_version || true)"
+          previous="${previous%%+*}"
+          echo "Version at HEAD^: ${previous:-<none>}"
+
+          if [ "$version" = "$previous" ]; then
+            echo "release=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Version unchanged at $version — no release."
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Version changed ${previous:-<none>} -> $version — releasing."
+          fi
+
+  # The gate. This is the CI workflow itself rather than a copy of its steps, so
+  # "the tests passed" means the same thing for a release as it does for a PR.
+  test:
+    name: test
+    needs: detect
+    if: needs.detect.outputs.release == 'true'
+    uses: ./.github/workflows/ci.yml
+
+  android:
+    name: build the Android APK
+    needs: [detect, test]
+    runs-on: ubuntu-latest
+    outputs:
+      signed: ${{ steps.signing.outputs.signed }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/prepare-flutter-build
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      # android/app/build.gradle.kts picks the release signing config up from
+      # android/key.properties, and falls back to the debug keys when that file
+      # is absent. Absent is the honest state for a repository that has not been
+      # given a keystore yet: the build still produces an installable APK, and
+      # the release notes say plainly that it is not distributable.
+      - name: Configure release signing
+        id: signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${KEYSTORE_BASE64:-}" ]; then
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::ANDROID_KEYSTORE_BASE64 is not set. Building with the debug keys — the APK will not be distributable. See docs/RELEASING.md."
+            exit 0
+          fi
+
+          # Half-configured is worse than unconfigured: it produces an APK
+          # signed with a key nobody meant to use, or a confusing Gradle error.
+          missing=""
+          [ -n "${STORE_PASSWORD:-}" ] || missing="$missing ANDROID_KEYSTORE_PASSWORD"
+          [ -n "${KEY_ALIAS:-}" ] || missing="$missing ANDROID_KEY_ALIAS"
+          [ -n "${KEY_PASSWORD:-}" ] || missing="$missing ANDROID_KEY_PASSWORD"
+          if [ -n "$missing" ]; then
+            echo "::error::ANDROID_KEYSTORE_BASE64 is set but these are not:$missing"
+            exit 1
+          fi
+
+          printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/upload-keystore.jks"
+
+          # An absolute path, because Gradle resolves a relative storeFile
+          # against android/app rather than against key.properties.
+          {
+            echo "storeFile=$RUNNER_TEMP/upload-keystore.jks"
+            echo "storePassword=$STORE_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "keyPassword=$KEY_PASSWORD"
+          } > android/key.properties
+
+          echo "signed=true" >> "$GITHUB_OUTPUT"
+          echo "Release keystore configured."
+
+      # --build-number is the run number rather than anything in pubspec.yaml:
+      # Play rejects an upload whose versionCode it has seen before, and a
+      # number that only ever goes up is one less thing to remember at bump
+      # time. The user-visible version name still comes from pubspec.yaml.
+      - name: Build the APK
+        run: flutter build apk --release --build-number=${{ github.run_number }}
+
+      - name: Name the APK after its version
+        env:
+          VERSION: ${{ needs.detect.outputs.version }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          mv build/app/outputs/flutter-apk/app-release.apk "dist/wirdi-$VERSION.apk"
+          ls -l dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: dist/*.apk
+          if-no-files-found: error
+          retention-days: 7
+
+  ios:
+    name: build the iOS app
+    needs: [detect, test]
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/prepare-flutter-build
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      # --no-codesign, because signing needs an Apple Developer certificate and
+      # a provisioning profile that this repository does not hold. What comes
+      # out is a real release build that cannot be installed through the normal
+      # route; it is here to be archived and to be sideloaded by tools that
+      # re-sign it themselves. `flutter build ipa` is not usable without those
+      # credentials, so the .app is packaged into the Payload/ layout by hand —
+      # which is all an .ipa is.
+      - name: Build the iOS app
+        run: flutter build ios --release --no-codesign --build-number=${{ github.run_number }}
+
+      - name: Package it as an unsigned .ipa
+        env:
+          VERSION: ${{ needs.detect.outputs.version }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist build/payload/Payload
+          cp -R build/ios/iphoneos/Runner.app build/payload/Payload/
+          (cd build/payload && zip -qry "$GITHUB_WORKSPACE/dist/wirdi-$VERSION-unsigned.ipa" Payload)
+          ls -l dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: dist/*.ipa
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    name: publish the release
+    needs: [detect, android, ios]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.detect.outputs.version }}
+          ANDROID_SIGNED: ${{ needs.android.outputs.signed }}
+        run: |
+          set -euo pipefail
+          ls -l dist
+
+          if [ "$ANDROID_SIGNED" = "true" ]; then
+            apk_note="Signed with the upload keystore."
+          else
+            apk_note="**Signed with the Android debug keys**, because no release keystore is configured. Installable for testing; not distributable through Play, and anyone can re-sign it. See \`docs/RELEASING.md\`."
+          fi
+
+          notes="$(cat <<EOF
+          Wirdi $VERSION, built from \`${GITHUB_SHA:0:8}\` after the full test suite passed.
+
+          Build number \`${{ github.run_number }}\` — the version name comes from \`pubspec.yaml\`, the build number from the CI run, so it only ever goes up.
+
+          ### Artifacts
+
+          - \`wirdi-$VERSION.apk\` — Android. $apk_note
+          - \`wirdi-$VERSION-unsigned.ipa\` — iOS, **unsigned**. Built with \`--no-codesign\`: it needs re-signing with your own certificate before a device will install it.
+          EOF
+          )"
+
+          # The tag is created by this command, at this commit, and only now —
+          # after the tests and both builds have gone green.
+          gh release create "v$VERSION" \
+            --title "Wirdi $VERSION" \
+            --notes "$notes" \
+            --target "$GITHUB_SHA" \
+            dist/*

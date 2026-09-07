@@ -1,8 +1,33 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
+
+// Release signing is configured out of band, through `android/key.properties`,
+// which is gitignored along with the keystore it points at. CI writes both from
+// repository secrets before building. When the file is absent — a fresh clone, a
+// fork, a pull request from someone without access to the secrets — the release
+// build falls back to the debug keys so that `flutter build apk --release` still
+// works locally. The release workflow reads the same file to decide whether the
+// APK it produces is distributable, so an unsigned build is labelled rather than
+// silently published as if it were signed.
+val keystorePropertiesFile: File = rootProject.file("key.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.inputStream().use(keystoreProperties::load)
+}
+
+// A key.properties written by hand and missing a line would otherwise fail deep
+// inside the signing task, with a message that does not name what is missing.
+fun keystoreProperty(name: String): String =
+    keystoreProperties.getProperty(name)
+        ?: throw GradleException(
+            "android/key.properties has no '$name'. It needs storeFile, " +
+                "storePassword, keyAlias and keyPassword — see docs/RELEASING.md.",
+        )
 
 android {
     namespace = "app.wirdi"
@@ -28,11 +53,30 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (keystorePropertiesFile.exists()) {
+            create("release") {
+                // An absolute path: Gradle resolves a relative one against
+                // this module's directory, android/app, rather than against
+                // key.properties, which is rarely what was meant.
+                storeFile = file(keystoreProperty("storeFile"))
+                storePassword = keystoreProperty("storePassword")
+                keyAlias = keystoreProperty("keyAlias")
+                keyPassword = keystoreProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (keystorePropertiesFile.exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                // Debug keys, so a local `flutter build apk --release` works
+                // without a keystore. Not distributable: Play rejects it, and
+                // the debug key is a well-known one anybody can re-sign with.
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }
