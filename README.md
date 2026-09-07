@@ -28,17 +28,27 @@ Only the raw QUL exports it was generated from are left out, and only because th
 are bulky and needed just to regenerate. See
 [`content/sources/quran/README.md`](content/sources/quran/README.md) for that.
 
-Five collections are authored and built in: the **wird of Imam al-Nawawi**; the
+Six collections are authored and built in: the **wird of Imam al-Nawawi**; the
 **morning** and **evening adhkar**, summarised from the works of Shaykh Abd
-al-Aziz al-Tarefe; and **al-Wird al-Latif** of Imam al-Haddad, morning and
-evening. Each morning/evening pair shares one file of dhikr text — most of what
-is said in the morning is said again in the evening, and the wordings that
-differ (`asbahna` against `amsayna`, and their pairs) sit beside each other
-rather than being duplicated. Their Quranic portions are **not** transcribed:
-al-Ikhlas, al-Falaq, al-Nas, the last two verses of al-Baqarah and the passages
-al-Wird al-Latif draws from al-Muminun, al-Rum, al-Hashr and al-Saffat are
-`surah` and `ayah` items resolved out of the imported mushaf, so that text
-exists in exactly one place in the database.
+al-Aziz al-Tarefe; **al-Wird al-Latif** of Imam al-Haddad, morning and evening;
+and **Hizb al-Bahr** of Imam Abu al-Hasan al-Shadhili. Each morning/evening pair
+shares one file of dhikr text — most of what is said in the morning is said
+again in the evening, and the wordings that differ (`asbahna` against
+`amsayna`, and their pairs) sit beside each other rather than being duplicated.
+Their Quranic portions are **not** transcribed: al-Ikhlas, al-Falaq, al-Nas, the
+last two verses of al-Baqarah, the passages al-Wird al-Latif draws from
+al-Muminun, al-Rum, al-Hashr and al-Saffat, and the passages Hizb al-Bahr draws
+from Maryam, Ya Sin, Ta Ha, al-Rahman, Ghafir, al-Buruj and al-Araf are `surah`
+and `ayah` items resolved out of the imported mushaf, so that text exists in
+exactly one place in the database.
+
+Hizb al-Bahr also quotes four passages only in part — the tail of 2:137, of
+12:64 and of 9:129, and 33:11-12 opened on `fa-qadi` in place of the verse's own
+`hunalika`. Reciting the whole verse instead would not be the litany, so those
+are adhkar rather than `ayah` items; their text is nonetheless **sliced out of
+`sources/quran/ayahs.json`** rather than typed, so every Quranic character in
+the database still comes from the imported mushaf, and each carries a `notes`
+naming the verse it is drawn from.
 
 Every id in the database is either computed by a fixed rule or written by hand in
 the source files. Nothing autoincrements. The database is rebuilt from source
