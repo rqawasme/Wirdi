@@ -96,8 +96,13 @@ neither `flutter analyze` nor `dart format` crosses.
 
 ## What is not covered by tests
 
-The install intent, the settings round trip and `canRequestPackageInstalls()`
-need a device. On a phone, check:
+The Kotlin itself is compiled: `.github/workflows/ci.yml` builds a debug APK on
+every pull request, which also merges the manifest and links the resources, so a
+bad `FileProvider` authority or a missing `@xml/file_paths` fails there rather
+than on a phone.
+
+What no CI can reach is the device: the install intent, the settings round trip
+and `canRequestPackageInstalls()`. On a phone, check:
 
 1. With the setting off, no notice appears even when a newer release exists.
 2. Turning it on and relaunching shows the notice, naming the right version and

@@ -5,13 +5,14 @@ import 'package:wirdi/data/update_client.dart';
 
 /// The strings the Dart and the Android halves of the updater have to agree on.
 ///
-/// Nothing else checks these. `analysis_options.yaml` excludes `android/**`,
-/// `dart format` covers only `lib test tool`, and no workflow compiles the
-/// Android app except during a release — so a renamed channel or a mistyped
-/// authority is invisible until it is a MissingPluginException or an
-/// IllegalArgumentException on a phone. This is the same idea as
-/// `test/app_version_test.dart`: a duplicated string is safe only if something
-/// fails when the copies drift.
+/// `analysis_options.yaml` excludes `android/**` and `dart format` covers only
+/// `lib test tool`, so nothing on the Dart side reads these files. CI does build
+/// a debug APK, which catches a manifest that will not merge and a resource that
+/// is not there — but a channel name or a FileProvider authority that simply
+/// disagrees between the two halves compiles perfectly and fails on a phone, as
+/// a MissingPluginException or an IllegalArgumentException. That is the gap this
+/// closes. Same idea as `test/app_version_test.dart`: a duplicated string is
+/// safe only if something fails when the copies drift.
 void main() {
   String read(String path) {
     final File file = File(path);

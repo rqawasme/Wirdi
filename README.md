@@ -665,6 +665,12 @@ self-updating works, and uninstalling takes `user.db` with it. And the
 `REQUEST_INSTALL_PACKAGES` permission this needs must come out before the app is
 submitted to Play.
 
+CI compiles the Android app on every pull request — `flutter build apk --debug`
+in a job beside the tests. `analysis_options.yaml` excludes `android/**` and
+`dart format` covers only `lib test tool`, so without that job the Kotlin, the
+manifest and the `FileProvider` would have nothing checking them until a release
+was being cut. The release workflow skips it, having a real APK to build.
+
 [`docs/SELF_UPDATE.md`](docs/SELF_UPDATE.md) covers both, how the pieces fit,
 the on-device checks that no test can make, and the checklist for removing the
 feature.
