@@ -270,7 +270,9 @@ length of brick across its top edge instead — the one place brick acts as a
 plain bar rather than as the voussoir rhythm — plus `onSurface` ink and Inter
 Medium. Icons stay chrome, never brick and never gold, and nothing swaps between
 filled and outline to signal selection. No tab carries a badge, dot or count,
-because the app has no notifications.
+because the app has no notifications. That rule holds with the update notice
+too: it is a card in the Home list, never a mark on a tab, and it exists only
+for somebody who turned the update check on — see Updating.
 
 **Each tab keeps its own scroll position.** The four bodies live in an
 `IndexedStack`, and each gets its own `ScrollController` — a vertical `ListView`
@@ -637,3 +639,32 @@ configured through repository secrets, and the iOS build is unsigned, because
 signing it needs an Apple Developer certificate this repository does not hold.
 Both facts are stated on the release itself rather than left to be discovered.
 [`docs/RELEASING.md`](docs/RELEASING.md) has the details and the setup.
+
+## Updating
+
+The app can notice that a newer version has been released and install it.
+Turned on, it asks GitHub once a launch what the latest release is; if that is
+newer than the running build, a notice appears at the top of Home, and tapping
+it downloads that release's APK and hands it to Android's installer. It exists
+so a phone can be updated from the phone rather than from a cable.
+
+**Off by default, and the only thing in the app that opens a socket.** Left
+alone Wirdi makes no network calls at all — the fonts and the content are
+bundled, and nothing is fetched. The switch is in Settings, the About sheet says
+what it does, and `test/app/update_banner_test.dart` asserts that with it off
+the update client is never called even once. A claim printed under a switch is
+worth a test.
+
+**Android only.** iOS does not let an app install itself, so the notice and the
+switch are not there rather than being there and inert.
+
+Two things are worth knowing before the first use. Android refuses to upgrade an
+app whose signing key changed, so a phone holding a debug-signed build — which
+is what `flutter run` installs — needs one manual uninstall and reinstall before
+self-updating works, and uninstalling takes `user.db` with it. And the
+`REQUEST_INSTALL_PACKAGES` permission this needs must come out before the app is
+submitted to Play.
+
+[`docs/SELF_UPDATE.md`](docs/SELF_UPDATE.md) covers both, how the pieces fit,
+the on-device checks that no test can make, and the checklist for removing the
+feature.

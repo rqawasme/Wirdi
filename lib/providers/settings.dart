@@ -17,6 +17,7 @@ abstract final class SettingKeys {
   static const String showTranslation = 'text.show_translation';
   static const String haptics = 'haptics.enabled';
   static const String showStreak = 'streak.visible';
+  static const String checkForUpdates = 'updates.check';
 
   static const String devQuranInGold = 'dev.quran_in_gold';
   static const String devArabicFace = 'dev.arabic_face';
@@ -36,6 +37,7 @@ final class WirdiSettings {
     this.showTranslation = true,
     this.haptics = true,
     this.showStreak = true,
+    this.checkForUpdates = false,
     this.quranInGold = false,
     this.arabicFace = ArabicFace.notoNaskh,
     this.dimBrackets = true,
@@ -73,6 +75,18 @@ final class WirdiSettings {
   /// them to turn it back on.
   final bool showStreak;
 
+  /// Whether the app asks GitHub, once a launch, whether a newer version has
+  /// been released.
+  ///
+  /// Off, and it is the only thing in this app that would ever open a socket.
+  /// Left alone, Wirdi makes no network calls at all — no check, no ping,
+  /// nothing about the user going anywhere — which is a property worth keeping
+  /// true by default and worth making somebody ask for an exception to.
+  ///
+  /// Android only. iOS cannot install an app over itself, so the switch is not
+  /// on that screen at all rather than being one that does nothing.
+  final bool checkForUpdates;
+
   /// Dev screen: Quran text in `tertiary` gold, or in `onSurface` cedar ink.
   ///
   /// Cedar ink by decision, after looking at both on a device. Which leaves
@@ -99,6 +113,7 @@ final class WirdiSettings {
     bool? showTranslation,
     bool? haptics,
     bool? showStreak,
+    bool? checkForUpdates,
     bool? quranInGold,
     ArabicFace? arabicFace,
     bool? dimBrackets,
@@ -110,6 +125,7 @@ final class WirdiSettings {
       showTranslation: showTranslation ?? this.showTranslation,
       haptics: haptics ?? this.haptics,
       showStreak: showStreak ?? this.showStreak,
+      checkForUpdates: checkForUpdates ?? this.checkForUpdates,
       quranInGold: quranInGold ?? this.quranInGold,
       arabicFace: arabicFace ?? this.arabicFace,
       dimBrackets: dimBrackets ?? this.dimBrackets,
@@ -151,6 +167,9 @@ class SettingsController extends AsyncNotifier<WirdiSettings> {
       showStreak:
           _bool(await repository.setting(SettingKeys.showStreak)) ??
           defaults.showStreak,
+      checkForUpdates:
+          _bool(await repository.setting(SettingKeys.checkForUpdates)) ??
+          defaults.checkForUpdates,
       quranInGold:
           _bool(await repository.setting(SettingKeys.devQuranInGold)) ??
           defaults.quranInGold,
@@ -210,6 +229,14 @@ class SettingsController extends AsyncNotifier<WirdiSettings> {
       SettingKeys.showStreak,
       value.toString(),
       (WirdiSettings s) => s.copyWith(showStreak: value),
+    );
+  }
+
+  Future<void> setCheckForUpdates(bool value) {
+    return _set(
+      SettingKeys.checkForUpdates,
+      value.toString(),
+      (WirdiSettings s) => s.copyWith(checkForUpdates: value),
     );
   }
 

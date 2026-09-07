@@ -81,6 +81,14 @@ android {
     }
 }
 
+dependencies {
+    // Named rather than relied on transitively. AndroidManifest.xml references
+    // androidx.core.content.FileProvider by class name and MainActivity.kt
+    // imports it, so a Flutter embedding that stopped pulling androidx.core in
+    // would fail at install time on a device rather than at build time here.
+    implementation("androidx.core:core:1.15.0")
+}
+
 kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
