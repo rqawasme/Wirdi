@@ -5,4 +5,4 @@
 /// remember to. `test/app_version_test.dart` reads the pubspec and fails if the
 /// two ever disagree, which is what makes the duplication safe rather than a
 /// thing that quietly goes stale.
-const String appVersion = '0.2.0';
+const String appVersion = '0.3.0';
