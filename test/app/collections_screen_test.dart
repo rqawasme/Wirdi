@@ -8,6 +8,7 @@ import 'package:wirdi/providers/data_providers.dart';
 import 'package:wirdi/routes.dart';
 import 'package:wirdi/screens/collections_screen.dart';
 import 'package:wirdi/theme/theme.dart';
+import 'package:wirdi/widgets/collection_row.dart';
 
 import '../support/fixtures.dart';
 
@@ -158,10 +159,20 @@ void main() {
     expect(find.textContaining('Part-way through'), findsNothing);
   });
 
-  testWidgets('a row opens the player', (WidgetTester tester) async {
+  testWidgets("a row's view button opens the player", (
+    WidgetTester tester,
+  ) async {
     await pumpList(tester, withRouter: true);
 
-    await tester.tap(find.text('PLACEHOLDER collection 1 english'));
+    // The row itself no longer opens anything — only its buttons do — so the
+    // view button is found scoped to this row rather than tapping the name.
+    final Finder row = find.ancestor(
+      of: find.text('PLACEHOLDER collection 1 english'),
+      matching: find.byType(CollectionRow),
+    );
+    await tester.tap(
+      find.descendant(of: row, matching: find.byTooltip('Open collection')),
+    );
     await settle(tester);
 
     expect(find.text('1 of 14'), findsOneWidget);
