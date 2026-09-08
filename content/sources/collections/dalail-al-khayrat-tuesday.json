@@ -1,0 +1,19 @@
+{
+  "id": 8,
+  "name_arabic": "الْحِزْبُ الثَّانِي مِنَ الْأَحْزَابِ السَّبْعَةِ",
+  "name_english": "Dala'il al-Khayrat — Part 2 (Tuesday)",
+  "author": "Imam Muhammad al-Jazuli",
+  "type": "wird",
+  "sort_order": 30,
+  "items": [
+    { "dhikr": 11001 },
+    { "dhikr": 11002 },
+    { "dhikr": 11003 },
+    { "dhikr": 11004 },
+    { "dhikr": 11005 },
+    { "dhikr": 11006 },
+    { "dhikr": 11007 },
+    { "dhikr": 11008 },
+    { "dhikr": 11009 }
+  ]
+}

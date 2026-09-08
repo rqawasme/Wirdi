@@ -1,0 +1,59 @@
+{
+  "group": "dalail-al-khayrat-tuesday",
+  "adhkar": [
+    {
+      "id": 11001,
+      "text_arabic": "اَللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ خَيْرِ مَا تَعْلَمُ.",
+      "translation": "O Allah, I ask You for the good of what You know,",
+      "default_count": 1
+    },
+    {
+      "id": 11002,
+      "text_arabic": "وَأَعُوذُ بِكَ مِنْ شَرِّ مَا تَعْلَمُ.",
+      "translation": "and I seek refuge in You from the evil of what You know,",
+      "default_count": 1
+    },
+    {
+      "id": 11003,
+      "text_arabic": "وَأَسْتَغْفِرُكَ مِنْ كُلِّ مَا تَعْلَمُ.",
+      "translation": "and I seek Your forgiveness for everything You know,",
+      "default_count": 1
+    },
+    {
+      "id": 11004,
+      "text_arabic": "إِنَّكَ تَعْلَمُ وَلَا نَعْلَمُ، وَأَنْتَ عَلَّامُ الْغُيُوبِ.",
+      "translation": "for You indeed know and we do not know, and indeed You are the Knower of the Unseen.",
+      "default_count": 1
+    },
+    {
+      "id": 11005,
+      "text_arabic": "اَللَّهُمَّ ارْحَمْنِي مِنْ زَمَانِي هَذَا وَإِحْدَاقِ الْفِتَنِ.",
+      "translation": "O Allah, have mercy on me in this time from the encirclement of discord,",
+      "default_count": 1
+    },
+    {
+      "id": 11006,
+      "text_arabic": "وَتَطَاوُلِ أَهْلِ الْجُرْأَةِ عَلَيَّ وَاسْتِضْعَافِهِمُ إِيَّايَ.",
+      "translation": "from the oppression of the insolent and their deficiencies and all such ills.",
+      "default_count": 1
+    },
+    {
+      "id": 11007,
+      "text_arabic": "اَللَّهُمَّ اجْعَلْنِي مِنْكَ فِي عِيَاذٍ مَنِيعٍ وَحِرْزٍ حَصِينٍ.",
+      "translation": "O Allah, give me an unassailable refuge in You, an impenetrable protection with You",
+      "default_count": 1
+    },
+    {
+      "id": 11008,
+      "text_arabic": "مِنْ جَمِيعِ خَلْقِكَ حَتَّى تُبَلِّغَنِيَ أَجَلِي مُعَافًى.",
+      "translation": "from all of Your creation until I come to a virtuous end.",
+      "default_count": 1
+    },
+    {
+      "id": 11009,
+      "text_arabic": "اَللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ وَعَلَىٰ آلِ سَيِّدِنَا مُحَمَّدٍ عَدَدَ مَنْ صَلَّى عَلَيْهِ.",
+      "translation": "O Allah, bless our master Muhammad and the family of our master Muhammad as many times as those who have asked for blessings upon him.",
+      "default_count": 1
+    }
+  ]
+}
