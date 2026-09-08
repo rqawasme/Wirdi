@@ -242,9 +242,7 @@ void main() {
     ) async {
       await pumpApp(tester);
 
-      await tester.tap(find.byTooltip('More').first);
-      await settle(tester);
-      await tester.tap(find.text('Commit to my practice'));
+      await tester.tap(find.byTooltip('Commit to my practice').first);
       await settle(tester);
 
       // Three sections, seven days, and a default that says so in words.
@@ -260,9 +258,7 @@ void main() {
     ) async {
       await pumpApp(tester);
 
-      await tester.tap(find.byTooltip('More').first);
-      await settle(tester);
-      await tester.tap(find.text('Commit to my practice'));
+      await tester.tap(find.byTooltip('Commit to my practice').first);
       await settle(tester);
       await tester.tap(find.text('Commit'));
       await settle(tester);
@@ -278,9 +274,7 @@ void main() {
     ) async {
       await pumpApp(tester);
 
-      await tester.tap(find.byTooltip('More').first);
-      await settle(tester);
-      await tester.tap(find.text('Commit to my practice'));
+      await tester.tap(find.byTooltip('Commit to my practice').first);
       await settle(tester);
 
       // Turn six of the seven off, leaving Friday: al-Kahf on a Friday is the
@@ -310,9 +304,7 @@ void main() {
     ) async {
       await pumpApp(tester);
 
-      await tester.tap(find.byTooltip('More').first);
-      await settle(tester);
-      await tester.tap(find.text('Commit to my practice'));
+      await tester.tap(find.byTooltip('Commit to my practice').first);
       await settle(tester);
 
       for (final String day in <String>[
