@@ -9,6 +9,7 @@ import 'package:wirdi/routes.dart';
 import 'package:wirdi/screens/wird_player_screen.dart';
 import 'package:wirdi/theme/theme.dart';
 import 'package:wirdi/widgets/ayah_block.dart';
+import 'package:wirdi/widgets/collection_row.dart';
 import 'package:wirdi/widgets/dhikr_block.dart';
 import 'package:wirdi/widgets/voussoir_stripe.dart';
 
@@ -467,7 +468,15 @@ void main() {
       // collections list, which is a tab away.
       await tester.tap(find.text('Collections'));
       await settle(tester);
-      await tester.tap(find.text('PLACEHOLDER collection 1 english'));
+      // The row itself no longer opens anything — only its view button does
+      // — so it is found scoped to this row rather than by tapping the name.
+      final Finder row = find.ancestor(
+        of: find.text('PLACEHOLDER collection 1 english'),
+        matching: find.byType(CollectionRow),
+      );
+      await tester.tap(
+        find.descendant(of: row, matching: find.byTooltip('Open collection')),
+      );
       await settle(tester);
       expect(find.text('14 of 14'), findsOneWidget);
       expect(find.text('Repeat 1 of 3'), findsOneWidget);

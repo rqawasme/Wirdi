@@ -82,7 +82,20 @@ class _CollectionList extends ConsumerWidget {
       children: <Widget>[
         // Yours first. What somebody made is what they are looking for; the
         // built-ins are the shelf they took it off.
-        const _GroupLabel('Yours'),
+        _GroupLabel(
+          'Yours',
+          // Only once there is a list to pin it above: the empty state below
+          // already offers the same action, front and centre, and a second
+          // one beside an empty label would be pointing at nothing.
+          action: mine.isEmpty
+              ? null
+              : IconButton(
+                  visualDensity: VisualDensity.compact,
+                  tooltip: 'New collection',
+                  icon: const Icon(Icons.add),
+                  onPressed: () => newCollection(context, ref),
+                ),
+        ),
         if (mine.isEmpty) const _NoneOfYourOwn() else ..._rows(mine),
         const _GroupLabel('Built-in'),
         ..._rows(builtin),
@@ -104,9 +117,13 @@ class _CollectionList extends ConsumerWidget {
 }
 
 class _GroupLabel extends StatelessWidget {
-  const _GroupLabel(this.label);
+  const _GroupLabel(this.label, {this.action});
 
   final String label;
+
+  /// Sits at the label's trailing edge — "New collection" on "Yours", and
+  /// nothing on "Built-in" or on an empty "Yours".
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -114,15 +131,24 @@ class _GroupLabel extends StatelessWidget {
     final WirdiTypography type = theme.extension<WirdiTypography>()!;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
+      padding: EdgeInsets.fromLTRB(
         WirdiMetrics.space4,
         WirdiMetrics.space5,
-        WirdiMetrics.space4,
+        action == null ? WirdiMetrics.space4 : WirdiMetrics.space2,
         WirdiMetrics.space2,
       ),
-      child: Text(
-        label,
-        style: type.caption.copyWith(color: theme.colorScheme.onSurfaceVariant),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Text(
+              label,
+              style: type.caption.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          ?action,
+        ],
       ),
     );
   }
@@ -141,7 +167,13 @@ class _Hairline extends StatelessWidget {
   }
 }
 
-/// One collection, and the menu of what can be done to it.
+/// One collection, and what can be done to it: open it, commit it, or reach
+/// the rest through the overflow menu.
+///
+/// The row's body carries no `onTap` of its own — three separate buttons
+/// covering "open", "commit" and "everything else" made a fourth, implicit
+/// one (the row itself) a false economy: it duplicated the first button
+/// without looking like a button at all.
 class _Row extends ConsumerWidget {
   const _Row({required this.listing});
 
@@ -149,10 +181,39 @@ class _Row extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final Map<CollectionId, Commitment> committed =
+        ref.watch(commitmentsProvider).value ??
+        const <CollectionId, Commitment>{};
+    final Commitment? commitment = committed[listing.id];
+
     return CollectionRow(
       listing: listing,
-      onTap: () => _open(context, ref),
-      trailing: _RowMenu(listing: listing),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          _ViewButton(listing: listing),
+          _CommitButton(listing: listing, commitment: commitment),
+          _RowMenu(listing: listing, commitment: commitment),
+        ],
+      ),
+    );
+  }
+}
+
+/// Opens the collection in the player — the single most common thing to do
+/// with a row, so it gets its own button rather than a menu entry.
+class _ViewButton extends ConsumerWidget {
+  const _ViewButton({required this.listing});
+
+  final CollectionListing listing;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return IconButton(
+      visualDensity: VisualDensity.compact,
+      tooltip: 'Open collection',
+      icon: const Icon(Icons.play_arrow_outlined),
+      onPressed: () => _open(context, ref),
     );
   }
 
@@ -169,6 +230,46 @@ class _Row extends ConsumerWidget {
       ref.invalidate(collectionListingsProvider);
       ref.invalidate(homeViewProvider);
     }
+  }
+}
+
+/// Commits the collection to the day, or changes when an already-committed
+/// one falls — the same sheet either way, since "commit" and "change when"
+/// are the same question asked at different times.
+///
+/// The icon mirrors the Home tab's own (`Icons.home_outlined` /
+/// `Icons.home`) and the overflow menu's language ("Remove from home"): this
+/// button is asking whether the collection has a place in the day.
+class _CommitButton extends ConsumerWidget {
+  const _CommitButton({required this.listing, required this.commitment});
+
+  final CollectionListing listing;
+  final Commitment? commitment;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bool committed = commitment != null;
+    return IconButton(
+      visualDensity: VisualDensity.compact,
+      tooltip: committed ? 'Change when committed' : 'Commit to my practice',
+      icon: Icon(committed ? Icons.home : Icons.home_outlined),
+      onPressed: () => _commit(context, ref),
+    );
+  }
+
+  Future<void> _commit(BuildContext context, WidgetRef ref) async {
+    final Commitment? current = commitment;
+    final CommitmentChoice? choice = await showCommitmentSheet(
+      context,
+      name: listing.name,
+      current: current == null
+          ? null
+          : CommitmentChoice(section: current.section, days: current.days),
+    );
+    if (choice == null || !context.mounted) return;
+    await ref
+        .read(homeCommitmentsProvider)
+        .commit(listing.id, choice.section, days: choice.days);
   }
 }
 
@@ -196,35 +297,28 @@ class _NoneOfYourOwn extends ConsumerWidget {
   }
 }
 
-enum _RowAction { commit, uncommit, edit, duplicate, delete }
+enum _RowAction { uncommit, edit, duplicate, delete }
 
-/// What can be done to a collection without opening it.
+/// What can be done to a collection beyond opening or committing it, both of
+/// which have their own buttons now: removing it from the day, editing it,
+/// copying it, deleting it.
 ///
-/// A built-in offers two things: a copy you can edit, and a place in your day.
-/// Committing is here rather than on Home because Home shows the result of the
-/// decision and this is where the decision is made — and because a built-in
-/// can be committed to without being copied first, which is the common case.
+/// A built-in only ever offers a copy you can edit — it has no edit or
+/// delete of its own, and no uncommit either while nobody has committed it.
 class _RowMenu extends ConsumerWidget {
-  const _RowMenu({required this.listing});
+  const _RowMenu({required this.listing, required this.commitment});
 
   final CollectionListing listing;
+  final Commitment? commitment;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final CollectionId id = listing.id;
-    // Absent means not committed. While the read is in flight the menu offers
-    // committing, which is the right guess for a collection nobody has
-    // committed yet and is corrected the moment the map arrives.
-    final Map<CollectionId, Commitment> committed =
-        ref.watch(commitmentsProvider).value ??
-        const <CollectionId, Commitment>{};
-    final Commitment? commitment = committed[id];
 
     return PopupMenuButton<_RowAction>(
       icon: const Icon(Icons.more_vert),
       tooltip: 'More',
       onSelected: (_RowAction action) => switch (action) {
-        _RowAction.commit => _commit(context, ref, id, current: commitment),
         _RowAction.uncommit => ref.read(homeCommitmentsProvider).uncommit(id),
         _RowAction.edit => _edit(context, id),
         _RowAction.duplicate => duplicateCollectionFlow(
@@ -236,14 +330,6 @@ class _RowMenu extends ConsumerWidget {
         _RowAction.delete => _delete(context, ref, id),
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<_RowAction>>[
-        PopupMenuItem<_RowAction>(
-          value: _RowAction.commit,
-          // Committed already, this moves it. The label says which it is
-          // doing rather than leaving the user to find out.
-          child: Text(
-            commitment == null ? 'Commit to my practice' : 'Change when',
-          ),
-        ),
         if (commitment != null)
           const PopupMenuItem<_RowAction>(
             value: _RowAction.uncommit,
@@ -265,25 +351,6 @@ class _RowMenu extends ConsumerWidget {
           ),
       ],
     );
-  }
-
-  Future<void> _commit(
-    BuildContext context,
-    WidgetRef ref,
-    CollectionId id, {
-    required Commitment? current,
-  }) async {
-    final CommitmentChoice? choice = await showCommitmentSheet(
-      context,
-      name: listing.name,
-      current: current == null
-          ? null
-          : CommitmentChoice(section: current.section, days: current.days),
-    );
-    if (choice == null || !context.mounted) return;
-    await ref
-        .read(homeCommitmentsProvider)
-        .commit(id, choice.section, days: choice.days);
   }
 
   Future<void> _edit(BuildContext context, CollectionId id) async {

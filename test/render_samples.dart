@@ -208,9 +208,7 @@ void main() {
     // day, which is the default and what most commitments are, and a single
     // day, which is what the picker exists for.
     Future<void> shootSheet(int row, String name) async {
-      await tester.tap(find.byTooltip('More').at(row));
-      await settle(tester);
-      await tester.tap(find.text('Change when'));
+      await tester.tap(find.byTooltip('Change when committed').at(row));
       await settle(tester);
       await shoot(tester, name);
       Navigator.of(tester.element(find.byType(SegmentedButton<int>))).pop();

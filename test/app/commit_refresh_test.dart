@@ -70,9 +70,7 @@ void main() {
   /// Commits the first collection in the list through the row menu, taking the
   /// sheet's defaults: Today, every day.
   Future<void> commitFirstRow(WidgetTester tester) async {
-    await tester.tap(find.byTooltip('More').first);
-    await settle(tester);
-    await tester.tap(find.text('Commit to my practice'));
+    await tester.tap(find.byTooltip('Commit to my practice').first);
     await settle(tester);
     await tester.tap(find.text('Commit'));
     await settle(tester);
@@ -131,9 +129,7 @@ void main() {
 
     // Moved to Fridays, which is what today is.
     await openTab(tester, 'Collections');
-    await tester.tap(find.byTooltip('More').first);
-    await settle(tester);
-    await tester.tap(find.text('Change when'));
+    await tester.tap(find.byTooltip('Change when committed').first);
     await settle(tester);
     await tester.tap(
       find.byWidgetPredicate(

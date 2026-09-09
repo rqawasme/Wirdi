@@ -20,7 +20,7 @@ class CollectionRow extends StatelessWidget {
   const CollectionRow({
     super.key,
     required this.listing,
-    required this.onTap,
+    this.onTap,
     this.trailing,
   });
 
@@ -29,7 +29,11 @@ class CollectionRow extends StatelessWidget {
 
   final CollectionListing listing;
 
-  final VoidCallback onTap;
+  /// What tapping the row's body does. Null when the row is informational
+  /// only and everything actionable lives in [trailing] instead — the
+  /// collections list does this, so it isn't announced as a button with
+  /// nothing distinguishing it from the icon buttons beside it.
+  final VoidCallback? onTap;
 
   /// What sits at the trailing edge, outside the row's own semantics: the
   /// overflow menu in the collections list, and nothing at all in a list that
@@ -43,6 +47,7 @@ class CollectionRow extends StatelessWidget {
     final Color quiet = theme.colorScheme.onSurfaceVariant;
     final String? nameArabic = listing.summary.nameArabic;
     final Widget? trailing = this.trailing;
+    final VoidCallback? onTap = this.onTap;
 
     final String items =
         '${listing.itemCount} ${listing.itemCount == 1 ? 'item' : 'items'}';
@@ -52,77 +57,78 @@ class CollectionRow extends StatelessWidget {
         ? 'part-way through'
         : 'not started today';
 
+    final Widget body = Padding(
+      padding: EdgeInsets.fromLTRB(
+        WirdiMetrics.space4,
+        WirdiMetrics.space4,
+        trailing == null ? WirdiMetrics.space4 : 0,
+        WirdiMetrics.space4,
+      ),
+      child: ExcludeSemantics(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) =>
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          listing.name,
+                          style: theme.textTheme.titleMedium,
+                        ),
+                      ),
+                      if (nameArabic != null) ...<Widget>[
+                        const SizedBox(width: WirdiMetrics.space4),
+                        // Capped rather than given a flex share: an
+                        // Arabic name that needs a third of the row
+                        // should not take half of it and wrap the
+                        // English name that would otherwise have
+                        // fitted.
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: constraints.maxWidth * arabicShare,
+                          ),
+                          child: Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: Text(
+                              nameArabic,
+                              style: type.arabicTitle,
+                              locale: const Locale('ar'),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+            ),
+            const SizedBox(height: WirdiMetrics.space2),
+            // On its own line under both names, so it has the width
+            // to say what it has to say however long the collection
+            // is called.
+            _Meta(listing: listing, items: items, colour: quiet),
+          ],
+        ),
+      ),
+    );
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Expanded(
-          child: Semantics(
-            container: true,
-            button: true,
-            label: '${listing.name}, $items, $state',
-            child: InkWell(
-              onTap: onTap,
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  WirdiMetrics.space4,
-                  WirdiMetrics.space4,
-                  trailing == null ? WirdiMetrics.space4 : 0,
-                  WirdiMetrics.space4,
+          child: onTap == null
+              ? Semantics(
+                  container: true,
+                  label: '${listing.name}, $items, $state',
+                  child: body,
+                )
+              : Semantics(
+                  container: true,
+                  button: true,
+                  label: '${listing.name}, $items, $state',
+                  child: InkWell(onTap: onTap, child: body),
                 ),
-                child: ExcludeSemantics(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      LayoutBuilder(
-                        builder:
-                            (
-                              BuildContext context,
-                              BoxConstraints constraints,
-                            ) => Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Expanded(
-                                  child: Text(
-                                    listing.name,
-                                    style: theme.textTheme.titleMedium,
-                                  ),
-                                ),
-                                if (nameArabic != null) ...<Widget>[
-                                  const SizedBox(width: WirdiMetrics.space4),
-                                  // Capped rather than given a flex share: an
-                                  // Arabic name that needs a third of the row
-                                  // should not take half of it and wrap the
-                                  // English name that would otherwise have
-                                  // fitted.
-                                  ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      maxWidth:
-                                          constraints.maxWidth * arabicShare,
-                                    ),
-                                    child: Directionality(
-                                      textDirection: TextDirection.rtl,
-                                      child: Text(
-                                        nameArabic,
-                                        style: type.arabicTitle,
-                                        locale: const Locale('ar'),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                      ),
-                      const SizedBox(height: WirdiMetrics.space2),
-                      // On its own line under both names, so it has the width
-                      // to say what it has to say however long the collection
-                      // is called.
-                      _Meta(listing: listing, items: items, colour: quiet),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
         ),
         // Outside the row's own semantics rather than inside it: a menu that
         // opens the only way to copy a built-in should not be something a
