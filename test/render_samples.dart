@@ -283,6 +283,10 @@ void main() {
             await tester.tap(find.byType(SingleChildScrollView));
             await tester.pump();
           }
+          // Nothing on this screen animates, so this settles no motion: it is
+          // for the reads a tap can start — the run of days behind a finished
+          // wird — which would otherwise be shot before they land.
+          if (taps > 0) await settle(tester);
         },
       );
       await data.userRepository.clearProgress(id);
@@ -388,6 +392,10 @@ void main() {
     // surah said three times over.
     await openPlayer(wird, '04-player-ayah', stepIndex: 40, taps: 2);
     await openPlayer(wird, '05-player-surah', stepIndex: 23);
+    // The end of a wird: the finished step, in the shape of every step before
+    // it. Al-Kursi is one step said three times, so three taps is the whole of
+    // it.
+    await openPlayer(kursi, '05b-player-complete', taps: 3);
 
     await settings.setThemeMode(ThemeMode.dark);
     await settle(tester);
