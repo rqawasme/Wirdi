@@ -400,14 +400,18 @@ design: the same header, the same content area as the tap target, the same band
 naming the gesture, the same controls underneath. What changes is what each of
 them says. The header reads `Wird complete` over `12 steps · 87 repetitions`,
 the band swaps the numeral for a check and reads `done` / `Tap anywhere above
-to close`, and the content area carries two sentences — `May it be accepted.`
-and this collection's run of days in the home tile's own words (`A day begun.`,
-`4 days and counting.`). There is no button, because no other step has one and
-the end of a wird is a poor place to teach a new gesture.
+to close`, and the content area carries three lines, centred and in the largest
+type the app sets outside the mushaf: `الْحَمْدُ لِلَّهِ`, then `Consistency is
+the key. May it be accepted, Ameen.`, then this collection's run of days in the
+home tile's own words (`A day begun.`, `4 days and counting.`). Centred and
+large because there is nothing to read here — every other step is a column of
+text with a number beside it, and this one is the words and nothing else. There
+is no button, because no other step has one and the end of a wird is a poor
+place to teach a new gesture.
 
 What keeps that from being a celebration is the same argument the home tile
-makes: nothing escalates — the lines read the same at three hundred days as at
-three — nothing is negative, and the mark itself is the app's own material, the
+makes: nothing escalates — the first two lines read the same at three hundred
+days as at three — nothing is negative, and the mark itself is the app's own material, the
 stripe above gone solid because the wird filled it. No confetti, no sound,
 nothing animating.
 

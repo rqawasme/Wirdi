@@ -492,13 +492,17 @@ void main() {
       // The finished step, shaped like every step before it: a header, a tap
       // target, and the band naming the gesture. The stripe is solid.
       expect(find.text('Wird complete'), findsOneWidget);
-      expect(find.text('May it be accepted.'), findsOneWidget);
+      expect(find.text('الْحَمْدُ لِلَّهِ'), findsOneWidget);
+      expect(
+        find.text('Consistency is the key. May it be accepted, Ameen.'),
+        findsOneWidget,
+      );
       expect(find.text('done'), findsOneWidget);
       expect(find.text('Tap anywhere above to close'), findsOneWidget);
       expect(_stripe(tester).value, 1);
       // Nothing has left on its own, and nothing is going to.
       await tester.pump(const Duration(seconds: 2));
-      expect(find.text('May it be accepted.'), findsOneWidget);
+      expect(find.text('الْحَمْدُ لِلَّهِ'), findsOneWidget);
 
       // The completion is logged the moment the wird ends, not when the step
       // is closed: the run of days it reports is read back from the table.
@@ -509,7 +513,7 @@ void main() {
 
       // A tap anywhere in the content area closes it, the same gesture that
       // counted every step.
-      await tester.tap(find.text('May it be accepted.'));
+      await tester.tap(find.text('الْحَمْدُ لِلَّهِ'));
       await settle(tester);
 
       // Back on the list it was opened from, with the row marked.
@@ -535,9 +539,9 @@ void main() {
       // step, which is not taking taps yet — so the reciter sees the end of
       // their wird instead of tapping straight through it.
       expect(_closeTap(tester), isNull);
-      await tester.tap(find.text('May it be accepted.'));
+      await tester.tap(find.text('الْحَمْدُ لِلَّهِ'));
       await tester.pump();
-      expect(find.text('May it be accepted.'), findsOneWidget);
+      expect(find.text('الْحَمْدُ لِلَّهِ'), findsOneWidget);
 
       // The beat over, the whole content area is the way out, exactly as it
       // was the way forward on every step before this one.
@@ -570,7 +574,7 @@ VoidCallback? _closeTap(WidgetTester tester) {
   return tester
       .widgetList<GestureDetector>(
         find.ancestor(
-          of: find.text('May it be accepted.'),
+          of: find.text('الْحَمْدُ لِلَّهِ'),
           matching: find.byType(GestureDetector),
         ),
       )

@@ -485,12 +485,16 @@ String _recited(WirdPlayer player) {
 /// leave. There is no button, because no other step has one and the end of a
 /// wird is a poor place to teach a new gesture.
 ///
-/// Two sentences and nothing else. The first is the same at three days as at
-/// three hundred, and the second counts the run without remarking on it: the
-/// home tile's vocabulary, which is the one place in the app already allowed
-/// to encourage. Nothing escalates, nothing is negative, and the mark itself
-/// is the app's own material — the stripe above, solid brick because the wird
-/// filled it.
+/// Three lines, centred in the area a step's text would fill, and the largest
+/// type the app sets outside the mushaf: `الْحَمْدُ لِلَّهِ`, one sentence,
+/// and the run of days under it. There is nothing to read here, so there is
+/// no column to read down — the words are the screen.
+///
+/// The first two read the same at three days as at three hundred, and the
+/// third counts the run without remarking on it: the home tile's vocabulary,
+/// which is the one place in the app already allowed to encourage. Nothing
+/// escalates, nothing is negative, and the mark itself is the app's own
+/// material — the stripe above, solid brick because the wird filled it.
 class _CompleteStep extends StatefulWidget {
   const _CompleteStep({required this.player, required this.onLeave});
 
@@ -541,38 +545,40 @@ class _CompleteStepState extends State<_CompleteStep> {
     final ColorScheme colors = theme.colorScheme;
     final String? run = _run(widget.player.completedStreak);
 
+    final WirdiTypography type = theme.extension<WirdiTypography>()!;
+
     return _TapToCount(
       onTap: _ready ? widget.onLeave : null,
       label: 'Close',
-      child: Padding(
-        // Centred in the area the words of a step would fill, rather than sat
-        // at the top of it: there is nothing to read down here, and two lines
-        // pinned under the header would read as the top of a page that never
-        // arrived.
-        padding: const EdgeInsets.only(top: WirdiMetrics.space6),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'May it be accepted.',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: colors.primary,
-              ),
-            ),
-            if (run != null)
-              Padding(
-                padding: const EdgeInsets.only(top: WirdiMetrics.space3),
-                child: Text(
-                  run,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colors.onSurfaceVariant,
-                  ),
+      centred: true,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            'الْحَمْدُ لِلَّهِ',
+            textAlign: TextAlign.center,
+            textDirection: TextDirection.rtl,
+            style: type.completionArabic.copyWith(color: colors.primary),
+          ),
+          const SizedBox(height: WirdiMetrics.space4),
+          Text(
+            'Consistency is the key. May it be accepted, Ameen.',
+            textAlign: TextAlign.center,
+            style: type.completionLine.copyWith(color: colors.onSurface),
+          ),
+          if (run != null)
+            Padding(
+              padding: const EdgeInsets.only(top: WirdiMetrics.space3),
+              child: Text(
+                run,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
                 ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
@@ -791,6 +797,7 @@ class _TapToCount extends StatelessWidget {
     required this.onTap,
     required this.label,
     required this.child,
+    this.centred = false,
   });
 
   /// What the tap does. Counting on every step but the last; on the finished
@@ -800,7 +807,21 @@ class _TapToCount extends StatelessWidget {
   /// What the tap does, in the same words the band uses.
   final String label;
 
+  /// Centre the child in the area rather than sitting it at the top.
+  ///
+  /// For the finished step, which is two short lines and no page to read: at
+  /// the top they hang under the header with the screen empty below them.
+  /// Every other step is a column of text that starts where text starts.
+  final bool centred;
+
   final Widget child;
+
+  static const EdgeInsets _padding = EdgeInsets.fromLTRB(
+    WirdiMetrics.readingColumnPadding,
+    0,
+    WirdiMetrics.readingColumnPadding,
+    WirdiMetrics.space6,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -811,15 +832,30 @@ class _TapToCount extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(
-            WirdiMetrics.readingColumnPadding,
-            0,
-            WirdiMetrics.readingColumnPadding,
-            WirdiMetrics.space6,
-          ),
-          child: child,
-        ),
+        // Two shapes, and the counting path keeps the plain one: a
+        // [LayoutBuilder] on it would run its builder inside layout on every
+        // tap, for a centring nothing on a step of text asks for.
+        child: centred
+            ? LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  return SingleChildScrollView(
+                    padding: _padding,
+                    // Still a scroll view: centred until the text outgrows the
+                    // area, which at the largest accessibility sizes it does,
+                    // and then it scrolls like everything else.
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: math.max(
+                          0,
+                          constraints.maxHeight - _padding.vertical,
+                        ),
+                      ),
+                      child: Center(child: child),
+                    ),
+                  );
+                },
+              )
+            : SingleChildScrollView(padding: _padding, child: child),
       ),
     );
   }

@@ -151,6 +151,16 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
   /// returns to between repetitions without reading.
   static const double counterSize = 40;
 
+  /// `الحمد لله` on the finished step, and the sentence under it.
+  ///
+  /// The two largest things the app sets outside the mushaf, and deliberately:
+  /// the finished step has one thing to say and a whole screen to say it in,
+  /// where every other step is a page of text with a number beside it. Chrome
+  /// rather than reading text, so the two user multipliers do not reach them —
+  /// a reader who turned the Quran up did not ask for this.
+  static const double completionArabicSize = 32;
+  static const double completionLineSize = 20;
+
   static const double sectionHeaderSize = 17;
   static const double navLabelSize = 14;
   static const double captionSize = 12;
@@ -245,6 +255,15 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
     lineHeight: chromeLineHeight,
   );
 
+  /// `الحمد لله`, the mark at the end of a wird.
+  ///
+  /// Set in the dhikr face at the dhikr's weight, because that is what it is —
+  /// a remembrance said at the end of one — and larger than the app sets
+  /// Arabic anywhere but the mushaf, because it is the only thing on the
+  /// screen.
+  TextStyle get completionArabic =>
+      _arabic(face: ArabicFace.notoNaskh, nominalSize: completionArabicSize);
+
   TextStyle _arabic({
     required ArabicFace face,
     required double nominalSize,
@@ -301,6 +320,16 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
 
   TextStyle get sectionHeader => _latin(
     size: sectionHeaderSize,
+    weight: FontWeight.w500,
+    lineHeight: chromeLineHeight,
+  );
+
+  /// The sentence under the mark at the end of a wird.
+  ///
+  /// A step above [sectionHeader] rather than the same size as it: it is not a
+  /// header over something, it is the thing.
+  TextStyle get completionLine => _latin(
+    size: completionLineSize,
     weight: FontWeight.w500,
     lineHeight: chromeLineHeight,
   );
