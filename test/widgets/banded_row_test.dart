@@ -29,29 +29,59 @@ void main() {
     );
   }
 
-  List<Color?> bandColours(WidgetTester tester) => tester
+  List<int> bandColours(WidgetTester tester) => tester
       .widgetList<Material>(
         find.descendant(
           of: find.byType(BandedRow),
           matching: find.byType(Material),
         ),
       )
-      .map((Material m) => m.color)
+      // Compared as packed 8-bit rather than as Color objects: a blended colour
+      // carries floating-point channels, and comparing it to a const Color
+      // fails on the last decimal place while looking identical on screen.
+      .map((Material m) => m.color!.toARGB32())
       .toList();
 
-  testWidgets('consecutive rows are one tonal step apart, in light', (
+  /// How far a colour is from grey.
+  ///
+  /// The discriminator between a brick wash and a rung of the limestone ladder,
+  /// and not the obvious one: the ladder is itself warm — the palette steps it
+  /// by about -5 red, -7 green, -11 blue per rung — so "the blue channel falls
+  /// further than the red" is true of both and separates nothing. What the wash
+  /// actually does is pull the band further from grey than any neutral rung
+  /// goes.
+  int chroma(int argb) {
+    final int r = (argb >> 16) & 0xFF;
+    final int g = (argb >> 8) & 0xFF;
+    final int b = argb & 0xFF;
+    return <int>[r, g, b].reduce((int a, int b) => a > b ? a : b) -
+        <int>[r, g, b].reduce((int a, int b) => a < b ? a : b);
+  }
+
+  testWidgets('odd rows carry a wash of brick, in light', (
     WidgetTester tester,
   ) async {
     await pumpBands(tester, dark: false);
 
-    final List<Color?> colours = bandColours(tester);
-    expect(colours, <Color>[
-      WirdiColorSchemes.light.surface,
-      WirdiColorSchemes.light.surfaceContainerLow,
+    final List<int> colours = bandColours(tester);
+    // Pinned rather than recomputed: asserting WirdiColorSchemes.band() here
+    // would be the implementation restating itself. This is the decision.
+    expect(colours, <int>[
+      WirdiColorSchemes.light.surface.toARGB32(),
+      0xFFF4E8DD,
     ]);
-    // The guard that matters if the palette ever changes: the step has to be
-    // visible at all. One rung, deliberately — but not zero rungs.
+    // The step has to be visible at all — faint, deliberately, but not absent.
     expect(colours.first, isNot(colours.last));
+
+    // And it is brick, not another rung of the neutral ladder. This is the
+    // assertion that fails if the band is quietly put back on
+    // surfaceContainerLow; the pin above would only say something changed.
+    expect(
+      chroma(colours.last),
+      greaterThan(
+        chroma(WirdiColorSchemes.light.surfaceContainerLow.toARGB32()),
+      ),
+    );
   });
 
   testWidgets('and in dark, which is designed on its own terms', (
@@ -59,12 +89,46 @@ void main() {
   ) async {
     await pumpBands(tester, dark: true);
 
-    final List<Color?> colours = bandColours(tester);
-    expect(colours, <Color>[
-      WirdiColorSchemes.dark.surface,
-      WirdiColorSchemes.dark.surfaceContainerLow,
+    final List<int> colours = bandColours(tester);
+    // Half the tint of the light band: dark is keeping the weight the neutral
+    // rung already had and only picking up the warmth.
+    expect(colours, <int>[
+      WirdiColorSchemes.dark.surface.toARGB32(),
+      0xFF201712,
     ]);
     expect(colours.first, isNot(colours.last));
+    expect(
+      chroma(colours.last),
+      greaterThan(
+        chroma(WirdiColorSchemes.dark.surfaceContainerLow.toARGB32()),
+      ),
+    );
+  });
+
+  test('the band is the surface carried toward brick, by the tint', () {
+    // What "a wash of brick" means arithmetically, in both themes: every
+    // channel moves from the surface toward primary by the same fraction, and
+    // that fraction is the tint. A neutral rung cannot satisfy this — the
+    // ladder's steps are not proportional to the distance to brick.
+    for (final (ColorScheme scheme, double tint) in <(ColorScheme, double)>[
+      (WirdiColorSchemes.light, WirdiColorSchemes.lightBandTint),
+      (WirdiColorSchemes.dark, WirdiColorSchemes.darkBandTint),
+    ]) {
+      final int band = WirdiColorSchemes.band(scheme).toARGB32();
+      final int surface = scheme.surface.toARGB32();
+      final int primary = scheme.primary.toARGB32();
+
+      for (final int shift in <int>[16, 8, 0]) {
+        final int s = (surface >> shift) & 0xFF;
+        final int p = (primary >> shift) & 0xFF;
+        final int b = (band >> shift) & 0xFF;
+        expect(
+          (b - (s + (p - s) * tint)).abs(),
+          lessThanOrEqualTo(1),
+          reason: 'channel at bit $shift is not $tint of the way to brick',
+        );
+      }
+    }
   });
 
   testWidgets('a Material and not a ColoredBox, so the ink still splashes', (

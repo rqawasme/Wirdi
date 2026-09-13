@@ -395,8 +395,8 @@ void main() {
     // screen is where most of its surfaces are visible at once.
     await shoot(tester, '06a-home-dark');
     await openPlayer(wird, '06-player-dark', stepIndex: 10, taps: 2);
-    // The banding in dark, where the step between surface and
-    // surfaceContainerLow is at its quietest and most worth looking at.
+    // The banding in dark, where the brick wash is at half the strength it
+    // carries in light and most worth looking at.
     await openRoute(Routes.pickDhikr, '06b-pick-dhikr-dark');
     await openRoute(
       Routes.collectionContents,

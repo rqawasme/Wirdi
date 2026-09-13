@@ -1,23 +1,35 @@
 import 'package:flutter/material.dart';
 
+import '../theme/theme.dart';
+
 /// One row of a list you are picking from, on an alternating background.
 ///
-/// A single tonal step — [ColorScheme.surface] under the even rows,
-/// [ColorScheme.surfaceContainerLow] under the odd ones — and nothing else. A
-/// long list of Arabic and translation has no natural boundary between one row
-/// and the next, and two lines of text running into two more is the complaint
-/// this answers.
+/// Even rows sit on [ColorScheme.surface]; odd rows sit on a course of the same
+/// surface with a breath of brick washed into it — see [WirdiColorSchemes.band].
+/// A long list of Arabic and translation has no natural boundary between one
+/// row and the next, and two lines of text running into two more is the
+/// complaint this answers.
 ///
-/// **Not the voussoir motif**, and not called a stripe, because
-/// `VoussoirStripe` is that and this is not. Brick and stone alternating across
-/// a row is how this app draws *data*: the week strip on a home card lets the
-/// days decide where the joints fall, and the progress stripe lets the count
-/// decide. Spending that pattern on "these are different rows" would spend the
-/// app's one figurative device on something a shade of the surface already
-/// says — and the precedent is in the README, where a voussoir arch watermark
-/// behind the home tile was drawn, looked at, and taken off again for being
-/// ornament that carried nothing. What carries over is the rhythm; the accent
-/// colour stays where it is earning its keep.
+/// **It was a rung of the neutral ladder first**, `surfaceContainerLow` under
+/// the odd rows, on the argument that brick is how this app draws *data* and
+/// should not be spent on saying "these are different rows". That was decided
+/// before looking at it on a device, where the light rung turned out to be
+/// fourteen points out of two hundred and fifty-five and the list still ran
+/// together. The course is clay now.
+///
+/// What the original argument got right, and what still holds: the week strip
+/// and the progress stripe use brick at **full** strength, and in both of them
+/// something decides where the joints fall — the days in one, the count in the
+/// other. This is a wash at eight percent, decided by nothing but whether a row
+/// is odd, and it sits behind text rather than standing for anything. Brick and
+/// stone alternating is the Mezquita's own pattern; used this faintly it is the
+/// rhythm of it and not a second progress bar.
+///
+/// The watermark precedent in the README still applies, and is the thing to
+/// measure this against: what killed the voussoir arch behind the home tile was
+/// that it carried nothing *and looked like it*. A ground a shade off the page
+/// does not have that problem — the moment it does, it is too loud, and
+/// [WirdiColorSchemes.lightBandTint] is the dial.
 ///
 /// **Applied per list, not inside the row.** `SurahRow` is shared between the
 /// surah picker and the mushaf's reading list. A picker is a list you are
@@ -49,7 +61,7 @@ class BandedRow extends StatelessWidget {
     // looking at the list; it is not information, and a screen reader announcing
     // it would be announcing the furniture.
     return Material(
-      color: index.isEven ? scheme.surface : scheme.surfaceContainerLow,
+      color: index.isEven ? scheme.surface : WirdiColorSchemes.band(scheme),
       child: child,
     );
   }

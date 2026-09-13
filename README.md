@@ -533,19 +533,35 @@ typing in — a guess that fails on the first transliterated word. Nothing is
 debounced, because there is nothing to coalesce: the rows are folded once when
 the picker opens and the filter is a `contains` over strings already in memory.
 
-**Rows in a picker sit on alternating courses.** One tonal step — `surface`
-under the even rows, `surfaceContainerLow` under the odd — and nothing else.
-Two lines of Arabic and two of translation, four hundred times over, have no
-natural boundary between one row and the next, and that is the whole problem it
-solves.
+**Rows in a picker sit on alternating courses of stone and clay.** The even
+rows are `surface`; the odd ones are that same surface with a wash of brick
+blended into it — eight percent in light, four in dark. Two lines of Arabic and
+two of translation, four hundred times over, have no natural boundary between
+one row and the next, and that is the whole problem it solves.
 
-It is deliberately **not** the voussoir motif. Brick and stone alternating
-across a row is how this app draws data — the week strip lets the days decide
-where the joints fall, the progress stripe lets the count decide — and spending
-that pattern on "these are different rows" would spend the app's one figurative
-device on something a shade of the surface already says. The precedent is the
-arch watermark above: ornament that carried nothing. What carries over here is
-the rhythm; the accent colour stays where it is earning its keep.
+That went the other way first, and the reversal is the interesting part. The
+band was a rung of the neutral ladder, `surfaceContainerLow`, on the argument
+that brick is how this app draws *data* and should not be spent on saying "these
+are different rows". It was a good argument made without looking at it: the
+light rung is fourteen points out of two hundred and fifty-five, and on a device
+the list still ran together. Dark, where the same rung reads fine, is tuned to
+keep exactly the weight it had and only pick up the warmth.
+
+What the argument got right still holds, and is the line the code has to keep
+drawing. The week strip and the progress stripe use brick at **full** strength,
+and in both of them something decides where the joints fall — the days in one,
+the count in the other. This is a wash, decided by nothing but whether a row is
+odd, sitting behind text rather than standing for anything. Brick and stone
+alternating is the Mezquita's own pattern; at eight percent it is the rhythm of
+it and not a second progress bar.
+
+The arch watermark above is still the thing to measure it against: what killed
+that was carrying nothing *and looking like it*. A ground a shade off the page
+does not have that problem — the moment it does, it is too loud, and
+`WirdiColorSchemes.lightBandTint` is the dial. The colour is derived from the
+palette rather than written down, so it follows if brick or limestone ever move,
+and it lives in `color_schemes.dart` because that file is the only place in
+`lib/` that decides a colour at all.
 
 `BandedRow` takes the row's index, so banding is a decision the *list* makes.
 `SurahRow` is shared between the surah picker and the mushaf's reading list, and
