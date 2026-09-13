@@ -5,8 +5,8 @@ import '../routes.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/voussoir_stripe.dart';
 import 'collections_screen.dart';
-import 'dhikr_screen.dart';
 import 'home_screen.dart';
+import 'tasbih_screen.dart';
 import 'tracker_screen.dart';
 
 /// The app: four destinations under one bar.
@@ -94,7 +94,7 @@ class _AppShellState extends ConsumerState<AppShell> {
           for (final (int index, Widget body) in const <Widget>[
             HomeScreen(),
             CollectionsScreen(),
-            DhikrScreen(),
+            TasbihScreen(),
             TrackerScreen(),
           ].indexed)
             PrimaryScrollController(
@@ -119,7 +119,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     // Wird because that is what is on it.
     WirdiTab.home => 'Wird',
     WirdiTab.collections => 'Collections',
-    WirdiTab.dhikr => 'Dhikr',
+    WirdiTab.tasbih => 'Tasbih',
     WirdiTab.tracker => 'Tracker',
   };
 }
