@@ -202,10 +202,11 @@ void main() {
       await settle(tester);
       await tester.tap(find.text('Edit'));
       await settle(tester);
-      // Rename lives in the editor's own overflow menu.
+      // The name lives in the editor's own overflow menu, alongside the
+      // description the same form asks for.
       await tester.tap(find.byTooltip('More').last);
       await settle(tester);
-      await tester.tap(find.text('Rename'));
+      await tester.tap(find.text('Edit details'));
       await settle(tester);
       await tester.enterText(find.byType(TextField).first, 'Al-Kahf, Fridays');
       await settle(tester);

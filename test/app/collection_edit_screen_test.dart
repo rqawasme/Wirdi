@@ -176,13 +176,12 @@ void main() {
 
     await tester.tap(find.widgetWithText(FilledButton, 'Add an item'));
     await settle(tester);
-    await tester.tap(find.text('Dhikr'));
+    await tester.tap(find.text('From collection'));
     await settle(tester);
 
-    // The built-ins, as the way in. There is no tagging and no search in this
-    // content build, so a flat list of every dhikr would have nothing to sort
-    // it by.
-    expect(find.text('Add a dhikr'), findsOneWidget);
+    // The built-ins, as the way in: this is the picker for somebody who knows
+    // which wird they want and not which words. The flat list is the other one.
+    expect(find.text('From collection'), findsOneWidget);
     expect(find.text('PLACEHOLDER collection 1 english'), findsOneWidget);
     await tester.tap(find.text('PLACEHOLDER collection 2 english'));
     await settle(tester);
@@ -211,7 +210,7 @@ void main() {
 
     await tester.tap(find.widgetWithText(FilledButton, 'Add an item'));
     await settle(tester);
-    await tester.tap(find.text('Dhikr'));
+    await tester.tap(find.text('From collection'));
     await settle(tester);
     await tester.tap(find.text('PLACEHOLDER collection 1 english'));
     await settle(tester);
@@ -364,7 +363,39 @@ void main() {
     );
   });
 
-  testWidgets('renaming keeps the collection and its items', (
+  testWidgets('the add sheet offers four ways in, and each opens its own '
+      'picker', (WidgetTester tester) async {
+    await pumpEditor(tester);
+
+    Future<void> openSheet() async {
+      await tester.tap(find.widgetWithText(FilledButton, 'Add an item'));
+      await settle(tester);
+    }
+
+    await openSheet();
+    expect(find.text('Surah'), findsOneWidget);
+    expect(find.text('Ayah'), findsOneWidget);
+    expect(find.text('From collection'), findsOneWidget);
+    expect(find.text('Dhikr'), findsOneWidget);
+
+    // The two dhikr options are different screens, and the labels have to mean
+    // what they say: "Dhikr" is the flat searchable list, "From collection"
+    // browses by the wird.
+    await tester.tap(find.text('Dhikr'));
+    await settle(tester);
+    expect(find.text('Add a dhikr'), findsOneWidget);
+    expect(find.byType(TextField), findsOneWidget);
+    await tester.tap(find.byTooltip('Back'));
+    await settle(tester);
+
+    await openSheet();
+    await tester.tap(find.text('From collection'));
+    await settle(tester);
+    expect(find.text('PLACEHOLDER collection 1 english'), findsOneWidget);
+    expect(find.byType(TextField), findsNothing);
+  });
+
+  testWidgets('editing the details keeps the collection and its items', (
     WidgetTester tester,
   ) async {
     await seedFourAdhkar();
@@ -372,18 +403,53 @@ void main() {
 
     await tester.tap(find.byTooltip('More'));
     await settle(tester);
-    await tester.tap(find.text('Rename'));
+    await tester.tap(find.text('Edit details'));
     await settle(tester);
 
     await tester.enterText(
       find.widgetWithText(TextField, 'Name'),
       'After maghrib',
     );
+    // The form asks for the description too now. It used to ask for the name
+    // alone, which left a description set at creation unreachable afterwards.
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Description'),
+      'Said once the sun is down',
+    );
     await settle(tester);
     await tester.tap(find.widgetWithText(FilledButton, 'Save'));
     await settle(tester);
 
     expect(find.text('After maghrib'), findsOneWidget);
-    expect((await resolve()).entries.length, 4);
+    final ResolvedCollection after = await resolve();
+    expect(after.collection.description, 'Said once the sun is down');
+    expect(after.entries.length, 4);
+  });
+
+  testWidgets('emptying the description clears it', (
+    WidgetTester tester,
+  ) async {
+    await pumpEditor(tester);
+
+    Future<void> save(String description) async {
+      await tester.tap(find.byTooltip('More'));
+      await settle(tester);
+      await tester.tap(find.text('Edit details'));
+      await settle(tester);
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Description'),
+        description,
+      );
+      await settle(tester);
+      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+      await settle(tester);
+    }
+
+    await save('Something about it');
+    expect((await resolve()).collection.description, 'Something about it');
+
+    // Emptying the field is the only way there is to take a description off.
+    await save('');
+    expect((await resolve()).collection.description, isNull);
   });
 }

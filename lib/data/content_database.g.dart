@@ -3348,6 +3348,14 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
     ).asyncMap(adhkar.mapFromRow);
   }
 
+  Selectable<DhikrRow> allAdhkar() {
+    return customSelect(
+      'SELECT * FROM adhkar ORDER BY id',
+      variables: [],
+      readsFrom: {adhkar},
+    ).asyncMap(adhkar.mapFromRow);
+  }
+
   Selectable<SourceRow> sourcesByIds({required List<int> ids}) {
     var $arrayStartIndex = 1;
     final expandedids = $expandVar($arrayStartIndex, ids.length);

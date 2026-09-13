@@ -468,14 +468,15 @@ void main() {
       // collections list, which is a tab away.
       await tester.tap(find.text('Collections'));
       await settle(tester);
-      // The row itself no longer opens anything — only its view button does
-      // — so it is found scoped to this row rather than by tapping the name.
+      // The row itself no longer opens anything — only its buttons do — so the
+      // play button is found scoped to this row rather than by tapping the
+      // name. The button beside it opens the contents, which is not the player.
       final Finder row = find.ancestor(
         of: find.text('PLACEHOLDER collection 1 english'),
         matching: find.byType(CollectionRow),
       );
       await tester.tap(
-        find.descendant(of: row, matching: find.byTooltip('Open collection')),
+        find.descendant(of: row, matching: find.byTooltip('Recite')),
       );
       await settle(tester);
       expect(find.text('14 of 14'), findsOneWidget);

@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'domain/collection_id.dart';
 import 'dev/dev_screen.dart';
 import 'screens/app_shell.dart';
+import 'screens/collection_contents_screen.dart';
 import 'screens/collection_edit_screen.dart';
 import 'screens/pickers/ayah_picker_screen.dart';
 import 'screens/pickers/dhikr_picker_screen.dart';
+import 'screens/pickers/from_collection_picker_screen.dart';
 import 'screens/pickers/surah_picker_screen.dart';
 import 'screens/reading_screen.dart';
 import 'screens/settings_screen.dart';
@@ -32,14 +34,26 @@ abstract final class Routes {
 
   static const String player = '/player';
 
+  /// What is in a collection, read-only. Built-in or the user's own — this is
+  /// the screen a row in the collections list opens, and the player is the
+  /// button beside the one that opens it.
+  static const String collectionContents = '/collection/contents';
+
   /// Editing one of the user's own collections.
   static const String collectionEdit = '/collection/edit';
 
-  /// The three item pickers. Each is pushed to answer one question and popped
+  /// The four item pickers. Each is pushed to answer one question and popped
   /// with a `List<PickedItem>`, or with nothing if it was backed out of.
+  ///
+  /// Two of them are about adhkar, and they answer different questions.
+  /// [pickDhikr] is the flat list of every dhikr in the content build, with a
+  /// search over it, for somebody who can remember a word. [pickFromCollection]
+  /// browses them by the built-in wird they come from, for somebody who can
+  /// remember the wird and not the words.
   static const String pickSurah = '/pick/surah';
   static const String pickAyah = '/pick/ayah';
   static const String pickDhikr = '/pick/dhikr';
+  static const String pickFromCollection = '/pick/from-collection';
 
   static const String surahList = '/quran';
   static const String reading = '/reading';
@@ -55,6 +69,17 @@ abstract final class Routes {
 final class PlayerArguments {
   const PlayerArguments({required this.collectionId});
 
+  final CollectionId collectionId;
+}
+
+/// Which collection a [Routes.collectionContents] push is opening.
+@immutable
+final class CollectionContentsArguments {
+  const CollectionContentsArguments({required this.collectionId});
+
+  /// A [CollectionId] and not a [UserCollectionId]: a built-in cannot be
+  /// edited, but it can be read, and reading one is the commonest reason to
+  /// open this screen.
   final CollectionId collectionId;
 }
 
@@ -106,6 +131,22 @@ abstract final class WirdiRouter {
               WirdPlayerScreen(collectionId: arguments.collectionId),
         );
 
+      case Routes.collectionContents:
+        final Object? arguments = settings.arguments;
+        if (arguments is! CollectionContentsArguments) {
+          throw ArgumentError.value(
+            arguments,
+            'settings.arguments',
+            'pushing ${Routes.collectionContents} needs '
+                'CollectionContentsArguments',
+          );
+        }
+        return _page(
+          settings,
+          (BuildContext _) =>
+              CollectionContentsScreen(collectionId: arguments.collectionId),
+        );
+
       case Routes.collectionEdit:
         final Object? arguments = settings.arguments;
         if (arguments is! CollectionEditArguments) {
@@ -129,6 +170,12 @@ abstract final class WirdiRouter {
 
       case Routes.pickDhikr:
         return _page(settings, (BuildContext _) => const DhikrPickerScreen());
+
+      case Routes.pickFromCollection:
+        return _page(
+          settings,
+          (BuildContext _) => const FromCollectionPickerScreen(),
+        );
 
       case Routes.surahList:
         return _page(settings, (BuildContext _) => const SurahListScreen());

@@ -94,31 +94,46 @@ class _CollectionEditScreenState extends ConsumerState<CollectionEditScreen> {
   // Adding
   // ---------------------------------------------------------------------
 
-  /// The three pickers, as a sheet rather than a menu: they are three equal
+  /// The four pickers, as a sheet rather than a menu: they are four equal
   /// choices and one of them is the answer, which is a sheet's shape.
+  ///
+  /// Scrollable, and scroll-controlled, because of the fourth one. Three tiles
+  /// with subtitles fit under any text scale; four do not at the large
+  /// accessibility sizes, and a sheet that overflows is a sheet with a choice
+  /// hidden under the bottom edge.
   Future<void> _add() async {
     final String? route = await showModalBottomSheet<String>(
       context: context,
+      isScrollControlled: true,
       builder: (BuildContext context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            ListTile(
-              title: const Text('Surah'),
-              subtitle: const Text('A whole surah, read once'),
-              onTap: () => Navigator.pop(context, Routes.pickSurah),
-            ),
-            ListTile(
-              title: const Text('Ayah'),
-              subtitle: const Text('One ayah, or a range of them'),
-              onTap: () => Navigator.pop(context, Routes.pickAyah),
-            ),
-            ListTile(
-              title: const Text('Dhikr'),
-              subtitle: const Text('Browsed by the collection it comes from'),
-              onTap: () => Navigator.pop(context, Routes.pickDhikr),
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                title: const Text('Surah'),
+                subtitle: const Text('A whole surah, read once'),
+                onTap: () => Navigator.pop(context, Routes.pickSurah),
+              ),
+              ListTile(
+                title: const Text('Ayah'),
+                subtitle: const Text('One ayah, or a range of them'),
+                onTap: () => Navigator.pop(context, Routes.pickAyah),
+              ),
+              ListTile(
+                title: const Text('From collection'),
+                subtitle: const Text(
+                  'Adhkar, browsed by the wird they come from',
+                ),
+                onTap: () => Navigator.pop(context, Routes.pickFromCollection),
+              ),
+              ListTile(
+                title: const Text('Dhikr'),
+                subtitle: const Text('Every dhikr there is, searchable'),
+                onTap: () => Navigator.pop(context, Routes.pickDhikr),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -188,16 +203,26 @@ class _CollectionEditScreenState extends ConsumerState<CollectionEditScreen> {
   // The collection itself
   // ---------------------------------------------------------------------
 
-  Future<void> _rename(CollectionSummary summary) async {
+  /// The name and the description, in the form that asked for both when the
+  /// collection was made.
+  ///
+  /// It used to ask for the name alone, which left the description write-once:
+  /// set at creation and unreachable afterwards. Emptying the field clears it,
+  /// and that is the only way there is to take one off.
+  Future<void> _editDetails(CollectionSummary summary) async {
     final CollectionForm? form = await showCollectionForm(
       context,
-      title: 'Rename',
+      title: 'Edit details',
       submitLabel: 'Save',
       initialName: summary.name,
-      askForDescription: false,
+      initialDescription: summary.description,
     );
     if (form == null || !mounted) return;
-    await _run(() => ref.read(collectionEditorProvider).rename(_id, form.name));
+    await _run(
+      () => ref
+          .read(collectionEditorProvider)
+          .editDetails(_id, name: form.name, description: form.description),
+    );
   }
 
   Future<void> _delete(CollectionSummary summary) async {
@@ -266,15 +291,15 @@ class _CollectionEditScreenState extends ConsumerState<CollectionEditScreen> {
                   icon: const Icon(Icons.more_vert),
                   tooltip: 'More',
                   onSelected: (_Action action) => switch (action) {
-                    _Action.rename => _rename(collection.collection),
+                    _Action.editDetails => _editDetails(collection.collection),
                     _Action.group => _toggleSelectingAsync(),
                     _Action.delete => _delete(collection.collection),
                   },
                   itemBuilder: (BuildContext context) =>
                       <PopupMenuEntry<_Action>>[
                         const PopupMenuItem<_Action>(
-                          value: _Action.rename,
-                          child: Text('Rename'),
+                          value: _Action.editDetails,
+                          child: Text('Edit details'),
                         ),
                         PopupMenuItem<_Action>(
                           value: _Action.group,
@@ -342,7 +367,7 @@ class _CollectionEditScreenState extends ConsumerState<CollectionEditScreen> {
   };
 }
 
-enum _Action { rename, group, delete }
+enum _Action { editDetails, group, delete }
 
 /// One row: a single item, or a whole repeat block.
 class _EntryRow extends StatelessWidget {

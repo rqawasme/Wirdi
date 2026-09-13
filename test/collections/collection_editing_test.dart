@@ -85,6 +85,51 @@ void main() {
     });
   });
 
+  group('editing the details', () {
+    test('the name and the description are written together', () async {
+      final UserCollectionId id = await editor.create('Before');
+      await editor.editDetails(id, name: '  After  ', description: '  why  ');
+
+      final ResolvedCollection resolved = await collections.resolve(id);
+      expect(resolved.collection.name, 'After');
+      expect(resolved.collection.description, 'why');
+    });
+
+    test('an all-whitespace description clears it', () async {
+      final UserCollectionId id = await editor.create(
+        'Mine',
+        description: 'something',
+      );
+      await editor.editDetails(id, name: 'Mine', description: '   ');
+      expect((await collections.resolve(id)).collection.description, isNull);
+    });
+
+    test('an empty name is refused before anything is written', () async {
+      final UserCollectionId id = await editor.create(
+        'Mine',
+        description: 'something',
+      );
+      // The closure form: the guard runs before the future is returned, so the
+      // refusal is thrown synchronously the way `create`'s is.
+      expect(
+        () => editor.editDetails(id, name: '  ', description: 'else'),
+        throwsA(
+          isA<CollectionEditingError>().having(
+            (CollectionEditingError e) => e.message,
+            'message',
+            'A collection needs a name.',
+          ),
+        ),
+      );
+
+      // Neither half landed: a rename that fails must not take the
+      // description with it.
+      final ResolvedCollection resolved = await collections.resolve(id);
+      expect(resolved.collection.name, 'Mine');
+      expect(resolved.collection.description, 'something');
+    });
+  });
+
   group('duplicating a built-in', () {
     test('preserves order, counts, notes and repeat groups', () async {
       final ResolvedCollection source = await collections.resolve(mixed);

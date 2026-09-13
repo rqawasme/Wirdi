@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'
     show FilteringTextInputFormatter, TextInputFormatter;
 
+import '../collections/picked_item.dart';
 import '../domain/commitment.dart';
+import '../domain/content.dart';
+import '../domain/content_ref.dart';
 import '../theme/theme.dart';
 
 /// What the name-and-description form came back with.
@@ -180,6 +183,30 @@ Future<ItemOptions?> showItemOptions(
       subtitle: subtitle,
       naturalCount: naturalCount,
     ),
+  );
+}
+
+/// The count-and-note question for a dhikr, wherever it was found, and the
+/// [PickedItem] the answer makes.
+///
+/// Both dhikr pickers end here — the flat searchable list and the one that
+/// browses by collection — and neither should be deciding on its own what a
+/// dhikr's natural count is. It is the dhikr's own `default_count`, so leaving
+/// the field alone writes no override at all.
+///
+/// Null when the dialog was dismissed.
+Future<PickedItem?> askDhikrOptions(BuildContext context, Dhikr dhikr) async {
+  final ItemOptions? options = await showItemOptions(
+    context,
+    title: 'Add this dhikr',
+    subtitle: dhikr.translation,
+    naturalCount: dhikr.defaultCount,
+  );
+  if (options == null) return null;
+  return PickedItem(
+    ref: ContentRef.dhikr(dhikr.id),
+    count: options.count,
+    note: options.note,
   );
 }
 

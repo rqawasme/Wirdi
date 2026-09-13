@@ -8,6 +8,7 @@ import '../../domain/content.dart';
 import '../../providers/editing.dart';
 import '../../providers/reading.dart';
 import '../../theme/theme.dart';
+import '../../widgets/banded_row.dart';
 import '../../widgets/collection_dialogs.dart';
 import '../../widgets/failure_screen.dart';
 import '../../widgets/surah_row.dart';
@@ -40,9 +41,12 @@ class AyahPickerScreen extends ConsumerWidget {
           ),
         AsyncData(:final List<Surah> value) => ListView.builder(
           itemCount: value.length,
-          itemBuilder: (BuildContext context, int index) => SurahRow(
-            surah: value[index],
-            onTap: () => _openRange(context, value[index]),
+          itemBuilder: (BuildContext context, int index) => BandedRow(
+            index: index,
+            child: SurahRow(
+              surah: value[index],
+              onTap: () => _openRange(context, value[index]),
+            ),
           ),
         ),
         _ => const Center(child: CircularProgressIndicator()),

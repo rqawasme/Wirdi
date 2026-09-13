@@ -98,6 +98,12 @@ class DriftContentRepository implements ContentRepository {
   }
 
   @override
+  Future<List<Dhikr>> adhkar() async {
+    final List<DhikrRow> rows = await _db.allAdhkar().get();
+    return rows.map(dhikrFromRow).toList(growable: false);
+  }
+
+  @override
   Future<Dhikr> dhikr(int id) async {
     final DhikrRow? row = await _db.dhikrById(id: id).getSingleOrNull();
     if (row == null) {

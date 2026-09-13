@@ -29,6 +29,14 @@ abstract class ContentRepository {
 
   Future<Dhikr> dhikr(int id);
 
+  /// Every dhikr in this content build, by id — 496 rows in the current one.
+  ///
+  /// The whole table, deliberately. The dhikr picker matches Arabic
+  /// diacritic-insensitively and `adhkar` carries no normalised column to match
+  /// against, so the search runs in Dart over rows read once. See
+  /// `ArabicText.simplify` for why the folding cannot live in SQL.
+  Future<List<Dhikr>> adhkar();
+
   /// What this content build is and where it came from.
   ///
   /// Needed to credit the Quran text and the translation without hard-coding
@@ -48,7 +56,19 @@ abstract class CollectionRepository {
 
   Future<UserCollectionId> create(String name, {String? description});
 
-  Future<void> rename(UserCollectionId id, String name);
+  /// Sets the name and the description together.
+  ///
+  /// A required nullable [description] rather than an optional one: null means
+  /// "no description", where an optional parameter would be ambiguous about
+  /// whether it meant that or "leave whatever is there alone".
+  ///
+  /// One statement rather than two, so a rename cannot land while the
+  /// description it was written alongside does not.
+  Future<void> updateDetails(
+    UserCollectionId id, {
+    required String name,
+    required String? description,
+  });
 
   /// [note] is a rubric shown with the item, mirroring what the content
   /// pipeline authors for built-ins. It is here so that copying a built-in

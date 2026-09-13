@@ -167,13 +167,14 @@ class _Hairline extends StatelessWidget {
   }
 }
 
-/// One collection, and what can be done to it: open it, commit it, or reach
-/// the rest through the overflow menu.
+/// One collection, and what can be done to it: look inside it, recite it,
+/// commit it, or reach the rest through the overflow menu.
 ///
-/// The row's body carries no `onTap` of its own — three separate buttons
-/// covering "open", "commit" and "everything else" made a fourth, implicit
-/// one (the row itself) a false economy: it duplicated the first button
-/// without looking like a button at all.
+/// The row's body carries no `onTap` of its own — separate buttons covering
+/// "look inside", "recite", "commit" and "everything else" made a fifth,
+/// implicit one (the row itself) a false economy: it would duplicate one of
+/// them without looking like a button at all, and there is no longer an obvious
+/// candidate for which.
 class _Row extends ConsumerWidget {
   const _Row({required this.listing});
 
@@ -191,7 +192,8 @@ class _Row extends ConsumerWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          _ViewButton(listing: listing),
+          _ContentsButton(listing: listing),
+          _PlayButton(listing: listing),
           _CommitButton(listing: listing, commitment: commitment),
           _RowMenu(listing: listing, commitment: commitment),
         ],
@@ -200,10 +202,18 @@ class _Row extends ConsumerWidget {
   }
 }
 
-/// Opens the collection in the player — the single most common thing to do
-/// with a row, so it gets its own button rather than a menu entry.
-class _ViewButton extends ConsumerWidget {
-  const _ViewButton({required this.listing});
+/// Opens the collection's contents: what is in it, in the order it is recited.
+///
+/// This used to be the player, which meant the only way to find out what a wird
+/// contained was to start reciting it. Looking and reciting are now two
+/// buttons, and this is the one people reach for when they do not yet know
+/// which collection they want.
+///
+/// `Icons.list_alt_outlined` rather than `Icons.format_list_bulleted`, which is
+/// the Collections tab's own glyph and would read as "you are here" instead of
+/// "look inside this"; and not `Icons.menu_book_outlined`, which is the mushaf.
+class _ContentsButton extends ConsumerWidget {
+  const _ContentsButton({required this.listing});
 
   final CollectionListing listing;
 
@@ -211,7 +221,40 @@ class _ViewButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return IconButton(
       visualDensity: VisualDensity.compact,
-      tooltip: 'Open collection',
+      tooltip: 'See what is in it',
+      icon: const Icon(Icons.list_alt_outlined),
+      onPressed: () => _open(context, ref),
+    );
+  }
+
+  Future<void> _open(BuildContext context, WidgetRef ref) async {
+    await Navigator.pushNamed(
+      context,
+      Routes.collectionContents,
+      arguments: CollectionContentsArguments(collectionId: listing.id),
+    );
+    // The contents screen recites nothing itself, but the player is one row
+    // away in the list behind it and a return here can have a finished wird
+    // behind it too. Refreshing costs a handful of indexed reads.
+    if (context.mounted) {
+      ref.invalidate(collectionListingsProvider);
+      ref.invalidate(homeViewProvider);
+    }
+  }
+}
+
+/// Opens the collection in the player — the single most common thing to do
+/// with a row, so it keeps its own button rather than becoming a menu entry.
+class _PlayButton extends ConsumerWidget {
+  const _PlayButton({required this.listing});
+
+  final CollectionListing listing;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return IconButton(
+      visualDensity: VisualDensity.compact,
+      tooltip: 'Recite',
       icon: const Icon(Icons.play_arrow_outlined),
       onPressed: () => _open(context, ref),
     );

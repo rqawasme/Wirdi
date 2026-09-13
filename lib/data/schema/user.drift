@@ -112,8 +112,15 @@ insertUserCollection:
         (id, name, description, sort_order, created_at, updated_at, deleted_at)
     VALUES (:id, :name, :description, :sortOrder, :createdAt, :updatedAt, NULL);
 
-renameUserCollection:
-    UPDATE user_collections SET name = :name, updated_at = :updatedAt
+-- Name and description together, in one statement. The form asks both questions at
+-- once, and a half-applied answer — a renamed collection carrying the description of
+-- what it used to be — is worse than a refused one.
+--
+-- NULL clears the description. A description somebody emptied is a description they
+-- removed, and the form hands back null for an empty field.
+updateUserCollectionDetails:
+    UPDATE user_collections
+    SET name = :name, description = :description, updated_at = :updatedAt
     WHERE id = :id AND deleted_at IS NULL;
 
 softDeleteUserCollection:

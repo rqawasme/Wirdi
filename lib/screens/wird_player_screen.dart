@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../collections/item_labels.dart';
 import '../domain/collection.dart';
 import '../domain/collection_id.dart';
 import '../domain/content.dart';
@@ -355,24 +356,10 @@ class _StepHeader extends ConsumerWidget {
 
   /// What this step is called, and what kind of thing it is under that.
   ///
-  /// A dhikr has neither: `adhkar` has no title column, and the nearest things
-  /// to one — the transliteration, the translation — are both already on the
-  /// screen underneath, where they are being recited from. So it is named by
-  /// its kind and the second line goes, rather than printing the dhikr twice.
+  /// Delegated to [itemHeading] so that the item sheet on the contents screen
+  /// calls the same ayah the same thing this does.
   (String, String?) _title(WidgetRef ref, CollectionItemEntry? item) =>
-      switch (item) {
-        SurahItem(:final Surah surah) => (
-          surah.nameTransliterated,
-          'Surah ${surah.number} · ${surah.ayahCount} ayahs',
-        ),
-        AyahItem(:final Ayah ayah) => (
-          '${_surahName(ref, ayah.surahNumber)} '
-              '${ayah.surahNumber}:${ayah.ayahNumber}',
-          'Single ayah',
-        ),
-        DhikrItem() => ('Dhikr', null),
-        null => ('Unavailable', null),
-      };
+      itemHeading(item, surahName: (int number) => _surahName(ref, number));
 
   /// The transliterated surah name, for an ayah that names its surah.
   ///

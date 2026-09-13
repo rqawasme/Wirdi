@@ -2863,15 +2863,17 @@ abstract class _$UserDatabase extends GeneratedDatabase {
     );
   }
 
-  Future<int> renameUserCollection({
+  Future<int> updateUserCollectionDetails({
     required String name,
+    String? description,
     required int updatedAt,
     required String id,
   }) {
     return customUpdate(
-      'UPDATE user_collections SET name = ?1, updated_at = ?2 WHERE id = ?3 AND deleted_at IS NULL',
+      'UPDATE user_collections SET name = ?1, description = ?2, updated_at = ?3 WHERE id = ?4 AND deleted_at IS NULL',
       variables: [
         Variable<String>(name),
+        Variable<String>(description),
         Variable<int>(updatedAt),
         Variable<String>(id),
       ],

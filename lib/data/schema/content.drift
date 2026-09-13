@@ -125,6 +125,16 @@ dhikrById: SELECT * FROM adhkar WHERE id = :id;
 
 adhkarByIds: SELECT * FROM adhkar WHERE id IN :ids;
 
+-- The whole adhkar table: 496 rows in the current build. The dhikr picker searches
+-- it in Dart, because `adhkar` has no `text_simple` the way `ayahs` does and SQLite's
+-- LIKE folds ASCII case and nothing else — so a WHERE clause here would do the English
+-- half of the search in SQL and the Arabic half somewhere else. See ArabicText.simplify.
+--
+-- Ordered by id, which is the order the content build assigned them in: adhkar from
+-- the same source file land together, so the unsearched list opens on something with
+-- a shape rather than on a shuffle.
+allAdhkar: SELECT * FROM adhkar ORDER BY id;
+
 -- The fourth batched fetch of collection resolution: the references cited by
 -- the adhkar just fetched. Sourcing is a trust feature, so the reference rides
 -- along with the dhikr rather than waiting on a lookup the UI might forget.

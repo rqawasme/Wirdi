@@ -76,6 +76,14 @@ VERSE_KEY_RE = re.compile(r"^(\d{1,3}):(\d{1,3})$")
 #
 # Reviewed and kept, 2026-08-30. Changing any of this silently changes what
 # text_simple matches, so treat it as a content migration, not a tweak.
+#
+# simplify_arabic() is also written out in Dart, as ArabicText.simplify in
+# lib/quran/arabic_text.dart, because the adhkar table has no text_simple column
+# and cannot be given one — tool/check_schema_parity.py requires content.drift
+# to mirror SCHEMA_SQL verbatim — so the dhikr picker's search folds its rows at
+# read time instead. The two are a matched pair and must agree character for
+# character. test/data/real_content_db_test.dart is the guard: it folds every
+# ayah of the built database in Dart and expects the string written here.
 DIACRITIC_RANGES: tuple[tuple[int, int], ...] = (
     (0x064B, 0x065F),  # tanween, harakat, shadda, sukun, and the Quranic
                        # vowel signs through U+065F (widened from U+0656)

@@ -323,11 +323,52 @@ void main() {
       expect(resolved.collection.isBuiltin, isFalse);
     });
 
-    test('rename', () async {
-      final UserCollectionId id = await collections.create('Before');
-      await collections.rename(id, 'After');
+    test(
+      'updateDetails writes the name and the description together',
+      () async {
+        final UserCollectionId id = await collections.create(
+          'Before',
+          description: 'before',
+        );
+        await collections.updateDetails(
+          id,
+          name: 'After',
+          description: 'after',
+        );
+        final ResolvedCollection resolved = await collections.resolve(id);
+        expect(resolved.collection.name, 'After');
+        expect(resolved.collection.description, 'after');
+      },
+    );
+
+    test('updateDetails clears the description with null', () async {
+      final UserCollectionId id = await collections.create(
+        'Mine',
+        description: 'a description',
+      );
+      await collections.updateDetails(id, name: 'Mine', description: null);
       final ResolvedCollection resolved = await collections.resolve(id);
-      expect(resolved.collection.name, 'After');
+      expect(resolved.collection.description, isNull);
+    });
+
+    test('updateDetails refuses a collection that is not there', () async {
+      await expectLater(
+        collections.updateDetails(
+          UserCollectionId('nobody'),
+          name: 'Whatever',
+          description: null,
+        ),
+        throwsA(isA<CollectionNotFoundException>()),
+      );
+    });
+
+    test('updateDetails refuses a deleted collection', () async {
+      final UserCollectionId id = await collections.create('Mine');
+      await collections.delete(id);
+      await expectLater(
+        collections.updateDetails(id, name: 'Again', description: null),
+        throwsA(isA<CollectionNotFoundException>()),
+      );
     });
 
     test('removeItem drops just that item', () async {

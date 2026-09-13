@@ -69,6 +69,17 @@ void main() {
     expect(dhikr.textArabic, contains('1002'));
   });
 
+  test('adhkar returns the whole table, by id', () async {
+    // The dhikr picker reads all of it once and searches it in Dart, because
+    // `adhkar` has no normalised column to match Arabic against.
+    final List<Dhikr> all = await content.adhkar();
+    expect(
+      <int>[for (final Dhikr d in all) d.id],
+      <int>[1001, 1002, 1003, 1004, 1005],
+    );
+    expect(all.first.defaultCount, 1);
+  });
+
   group('ayahRange', () {
     test('returns the inclusive range', () async {
       final List<Ayah> ayahs = await content.ayahRange(1, 2, 4);

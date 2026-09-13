@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show FutureProviderFamily;
 
 import '../collections/collection_editing.dart';
+import '../collections/dhikr_search.dart';
 import '../collections/picked_item.dart';
 import '../domain/collection.dart';
 import '../domain/collection_id.dart';
@@ -32,6 +33,22 @@ final FutureProvider<List<CollectionSummary>> builtinCollectionsProvider =
           .where((CollectionSummary s) => s.isBuiltin)
           .toList(growable: false);
     }, name: 'builtinCollections');
+
+/// Every dhikr in the content build, folded for search.
+///
+/// Read when the dhikr picker opens and dropped when it closes; nothing keeps
+/// it alive, and nothing should — 496 rows of Arabic and English is well under
+/// a megabyte to hold for as long as a picker is on screen, and the whole
+/// process lifetime to hold it for one.
+final FutureProvider<List<SearchableDhikr>> searchableAdhkarProvider =
+    FutureProvider<List<SearchableDhikr>>((Ref ref) async {
+      final List<Dhikr> adhkar = await ref
+          .watch(contentRepositoryProvider)
+          .adhkar();
+      return <SearchableDhikr>[
+        for (final Dhikr dhikr in adhkar) SearchableDhikr.of(dhikr),
+      ];
+    }, name: 'searchableAdhkar');
 
 /// The editing actions, over [CollectionRepository] and nothing else.
 ///
@@ -79,12 +96,25 @@ final class CollectionEditor {
     );
   }
 
-  Future<void> rename(UserCollectionId id, String name) {
+  /// Renames and re-describes in one edit, because the form asks both
+  /// questions at once.
+  ///
+  /// The name is still required; the description is still optional, and
+  /// emptying it clears it — which is the only way there is to take one off.
+  Future<void> editDetails(
+    UserCollectionId id, {
+    required String name,
+    String? description,
+  }) {
     final String trimmed = name.trim();
     if (trimmed.isEmpty) {
       throw const CollectionEditingError('A collection needs a name.');
     }
-    return _collections.rename(id, trimmed);
+    return _collections.updateDetails(
+      id,
+      name: trimmed,
+      description: _clean(description),
+    );
   }
 
   Future<void> delete(UserCollectionId id) => _collections.delete(id);
