@@ -19,6 +19,12 @@ abstract final class SettingKeys {
   static const String showStreak = 'streak.visible';
   static const String checkForUpdates = 'updates.check';
 
+  // `tasbih.count` is written into the same table and is deliberately not
+  // here: it is not part of [WirdiSettings], because putting it there would
+  // rebuild every widget watching the settings on every tap of a counter. It
+  // belongs to `TasbihCounter.settingKey`, which is the only thing that reads
+  // or writes it.
+
   static const String devQuranInGold = 'dev.quran_in_gold';
   static const String devArabicFace = 'dev.arabic_face';
   static const String devDimBrackets = 'dev.dim_brackets';

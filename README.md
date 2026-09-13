@@ -171,7 +171,7 @@ lib/
   screens/                the four-tab shell and its tabs, wird player, surah
                           list, reading view, collection editor, settings
   screens/pickers/        surah, ayah and dhikr, each popped with its answer
-  player/                 the counter's state and its haptics — no widgets
+  player/                 the counters' state and their haptics — no widgets
   collections/            editing and calendar logic, with no widgets in it
   widgets/                the pieces the screens share
   providers/              riverpod: the databases, the repositories, settings
@@ -182,7 +182,7 @@ lib/
 
 ### The app shell and the home screen
 
-Four destinations — Home, Collections, Dhikr, Tracker — and four is the ceiling.
+Four destinations — Home, Collections, Tasbih, Tracker — and four is the ceiling.
 A fifth would mean the information architecture is wrong rather than that the
 bar needs another slot, which is why the mushaf is an app-bar action rather than
 a tab.
@@ -311,11 +311,30 @@ night is not half done this morning — it has not been started. That rule lives
 in one place, which is what keeps a tile, the collections list and the player
 from disagreeing about where the day begins.
 
-The Dhikr tab is deliberately empty. Nothing in either database describes a
-standalone single-dhikr counter yet — `content.db` has adhkar and it has
-collections, and a dhikr on its own is neither — so the tab says so rather than
-being filled by listing every dhikr in the database, which would be a product
-decision made by whoever was nearest the keyboard.
+### The tasbih tab
+
+A free counter, and nothing else. One enormous tap target, the running count in
+72dp numerals over it, and undo and reset in a bar underneath — no dhikr behind
+the number, no target in front of it, and no history kept of what it reached.
+
+**It counts until somebody resets it.** Not until the end of a step, not until
+midnight, and not until the app is closed: `TasbihCounter` persists the number
+under `tasbih.count` in `user.db`'s settings table, so a tab switch and a cold
+start both come back to the count that was left. Writes are rate-limited to one
+every half second while counting — the player's rule, for the player's reason —
+and a reset is written immediately, because it is the change that would be worst
+to lose.
+
+**It is deliberately not the wird player.** The player counts *something*, a
+step at a time, and finishes; this counts taps, and does not. What it borrows is
+the shape — `lib/player/tasbih_counter.dart` is a `ChangeNotifier` with no
+widget in it, and the screen is a `ListenableBuilder` over it — and the two
+rules the counting path lives by: nothing animates, and feedback is the haptic,
+through the same `PlayerHaptics` and the same settings switch.
+
+**Reset asks first.** It sits a thumb's width from a target being tapped at
+speed, and what it throws away is however long somebody has been counting. Undo
+does not ask: it takes back one tap, which is what a mis-tap costs.
 
 ### The wird player
 
@@ -735,6 +754,8 @@ Quran text rendered in a substituted font is not the same text.
 | Translation | Inter | 15 | 1.6 |
 | Dhikr caption | Inter | 13 | 1.5 |
 | Section header | Inter | 17 | 1.4 |
+| Player count | Inter | 40 | 1.1 |
+| Tasbih count | Inter | 72 | 1.1 |
 | Nav and labels | Inter | 14 | 1.4 |
 | Caption and meta | Inter | 12 | 1.4 |
 

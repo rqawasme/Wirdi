@@ -217,7 +217,7 @@ void main() {
 
     await shootSheet(0, '01b2-commit-sheet-every-day');
     await shootSheet(1, '01b3-commit-sheet-one-day');
-    await openTab(WirdiTab.dhikr, '01c-dhikr');
+    await openTab(WirdiTab.tasbih, '01c-tasbih');
     await openTab(WirdiTab.tracker, '01d-tracker');
     await openTab(WirdiTab.home, '01e-home-again');
 

@@ -15,7 +15,11 @@ enum WirdiTab {
   // throughout, so this is the nearest the bundled Material Icons get.
   home(Icons.home_outlined, 'Home'),
   collections(Icons.format_list_bulleted, 'Collections'),
-  dhikr(Icons.repeat, 'Dhikr'),
+  // Repeat, and not a counter glyph: Material has nothing that means a hand
+  // counting beads, and every candidate that means "add one" — plus-one, a
+  // filled circle with a plus in it — says the button does the counting, when
+  // on that screen the whole page does.
+  tasbih(Icons.repeat, 'Tasbih'),
   tracker(Icons.calendar_month, 'Tracker');
 
   const WirdiTab(this.icon, this.label);

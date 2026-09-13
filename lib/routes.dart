@@ -23,7 +23,7 @@ import 'screens/wird_player_screen.dart';
 /// requirement it will bring its own constraints, and choosing a router before
 /// then is choosing without them.
 abstract final class Routes {
-  /// The four-tab shell: Home, Collections, Dhikr, Tracker. The app opens
+  /// The four-tab shell: Home, Collections, Tasbih, Tracker. The app opens
   /// here, on Home. Every top-level screen is a tab of this one rather than a
   /// route of its own, so the navigation bar never appears over something
   /// pushed on top of it.

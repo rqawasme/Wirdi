@@ -151,6 +151,14 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
   /// returns to between repetitions without reading.
   static const double counterSize = 40;
 
+  /// The tasbih tab's running count. The largest type in the app.
+  ///
+  /// Nearly twice [counterSize] because it is not sharing the screen with
+  /// anything. The player's readout sits in a band under the verse being
+  /// recited and has to stay out of its way; on the tasbih tab the number *is*
+  /// the screen, and it is meant to be read at arm's length from a phone lying
+  /// on the floor.
+  static const double tasbihCountSize = 72;
   /// `الحمد لله` on the finished step, and the sentence under it.
   ///
   /// The two largest things the app sets outside the mushaf, and deliberately:
@@ -314,6 +322,17 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
   /// far more visible at 40px than anywhere else in the app.
   TextStyle get counter => _latin(
     size: counterSize,
+    weight: FontWeight.w500,
+    lineHeight: 1.1,
+  ).copyWith(fontFeatures: const <FontFeature>[FontFeature.tabularFigures()]);
+
+  /// The running count on the tasbih tab.
+  ///
+  /// [counter] at [tasbihCountSize], tabular for the same reason and more so:
+  /// the width a proportional digit gains or loses is proportional too, so the
+  /// sideways jolt this prevents is nearly twice as far here as it is there.
+  TextStyle get tasbihCount => _latin(
+    size: tasbihCountSize,
     weight: FontWeight.w500,
     lineHeight: 1.1,
   ).copyWith(fontFeatures: const <FontFeature>[FontFeature.tabularFigures()]);
