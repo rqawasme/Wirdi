@@ -315,9 +315,15 @@ class _SurahBodyState extends ConsumerState<_SurahBody> {
       child: ListView.builder(
         key: _listKey,
         controller: _controller,
-        padding: const EdgeInsets.only(
-          top: WirdiMetrics.space6,
-          bottom: WirdiMetrics.space6,
+        // The bottom is the constant plus the system's own inset, so the
+        // last ayah of a surah is readable rather than half behind Android's
+        // navigation bar — see [WirdiMetrics.withSystemBottom].
+        padding: WirdiMetrics.withSystemBottom(
+          context,
+          const EdgeInsets.only(
+            top: WirdiMetrics.space6,
+            bottom: WirdiMetrics.space6,
+          ),
         ),
         itemCount: reading.ayahs.length + _leading,
         itemBuilder: (BuildContext context, int index) {

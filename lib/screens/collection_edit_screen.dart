@@ -336,7 +336,13 @@ class _CollectionEditScreenState extends ConsumerState<CollectionEditScreen> {
               // fight the tap that selects it, and a row that sometimes picks
               // itself up is a row nobody trusts.
               buildDefaultDragHandles: false,
-              padding: const EdgeInsets.only(bottom: WirdiMetrics.space6),
+              // Plus the system's own inset: the last row is one a drag has to
+              // be able to reach, and a row under the navigation bar is not —
+              // see [WirdiMetrics.withSystemBottom].
+              padding: WirdiMetrics.withSystemBottom(
+                context,
+                const EdgeInsets.only(bottom: WirdiMetrics.space6),
+              ),
               itemCount: entries.length,
               // onReorderItem rather than the deprecated onReorder: it hands
               // back an index already adjusted for the row having been taken

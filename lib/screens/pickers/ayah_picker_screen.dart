@@ -171,7 +171,12 @@ class _AyahRangeScreenState extends ConsumerState<_AyahRangeScreen> {
     return PickerScaffold(
       title: widget.surah.nameTransliterated,
       body: ListView(
-        padding: const EdgeInsets.all(WirdiMetrics.space5),
+        // Plus the system's own inset — see [WirdiMetrics.withSystemBottom].
+        // The Add button is the bottom of this form.
+        padding: WirdiMetrics.withSystemBottom(
+          context,
+          const EdgeInsets.all(WirdiMetrics.space5),
+        ),
         children: <Widget>[
           Text(
             '${widget.surah.ayahCount} '

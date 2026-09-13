@@ -40,7 +40,14 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.only(bottom: WirdiMetrics.space6),
+        // The About button is the last thing on this screen, so the system's
+        // own bottom inset is part of this padding — see
+        // [WirdiMetrics.withSystemBottom]. Without it Android's three-button
+        // navigation bar sits on top of the button.
+        padding: WirdiMetrics.withSystemBottom(
+          context,
+          const EdgeInsets.only(bottom: WirdiMetrics.space6),
+        ),
         children: <Widget>[
           const _Preview(),
           const VoussoirStripe.rule(),
