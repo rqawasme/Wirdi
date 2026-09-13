@@ -434,9 +434,8 @@ void main() {
   });
 
   group('finishing', () {
-    testWidgets('the last step logs the completion and goes back to the list', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('the last step logs the completion and shows the finished '
+        'step, which closes on a tap', (WidgetTester tester) async {
       tester.view.physicalSize = const Size(400, 1400);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
@@ -488,20 +487,62 @@ void main() {
       await tester.tap(text);
       await tester.pump();
       await tester.tap(text);
-
-      // The quiet mark: the stripe solid and the screen still there. Nothing
-      // is animating — the hold is the whole of it.
       await tester.pump();
+
+      // The finished step, shaped like every step before it: a header, a tap
+      // target, and the band naming the gesture. The stripe is solid.
       expect(find.text('Wird complete'), findsOneWidget);
+      expect(find.text('May it be accepted.'), findsOneWidget);
+      expect(find.text('done'), findsOneWidget);
+      expect(find.text('Tap anywhere above to close'), findsOneWidget);
       expect(_stripe(tester).value, 1);
+      // Nothing has left on its own, and nothing is going to.
+      await tester.pump(const Duration(seconds: 2));
+      expect(find.text('May it be accepted.'), findsOneWidget);
 
-      await tester.pump(const WirdiMotion.standardTiming().completion);
-      await settle(tester);
-
-      // Back on the list, with the row marked.
-      expect(find.textContaining('Done today'), findsOneWidget);
+      // The completion is logged the moment the wird ends, not when the step
+      // is closed: the run of days it reports is read back from the table.
       expect(await dbs.userRepository().isCompletedToday(mixed), isTrue);
       expect(await dbs.userRepository().progress(mixed), isNull);
+      await settle(tester);
+      expect(find.text('A day begun.'), findsOneWidget);
+
+      // A tap anywhere in the content area closes it, the same gesture that
+      // counted every step.
+      await tester.tap(find.text('May it be accepted.'));
+      await settle(tester);
+
+      // Back on the list it was opened from, with the row marked.
+      expect(find.textContaining('Done today'), findsOneWidget);
+    });
+
+    testWidgets('the tap that finished the wird does not close the step', (
+      WidgetTester tester,
+    ) async {
+      await openAt(tester, 13);
+      expect(find.text('14 of 14'), findsOneWidget);
+
+      final Finder text = find.text('PLACEHOLDER dhikr 1003 translation');
+      await tester.tap(text);
+      await tester.pump();
+      await tester.tap(text);
+      await tester.pump();
+      await tester.tap(text);
+      await tester.pump();
+
+      // A tasbih is counted faster than a screen changes, and the tap after
+      // the last one is already on its way down. It lands on the finished
+      // step, which is not taking taps yet — so the reciter sees the end of
+      // their wird instead of tapping straight through it.
+      expect(_closeTap(tester), isNull);
+      await tester.tap(find.text('May it be accepted.'));
+      await tester.pump();
+      expect(find.text('May it be accepted.'), findsOneWidget);
+
+      // The beat over, the whole content area is the way out, exactly as it
+      // was the way forward on every step before this one.
+      await tester.pump(const WirdiMotion.standardTiming().completion);
+      expect(_closeTap(tester), isNotNull);
     });
   });
 
@@ -521,6 +562,20 @@ void main() {
       expect(await dbs.userRepository().progress(mixed), isNull);
     });
   });
+}
+
+/// What a tap on the finished step's content area does, or null while the step
+/// is still ignoring taps.
+VoidCallback? _closeTap(WidgetTester tester) {
+  return tester
+      .widgetList<GestureDetector>(
+        find.ancestor(
+          of: find.text('May it be accepted.'),
+          matching: find.byType(GestureDetector),
+        ),
+      )
+      .first
+      .onTap;
 }
 
 /// Where the content area is scrolled to.

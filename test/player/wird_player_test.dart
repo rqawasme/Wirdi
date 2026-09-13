@@ -559,6 +559,51 @@ void main() {
       },
     );
 
+    test(
+      'the finished wird reports the run of days it just extended',
+      () async {
+        const CollectionId id = BuiltinCollectionId(1);
+        // Yesterday's completion, so today's makes a run of two.
+        await user.logCompletion(id, now.subtract(const Duration(days: 1)));
+
+        final WirdPlayer player = playerFor(
+          collectionOf(<CollectionEntry>[
+            dhikrItem(1001, position: 1, count: 3),
+            dhikrItem(1002, position: 2, count: 4),
+          ]),
+        );
+
+        // Nothing to report before the wird is over, and nothing the instant it
+        // is: the count is read back from the table, behind the write that put
+        // today in it.
+        expect(player.completedStreak, isNull);
+        expect(player.totalRepetitions, 7);
+
+        for (int tap = 0; tap < 7; tap++) {
+          player.increment();
+        }
+        expect(player.finished, isTrue);
+        expect(player.completedStreak, isNull);
+
+        await player.flush();
+        expect(player.completedStreak, 2);
+      },
+    );
+
+    test('starting over takes the run of days back off the screen', () async {
+      final WirdPlayer player = playerFor(
+        collectionOf(<CollectionEntry>[dhikrItem(1001, position: 1, count: 1)]),
+      );
+
+      player.increment();
+      await player.flush();
+      expect(player.completedStreak, 1);
+
+      player.startOver();
+      expect(player.finished, isFalse);
+      expect(player.completedStreak, isNull);
+    });
+
     test('further taps after the end do nothing', () async {
       final WirdPlayer player = playerFor(
         collectionOf(<CollectionEntry>[dhikrItem(1001, position: 1, count: 1)]),

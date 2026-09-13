@@ -394,10 +394,31 @@ background. Every write goes through one ordered chain, which is what keeps a
 count queued half a second ago from landing after the completion cleared the
 row.
 
-**Finishing** logs the completion, clears the progress row, holds the solid
-stripe for about half a second, and returns to the list. That hold is the one
-deliberate beat in the app — no confetti, no sound — and with reduce-motion on
-it is skipped.
+**Finishing** logs the completion, clears the progress row, and lands on a
+**finished step**. It is a step like the others and that is the whole of its
+design: the same header, the same content area as the tap target, the same band
+naming the gesture, the same controls underneath. What changes is what each of
+them says. The header reads `Wird complete` over `12 steps · 87 repetitions`,
+the band swaps the numeral for a check and reads `done` / `Tap anywhere above
+to close`, and the content area carries two sentences — `May it be accepted.`
+and this collection's run of days in the home tile's own words (`A day begun.`,
+`4 days and counting.`). There is no button, because no other step has one and
+the end of a wird is a poor place to teach a new gesture.
+
+What keeps that from being a celebration is the same argument the home tile
+makes: nothing escalates — the lines read the same at three hundred days as at
+three — nothing is negative, and the mark itself is the app's own material, the
+stripe above gone solid because the wird filled it. No confetti, no sound,
+nothing animating.
+
+The run of days is read back **after** the completion is written, on the same
+ordered chain, so the number includes the wird just finished; until that read
+lands the line is simply absent rather than guessed at. The screen no longer
+leaves on its own — it waits for the tap, and goes back to whichever of Home or
+the collections list opened it. `WirdiMotion.completion` is still the one
+deliberate beat in the app, spent differently: for that half second the
+finished step ignores taps, because a tasbih is counted faster than a screen
+changes and the tap after the last one is already on its way down.
 
 ### The reading view
 

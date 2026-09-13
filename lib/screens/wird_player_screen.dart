@@ -55,10 +55,6 @@ class _WirdPlayerScreenState extends ConsumerState<WirdPlayerScreen> {
 
   WirdPlayer? _player;
 
-  /// The completion beat is running. Guards against a second notification
-  /// starting a second one.
-  bool _leaving = false;
-
   @override
   void initState() {
     super.initState();
@@ -91,7 +87,6 @@ class _WirdPlayerScreenState extends ConsumerState<WirdPlayerScreen> {
       return player;
     }
     _player = player;
-    player.addListener(_onPlayerChanged);
     return player;
   }
 
@@ -103,33 +98,19 @@ class _WirdPlayerScreenState extends ConsumerState<WirdPlayerScreen> {
   @override
   void dispose() {
     _lifecycle.dispose();
-    _player?.removeListener(_onPlayerChanged);
     // Writes whatever is pending on the way out: leaving the player is exactly
     // when the position needs to be durable.
     _player?.dispose();
     super.dispose();
   }
 
-  void _onPlayerChanged() {
-    if (_player!.finished && !_leaving) {
-      _leaving = true;
-      unawaited(_holdThenLeave());
-    }
-  }
-
-  /// The quiet mark at the end of a wird.
+  /// Leaves the player, from the tap on the finished step.
   ///
-  /// The stripe is already solid brick — the last tap filled it — so the mark
-  /// is that the screen *stays* for a beat instead of snapping away, and the
-  /// counter reads finished while it does. No confetti, no sound, and no
-  /// animation to reduce, which is why reduce-motion simply takes the hold
-  /// away rather than replacing it with something shorter.
-  Future<void> _holdThenLeave() async {
-    final Duration hold = MediaQuery.disableAnimationsOf(context)
-        ? Duration.zero
-        : Theme.of(context).extension<WirdiMotion>()!.completion;
-    await Future<void>.delayed(hold);
-    if (mounted) await Navigator.of(context).maybePop();
+  /// [maybePop] and nothing more: the player was pushed from Home or from the
+  /// collections list, and it goes back to whichever of them opened it. Both
+  /// of those refresh themselves when it does.
+  void _leave() {
+    unawaited(Navigator.of(context).maybePop());
   }
 
   @override
@@ -165,7 +146,7 @@ class _WirdPlayerScreenState extends ConsumerState<WirdPlayerScreen> {
         return ListenableBuilder(
           listenable: player,
           builder: (BuildContext context, Widget? child) =>
-              _Player(player: player),
+              _Player(player: player, onLeave: _leave),
         );
       },
     );
@@ -179,9 +160,12 @@ class _WirdPlayerScreenState extends ConsumerState<WirdPlayerScreen> {
 /// is neither re-shaped nor re-laid-out. What actually changes is the count,
 /// the stripe, and whether two buttons are enabled.
 class _Player extends StatelessWidget {
-  const _Player({required this.player});
+  const _Player({required this.player, required this.onLeave});
 
   final WirdPlayer player;
+
+  /// What the tap on the finished step does.
+  final VoidCallback onLeave;
 
   @override
   Widget build(BuildContext context) {
@@ -219,10 +203,18 @@ class _Player extends StatelessWidget {
       ),
       body: player.isEmpty
           ? const _EmptyCollection()
+          // The finished step is a step: the same header, the same tap target,
+          // the same band naming the gesture and the same controls below it.
+          // What changes is what each of them says — nothing about the shape
+          // of the screen, because the last thing a reciter does here should
+          // not be the one thing that looks unlike everything else.
           : Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                _StepHeader(player: player, item: item),
+                if (player.finished)
+                  _CompleteHeader(player: player)
+                else
+                  _StepHeader(player: player, item: item),
                 Expanded(
                   // Keyed on the whole position, so each step, each round and
                   // each unit gets a fresh subtree: without it the scroll
@@ -231,10 +223,14 @@ class _Player extends StatelessWidget {
                   // is a reading of the item from the start, so it starts at
                   // the top the same way a new step does.
                   key: ValueKey<String>(
-                    'step-${player.stepIndex}-${player.currentCount}'
-                    '-${player.unitIndex}',
+                    player.finished
+                        ? 'complete'
+                        : 'step-${player.stepIndex}-${player.currentCount}'
+                              '-${player.unitIndex}',
                   ),
-                  child: _StepContent(player: player, item: item),
+                  child: player.finished
+                      ? _CompleteStep(player: player, onLeave: onLeave)
+                      : _StepContent(player: player, item: item),
                 ),
                 _AdvanceBand(player: player),
                 _Controls(player: player),
@@ -425,6 +421,175 @@ String? _positionLine(WirdPlayer player) {
   return (step.index - first + 1, last - first + 1);
 }
 
+/// The header of the finished step: what was just finished, and how much of it
+/// there was.
+///
+/// The step header's own shape — a title with a quieter line under it — so the
+/// top of the screen does not rearrange itself at the end of a wird. What it
+/// drops is the plate: a step that repeats is `x3`, and the wird as a whole is
+/// not a step that repeats.
+class _CompleteHeader extends StatelessWidget {
+  const _CompleteHeader({required this.player});
+
+  final WirdPlayer player;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        WirdiMetrics.readingColumnPadding,
+        WirdiMetrics.space4,
+        WirdiMetrics.readingColumnPadding,
+        WirdiMetrics.space3,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text('Wird complete', style: theme.textTheme.titleMedium),
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Text(
+              _recited(player),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// `12 steps · 87 repetitions`.
+///
+/// Counted rather than praised. It is the wird the reciter just said, stated
+/// in the two units the screen has been using all the way through — the step
+/// counter in the controls and the count in the band — so the line is a total
+/// of numbers they already watched go by.
+String _recited(WirdPlayer player) {
+  final int steps = player.steps.length;
+  final int repetitions = player.totalRepetitions;
+  final String stepWord = steps == 1 ? 'step' : 'steps';
+  final String repetitionWord = repetitions == 1 ? 'repetition' : 'repetitions';
+  return '$steps $stepWord · $repetitions $repetitionWord';
+}
+
+/// The finished step.
+///
+/// A step like the others: the content area is the tap target, the band above
+/// the controls says so, and the tap does the next thing — which here is to
+/// leave. There is no button, because no other step has one and the end of a
+/// wird is a poor place to teach a new gesture.
+///
+/// Two sentences and nothing else. The first is the same at three days as at
+/// three hundred, and the second counts the run without remarking on it: the
+/// home tile's vocabulary, which is the one place in the app already allowed
+/// to encourage. Nothing escalates, nothing is negative, and the mark itself
+/// is the app's own material — the stripe above, solid brick because the wird
+/// filled it.
+class _CompleteStep extends StatefulWidget {
+  const _CompleteStep({required this.player, required this.onLeave});
+
+  final WirdPlayer player;
+
+  final VoidCallback onLeave;
+
+  @override
+  State<_CompleteStep> createState() => _CompleteStepState();
+}
+
+class _CompleteStepState extends State<_CompleteStep> {
+  /// The tap that finished the wird is one of a run of taps, and at a tasbih's
+  /// pace the next one is already on its way down. Without this the reciter
+  /// would tap straight through the end of their wird and never see it.
+  ///
+  /// [WirdiMotion.completion] because it is the same beat it always was — the
+  /// screen holding still at the end of a wird — spent guarding the step
+  /// instead of counting down to a dismissal the reciter did not ask for.
+  Timer? _grace;
+  bool _ready = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_ready || _grace != null) return;
+    final Duration beat = Theme.of(
+      context,
+    ).extension<WirdiMotion>()!.completion;
+    if (beat == Duration.zero) {
+      _ready = true;
+      return;
+    }
+    _grace = Timer(beat, () {
+      if (mounted) setState(() => _ready = true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _grace?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colors = theme.colorScheme;
+    final String? run = _run(widget.player.completedStreak);
+
+    return _TapToCount(
+      onTap: _ready ? widget.onLeave : null,
+      label: 'Close',
+      child: Padding(
+        // Centred in the area the words of a step would fill, rather than sat
+        // at the top of it: there is nothing to read down here, and two lines
+        // pinned under the header would read as the top of a page that never
+        // arrived.
+        padding: const EdgeInsets.only(top: WirdiMetrics.space6),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'May it be accepted.',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: colors.primary,
+              ),
+            ),
+            if (run != null)
+              Padding(
+                padding: const EdgeInsets.only(top: WirdiMetrics.space3),
+                child: Text(
+                  run,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// This collection's run of days, in the home tile's own words.
+  ///
+  /// Past tense and closing, because the wird is done. Null until the read
+  /// behind the completion lands, and null at zero — which the completion
+  /// just written makes unreachable, but a number that says a run of none
+  /// would be worse than no line at all.
+  String? _run(int? streak) => switch (streak) {
+    null || 0 => null,
+    1 => 'A day begun.',
+    final int days => '$days days and counting.',
+  };
+}
+
 /// The count, and the gesture that changes it, named in words.
 ///
 /// The screen's one affordance. The content area above has counted since the
@@ -477,50 +642,56 @@ class _AdvanceBand extends StatelessWidget {
               ),
             ),
           ),
-          child: player.finished
-              // The mark, for the beat the screen holds: the stripe solid and
-              // this. The band would say "0 left" otherwise, which reads as
-              // nothing having been done at all.
-              ? Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Text(
-                    'Wird complete',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: colors.primary,
-                    ),
-                  ),
+          // The same three slots on every step, the finished one included: the
+          // brick figure, the word under it, and the line that names the
+          // gesture. At the end the figure is a check rather than a numeral —
+          // the band would say "0 left" otherwise, which reads as nothing
+          // having been done at all — and the gesture it names is the way out.
+          child: Row(
+            children: <Widget>[
+              if (player.finished)
+                Icon(
+                  Icons.check,
+                  // Sized off the numeral it stands in for, so the band's
+                  // first column is the same width at the end as all the way
+                  // through it.
+                  size: type.counter.fontSize,
+                  color: colors.primary,
                 )
-              : Row(
+              else
+                Text(
+                  '${player.remaining}',
+                  style: type.counter.copyWith(color: colors.primary),
+                ),
+              const SizedBox(width: WirdiMetrics.space3),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Text(
-                      '${player.remaining}',
-                      style: type.counter.copyWith(color: colors.primary),
+                      player.finished ? 'done' : 'left',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: colors.onSurface,
+                      ),
                     ),
-                    const SizedBox(width: WirdiMetrics.space3),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Text(
-                            'left',
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              color: colors.onSurface,
-                            ),
-                          ),
-                          Text(
-                            player.isMultiUnit
-                                ? 'Tap anywhere above to go to the next ayah'
-                                : 'Tap anywhere above to count',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: colors.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
+                    Text(
+                      switch (player) {
+                        WirdPlayer(finished: true) =>
+                          'Tap anywhere above to close',
+                        WirdPlayer(isMultiUnit: true) =>
+                          'Tap anywhere above to go to the next ayah',
+                        _ => 'Tap anywhere above to count',
+                      },
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colors.onSurfaceVariant,
                       ),
                     ),
                   ],
                 ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -529,7 +700,7 @@ class _AdvanceBand extends StatelessWidget {
   /// The live region: the count, where in the item the reciter is, and where
   /// in the wird. Announced on every tap, so it is the whole position.
   String _semanticLabel() {
-    if (player.finished) return 'Wird complete';
+    if (player.finished) return 'Wird complete. Tap anywhere above to close';
     final PlaybackStep step = player.step;
     final String left = step.count > 1
         ? '${player.remaining} left of ${step.count}'
@@ -562,17 +733,17 @@ class _StepContent extends StatelessWidget {
     final String label = player.isMultiUnit ? 'Next ayah' : 'Count';
     return switch (entry) {
       DhikrItem() => _TapToCount(
-        player: player,
+        onTap: player.increment,
         label: label,
         child: _DhikrStep(item: entry),
       ),
       AyahItem() => _TapToCount(
-        player: player,
+        onTap: player.increment,
         label: label,
         child: _AyahStep(item: entry),
       ),
       SurahItem() => _TapToCount(
-        player: player,
+        onTap: player.increment,
         label: label,
         child: _SurahStep(player: player, item: entry),
       ),
@@ -617,12 +788,14 @@ class _MissingStep extends StatelessWidget {
 /// one surface that must not have any.
 class _TapToCount extends StatelessWidget {
   const _TapToCount({
-    required this.player,
+    required this.onTap,
     required this.label,
     required this.child,
   });
 
-  final WirdPlayer player;
+  /// What the tap does. Counting on every step but the last; on the finished
+  /// step, leaving — one mechanic, to the end of the wird and out of it.
+  final VoidCallback? onTap;
 
   /// What the tap does, in the same words the band uses.
   final String label;
@@ -634,10 +807,10 @@ class _TapToCount extends StatelessWidget {
     return Semantics(
       button: true,
       label: label,
-      onTap: player.increment,
+      onTap: onTap,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: player.increment,
+        onTap: onTap,
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(
             WirdiMetrics.readingColumnPadding,
