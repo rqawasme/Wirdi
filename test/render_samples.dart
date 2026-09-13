@@ -288,6 +288,87 @@ void main() {
       await data.userRepository.clearProgress(id);
     }
 
+    // What a row's contents button opens: the wird as a list, with its
+    // description above it and one of its repeat blocks drawn as a group.
+    await openRoute(
+      Routes.collectionContents,
+      '01f-contents-morning',
+      arguments: const CollectionContentsArguments(
+        collectionId: BuiltinCollectionId(3),
+      ),
+    );
+
+    /// Opens the contents of [id], taps the row [row] of them, and shoots the
+    /// sheet that comes up.
+    Future<void> openItemSheet(CollectionId id, int row, String name) async {
+      await openRoute(
+        Routes.collectionContents,
+        name,
+        arguments: CollectionContentsArguments(collectionId: id),
+        before: () async {
+          await tester.tap(find.byType(InkWell).at(row));
+          await settle(tester);
+        },
+      );
+    }
+
+    // The three kinds of item, each in full: a dhikr with its translation, an
+    // ayah, and a whole surah with its verses expanded on the way in.
+    await openItemSheet(morning, 0, '01g-item-sheet-dhikr');
+    await openItemSheet(morning, 4, '01h-item-sheet-surah');
+
+    // Al-Baqarah in the sheet: 286 verses, expanded on the way in because a
+    // SurahItem resolves to metadata only. The shot is here for the timing as
+    // much as the look — a Column of 286 AyahBlocks would lay every one of
+    // them out before the sheet appeared, and this run would hang rather than
+    // fail.
+    final UserCollectionId longest = await data.collectionRepository.create(
+      'The long one',
+    );
+    await data.collectionRepository.addItem(longest, const ContentRef.surah(2));
+    await openItemSheet(longest, 0, '01h2-item-sheet-al-baqarah');
+
+    // A repeat block on the contents screen: the bordered group the editor
+    // draws, read-only, with each item inside it still its own way in.
+    final UserCollectionId grouped = await data.collectionRepository.create(
+      'The three quls, three times',
+      description: 'Said after fajr and after maghrib.',
+    );
+    for (final int surah in <int>[112, 113, 114]) {
+      await data.collectionRepository.addItem(grouped, ContentRef.surah(surah));
+    }
+    // Dhikr 1 deliberately: the build numbers adhkar from 1001, so this row
+    // resolves to nothing and the screen has to say so. It is the state a user
+    // collection lands in when a content update drops a dhikr it was using, and
+    // this screen is the only place in the app that can report it.
+    await data.collectionRepository.addItem(grouped, const ContentRef.dhikr(1));
+    final ResolvedCollection quls = await data.collectionRepository.resolve(
+      grouped,
+    );
+    await data.collectionRepository.setRepeatGroup(grouped, <String>[
+      for (final CollectionEntry e in quls.entries.take(3))
+        (e as CollectionItemEntry).entryId,
+    ], 3);
+    await openRoute(
+      Routes.collectionContents,
+      '01h3-contents-repeat-block',
+      arguments: CollectionContentsArguments(collectionId: grouped),
+    );
+
+    // The two dhikr pickers, and the banding that keeps four hundred rows of
+    // Arabic from running together.
+    await openRoute(Routes.pickDhikr, '01i-pick-dhikr');
+    await openRoute(
+      Routes.pickDhikr,
+      '01j-pick-dhikr-searched',
+      before: () async {
+        await tester.enterText(find.byType(TextField), 'forgive');
+        await settle(tester);
+      },
+    );
+    await openRoute(Routes.pickFromCollection, '01k-pick-from-collection');
+    await openRoute(Routes.pickSurah, '01l-pick-surah');
+
     // The wird the content build ships: 39 adhkar, three of them said three
     // times over.
     const CollectionId wird = BuiltinCollectionId(2);
@@ -314,6 +395,16 @@ void main() {
     // screen is where most of its surfaces are visible at once.
     await shoot(tester, '06a-home-dark');
     await openPlayer(wird, '06-player-dark', stepIndex: 10, taps: 2);
+    // The banding in dark, where the brick wash is at half the strength it
+    // carries in light and most worth looking at.
+    await openRoute(Routes.pickDhikr, '06b-pick-dhikr-dark');
+    await openRoute(
+      Routes.collectionContents,
+      '06c-contents-dark',
+      arguments: const CollectionContentsArguments(
+        collectionId: BuiltinCollectionId(3),
+      ),
+    );
     await settings.setThemeMode(ThemeMode.light);
     await settle(tester);
 

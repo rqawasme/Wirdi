@@ -98,11 +98,19 @@ Future<void> seedContent(ContentDatabase db) async {
       _dhikr(1002, defaultCount: 33, sourceId: 1),
       _dhikr(1003, defaultCount: 3, sourceId: 2),
       _dhikr(1004, defaultCount: 7),
+      // The one row with real Arabic letters in it, so the diacritic fold has
+      // something to fold. See [foldableArabic].
+      _dhikr(1005, defaultCount: 5, textArabic: foldableArabic),
     ]);
 
     b.insertAll(db.collections, <CollectionsCompanion>[
       _collection(mixedCollectionId, type: 'wird', sortOrder: 10),
-      _collection(simpleCollectionId, type: 'dhikr_set', sortOrder: 20),
+      _collection(
+        simpleCollectionId,
+        type: 'dhikr_set',
+        sortOrder: 20,
+        described: false,
+      ),
     ]);
 
     // Deliberately inserted out of position order: `position` is
@@ -174,15 +182,38 @@ AyahsCompanion _ayah(int surah, int ayah, {required int juz}) {
   );
 }
 
-AdhkarCompanion _dhikr(int id, {required int defaultCount, int? sourceId}) {
+AdhkarCompanion _dhikr(
+  int id, {
+  required int defaultCount,
+  int? sourceId,
+  String? textArabic,
+}) {
   return AdhkarCompanion.insert(
     id: Value<int>(id),
-    textArabic: 'PLACEHOLDER dhikr $id arabic',
+    textArabic: textArabic ?? 'PLACEHOLDER dhikr $id arabic',
     translation: 'PLACEHOLDER dhikr $id translation',
     defaultCount: defaultCount,
     sourceId: Value<int?>(sourceId),
   );
 }
+
+/// Arabic letters, carrying the marks the search has to fold away.
+///
+/// Assembled from code points rather than typed, and spelling nothing: these
+/// are four letters chosen because they exercise every branch of
+/// `ArabicText.simplify` — an alef with hamza above, a fatha, a tatweel, a
+/// shadda, an alef maksura — and they are **not a dhikr**. No Quranic or dhikr
+/// text appears anywhere in these fixtures, and none is invented here either.
+///
+/// Folds to `U+0627 U+0628 U+064A` — bare alef, beh, yeh.
+final String foldableArabic = String.fromCharCodes(<int>[
+  0x0623, // alef with hamza above -> alef
+  0x064E, // fatha                 -> dropped
+  0x0628, // beh                   -> kept
+  0x0640, // tatweel               -> dropped
+  0x0651, // shadda                -> dropped
+  0x0649, // alef maksura          -> yeh
+]);
 
 SourcesCompanion _source(int id) {
   return SourcesCompanion.insert(
@@ -193,16 +224,23 @@ SourcesCompanion _source(int id) {
   );
 }
 
+/// [described] false leaves `description` null.
+///
+/// Five of the fourteen real built-ins carry no description, and a row has to
+/// look right without one — so one of the two fixtures does not have one either.
 CollectionsCompanion _collection(
   int id, {
   required String type,
   required int sortOrder,
+  bool described = true,
 }) {
   return CollectionsCompanion.insert(
     id: Value<int>(id),
     nameArabic: 'PLACEHOLDER collection $id arabic',
     nameEnglish: 'PLACEHOLDER collection $id english',
-    description: Value<String>('PLACEHOLDER collection $id description'),
+    description: described
+        ? Value<String>('PLACEHOLDER collection $id description')
+        : const Value<String?>(null),
     author: Value<String>('PLACEHOLDER collection $id author'),
     type: type,
     sortOrder: sortOrder,

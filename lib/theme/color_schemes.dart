@@ -152,4 +152,32 @@ abstract final class WirdiColorSchemes {
     onInverseSurface: Color(0xFF241C15),
     inversePrimary: Color(0xFF9E4630),
   );
+
+  /// How much brick the alternating course of a banded list carries.
+  ///
+  /// The two differ, and not by accident: a step that registers on limestone is
+  /// about twice what registers near black. The light band was a rung of the
+  /// neutral ladder first — `surfaceContainerLow`, fourteen points out of two
+  /// hundred and fifty-five — and on a device it disappeared. Dark is tuned the
+  /// other way round: it keeps the weight that rung already had, and only picks
+  /// up the warmth.
+  static const double lightBandTint = 0.08;
+  static const double darkBandTint = 0.04;
+
+  /// The alternating course under a banded list row: [scheme]'s own surface
+  /// with a breath of its own brick blended into it.
+  ///
+  /// Derived rather than written out, so the band follows the palette if brick
+  /// or limestone ever move. It lives here because this file is the only place
+  /// in `lib/` that decides a colour — everything else in the app reaches for a
+  /// [ColorScheme] role — and a colour that is not a role still belongs with the
+  /// palette rather than in the widget that paints it.
+  static Color band(ColorScheme scheme) => Color.alphaBlend(
+    scheme.primary.withValues(
+      alpha: scheme.brightness == Brightness.light
+          ? lightBandTint
+          : darkBandTint,
+    ),
+    scheme.surface,
+  );
 }

@@ -32,7 +32,11 @@ void main() {
     }
   }
 
-  Future<void> pumpList(WidgetTester tester, {bool withRouter = false}) async {
+  Future<void> pumpList(
+    WidgetTester tester, {
+    bool withRouter = false,
+    TextScaler textScaler = TextScaler.noScaling,
+  }) async {
     tester.view.physicalSize = const Size(400, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -49,6 +53,10 @@ void main() {
           home: withRouter ? null : const Scaffold(body: CollectionsScreen()),
           onGenerateRoute: withRouter ? WirdiRouter.onGenerateRoute : null,
           initialRoute: withRouter ? Routes.shell : null,
+          builder: (BuildContext context, Widget? child) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(textScaler: textScaler),
+            child: child!,
+          ),
         ),
       ),
     );
@@ -159,23 +167,99 @@ void main() {
     expect(find.textContaining('Part-way through'), findsNothing);
   });
 
-  testWidgets("a row's view button opens the player", (
-    WidgetTester tester,
-  ) async {
-    await pumpList(tester, withRouter: true);
-
-    // The row itself no longer opens anything — only its buttons do — so the
-    // view button is found scoped to this row rather than tapping the name.
+  /// The row itself opens nothing — only its buttons do — so a button is found
+  /// scoped to its own row rather than by tapping the name.
+  Future<void> tapRowButton(WidgetTester tester, String tooltip) async {
     final Finder row = find.ancestor(
       of: find.text('PLACEHOLDER collection 1 english'),
       matching: find.byType(CollectionRow),
     );
     await tester.tap(
-      find.descendant(of: row, matching: find.byTooltip('Open collection')),
+      find.descendant(of: row, matching: find.byTooltip(tooltip)),
     );
     await settle(tester);
+  }
+
+  testWidgets("a row's contents button opens what is in the collection", (
+    WidgetTester tester,
+  ) async {
+    await pumpList(tester, withRouter: true);
+    await tapRowButton(tester, 'See what is in it');
+
+    // The contents, not the player: no step counter, and the whole collection
+    // on one screen rather than one item of it.
+    expect(find.text('1 of 14'), findsNothing);
+    expect(find.text('PLACEHOLDER dhikr 1001 arabic'), findsOneWidget);
+    expect(find.text('Repeated 3 times'), findsOneWidget);
+  });
+
+  testWidgets("a row's play button opens the player", (
+    WidgetTester tester,
+  ) async {
+    await pumpList(tester, withRouter: true);
+    await tapRowButton(tester, 'Recite');
 
     expect(find.text('1 of 14'), findsOneWidget);
     expect(find.text('PLACEHOLDER dhikr 1001 arabic'), findsOneWidget);
+  });
+
+  testWidgets('a description is shown when there is one, and not when there '
+      'is not', (WidgetTester tester) async {
+    await pumpList(tester);
+
+    expect(find.text('PLACEHOLDER collection 1 description'), findsOneWidget);
+    // The second fixture carries none, the way nine of the fourteen real
+    // built-ins do. Nothing is drawn in its place.
+    expect(find.text('PLACEHOLDER collection 2 description'), findsNothing);
+  });
+
+  group('the shapes a row has to survive', () {
+    testWidgets('a described row keeps its four buttons and its meta line at '
+        'the largest text scale', (WidgetTester tester) async {
+      // The row changed shape for the fourth button: names, description and
+      // meta each take the full width now, and the buttons share the bottom
+      // line with the meta. This is the scale that decides whether that was
+      // enough.
+      await pumpList(tester, textScaler: const TextScaler.linear(2));
+      expect(tester.takeException(), isNull);
+
+      final Finder row = find.ancestor(
+        of: find.text('PLACEHOLDER collection 1 english'),
+        matching: find.byType(CollectionRow),
+      );
+
+      // All four still there and still distinguishable.
+      for (final String tooltip in <String>[
+        'See what is in it',
+        'Recite',
+        'Commit to my practice',
+        'More',
+      ]) {
+        expect(
+          find.descendant(of: row, matching: find.byTooltip(tooltip)),
+          findsOneWidget,
+          reason: '$tooltip went missing at 2x',
+        );
+      }
+
+      // And the row still says what state it is in. The description is capped
+      // at two lines precisely so it cannot push this off the bottom.
+      expect(
+        find.descendant(of: row, matching: find.textContaining('items')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('a long description is clipped rather than unbounded', (
+      WidgetTester tester,
+    ) async {
+      await pumpList(tester);
+
+      final Text description = tester.widget<Text>(
+        find.text('PLACEHOLDER collection 1 description'),
+      );
+      expect(description.maxLines, 2);
+      expect(description.overflow, TextOverflow.ellipsis);
+    });
   });
 }

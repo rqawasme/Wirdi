@@ -429,12 +429,62 @@ closes.
 Everything here is composition over the phase 2 `CollectionRepository`. Nothing
 in the data layer changed, with one exception noted at the end.
 
+**Opening a collection shows what is in it.** `CollectionContentsScreen` lists
+its entries in recitation order, with its description and its author above them
+and each repeat block drawn as the group it is. Tapping a row opens that item in
+full — the Arabic, the transliteration, the translation, the collection's own
+note on it, and the reference it cites — in a sheet, capped at most of the
+screen's height and scrolled inside that cap.
+
+The row's button used to open the player instead, which meant the only way to
+find out what a wird contained was to start reciting it, and backing out of one
+leaves a progress row behind. Looking and reciting are two buttons now, and the
+player kept its own.
+
+A `SurahItem` resolves to surah metadata only — Al-Baqarah alone is 286 verses
+and a list has no use for the text — so the sheet is where that expansion
+finally happens, through `surahReadingProvider`. It builds them lazily and sits
+inside a bounded height, which are two halves of one requirement: a column of
+286 `AyahBlock`s would lay every one of them out before the sheet appeared, and
+an unbounded list inside a sheet has no height to build against at all.
+
+The translation is always shown in that sheet, whatever the show-translation
+setting says. That setting is about the surface you recite from — somebody
+reciting from memory wants the page uninterrupted — and this sheet exists to
+work out *which item this is*. Hiding half the answer would defeat the screen.
+
 **Two ways to make one.** From scratch — a name, an optional description, and an
 empty collection to fill. Or by copying an existing one, which is the path this
 is actually built around: somebody wants al-Haddad's wird with two more adhkar
 in it, or the morning adhkar at different counts. `duplicateCollection` walks
 the source's entries, appends each item with its count override and note, then
 puts the repeat blocks back over the runs they occupied.
+
+**The description is shown, and it can be changed.** It was write-only for two
+phases: the form asked for one when a collection was made, the column carried
+it in both databases, and no widget ever read it back. It is now a line on the
+collections row — capped at two lines, so a long one cannot push the row's
+actual state off the bottom at a large text scale — and the whole thing,
+unclipped, above the contents screen's list. Names say what a collection is,
+the description says what it is for, and the meta line says what state it is in
+today, which is the order they sit in.
+
+It is deliberately absent from the row's screen-reader label. A blurb read out
+on each of fourteen rows turns a scan down the list into a recital; the
+contents screen reads it in full, which is where somebody who wanted it went.
+
+`rename` became `CollectionRepository.updateDetails`, one statement writing both
+columns. The form asks both questions at once, and a rename that lands while the
+description it was written alongside does not is worse than a refusal. Emptying
+the field clears it, which is the only way there is to take one off.
+
+**Four buttons made the row change shape.** The names, the description and the
+meta line each take the row's full width now, and the buttons share the bottom
+line with the meta rather than standing to the right of the lot. At three
+buttons standing beside it was fine; at four, a hundred and sixty points of
+button took enough off a four-hundred-point row to wrap "Wird of Imam al-Nawawi"
+onto three lines. The meta line is short and the space to its right was empty.
+The row is no taller for the move, and the names stop paying for the actions.
 
 `addItem` does not return the id of the row it wrote and `setRepeatGroup` is
 addressed by item id, so the copy is resolved once after the items are in and
@@ -445,13 +495,80 @@ A resolved item's `count` has the fallbacks already applied — a dhikr's
 every row and freeze today's defaults into the copy. `countOverrideOf` writes
 one only where the source's count differs from its natural one.
 
-**Three pickers**, behind one add action. A whole surah, through the same
+**Four pickers**, behind one add action. A whole surah, through the same
 `SurahRow` the mushaf list uses. One ayah or a contiguous range, added one item
 per ayah through `ContentRepository.ayahRange` so an over-long range comes back
-clamped rather than adding items that resolve to nothing. And a dhikr, browsed
-by the built-in collection it comes from — there is no tagging and no search in
-this content build, so the collections are the only structure a flat list of
-several hundred adhkar could be sorted by.
+clamped rather than adding items that resolve to nothing. And two ways to a
+dhikr, because there are two ways of knowing which one you want.
+
+**The flat list searches; the other one browses.** "Dhikr" is every dhikr in the
+content build — 496 rows — with a search field over it. That list used to be
+the thing this section argued against: without tagging it had nothing to sort or
+filter it by, and several hundred rows of Arabic in a row is unusable in a way
+no amount of styling fixes. The search field is the thing it was missing, and
+the argument does not survive it.
+
+"From collection" is the old picker, kept rather than replaced, because the two
+answer different questions. A search wants a word you can remember; somebody
+reaching for the morning tasbih often cannot remember one, and what they know
+instead is which wird it came out of.
+
+Matching is diacritic-insensitive on the Arabic side. Nobody types the harakat
+and the text carries all of them, so a search that required them would find
+nothing every time and look broken rather than strict. `ArabicText.simplify` is
+`simplify_arabic` from `content/scripts/import_quran.py` written out in Dart —
+the same function that builds `ayahs.text_simple`, which `adhkar` has no
+equivalent of and cannot be given one, since `tool/check_schema_parity.py`
+requires `content.drift` to mirror the build script's tables verbatim. The two
+are a matched pair: a search that folds differently from the column it will one
+day be matched against is a search that disagrees with itself. They are checked
+against each other in `real_content_db_test.dart`, which folds every ayah of the
+real build in Dart and expects the string the Python already wrote.
+
+The query is matched against both forms with no script detection, which is not
+an omission: the Arabic fold leaves Latin alone and `toLowerCase` leaves Arabic
+alone, so an Arabic query cannot reach a translation and an English one cannot
+reach the Arabic. Two cheap comparisons beat guessing which script somebody is
+typing in — a guess that fails on the first transliterated word. Nothing is
+debounced, because there is nothing to coalesce: the rows are folded once when
+the picker opens and the filter is a `contains` over strings already in memory.
+
+**Rows in a picker sit on alternating courses of stone and clay.** The even
+rows are `surface`; the odd ones are that same surface with a wash of brick
+blended into it — eight percent in light, four in dark. Two lines of Arabic and
+two of translation, four hundred times over, have no natural boundary between
+one row and the next, and that is the whole problem it solves.
+
+That went the other way first, and the reversal is the interesting part. The
+band was a rung of the neutral ladder, `surfaceContainerLow`, on the argument
+that brick is how this app draws *data* and should not be spent on saying "these
+are different rows". It was a good argument made without looking at it: the
+light rung is fourteen points out of two hundred and fifty-five, and on a device
+the list still ran together. Dark, where the same rung reads fine, is tuned to
+keep exactly the weight it had and only pick up the warmth.
+
+What the argument got right still holds, and is the line the code has to keep
+drawing. The week strip and the progress stripe use brick at **full** strength,
+and in both of them something decides where the joints fall — the days in one,
+the count in the other. This is a wash, decided by nothing but whether a row is
+odd, sitting behind text rather than standing for anything. Brick and stone
+alternating is the Mezquita's own pattern; at eight percent it is the rhythm of
+it and not a second progress bar.
+
+The arch watermark above is still the thing to measure it against: what killed
+that was carrying nothing *and looking like it*. A ground a shade off the page
+does not have that problem — the moment it does, it is too loud, and
+`WirdiColorSchemes.lightBandTint` is the dial. The colour is derived from the
+palette rather than written down, so it follows if brick or limestone ever move,
+and it lives in `color_schemes.dart` because that file is the only place in
+`lib/` that decides a colour at all.
+
+`BandedRow` takes the row's index, so banding is a decision the *list* makes.
+`SurahRow` is shared between the surah picker and the mushaf's reading list, and
+only the picker gets it: a picker is a list you are scanning for one row out of
+a hundred and fourteen, where the mushaf list is a table of contents you already
+know your way down, and a banded ground under Quran headings is the ornament
+again. A test asserts that asymmetry rather than leaving it to be tidied away.
 
 **The reorder list is of entries, not items.** A `RepeatBlock` is one draggable
 row and one contiguous run of ids. That is what keeps a group whole:
@@ -473,7 +590,7 @@ a run that is not contiguous *by position*, and `removeItem` leaves a gap, so a
 collection carrying one has items that look adjacent in the list and cannot be
 grouped.
 
-**Missing from the repository.** There is no way to change an item's
+**Missing from the repository.** There is still no way to change an item's
 `count_override` or note after it has been added — no `updateItem`, and no
 drift query behind one. So a count is set when the item is added, and changing
 it means removing the item and adding it again. Doing that in the UI would mean

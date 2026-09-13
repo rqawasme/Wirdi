@@ -111,9 +111,14 @@ class DriftCollectionRepository implements CollectionRepository {
   }
 
   @override
-  Future<void> rename(UserCollectionId id, String name) async {
-    final int changed = await _user.renameUserCollection(
+  Future<void> updateDetails(
+    UserCollectionId id, {
+    required String name,
+    required String? description,
+  }) async {
+    final int changed = await _user.updateUserCollectionDetails(
       name: name,
+      description: description,
       updatedAt: toEpochMs(_now()),
       id: id.uuid,
     );

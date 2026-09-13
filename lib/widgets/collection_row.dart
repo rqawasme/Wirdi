@@ -46,6 +46,7 @@ class CollectionRow extends StatelessWidget {
     final WirdiTypography type = theme.extension<WirdiTypography>()!;
     final Color quiet = theme.colorScheme.onSurfaceVariant;
     final String? nameArabic = listing.summary.nameArabic;
+    final String? description = listing.summary.description;
     final Widget? trailing = this.trailing;
     final VoidCallback? onTap = this.onTap;
 
@@ -57,84 +58,119 @@ class CollectionRow extends StatelessWidget {
         ? 'part-way through'
         : 'not started today';
 
-    final Widget body = Padding(
-      padding: EdgeInsets.fromLTRB(
-        WirdiMetrics.space4,
-        WirdiMetrics.space4,
-        trailing == null ? WirdiMetrics.space4 : 0,
-        WirdiMetrics.space4,
-      ),
-      child: ExcludeSemantics(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) =>
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          listing.name,
-                          style: theme.textTheme.titleMedium,
-                        ),
+    // The names, the description and the meta line all get the row's whole
+    // width; the buttons share the bottom line with the meta rather than
+    // standing to the right of the lot.
+    //
+    // They used to stand beside it, which was fine at three of them and is not
+    // at four: a hundred and sixty points of button took enough off a
+    // four-hundred-point row to wrap "Wird of Imam al-Nawawi" onto three
+    // lines. The meta line is short and the space to its right was empty, so
+    // that is where they went. The row is no taller for it, and the names stop
+    // paying for the actions.
+    final Widget text = ExcludeSemantics(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) => Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  child: Text(listing.name, style: theme.textTheme.titleMedium),
+                ),
+                if (nameArabic != null) ...<Widget>[
+                  const SizedBox(width: WirdiMetrics.space4),
+                  // Capped rather than given a flex share: an Arabic name that
+                  // needs a third of the row should not take half of it and
+                  // wrap the English name that would otherwise have fitted.
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: constraints.maxWidth * arabicShare,
+                    ),
+                    child: Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: Text(
+                        nameArabic,
+                        style: type.arabicTitle,
+                        locale: const Locale('ar'),
                       ),
-                      if (nameArabic != null) ...<Widget>[
-                        const SizedBox(width: WirdiMetrics.space4),
-                        // Capped rather than given a flex share: an
-                        // Arabic name that needs a third of the row
-                        // should not take half of it and wrap the
-                        // English name that would otherwise have
-                        // fitted.
-                        ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxWidth: constraints.maxWidth * arabicShare,
-                          ),
-                          child: Directionality(
-                            textDirection: TextDirection.rtl,
-                            child: Text(
-                              nameArabic,
-                              style: type.arabicTitle,
-                              locale: const Locale('ar'),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
+                    ),
                   ),
+                ],
+              ],
             ),
+          ),
+          if (description != null && description.isNotEmpty) ...<Widget>[
             const SizedBox(height: WirdiMetrics.space2),
-            // On its own line under both names, so it has the width
-            // to say what it has to say however long the collection
-            // is called.
-            _Meta(listing: listing, items: items, colour: quiet),
+            // Between the names and the meta line, because that is the order
+            // the three of them answer questions in: the names say what this
+            // is, the description says what it is for, and the meta line says
+            // what state it is in today.
+            //
+            // A size step above the meta line beneath it, in the same quiet
+            // ink. Two lines at the same size in the same colour run together;
+            // this one is prose and the one under it is chrome, and the step is
+            // what says which is which.
+            //
+            // Capped at two lines: a long description must not push the row's
+            // actual state off the bottom at a large text scale.
+            Text(
+              description,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodyMedium?.copyWith(color: quiet),
+            ),
           ],
-        ),
+        ],
       ),
     );
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Expanded(
-          child: onTap == null
-              ? Semantics(
-                  container: true,
-                  label: '${listing.name}, $items, $state',
-                  child: body,
-                )
-              : Semantics(
-                  container: true,
-                  button: true,
-                  label: '${listing.name}, $items, $state',
-                  child: InkWell(onTap: onTap, child: body),
+    // The label is the name, the count and today's state — and deliberately
+    // not the description. A blurb read out on each of fourteen rows turns a
+    // scan down the list into a recital; the description is read in full on
+    // the contents screen, which is where somebody who wanted it went.
+    final String label = '${listing.name}, $items, $state';
+
+    final Widget titled = onTap == null
+        ? Semantics(container: true, label: label, child: text)
+        : Semantics(
+            container: true,
+            button: true,
+            label: label,
+            child: InkWell(onTap: onTap, child: text),
+          );
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        WirdiMetrics.space4,
+        WirdiMetrics.space4,
+        // The buttons carry their own padding; without them the row needs its
+        // own on that edge.
+        trailing == null ? WirdiMetrics.space4 : WirdiMetrics.space2,
+        trailing == null ? WirdiMetrics.space4 : WirdiMetrics.space2,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          titled,
+          const SizedBox(height: WirdiMetrics.space2),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Expanded(
+                child: ExcludeSemantics(
+                  child: _Meta(listing: listing, items: items, colour: quiet),
                 ),
-        ),
-        // Outside the row's own semantics rather than inside it: a menu that
-        // opens the only way to copy a built-in should not be something a
-        // screen reader has to find inside a button.
-        ?trailing,
-      ],
+              ),
+              // Outside the row's own semantics rather than inside it: a menu
+              // that opens the only way to copy a built-in should not be
+              // something a screen reader has to find inside a button.
+              ?trailing,
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

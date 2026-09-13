@@ -7,6 +7,7 @@ import 'package:wirdi/data/repositories/drift_collection_repository.dart';
 import 'package:wirdi/data/repositories/drift_content_repository.dart';
 import 'package:wirdi/data/user_database.dart';
 import 'package:wirdi/domain/domain.dart';
+import 'package:wirdi/quran/arabic_text.dart';
 
 /// Runs the data layer against the database the Python pipeline actually
 /// builds, when there is one.
@@ -176,6 +177,73 @@ void _tests(File file) {
         <int>[2285, 2286],
       );
     });
+  });
+
+  test(
+    'ArabicText.simplify agrees with the Python that built text_simple',
+    () async {
+      // The automated half of the matched pair. `ayahs.text_simple` is
+      // `simplify_arabic(text_uthmani)` as the content build wrote it; folding
+      // the same column in Dart has to land on the same string, character for
+      // character, or the dhikr search folds differently from the column it will
+      // one day be matched against.
+      //
+      // Six thousand rows of real Arabic, which is a far wider net than any
+      // hand-written case: every mark that occurs in the mushaf is in here
+      // somewhere.
+      final List<AyahRow> rows = await content.select(content.ayahs).get();
+      expect(rows, isNotEmpty);
+
+      for (final AyahRow row in rows) {
+        expect(
+          ArabicText.simplify(row.textUthmani),
+          row.textSimple,
+          reason:
+              'ayah ${row.surahNumber}:${row.ayahNumber} folds differently in '
+              'Dart than it did in content/scripts/import_quran.py',
+        );
+      }
+    },
+  );
+
+  test(
+    'every dhikr in the build is readable, and there are all of them',
+    () async {
+      final ContentRepository repo = DriftContentRepository(content);
+      final List<Dhikr> adhkar = await repo.adhkar();
+
+      // What the flat dhikr picker holds in memory while it is open.
+      expect(adhkar.length, greaterThan(400));
+      expect(
+        adhkar.map((Dhikr d) => d.id).toList(),
+        orderedEquals(adhkar.map((Dhikr d) => d.id).toList()..sort()),
+      );
+      for (final Dhikr dhikr in adhkar) {
+        expect(dhikr.textArabic, isNotEmpty);
+        expect(dhikr.translation, isNotEmpty);
+      }
+    },
+  );
+
+  test('folding a real dhikr drops its marks and keeps its letters', () async {
+    final ContentRepository repo = DriftContentRepository(content);
+    final List<Dhikr> adhkar = await repo.adhkar();
+
+    // The search's whole premise: nobody types the harakat, and the text
+    // carries them. At least some of the library must actually be vocalised,
+    // or the fold is guarding against nothing.
+    final Iterable<Dhikr> vocalised = adhkar.where(
+      (Dhikr d) => ArabicText.simplify(d.textArabic) != d.textArabic,
+    );
+    expect(vocalised, isNotEmpty);
+
+    for (final Dhikr dhikr in vocalised) {
+      final String folded = ArabicText.simplify(dhikr.textArabic);
+      expect(folded, isNotEmpty, reason: 'dhikr ${dhikr.id} folded away');
+      // Folding is idempotent, which is what lets the query be folded with
+      // the same function as the text.
+      expect(ArabicText.simplify(folded), folded);
+    }
   });
 
   test('every dhikr of the adhkar collections cites a source', () async {
