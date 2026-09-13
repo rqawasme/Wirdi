@@ -7,6 +7,7 @@ import 'package:wirdi/data/wirdi_data.dart';
 import 'package:wirdi/domain/domain.dart';
 import 'package:wirdi/providers/data_providers.dart';
 import 'package:wirdi/providers/editing.dart';
+import 'package:wirdi/providers/settings.dart';
 import 'package:wirdi/routes.dart';
 import 'package:wirdi/screens/collection_contents_screen.dart';
 import 'package:wirdi/theme/theme.dart';
@@ -52,6 +53,12 @@ void main() {
     await settle(tester);
   }
 
+  /// Scoped to the sheet, because the row that opened it is still behind it
+  /// showing the same text. What the sheet adds is the whole of the item, not
+  /// the two clipped lines the row had room for.
+  Finder inSheet(Finder finder) =>
+      find.descendant(of: find.byType(BottomSheet), matching: finder);
+
   testWidgets('lists every entry, in the order it is recited', (
     WidgetTester tester,
   ) async {
@@ -90,12 +97,6 @@ void main() {
     // The author still is: attribution belongs on a collection's own page.
     expect(find.text('PLACEHOLDER collection 2 author'), findsOneWidget);
   });
-
-  /// Scoped to the sheet, because the row that opened it is still behind it
-  /// showing the same text. What the sheet adds is the whole of the item, not
-  /// the two clipped lines the row had room for.
-  Finder inSheet(Finder finder) =>
-      find.descendant(of: find.byType(BottomSheet), matching: finder);
 
   group('the item sheet', () {
     testWidgets('a dhikr opens with its Arabic and its translation', (
@@ -160,6 +161,26 @@ void main() {
 
       expect(inSheet(find.text('PLACEHOLDER item note')), findsOneWidget);
     });
+  });
+
+  testWidgets('the sheet shows the translation even with translations off', (
+    WidgetTester tester,
+  ) async {
+    // Deliberate, and the kind of asymmetry a later reader will "fix" without
+    // a test holding it down. The show-translation setting is about the
+    // surface you recite from — somebody reciting from memory wants the page
+    // uninterrupted — and this sheet exists to work out *which item this is*.
+    // Hiding half the answer would defeat the screen.
+    await data.userRepository.setSetting(SettingKeys.showTranslation, 'false');
+    await pumpContents(tester, mixed);
+
+    await tester.tap(find.text('PLACEHOLDER dhikr 1001 arabic').first);
+    await settle(tester);
+
+    expect(
+      inSheet(find.text('PLACEHOLDER dhikr 1001 translation')),
+      findsOneWidget,
+    );
   });
 
   testWidgets('an empty collection of the user\'s own says so', (

@@ -32,7 +32,11 @@ void main() {
     }
   }
 
-  Future<void> pumpList(WidgetTester tester, {bool withRouter = false}) async {
+  Future<void> pumpList(
+    WidgetTester tester, {
+    bool withRouter = false,
+    TextScaler textScaler = TextScaler.noScaling,
+  }) async {
     tester.view.physicalSize = const Size(400, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -49,6 +53,10 @@ void main() {
           home: withRouter ? null : const Scaffold(body: CollectionsScreen()),
           onGenerateRoute: withRouter ? WirdiRouter.onGenerateRoute : null,
           initialRoute: withRouter ? Routes.shell : null,
+          builder: (BuildContext context, Widget? child) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(textScaler: textScaler),
+            child: child!,
+          ),
         ),
       ),
     );
@@ -203,5 +211,55 @@ void main() {
     // The second fixture carries none, the way nine of the fourteen real
     // built-ins do. Nothing is drawn in its place.
     expect(find.text('PLACEHOLDER collection 2 description'), findsNothing);
+  });
+
+  group('the shapes a row has to survive', () {
+    testWidgets('a described row keeps its four buttons and its meta line at '
+        'the largest text scale', (WidgetTester tester) async {
+      // The row changed shape for the fourth button: names, description and
+      // meta each take the full width now, and the buttons share the bottom
+      // line with the meta. This is the scale that decides whether that was
+      // enough.
+      await pumpList(tester, textScaler: const TextScaler.linear(2));
+      expect(tester.takeException(), isNull);
+
+      final Finder row = find.ancestor(
+        of: find.text('PLACEHOLDER collection 1 english'),
+        matching: find.byType(CollectionRow),
+      );
+
+      // All four still there and still distinguishable.
+      for (final String tooltip in <String>[
+        'See what is in it',
+        'Recite',
+        'Commit to my practice',
+        'More',
+      ]) {
+        expect(
+          find.descendant(of: row, matching: find.byTooltip(tooltip)),
+          findsOneWidget,
+          reason: '$tooltip went missing at 2x',
+        );
+      }
+
+      // And the row still says what state it is in. The description is capped
+      // at two lines precisely so it cannot push this off the bottom.
+      expect(
+        find.descendant(of: row, matching: find.textContaining('items')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('a long description is clipped rather than unbounded', (
+      WidgetTester tester,
+    ) async {
+      await pumpList(tester);
+
+      final Text description = tester.widget<Text>(
+        find.text('PLACEHOLDER collection 1 description'),
+      );
+      expect(description.maxLines, 2);
+      expect(description.overflow, TextOverflow.ellipsis);
+    });
   });
 }

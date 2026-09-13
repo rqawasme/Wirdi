@@ -39,8 +39,12 @@ void main() {
     }
   }
 
-  Future<void> pumpEditor(WidgetTester tester) async {
-    tester.view.physicalSize = const Size(400, 1400);
+  Future<void> pumpEditor(
+    WidgetTester tester, {
+    Size size = const Size(400, 1400),
+    TextScaler textScaler = TextScaler.noScaling,
+  }) async {
+    tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
@@ -51,6 +55,10 @@ void main() {
           theme: WirdiTheme.light(),
           onGenerateRoute: WirdiRouter.onGenerateRoute,
           home: CollectionEditScreen(collectionId: id),
+          builder: (BuildContext context, Widget? child) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(textScaler: textScaler),
+            child: child!,
+          ),
         ),
       ),
     );
@@ -393,6 +401,43 @@ void main() {
     await settle(tester);
     expect(find.text('PLACEHOLDER collection 1 english'), findsOneWidget);
     expect(find.byType(TextField), findsNothing);
+  });
+
+  group('the shapes the add sheet has to survive', () {
+    testWidgets('all four options are reachable at the largest text scale', (
+      WidgetTester tester,
+    ) async {
+      // The fourth option is what made the sheet need a scroll view. Three
+      // tiles with subtitles fit on a phone at any scale; four do not, and a
+      // sheet that overflows is a sheet with a choice hidden under the bottom
+      // edge — or, at this scale, off the screen entirely.
+      // Seeded, so the sheet is opened from the app bar and the empty state is
+      // not on screen: EmptyState has its own overflow at this scale on a
+      // short viewport, which predates the fourth tile and is not what this
+      // test is about.
+      await seedFourAdhkar();
+      await pumpEditor(
+        tester,
+        size: const Size(400, 700),
+        textScaler: const TextScaler.linear(2),
+      );
+
+      await tester.tap(find.byTooltip('Add an item'));
+      await settle(tester);
+      expect(tester.takeException(), isNull);
+
+      // The last of the four, scrolled to and actually tapped: finders reach
+      // widgets that are off screen, so finding it proves nothing on its own.
+      await tester.scrollUntilVisible(
+        find.text('Dhikr'),
+        100,
+        scrollable: find.byType(Scrollable).last,
+      );
+      await tester.tap(find.text('Dhikr'));
+      await settle(tester);
+
+      expect(find.text('Add a dhikr'), findsOneWidget);
+    });
   });
 
   testWidgets('editing the details keeps the collection and its items', (
