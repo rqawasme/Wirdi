@@ -137,9 +137,11 @@ class WirdPlayer extends ChangeNotifier {
   int _currentCount;
   int _unitIndex;
   bool _finished = false;
+  int? _completedStreak;
 
   Timer? _saveTimer;
   bool _pendingSave = false;
+  bool _disposed = false;
   Future<void> _writes = Future<void>.value();
 
   /// The structural entry each step came from, so the screen can show the
@@ -163,9 +165,26 @@ class WirdPlayer extends ChangeNotifier {
   int get currentCount => _currentCount;
 
   /// The last step's count has been reached. The wird is done, the completion
-  /// has been logged and the progress row cleared; the screen is holding the
-  /// quiet mark before it leaves.
+  /// has been logged and the progress row cleared; the screen is on the
+  /// finished step, waiting for the tap that closes it.
   bool get finished => _finished;
+
+  /// This collection's own run of days, read back after the completion was
+  /// written, or null until that read lands.
+  ///
+  /// Read here rather than on the screen because it is only true once the
+  /// completion is in the table: the number is the streak *including* the wird
+  /// that was just finished, and asking for it any earlier is asking before
+  /// the row exists. Null is a fact the finished step renders — it leaves the
+  /// line out — rather than a number to guess at.
+  int? get completedStreak => _completedStreak;
+
+  /// Every repetition in the wird, summed over its steps.
+  ///
+  /// Repetitions and not units: a surah said three times is three, the same
+  /// number the band counted down. What the finished step says was done.
+  int get totalRepetitions =>
+      steps.fold(0, (int total, PlaybackStep step) => total + step.count);
 
   /// The step being counted. Only valid when [isEmpty] is false.
   PlaybackStep get step => steps[_stepIndex];
@@ -368,6 +387,7 @@ class WirdPlayer extends ChangeNotifier {
     _currentCount = 0;
     _unitIndex = 0;
     _finished = false;
+    _completedStreak = null;
     _enqueue(() => _user.clearProgress(id));
     notifyListeners();
   }
@@ -391,6 +411,7 @@ class WirdPlayer extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
     _saveTimer?.cancel();
     _saveTimer = null;
     if (_pendingSave) {
@@ -412,7 +433,21 @@ class WirdPlayer extends ChangeNotifier {
     _currentCount = step.count;
     _enqueue(() => _user.logCompletion(id, _now()));
     _enqueue(() => _user.clearProgress(id));
+    // On the same chain and after the completion, so the count includes today.
+    // The finished step is already on screen by then and grows a line; it does
+    // not wait on the database to appear.
+    _enqueue(_readCompletedStreak);
     notifyListeners();
+  }
+
+  Future<void> _readCompletedStreak() async {
+    final int streak = await _user.currentStreakFor(id);
+    _completedStreak = streak;
+    // The player outlives the read only if the screen is still there. Nothing
+    // else is listening, so a notification after disposal is dropped rather
+    // than being an error to guard against — except that ChangeNotifier makes
+    // it one, hence the check.
+    if (!_disposed) notifyListeners();
   }
 
   void _scheduleSave() {
