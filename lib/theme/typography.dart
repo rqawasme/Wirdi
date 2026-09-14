@@ -159,6 +159,7 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
   /// the screen, and it is meant to be read at arm's length from a phone lying
   /// on the floor.
   static const double tasbihCountSize = 72;
+
   /// `الحمد لله` on the finished step, and the sentence under it.
   ///
   /// The two largest things the app sets outside the mushaf, and deliberately:

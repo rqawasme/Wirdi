@@ -71,4 +71,24 @@ abstract final class WirdiMetrics {
   static const EdgeInsets readingColumn = EdgeInsets.symmetric(
     horizontal: readingColumnPadding,
   );
+
+  /// [base], plus whatever the system draws over the bottom edge of the window.
+  ///
+  /// For a scroll view that runs to the bottom of the screen with no bar of its
+  /// own under it. A scroll view given an explicit `padding` opts out of the
+  /// inset [MediaQuery] would otherwise have applied on its behalf, and on
+  /// Android's three-button navigation that inset is 48dp of system buttons
+  /// drawn on top of the app: the last thing in the list ends up behind them,
+  /// and the last thing in a list is the thing that was put last because it
+  /// was worth arriving at.
+  ///
+  /// [MediaQuery.paddingOf] rather than the view padding, so that a bar the
+  /// screen already accounts for costs nothing: a [Scaffold] with a
+  /// `bottomNavigationBar` zeroes it for the body, as does a [SafeArea] above,
+  /// and an open keyboard takes the buttons with it. On a gesture-navigation
+  /// phone it is a few dp of handle, and on a desktop or a test view it is
+  /// zero — which is what makes this safe to use everywhere rather than only
+  /// where a collision has been noticed.
+  static EdgeInsets withSystemBottom(BuildContext context, EdgeInsets base) =>
+      base.copyWith(bottom: base.bottom + MediaQuery.paddingOf(context).bottom);
 }

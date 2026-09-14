@@ -62,7 +62,13 @@ class CollectionContentsScreen extends ConsumerWidget {
       body: entries.isEmpty
           ? _empty(summary)
           : ListView(
-              padding: const EdgeInsets.only(bottom: WirdiMetrics.space6),
+              // Plus the system's own inset, so the last entry clears
+              // Android's navigation bar — see
+              // [WirdiMetrics.withSystemBottom].
+              padding: WirdiMetrics.withSystemBottom(
+                context,
+                const EdgeInsets.only(bottom: WirdiMetrics.space6),
+              ),
               children: <Widget>[
                 _Header(summary: summary),
                 for (int i = 0; i < entries.length; i++) ...<Widget>[

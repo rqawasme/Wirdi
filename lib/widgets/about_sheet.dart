@@ -57,11 +57,17 @@ class AboutContent extends ConsumerWidget {
 
     return ListView(
       controller: controller,
-      padding: const EdgeInsets.fromLTRB(
-        WirdiMetrics.space5,
-        WirdiMetrics.space5,
-        WirdiMetrics.space5,
-        WirdiMetrics.space6,
+      // A sheet is bottom-anchored, so it is this padding and nothing else
+      // that keeps the font licences out from under Android's navigation bar
+      // — see [WirdiMetrics.withSystemBottom].
+      padding: WirdiMetrics.withSystemBottom(
+        context,
+        const EdgeInsets.fromLTRB(
+          WirdiMetrics.space5,
+          WirdiMetrics.space5,
+          WirdiMetrics.space5,
+          WirdiMetrics.space6,
+        ),
       ),
       children: <Widget>[
         const _Section(title: 'Wirdi'),
@@ -253,7 +259,12 @@ class _LicenceTile extends StatelessWidget {
                           }
                           return SingleChildScrollView(
                             controller: controller,
-                            padding: const EdgeInsets.all(WirdiMetrics.space5),
+                            // The licence text has to be readable to its last
+                            // line, which is where the terms end.
+                            padding: WirdiMetrics.withSystemBottom(
+                              context,
+                              const EdgeInsets.all(WirdiMetrics.space5),
+                            ),
                             child: SelectableText(
                               text,
                               style: theme.textTheme.bodySmall,
