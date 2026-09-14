@@ -363,9 +363,11 @@ however many ayahs it has — the cursor is inside a step, not a new step, becau
 Al-Baqarah would otherwise turn a twelve-step wird into a three-hundred-step
 one.
 
-**Nothing animates.** Not the count, not the stripe, not the band. At
+**Nothing on the counting path animates.** Not the count, not the stripe, not
+the band. At
 thirty-three repetitions a counter that eases into position is a counter running behind the
-thumb, and the lag is the whole experience. Feedback is haptic instead: a
+thumb, and the lag is the whole experience. The end of a wird is the one thing
+here that is not on that path — see **finishing** below. Feedback is haptic instead: a
 `selectionClick` on each tap, throttled to one per 60ms and **dropped** rather
 than queued, because some Android devices buffer rapid vibration calls and play
 them back late — which is the same lag arriving through the other sense. The
@@ -431,16 +433,47 @@ place to teach a new gesture.
 What keeps that from being a celebration is the same argument the home tile
 makes: nothing escalates — the first two lines read the same at three hundred
 days as at three — nothing is negative, and the mark itself is the app's own material, the
-stripe above gone solid because the wird filled it. No confetti, no sound,
-nothing animating.
+stripe above gone solid because the wird filled it. No confetti, no sound, and
+nothing that is not the app's own material moving.
+
+**The finished step arrives, and it leaves by coming apart.** The two pieces of
+motion in the app, both of them here, and both spent out of the same
+`WirdiMotion.completion` beat the screen already held still for:
+
+*Arriving* is three fades, opacity and nothing else. `الحمد لله` with `Wird
+complete` over it, then the sentence under it half a beat later, then the tally
+and the run of days half a beat after that — each one a beat long, so the whole
+reveal is two (`WirdiMotion.completionReveal`). Nothing slides, nothing scales
+and nothing is mounted late: every line holds its place in the layout from the
+first frame, so the screen is composed the moment it is reached and only the ink
+arrives.
+
+*Leaving* takes the screen apart. On the closing tap the whole route — app bar,
+stripe, step, band and controls — comes down in courses of 48 by 16 laid in a
+running bond, from the top to the bottom. Each brick turns from whatever the
+screen was showing there into a voussoir, brick and stone alternating exactly as
+`VoussoirStripe` alternates, with a hairline of ground for mortar, and then
+fades out to the bare surface. Every brick lags its course by a little, off a
+hash rather than a `Random` so it falls at the same moment on every frame the
+painter runs, which makes the front ragged rather than a wipe. It is painted
+over the route rather than clipped out of it — a clip needs a path of every
+brick still standing on every frame, this needs two rectangles per brick and
+only for the ones in flight — and the route pops on the last brick, not on the
+tap. `flutter test test/render_samples.dart` shoots both of them frame by frame,
+as `05c-reveal-*.png` and `05d-dismantle-*.png`.
+
+Neither reaches the counting path. At rest the dismantle painter does not exist
+and the reveal sits at zero, and a reciter who has turned animations off in the
+OS — or a theme whose completion beat is zero — gets the finished step whole on
+the frame it is reached, and an immediate close.
 
 The run of days is read back **after** the completion is written, on the same
 ordered chain, so the number includes the wird just finished; until that read
 lands the line is simply absent rather than guessed at. The screen no longer
 leaves on its own — it waits for the tap, and goes back to whichever of Home or
-the collections list opened it. `WirdiMotion.completion` is still the one
-deliberate beat in the app, spent differently: for that half second the
-finished step ignores taps, because a tasbih is counted faster than a screen
+the collections list opened it. The beat the screen used to hold still for is
+now the reveal, and it is still a guard: the finished step takes no tap until
+all three lines have landed, because a tasbih is counted faster than a screen
 changes and the tap after the last one is already on its way down.
 
 ### The reading view
