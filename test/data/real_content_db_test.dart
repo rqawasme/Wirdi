@@ -111,7 +111,7 @@ void _tests(File file) {
     }
   });
 
-  test('the six authored collections are the ones that ship', () async {
+  test('the authored collections are the ones that ship', () async {
     final CollectionRepository repo = DriftCollectionRepository(
       content: content,
       user: user,
@@ -123,7 +123,7 @@ void _tests(File file) {
     // authored rather than generated.
     expect(<String>[
       for (final CollectionSummary s in await repo.all()) s.id.canonical,
-    ], containsAll(<String>['b:2', 'b:3', 'b:4', 'b:5', 'b:6', 'b:7']));
+    ], containsAll(<String>['b:2', 'b:3', 'b:4', 'b:5', 'b:6', 'b:7', 'b:16']));
     expect(
       <String>[for (final CollectionSummary s in await repo.all()) s.name],
       containsAll(<String>[
@@ -133,6 +133,7 @@ void _tests(File file) {
         'al-Wird al-Latif (morning)',
         'al-Wird al-Latif (evening)',
         'Hizb al-Bahr',
+        'Wazifa ash-Shadhiliyya',
       ]),
     );
   });

@@ -1,0 +1,340 @@
+{
+  "group": "wazifa-shadhiliyya",
+  "description": "The Wazifa ash-Shadhiliyya, in the order of the recitation: the Ṣalāt al-Mashīshiyya of Sayyidi ʿAbd al-Salam ibn Mashish, the dhikr that follows it, and the prayers of Imam Abu al-Hasan al-Shadhili said three times each at the close. The Qur’anic passages the wird recites in full are collection items, not adhkar; the fragments here — where the wird recites only part of a verse — are sliced verbatim out of sources/quran/ayahs.json, so no Qur’anic text is transcribed by hand. Elsewhere the Arabic is transcribed from the booklet, whose text layer is unusable, off page renders. Three readings of the print are the booklet’s own transliteration rather than its glyphs, which settles each: its فَذَالِكَ is written فَذَلِكَ here, its الإحترام is written الاحترام, and العل — which the print leaves without its final alif — is written الْعُلَا, as its L’ULĀ requires.",
+  "adhkar": [
+    {
+      "id": 8001,
+      "text_arabic": "أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",
+      "translation": "I seek refuge with Allah from the accursed Satan.",
+      "default_count": 1,
+      "transliteration": "Aʿūdhu bi-Llāhi mina sh-shayṭāni r-rajīm."
+    },
+    {
+      "id": 8002,
+      "text_arabic": "اللَّهُمَّ صَلِّ وَسَلِّمْ بِجَمِيعِ الشُّؤُونِ فِي الظُّهُورِ وَالْبُطُونِ",
+      "translation": "O Allah, exalt and grant peace in all matters, in the outward and in the inward,",
+      "default_count": 1,
+      "transliteration": "Allāhumma ṣalli wa-sallim bi-jamīʿi sh-shuʾūni fi ẓ-ẓuhūri wa-l-buṭūn."
+    },
+    {
+      "id": 8003,
+      "text_arabic": "عَلَى مَنْ مِنْهُ انْشَقَّتِ الْأَسْرَارُ الْكَامِنَةُ فِي ذَاتِهِ الْعَلِيَّةِ ظُهُورًا، وَانْفَلَقَتِ الْأَنْوَارُ الْمُنْطَوِيَةُ فِي سَمَاءِ صِفَاتِهِ السَّنِيَّةِ بُدُورًا",
+      "translation": "upon the one from whom the secrets hidden in his lofty essence were cleft apart into manifestation, and from whom the lights folded in the sky of his exalted qualities broke forth as full moons;",
+      "default_count": 1,
+      "transliteration": "ʿAlā man minhu-nshaqqati l-asrāru l-kāminatu fī dhātihi l-ʿaliyyati ẓuhūrā, wa-nfalaqati l-anwāru l-munṭawiyatu fī samāʾi ṣifātihi s-saniyyati budūrā."
+    },
+    {
+      "id": 8004,
+      "text_arabic": "وَفِيهِ ارْتَقَتِ الْحَقَائِقُ مِنْهُ إِلَيْهِ، وَتَنَزَّلَتْ عُلُومُ آدَمَ بِهِ فِيهِ عَلَيْهِ",
+      "translation": "and in him the truths ascended, from him to Him; and the sciences of Adam descended through him, in him, upon him;",
+      "default_count": 1,
+      "transliteration": "Wa-fīhi-rtaqati l-ḥaqāʾiqu minhu ilayh, wa-tanazzalat ʿulūmu Ādama bihi fīhi ʿalayh."
+    },
+    {
+      "id": 8005,
+      "text_arabic": "فَأَعْجَزَ كُلًّا مِنَ الْخَلَائِقِ فَهْمُ مَا أُودِعَ مِنَ السِّرِّ فِيهِ، وَلَهُ تَضَاءَلَتِ الْفُهُومُ وَكُلٌّ عَجْزُهُ يَكْفِيهِ",
+      "translation": "so that the whole of creation was left unable to comprehend what of the secret was entrusted to him; before him understanding is diminished, and for each one his own inability suffices him.",
+      "default_count": 1,
+      "transliteration": "Fa-aʿjaza kullan mina l-khalāʾiqi fahmu mā ūdiʿa mina s-sirri fīh, wa-lahu taḍāʾalati l-fuhūmu wa-kullun ʿajzuhu yakfīh."
+    },
+    {
+      "id": 8006,
+      "text_arabic": "فَذَلِكَ السِّرُّ الْمَصُونُ لَمْ يُدْرِكْهُ مِنَّا سَابِقٌ فِي وُجُودِهِ، وَلَا يَبْلُغُهُ لَاحِقٌ عَلَى سَوَابِقِ شُهُودِهِ",
+      "translation": "That is the guarded secret: no one of us who went before has grasped it in its existence, and no one who comes after will reach his pre-existent witnessing.",
+      "default_count": 1,
+      "transliteration": "Fa-dhālika s-sirru l-maṣūnu lam yudrikhu minnā sābiqun fī wujūdih, wa-lā yablughuhu lāḥiqun ʿalā sawābiqi shuhūdih."
+    },
+    {
+      "id": 8007,
+      "text_arabic": "فَأَعْظِمْ بِهِ مِنْ نَبِيٍّ رِيَاضُ الْمُلْكِ وَالْمَلَكُوتِ بِزَهْرِ جَمَالِهِ الزَّاهِرِ مُونِقَةٌ، وَحِيَاضُ مَعَالِمِ الْجَبَرُوتِ بِفَيْضِ أَنْوَارِ سِرِّهِ الْبَاهِرِ مُتَدَفِّقَةٌ",
+      "translation": "How magnificent a Prophet: the gardens of the kingdom and the dominion are made to blossom by the radiant flower of his beauty, and the reservoirs of the landmarks of the omnipotence pour forth with the overflowing lights of his dazzling secret.",
+      "default_count": 1,
+      "transliteration": "Fa-aʿẓim bihi min nabiyyin riyāḍu l-mulki wa-l-malakūti bi-zahri jamālihi z-zāhiri mūniqah, wa-ḥiyāḍu maʿālimi l-jabarūti bi-fayḍi anwāri sirrihi l-bāhiri mutadaffiqah."
+    },
+    {
+      "id": 8008,
+      "text_arabic": "وَلَا شَيْءَ إِلَّا وَهُوَ بِهِ مَنُوطٌ، وَبِسِرِّهِ السَّارِي مَحُوطٌ",
+      "translation": "There is nothing that is not bound to him, and encompassed by his all-pervading secret;",
+      "default_count": 1,
+      "transliteration": "Wa-lā shayʾa illā wa-huwa bihi manūṭ, wa-bi-sirrihi s-sāriyi maḥūṭ."
+    },
+    {
+      "id": 8009,
+      "text_arabic": "إِذْ لَوْلَا الْوَاسِطَةُ فِي كُلِّ صُعُودٍ وَهُبُوطٍ، لَذَهَبَ كَمَا قِيلَ الْمَوْسُوطُ",
+      "translation": "for were he not the mediator in every ascent and descent, then — as it is said — that which is mediated would vanish.",
+      "default_count": 1,
+      "transliteration": "Idh lawla l-wāsiṭatu fī kulli ṣuʿūdin wa-hubūṭ, la-dhahaba kamā qīla l-mawsūṭ."
+    },
+    {
+      "id": 8010,
+      "text_arabic": "صَلَاةً تَلِيقُ بِكَ مِنْكَ إِلَيْهِ، وَتَتَوَارَدُ بِتَوَارُدِ الْخَلْقِ الْجَدِيدِ وَالْفَيْضِ الْمَدِيدِ عَلَيْهِ",
+      "translation": "An exaltation worthy of You, from You to him, arriving upon him as ceaselessly as the renewed creation and the outpouring abundance arrive;",
+      "default_count": 1,
+      "transliteration": "Ṣalātan talīqu bika minka ilayh, wa-tatawāradu bi-tawārudi l-khalqi l-jadīdi wa-l-fayḍi l-madīdi ʿalayh."
+    },
+    {
+      "id": 8011,
+      "text_arabic": "وَسَلَامًا يُجَارِي هَذِهِ الصَّلَاةَ فَيْضُهُ وَفَضْلُهُ كَمَا هُوَ أَهْلُهُ",
+      "translation": "and a peace whose abundance and favour keep pace with that exaltation, as he is worthy of it.",
+      "default_count": 1,
+      "transliteration": "Wa-salāman yujārī hādhihi ṣ-ṣalāta fayḍuhu wa-faḍluhu kamā huwa ahluh."
+    },
+    {
+      "id": 8012,
+      "text_arabic": "وَعَلَى آلِهِ شُمُوسِ سَمَاءِ الْعُلَا، وَأَصْحَابِهِ وَالتَّابِعِينَ وَمَنْ تَلَا",
+      "translation": "And upon his Family, the suns of the highest heaven, and his Companions and the Followers and those who came after.",
+      "default_count": 1,
+      "transliteration": "Wa-ʿalā ālihi shumūsi samāʾi l-ʿulā, wa-aṣḥābihi wa-t-tābiʿīna wa-man talā."
+    },
+    {
+      "id": 8013,
+      "text_arabic": "اللَّهُمَّ إِنَّهُ سِرُّكَ الْجَامِعُ لِكُلِّ الْأَسْرَارِ، وَنُورُكَ الْوَاسِعُ لِجَمِيعِ الْأَنْوَارِ",
+      "translation": "O Allah, he is Your secret that gathers every secret, and Your light that encompasses every light,",
+      "default_count": 1,
+      "transliteration": "Allāhumma innahu sirruka l-jāmiʿu li-kulli l-asrār, wa-nūruka l-wāsiʿu li-jamīʿi l-anwār."
+    },
+    {
+      "id": 8014,
+      "text_arabic": "وَدَلِيلُكَ الدَّالُّ بِكَ عَلَيْكَ، وَقَائِدُ رَكْبِ عَوَالِمِكَ إِلَيْكَ، وَحِجَابُكَ الْأَعْظَمُ الْقَائِمُ لَكَ بَيْنَ يَدَيْكَ",
+      "translation": "and Your guide who leads by You to You, and the leader of the caravan of Your worlds to You, and Your greatest veil, standing for You before You.",
+      "default_count": 1,
+      "transliteration": "Wa-dalīluka d-dāllu bika ʿalayk, wa-qāʾidu rakbi ʿawālimika ilayk, wa-ḥijābuka l-aʿẓamu l-qāʾimu laka bayna yadayk."
+    },
+    {
+      "id": 8015,
+      "text_arabic": "فَلَا يَصِلُ وَاصِلٌ إِلَّا إِلَى حَضْرَتِهِ الْمَانِعَةِ، وَلَا يَهْتَدِي حَائِرٌ إِلَّا بِأَنْوَارِهِ اللَّامِعَةِ",
+      "translation": "So none who arrives arrives but at his guarded presence, and no bewildered soul is guided but by his shining lights.",
+      "default_count": 1,
+      "transliteration": "Fa-lā yaṣilu wāṣilun illā ilā ḥaḍratihi l-māniʿah, wa-lā yahtadī ḥāʾirun illā bi-anwārihi l-lāmiʿah."
+    },
+    {
+      "id": 8016,
+      "text_arabic": "اللَّهُمَّ أَلْحِقْنِي بِنَسَبِهِ الرُّوحِي، وَحَقِّقْنِي بِحَسَبِهِ السُّبُّوحِيِّ",
+      "translation": "O Allah, join me to his spiritual lineage, and realise in me his all-glorifying descent.",
+      "default_count": 1,
+      "transliteration": "Allāhumma alḥiqnī bi-nasabihi r-rūḥī, wa-ḥaqqiqnī bi-ḥasabihi s-subbūḥiyy."
+    },
+    {
+      "id": 8017,
+      "text_arabic": "وَعَرِّفْنِي إِيَّاهُ مَعْرِفَةً أَشْهَدُ بِهَا مُحَيَّاهُ، وَأَصِيرُ بِهَا مَجْلَاهُ، كَمَا يُحِبُّهُ وَيَرْضَاهُ",
+      "translation": "Let me know him with a knowledge by which I witness his countenance, and by which I become the place of his unveiling, in the way he loves and is pleased with;",
+      "default_count": 1,
+      "transliteration": "Wa-ʿarrifnī iyyāhu maʿrifatan ashhadu bihā muḥayyāh, wa-aṣīru bihā majlāh, kamā yuḥibbuhu wa-yarḍāh."
+    },
+    {
+      "id": 8018,
+      "text_arabic": "وَأَسْلَمُ بِهَا مِنْ وُرُودِ مَوَارِدِ الْجَهْلِ بِعَوَارِفِهِ، وَأَكْرَعُ بِهَا مِنْ مَوَارِدِ الْفَضْلِ بِمَعَارِفِهِ",
+      "translation": "and by which I am kept safe from coming down to the watering places of ignorance, through his gifts of knowing; and by which I drink from the watering places of bounty, through his knowledge.",
+      "default_count": 1,
+      "transliteration": "Wa-aslamu bihā min wurūdi mawāridi l-jahli bi-ʿawārifih, wa-akraʿu bihā min mawāridi l-faḍli bi-maʿārifih."
+    },
+    {
+      "id": 8019,
+      "text_arabic": "وَاحْمِلْنِي عَلَى نَجَائِبِ لُطْفِكَ، وَرَكَائِبِ حَنَانِكَ وَعَطْفِكَ",
+      "translation": "And carry me upon the swift mounts of Your subtlety, and upon the steeds of Your tenderness and Your compassion.",
+      "default_count": 1,
+      "transliteration": "Wa-ḥmilnī ʿalā najāʾibi luṭfik, wa-rakāʾibi ḥanānika wa-ʿaṭfik."
+    },
+    {
+      "id": 8020,
+      "text_arabic": "وَسِرْ بِي فِي سَبِيلِهِ الْقَوِيمِ، وَصِرَاطِهِ الْمُسْتَقِيمِ إِلَى حَضْرَتِهِ بِحَضْرَتِكَ الْقُدْسِيَّةِ، الْمُتَبَلِّجَةِ بِتَجَلِّيَاتِ مَحَاسِنِهِ الْإِنْسِيَّةِ",
+      "translation": "And travel with me on his upright way and his straight path, to his presence by Your holy presence, which shines with the self-disclosures of his human excellences,",
+      "default_count": 1,
+      "transliteration": "Wa-sir bī fī sabīlihi l-qawīm, wa-ṣirāṭihi l-mustaqīmi ilā ḥaḍratihi bi-ḥaḍratika l-qudsiyyah, al-mutaballijati bi-tajalliyāti maḥāsinihi l-insiyyah."
+    },
+    {
+      "id": 8021,
+      "text_arabic": "حَمْلًا مَحْفُوفًا بِجُنُودِ نُصْرَتِكَ، مَصْحُوبًا بِعَوَالِمِ أُسْرَتِكَ",
+      "translation": "a carrying encircled by the armies of Your help, accompanied by the worlds of Your household.",
+      "default_count": 1,
+      "transliteration": "Ḥamlan maḥfūfan bi-junūdi nuṣratik, maṣḥūban bi-ʿawālimi usratik."
+    },
+    {
+      "id": 8022,
+      "text_arabic": "وَاقْذِفْ بِي عَلَى الْبَاطِلِ بِأَنْوَاعِهِ فِي جَمِيعِ بِقَاعِهِ، فَأَدْمَغَهُ بِالْحَقِّ عَلَى الْوَجْهِ الْأَحَقِّ",
+      "translation": "And hurl me against falsehood in all its kinds and in all its places, that I may crush it with the Truth, in the most rightful manner.",
+      "default_count": 1,
+      "transliteration": "Wa-qdhif bī ʿala l-bāṭili bi-anwāʿihi fī jamīʿi biqāʿih, fa-admaghahu bi-l-ḥaqqi ʿala l-wajhi l-aḥaqq."
+    },
+    {
+      "id": 8023,
+      "text_arabic": "وَزُجَّ بِي فِي بِحَارِ الْأَحَدِيَّةِ الْمُحِيطَةِ بِكُلِّ مُرَكَّبَةٍ وَبَسِيطَةٍ",
+      "translation": "And plunge me into the seas of Oneness that encompass every composite and simple thing.",
+      "default_count": 1,
+      "transliteration": "Wa-zujja bī fī biḥāri l-aḥadiyyati l-muḥīṭati bi-kulli murakkabatin wa-basīṭah."
+    },
+    {
+      "id": 8024,
+      "text_arabic": "وَانْشُلْنِي مِنْ أَوْحَالِ التَّوْحِيدِ إِلَى فَضَاءِ التَّفْرِيدِ، الْمُنَزَّهِ عَنِ الْإِطْلَاقِ وَالتَّقْيِيدِ",
+      "translation": "And draw me out of the mire of merely stated oneness into the open space of singling out, which is beyond both absoluteness and limitation.",
+      "default_count": 1,
+      "transliteration": "Wa-nshulnī min awḥāli t-tawḥīdi ilā faḍāʾi t-tafrīd, al-munazzahi ʿani l-iṭlāqi wa-t-taqyīd."
+    },
+    {
+      "id": 8025,
+      "text_arabic": "وَأَغْرِقْنِي فِي عَيْنِ بَحْرِ الْوَحْدَةِ شُهُودًا، حَتَّى لَا أَرَى وَلَا أَسْمَعَ وَلَا أَجِدَ وَلَا أُحِسَّ إِلَّا بِهَا نُزُولًا وَصُعُودًا، كَمَا هُوَ كَذَلِكَ لَمْ يَزَلْ وُجُودًا",
+      "translation": "And drown me in the very spring of the sea of Unity in witnessing, until I neither see nor hear nor find nor feel except by it, in descending and in ascending — as it is, and has never ceased to be, in existence.",
+      "default_count": 1,
+      "transliteration": "Wa-aghriqnī fī ʿayni baḥri l-waḥdati shuhūdā, ḥattā lā arā wa-lā asmaʿa wa-lā ajida wa-lā uḥissa illā bihā nuzūlan wa-ṣuʿūdā, kamā huwa kadhālika lam yazal wujūdā."
+    },
+    {
+      "id": 8026,
+      "text_arabic": "وَاجْعَلِ اللَّهُمَّ ذَلِكَ لَدَيْهِ مَمْدُوحًا وَعِنْدَكَ مَحْمُودًا",
+      "translation": "And make that, O Allah, praiseworthy in his sight and commended with You.",
+      "default_count": 1,
+      "transliteration": "Wa-jʿali llāhumma dhālika ladayhi mamdūḥan wa-ʿindaka maḥmūdā."
+    },
+    {
+      "id": 8027,
+      "text_arabic": "وَاجْعَلِ اللَّهُمَّ الْحِجَابَ الْأَعْظَمَ حَيَاةَ رُوحِي كَشْفًا وَعِيَانًا، إِذِ الْأَمْرُ كَذَلِكَ رَحْمَةً مِنْكَ وَحَنَانًا",
+      "translation": "And make, O Allah, the Greatest Veil the life of my spirit, by unveiling and by eye-witnessing — since the matter is so, as a mercy and a tenderness from You.",
+      "default_count": 1,
+      "transliteration": "Wa-jʿali llāhumma l-ḥijāba l-aʿẓama ḥayāta rūḥī kashfan wa-ʿiyānā, idhi l-amru kadhālika raḥmatan minka wa-ḥanānā."
+    },
+    {
+      "id": 8028,
+      "text_arabic": "وَاجْعَلِ اللَّهُمَّ رُوحَهُ سِرَّ حَقِيقَتِي ذَوْقًا وَحَالًا، وَحَقِيقَتَهُ جَامِعَ عَوَالِمِي فِي مَجَامِعِ مَعَالِمِي حَالًا وَمَآلًا",
+      "translation": "And make, O Allah, his spirit the secret of my reality in tasting and in state, and his reality the gatherer of my worlds in the assemblies of my landmarks, now and in the end.",
+      "default_count": 1,
+      "transliteration": "Wa-jʿali llāhumma rūḥahu sirra ḥaqīqatī dhawqan wa-ḥālā, wa-ḥaqīqatahu jāmiʿa ʿawālimī fī majāmiʿi maʿālimī ḥālan wa-maʾālā."
+    },
+    {
+      "id": 8029,
+      "text_arabic": "وَحَقِّقْنِي بِذَلِكَ عَلَى مَا هُنَالِكَ، بِتَحْقِيقِ الْحَقِّ الْأَوَّلِ وَالْآخِرِ وَالظَّاهِرِ وَالْبَاطِنِ",
+      "translation": "And realise that in me according to what is there with You, by the realisation of the Truth, the First and the Last, the Outward and the Inward.",
+      "default_count": 1,
+      "transliteration": "Wa-ḥaqqiqnī bi-dhālika ʿalā mā hunālik, bi-taḥqīqi l-ḥaqqi l-awwali wa-l-ākhiri wa-ẓ-ẓāhiri wa-l-bāṭin."
+    },
+    {
+      "id": 8030,
+      "text_arabic": "يَا أَوَّلُ فَلَيْسَ قَبْلَكَ شَيْءٌ، يَا آخِرُ فَلَيْسَ بَعْدَكَ شَيْءٌ، يَا ظَاهِرُ فَلَيْسَ فَوْقَكَ شَيْءٌ، يَا بَاطِنُ فَلَيْسَ دُونَكَ شَيْءٌ",
+      "translation": "O First, there is nothing before You. O Last, there is nothing after You. O Outward, there is nothing above You. O Inward, there is nothing beneath You.",
+      "default_count": 1,
+      "transliteration": "Yā Awwalu fa-laysa qablaka shayʾ, yā Ākhiru fa-laysa baʿdaka shayʾ, yā Ẓāhiru fa-laysa fawqaka shayʾ, yā Bāṭinu fa-laysa dūnaka shayʾ."
+    },
+    {
+      "id": 8031,
+      "text_arabic": "اسْمَعْ نِدَائِي فِي بَقَائِي وَفَنَائِي بِمَا سَمِعْتَ بِهِ نِدَاءَ عَبْدِكَ زَكَرِيَّا",
+      "translation": "Hear my call in my subsistence and in my annihilation, as You heard the call of Your servant Zakariyya.",
+      "default_count": 1,
+      "transliteration": "Ismaʿ nidāʾī fī baqāʾī wa-fanāʾī bimā samiʿta bihi nidāʾa ʿabdika Zakariyyā."
+    },
+    {
+      "id": 8032,
+      "text_arabic": "وَاجْعَلْنِي عَنْكَ رَاضِيًا وَعِنْدَكَ مَرْضِيًّا",
+      "translation": "And make me well pleased with You, and well pleasing in Your sight.",
+      "default_count": 1,
+      "transliteration": "Wa-jʿalnī ʿanka rāḍiyan wa-ʿindaka marḍiyyā."
+    },
+    {
+      "id": 8033,
+      "text_arabic": "وَانْصُرْنِي بِكَ لَكَ عَلَى عَوَالِمِ الْجِنِّ وَالْإِنْسِ وَالْمَلَكِ، وَأَيِّدْنِي بِكَ لَكَ بِتَأْيِيدِ مَنْ سَلَكَ فَمَلَكَ وَمَنْ مَلَكَ فَسَلَكَ",
+      "translation": "And help me, by You and for You, over the worlds of the jinn and of humankind and of the angels; and strengthen me, by You and for You, with the strengthening of one who travelled the way and so came to master it, and who mastered it and so travelled it.",
+      "default_count": 1,
+      "transliteration": "Wa-nṣurnī bika laka ʿalā ʿawālimi l-jinni wa-l-insi wa-l-malak, wa-ayyidnī bika laka bi-taʾyīdi man salaka fa-malaka wa-man malaka fa-salak."
+    },
+    {
+      "id": 8034,
+      "text_arabic": "وَاجْمَعْ بَيْنِي وَبَيْنَكَ، وَأَزِلْ عَنِ الْعَيْنِ غَيْنَكَ، وَحُلْ بَيْنِي وَبَيْنَ غَيْرِكَ، وَلَا تَحُلْ بَيْنِي وَبَيْنَكَ",
+      "translation": "And join me to You. And lift from my eye Your clouding veil. And come between me and everything other than You, and come not between me and You.",
+      "default_count": 1,
+      "transliteration": "Wa-jmaʿ baynī wa-baynak, wa-azil ʿani l-ʿayni ghaynak, wa-ḥul baynī wa-bayna ghayrik, wa-lā taḥul baynī wa-baynak."
+    },
+    {
+      "id": 8035,
+      "text_arabic": "وَاجْعَلْنِي مِنْ أَئِمَّةِ خَيْرِكَ وَمَيْرِكَ",
+      "translation": "And make me one of the leaders of Your goodness and Your provision.",
+      "default_count": 1,
+      "transliteration": "Wa-jʿalnī min aʾimmati khayrika wa-mayrik."
+    },
+    {
+      "id": 8036,
+      "text_arabic": "اللهُ",
+      "translation": "Allah.",
+      "default_count": 3,
+      "transliteration": "Allāh.",
+      "notes": "The booklet writes it ALLĀĀĀH and directs: hold each ĀĀĀ for twelve slow measures, one full breath."
+    },
+    {
+      "id": 8037,
+      "text_arabic": "اللهُ مِنْهُ بَدْءُ الْأَمْرِ، اللهُ الْأَمْرُ إِلَيْهِ يَعُودُ، اللهُ وَاجِبُ الْوُجُودِ وَمَا سِوَاهُ مَفْقُودٌ",
+      "translation": "Allah — from Him the affair begins. Allah — to Him the affair returns. Allah — the necessary Being, and all that is other than He is non-existent.",
+      "default_count": 1,
+      "transliteration": "Allāhu minhu badʾu l-amr, Allāhu l-amru ilayhi yaʿūd, Allāhu wājibu l-wujūdi wa-mā siwāhu mafqūd."
+    },
+    {
+      "id": 8038,
+      "text_arabic": "إِنَّ ٱلَّذِي فَرَضَ عَلَيۡكَ ٱلۡقُرۡءَانَ لَرَآدُّكَ إِلَىٰ مَعَادٖ",
+      "translation": "Indeed, He who imposed upon you the Qur’an will take you back to a place of return.",
+      "default_count": 1,
+      "transliteration": "Inna lladhī faraḍa ʿalayka l-Qurʾāna la-rādduka ilā maʿād.",
+      "notes": "The opening portion of Qur’an 28:85, recited on its own."
+    },
+    {
+      "id": 8039,
+      "text_arabic": "فِي كُلِّ اقْتِرَابٍ وَابْتِعَادٍ وَانْتِهَاضٍ وَاقْتِعَادٍ",
+      "translation": "in every drawing near and every drawing away, in every rising up and every sitting down.",
+      "default_count": 1,
+      "transliteration": "Fī kulli-qtirābin wa-btiʿādin wa-ntihāḍin wa-qtiʿād."
+    },
+    {
+      "id": 8040,
+      "text_arabic": "رَبَّنَآ ءَاتِنَا مِن لَّدُنكَ رَحۡمَةٗ وَهَيِّئۡ لَنَا مِنۡ أَمۡرِنَا رَشَدٗا",
+      "translation": "Our Lord, grant us from Yourself mercy and prepare for us from our affair right guidance.",
+      "default_count": 1,
+      "transliteration": "Rabbanā ātinā min ladunka raḥmatan wa-hayyiʾ lanā min amrinā rashadā.",
+      "notes": "The closing portion of Qur’an 18:10, recited on its own. The wird says it once here and three times among the closing prayers."
+    },
+    {
+      "id": 8041,
+      "text_arabic": "وَاجْعَلْنَا مِمَّنِ اهْتَدَى بِكَ فَهَدَى، حَتَّى لَا يَقَعَ مِنَّا نَظَرٌ إِلَّا عَلَيْكَ، وَلَا يَسِيرُ بِنَا وَطَرٌ إِلَّا إِلَيْكَ",
+      "translation": "And make us of those who are guided by You and so guide others — until no glance of ours falls but upon You, and no want of ours carries us but towards You.",
+      "default_count": 1,
+      "transliteration": "Wa-jʿalnā mimmani-htadā bika fa-hadā, ḥattā lā yaqaʿa minnā naẓarun illā ʿalayk, wa-lā yasīru binā waṭarun illā ilayk."
+    },
+    {
+      "id": 8042,
+      "text_arabic": "وَسِرْ بِنَا فِي مَعَارِجِ مَدَارِجَ",
+      "translation": "And travel with us through the ascending stages of the ranks.",
+      "default_count": 1,
+      "transliteration": "Wa-sir binā fī maʿāriji madārij."
+    },
+    {
+      "id": 8043,
+      "text_arabic": "اللَّهُمَّ فَصَلِّ وَسَلِّمْ مِنَّا عَلَيْهِ أَفْضَلَ الصَّلَاةِ وَأَتَمَّ التَّسْلِيمِ، فَإِنَّا لَا نَقْدِرُ قَدْرَهُ الْعَظِيمَ، وَلَا نُدْرِكُ مَا يَلِيقُ بِهِ مِنَ الِاحْتِرَامِ وَالتَّعْظِيمِ",
+      "translation": "O Allah, so exalt him and greet him on our behalf with the most excellent exaltation and the most complete peace — for we cannot measure his great worth, nor do we grasp what befits him of reverence and magnification.",
+      "default_count": 1,
+      "transliteration": "Allāhumma fa-ṣalli wa-sallim minnā ʿalayhi afḍala ṣ-ṣalāti wa-atamma t-taslīm, fa-innā lā naqdiru qadrahu l-ʿaẓīm, wa-lā nudriku mā yalīqu bihi mina l-iḥtirāmi wa-t-taʿẓīm."
+    },
+    {
+      "id": 8044,
+      "text_arabic": "صَلَوَاتُ اللهِ تَعَالَى وَسَلَامُهُ وَتَحِيَّاتُهُ وَرَحْمَتُهُ وَبَرَكَاتُهُ عَلَى سَيِّدِنَا مُحَمَّدٍ عَبْدِكَ وَنَبِيِّكَ وَرَسُولِكَ النَّبِيِّ الْأُمِّيِّ وَعَلَى آلِهِ وَصَحْبِهِ وَسَلِّمْ، عَدَدَ الشَّفْعِ وَالْوَتْرِ وَعَدَدَ كَلِمَاتِ رَبِّنَا التَّامَّاتِ الْمُبَارَكَاتِ",
+      "translation": "The exaltations of Allah, Exalted is He, and His peace and His greetings and His mercy and His blessings be upon our master Muhammad, Your servant and Your prophet and Your messenger, the Unlettered Prophet, and upon his Family and his Companions, and grant them peace — by the number of the even and the odd, and by the number of the perfect and blessed words of our Lord.",
+      "default_count": 1,
+      "transliteration": "Ṣalawātu Llāhi taʿālā wa-salāmuhu wa-taḥiyyātuhu wa-raḥmatuhu wa-barakātuhu ʿalā sayyidinā Muḥammadin ʿabdika wa-nabiyyika wa-rasūlika n-nabiyyi l-ummiyyi wa-ʿalā ālihi wa-ṣaḥbihi wa-sallim, ʿadada sh-shafʿi wa-l-watri wa-ʿadada kalimāti rabbinā t-tāmmāti l-mubārakāt."
+    },
+    {
+      "id": 8045,
+      "text_arabic": "تَحَصَّنْتُ بِذِي الْعِزَّةِ وَالْجَبَرُوتِ، وَاعْتَصَمْتُ بِرَبِّ الْمَلَكُوتِ، وَتَوَكَّلْتُ عَلَى الْحَيِّ الَّذِي لَا يَمُوتُ، اِصْرِفْ عَنَّا الْأَذَى إِنَّكَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      "translation": "I have taken refuge in the Possessor of might and omnipotence, and held fast to the Lord of the dominion, and put my trust in the Living One who does not die. Turn harm away from us; truly You have power over all things.",
+      "default_count": 3,
+      "transliteration": "Taḥaṣṣantu bi-dhi l-ʿizzati wa-l-jabarūt, wa-ʿtaṣamtu bi-Rabbi l-malakūt, wa-tawakkaltu ʿala l-Ḥayyi lladhī lā yamūt. Iṣrif ʿanna l-adhā innaka ʿalā kulli shayʾin Qadīr."
+    },
+    {
+      "id": 8046,
+      "text_arabic": "حَسۡبُنَا ٱللَّهُ وَنِعۡمَ ٱلۡوَكِيلُ",
+      "translation": "Sufficient for us is Allah, and He is the best Disposer of affairs.",
+      "default_count": 3,
+      "transliteration": "Ḥasbunā Llāhu wa-niʿma l-wakīl.",
+      "notes": "The closing portion of Qur’an 3:173, recited on its own."
+    },
+    {
+      "id": 8047,
+      "text_arabic": "وَأُفَوِّضُ أَمۡرِيٓ إِلَى ٱللَّهِۚ إِنَّ ٱللَّهَ بَصِيرُۢ بِٱلۡعِبَادِ",
+      "translation": "And I entrust my affair to Allah. Indeed, Allah is Seeing of His servants.",
+      "default_count": 3,
+      "transliteration": "Wa-ufawwiḍu amrī ila Llāh, inna Llāha Baṣīrun bi-l-ʿibād.",
+      "notes": "The middle portion of Qur’an 40:44, recited on its own."
+    }
+  ]
+}
