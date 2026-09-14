@@ -52,6 +52,7 @@ void main() {
     WidgetTester tester,
     int stepIndex, {
     double height = 1400,
+    bool disableAnimations = false,
   }) async {
     tester.view.physicalSize = Size(400, height);
     tester.view.devicePixelRatio = 1;
@@ -77,7 +78,17 @@ void main() {
           // The real theme: the reading widgets read the typography extension
           // and assert it is there.
           theme: WirdiTheme.light(),
-          home: const WirdPlayerScreen(collectionId: mixed),
+          // The reduce-motion switch, as the OS hands it over: the real
+          // media query with one flag turned, rather than a bare one that
+          // would take the window's size out with it.
+          home: Builder(
+            builder: (BuildContext context) => MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(disableAnimations: disableAnimations),
+              child: const WirdPlayerScreen(collectionId: mixed),
+            ),
+          ),
         ),
       ),
     );
@@ -500,7 +511,8 @@ void main() {
       expect(find.text('done'), findsOneWidget);
       expect(find.text('Tap anywhere above to close'), findsOneWidget);
       expect(_stripe(tester).value, 1);
-      // Nothing has left on its own, and nothing is going to.
+      // Nothing has left on its own, and nothing is going to. Two seconds is
+      // also well past the reveal, so what is on screen is the whole of it.
       await tester.pump(const Duration(seconds: 2));
       expect(find.text('الْحَمْدُ لِلَّهِ'), findsOneWidget);
 
@@ -514,6 +526,14 @@ void main() {
       // A tap anywhere in the content area closes it, the same gesture that
       // counted every step.
       await tester.tap(find.text('الْحَمْدُ لِلَّهِ'));
+      await tester.pump();
+
+      // The screen comes apart first: part way through the run the route is
+      // still there, in pieces, and the pop is what the end of it runs into.
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(find.text('الْحَمْدُ لِلَّهِ'), findsOneWidget);
+
+      await tester.pump(const Duration(seconds: 1));
       await settle(tester);
 
       // Back on the list it was opened from, with the row marked.
@@ -543,9 +563,81 @@ void main() {
       await tester.pump();
       expect(find.text('الْحَمْدُ لِلَّهِ'), findsOneWidget);
 
-      // The beat over, the whole content area is the way out, exactly as it
-      // was the way forward on every step before this one.
+      // Still shut a beat in, which is where the words are still arriving:
+      // the step is closed for as long as the reveal lasts, not for a timer
+      // of its own.
       await tester.pump(const WirdiMotion.standardTiming().completion);
+      expect(_closeTap(tester), isNull);
+
+      // The reveal over, the whole content area is the way out, exactly as it
+      // was the way forward on every step before this one.
+      await tester.pump(const WirdiMotion.standardTiming().completionReveal);
+      expect(_closeTap(tester), isNotNull);
+    });
+
+    testWidgets('the finished step arrives in three fades', (
+      WidgetTester tester,
+    ) async {
+      await openAt(tester, 13);
+
+      final Finder text = find.text('PLACEHOLDER dhikr 1003 translation');
+      await tester.tap(text);
+      await tester.pump();
+      await tester.tap(text);
+      await tester.pump();
+      await tester.tap(text);
+      await tester.pump();
+
+      const String praise = 'الْحَمْدُ لِلَّهِ';
+      const String sentence =
+          'Consistency is the key. May it be accepted, Ameen.';
+      final Finder tally = find.textContaining('14 steps');
+
+      // On the frame the wird ends the whole step is laid out and none of it
+      // is inked in: it arrives, it does not appear.
+      expect(_fade(tester, find.text(praise)), 0);
+      expect(_fade(tester, find.text(sentence)), 0);
+      expect(_fade(tester, tally), 0);
+
+      // The praise first, alone.
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(_fade(tester, find.text(praise)), greaterThan(0));
+      expect(_fade(tester, find.text(sentence)), 0);
+      expect(_fade(tester, tally), 0);
+
+      // Then the sentence under it, while the tally is still to come.
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(_fade(tester, find.text(sentence)), greaterThan(0));
+      expect(_fade(tester, tally), 0);
+
+      // Then what was recited.
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(_fade(tester, tally), greaterThan(0));
+
+      // And at the end of it, three lines at full strength, in the order they
+      // are read in.
+      await tester.pump(const WirdiMotion.standardTiming().completionReveal);
+      expect(_fade(tester, find.text(praise)), 1);
+      expect(_fade(tester, find.text(sentence)), 1);
+      expect(_fade(tester, tally), 1);
+    });
+
+    testWidgets('a reciter who has turned animations off gets the step whole', (
+      WidgetTester tester,
+    ) async {
+      await openAt(tester, 13, disableAnimations: true);
+
+      final Finder text = find.text('PLACEHOLDER dhikr 1003 translation');
+      await tester.tap(text);
+      await tester.pump();
+      await tester.tap(text);
+      await tester.pump();
+      await tester.tap(text);
+      await tester.pump();
+
+      // Nothing to wait for: the words are there on the frame the wird ends,
+      // and the step takes the tap out straight away.
+      expect(_fade(tester, find.text('الْحَمْدُ لِلَّهِ')), 1);
       expect(_closeTap(tester), isNotNull);
     });
   });
@@ -580,6 +672,20 @@ VoidCallback? _closeTap(WidgetTester tester) {
       )
       .first
       .onTap;
+}
+
+/// How far in a line of the finished step is, 0 to 1.
+///
+/// The nearest [FadeTransition] over it, which is the one the reveal drives:
+/// every line of the step has one and holds its place in the layout whatever
+/// it reads.
+double _fade(WidgetTester tester, Finder line) {
+  return tester
+      .widget<FadeTransition>(
+        find.ancestor(of: line, matching: find.byType(FadeTransition)).first,
+      )
+      .opacity
+      .value;
 }
 
 /// Where the content area is scrolled to.
