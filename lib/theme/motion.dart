@@ -40,6 +40,21 @@ final class WirdiMotion extends ThemeExtension<WirdiMotion> {
   /// Finishing a wird. The one moment allowed to take its time.
   final Duration completion;
 
+  /// The finished step arriving: `الحمد لله`, then the sentence under it, then
+  /// the accounting.
+  ///
+  /// Three fades of [completion], each starting half a beat after the one
+  /// before, so the whole reveal is two beats. Derived rather than stored, so
+  /// that the completion beat stays the single knob: set it to zero and the
+  /// finished step is simply there, as it was before it had a reveal at all.
+  Duration get completionReveal => completion * 2;
+
+  /// The finished screen coming apart on the way out.
+  ///
+  /// Shorter than the reveal and by the same argument: arriving is the moment,
+  /// leaving is a door closing behind it. A beat and a half.
+  Duration get dismantle => completion + completion ~/ 2;
+
   /// Material's standard easing. No overshoot, no bounce, nothing elastic.
   static const Curve easing = Easing.standard;
 

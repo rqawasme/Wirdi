@@ -283,10 +283,17 @@ void main() {
             await tester.tap(find.byType(SingleChildScrollView));
             await tester.pump();
           }
-          // Nothing on this screen animates, so this settles no motion: it is
-          // for the reads a tap can start — the run of days behind a finished
-          // wird — which would otherwise be shot before they land.
+          // Nothing on the counting path animates, so this settles no
+          // motion: it is for the reads a tap can start — the run of days
+          // behind a finished wird — which would otherwise be shot before
+          // they land.
           if (taps > 0) await settle(tester);
+          // The end of a wird is the exception. The finished step arrives
+          // over two beats, and a still of it wants the whole of it — the
+          // filmstrip below is where the arrival itself is looked at.
+          await tester.pump(
+            const WirdiMotion.standardTiming().completionReveal,
+          );
         },
       );
       await data.userRepository.clearProgress(id);
@@ -396,6 +403,54 @@ void main() {
     // it. Al-Kursi is one step said three times, so three taps is the whole of
     // it.
     await openPlayer(kursi, '05b-player-complete', taps: 3);
+
+    /// The two moments at the end of a wird, frame by frame.
+    ///
+    /// The one thing in the app a still cannot show, and the reason this file
+    /// exists at all: the finished step arriving in three fades, and the
+    /// screen coming apart course by course on the way out. Read the numbered
+    /// shots in order — they are a quarter of a beat apart on the way in and a
+    /// fifth of the run apart on the way out.
+    Future<void> filmstrip(CollectionId id) async {
+      await data.userRepository.clearProgress(id);
+      final NavigatorState nav = navigator();
+      unawaited(
+        nav.pushNamed<void>(
+          Routes.player,
+          arguments: PlayerArguments(collectionId: id),
+        ),
+      );
+      await settle(tester);
+      for (int tap = 0; tap < 3; tap++) {
+        await tester.tap(find.byType(SingleChildScrollView));
+        await tester.pump();
+      }
+
+      // The frame the wird ends on — laid out, and nothing inked in yet — and
+      // then every quarter of the reveal.
+      await shoot(tester, '05c-reveal-0');
+      for (int frame = 1; frame <= 4; frame++) {
+        await tester.pump(const Duration(milliseconds: 250));
+        await shoot(tester, '05c-reveal-$frame');
+      }
+
+      // The run of days lands on a read behind the completion, so it is a
+      // beat late whatever the reveal does.
+      await settle(tester);
+
+      // The way out. Six frames across three quarters of a second, which is
+      // the whole of it: the last one is the bare surface the pop leaves on.
+      await tester.tap(find.byType(SingleChildScrollView));
+      await tester.pump();
+      for (int frame = 1; frame <= 6; frame++) {
+        await tester.pump(const Duration(milliseconds: 120));
+        await shoot(tester, '05d-dismantle-$frame');
+      }
+      await settle(tester);
+      await data.userRepository.clearProgress(id);
+    }
+
+    await filmstrip(kursi);
 
     await settings.setThemeMode(ThemeMode.dark);
     await settle(tester);

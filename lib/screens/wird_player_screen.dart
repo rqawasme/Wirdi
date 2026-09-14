@@ -29,11 +29,18 @@ import '../widgets/voussoir_stripe.dart';
 /// the object that holds the count and back out as a repaint. Nothing on the
 /// counting path goes through a provider, a stream or an animation.
 ///
-/// **Nothing here animates.** Not the count, not the stripe, not the band. That
-/// is the one rule the whole screen is built around: at thirty-three
-/// repetitions a counter that eases into position is a counter running behind
-/// the thumb, and the lag is the entire experience. Feedback is haptic instead
-/// — see [PlayerHaptics].
+/// **Nothing on the counting path animates.** Not the count, not the stripe,
+/// not the band. That is the one rule the whole screen is built around: at
+/// thirty-three repetitions a counter that eases into position is a counter
+/// running behind the thumb, and the lag is the entire experience. Feedback is
+/// haptic instead — see [PlayerHaptics].
+///
+/// The wird being over is the one thing here that is not on that path: nothing
+/// is being counted any more, and there is no next tap to keep up with. So the
+/// finished step arrives in three fades and leaves by coming apart — see
+/// [_CompletionReveal] and [_DismantlePainter]. Both are spent from
+/// [WirdiMotion.completion], which was always this screen's one deliberate
+/// beat.
 ///
 /// **One mechanic.** Every step counts the same way: the content area is the
 /// tap target, whatever kind of step it is, and the band above the controls
@@ -48,16 +55,28 @@ class WirdPlayerScreen extends ConsumerStatefulWidget {
   ConsumerState<WirdPlayerScreen> createState() => _WirdPlayerScreenState();
 }
 
-class _WirdPlayerScreenState extends ConsumerState<WirdPlayerScreen> {
+class _WirdPlayerScreenState extends ConsumerState<WirdPlayerScreen>
+    with TickerProviderStateMixin {
   late final PlayerHaptics _haptics;
   late final Future<WirdPlayer> _opening;
   late final AppLifecycleListener _lifecycle;
+
+  /// The finished step arriving. Owned here rather than by the step itself,
+  /// because the header is part of what arrives and is a sibling of it.
+  late final _CompletionReveal _reveal = _CompletionReveal(vsync: this);
+
+  /// The screen coming apart on the way out. Runs over the whole route — app
+  /// bar, stripe, step, band and controls — so it is owned above all of them.
+  late final AnimationController _dismantle = AnimationController(vsync: this);
 
   WirdPlayer? _player;
 
   @override
   void initState() {
     super.initState();
+    // The pop is the end of the dismantle rather than something racing it: the
+    // route is still there, in pieces, until the last brick is gone.
+    _dismantle.addStatusListener(_onDismantled);
     _haptics = PlayerHaptics(
       enabled: ref.read(settingsProvider).value?.haptics ?? true,
     );
@@ -87,7 +106,30 @@ class _WirdPlayerScreenState extends ConsumerState<WirdPlayerScreen> {
       return player;
     }
     _player = player;
+    // A second listener beside the [ListenableBuilder]'s, and not a rebuild:
+    // all it watches for is the wird ending, which is the moment the reveal
+    // starts. It runs on every count, so it does as close to nothing as a
+    // callback can.
+    player.addListener(_onPlayerChanged);
     return player;
+  }
+
+  /// Starts the reveal on the tap that finishes the wird, and puts it back if
+  /// the reciter starts over.
+  void _onPlayerChanged() {
+    final WirdPlayer? player = _player;
+    if (player == null || !mounted) return;
+    if (player.finished) {
+      _reveal.start(context);
+    } else {
+      _reveal.rewind();
+    }
+  }
+
+  /// Leaves once the last brick is gone.
+  void _onDismantled(AnimationStatus status) {
+    if (status != AnimationStatus.completed || !mounted) return;
+    unawaited(Navigator.of(context).maybePop());
   }
 
   void _flush() {
@@ -98,6 +140,9 @@ class _WirdPlayerScreenState extends ConsumerState<WirdPlayerScreen> {
   @override
   void dispose() {
     _lifecycle.dispose();
+    _reveal.dispose();
+    _dismantle.dispose();
+    _player?.removeListener(_onPlayerChanged);
     // Writes whatever is pending on the way out: leaving the player is exactly
     // when the position needs to be durable.
     _player?.dispose();
@@ -106,11 +151,24 @@ class _WirdPlayerScreenState extends ConsumerState<WirdPlayerScreen> {
 
   /// Leaves the player, from the tap on the finished step.
   ///
-  /// [maybePop] and nothing more: the player was pushed from Home or from the
-  /// collections list, and it goes back to whichever of them opened it. Both
-  /// of those refresh themselves when it does.
+  /// The screen comes apart first and the pop is what the end of that runs
+  /// into — [maybePop] and nothing more, because the player was pushed from
+  /// Home or from the collections list and it goes back to whichever of them
+  /// opened it. Both of those refresh themselves when it does.
+  ///
+  /// One way out, however many taps land on it: a wall already coming down is
+  /// not taken down twice.
   void _leave() {
-    unawaited(Navigator.of(context).maybePop());
+    if (_dismantle.isAnimating || _dismantle.isCompleted) return;
+    final Duration run = MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : Theme.of(context).extension<WirdiMotion>()!.dismantle;
+    if (run == Duration.zero) {
+      unawaited(Navigator.of(context).maybePop());
+      return;
+    }
+    _dismantle.duration = run;
+    _dismantle.forward();
   }
 
   @override
@@ -126,31 +184,311 @@ class _WirdPlayerScreenState extends ConsumerState<WirdPlayerScreen> {
       if (enabled != null) _haptics.enabled = enabled;
     });
 
-    return FutureBuilder<WirdPlayer>(
-      future: _opening,
-      builder: (BuildContext context, AsyncSnapshot<WirdPlayer> snapshot) {
-        if (snapshot.hasError) {
-          return FailureScreen(
-            title: 'Could not open this wird',
-            error: snapshot.error!,
-            stackTrace: snapshot.stackTrace ?? StackTrace.empty,
+    return _Dismantle(
+      animation: _dismantle,
+      child: FutureBuilder<WirdPlayer>(
+        future: _opening,
+        builder: (BuildContext context, AsyncSnapshot<WirdPlayer> snapshot) {
+          if (snapshot.hasError) {
+            return FailureScreen(
+              title: 'Could not open this wird',
+              error: snapshot.error!,
+              stackTrace: snapshot.stackTrace ?? StackTrace.empty,
+            );
+          }
+          final WirdPlayer? player = snapshot.data;
+          if (player == null) {
+            return Scaffold(
+              appBar: AppBar(title: const Text('')),
+              body: const Center(child: CircularProgressIndicator()),
+            );
+          }
+          return ListenableBuilder(
+            listenable: player,
+            builder: (BuildContext context, Widget? child) =>
+                _Player(player: player, reveal: _reveal, onLeave: _leave),
           );
-        }
-        final WirdPlayer? player = snapshot.data;
-        if (player == null) {
-          return Scaffold(
-            appBar: AppBar(title: const Text('')),
-            body: const Center(child: CircularProgressIndicator()),
-          );
-        }
-        return ListenableBuilder(
-          listenable: player,
-          builder: (BuildContext context, Widget? child) =>
-              _Player(player: player, onLeave: _leave),
+        },
+      ),
+    );
+  }
+}
+
+/// The finished step arriving, in three beats.
+///
+/// One controller and three overlapping windows on it: `الحمد لله` and the
+/// title over it, then the sentence, then the tally and the run of days. Each
+/// fade is one [WirdiMotion.completion] long and starts half a beat after the
+/// one before, which is [WirdiMotion.completionReveal] end to end.
+///
+/// Fades only. Nothing slides, nothing scales and nothing is mounted late —
+/// every line holds its place in the layout from the first frame, so the
+/// screen is composed the moment it is reached and only the ink arrives.
+///
+/// The reveal is also the guard the finished step used to keep with a timer:
+/// the tap that finished the wird is one of a run of taps, and at a tasbih's
+/// pace the next one is already on its way down. Until the last beat has
+/// landed the step takes no taps at all — see [_CompleteStep].
+class _CompletionReveal {
+  _CompletionReveal({required TickerProvider vsync})
+    : _controller = AnimationController(vsync: vsync) {
+    praise = _beat(0);
+    sentence = _beat(1);
+    tally = _beat(2);
+  }
+
+  /// One fade, as a fraction of the whole reveal, and how far apart two of
+  /// them start. Half a beat of overlap: consecutive rather than queued, so
+  /// the screen fills in as one movement instead of three.
+  static const double _fade = 0.5;
+  static const double _stagger = 0.25;
+
+  final AnimationController _controller;
+
+  /// `الحمد لله`, and `Wird complete` over it.
+  late final CurvedAnimation praise;
+
+  /// The sentence under the praise.
+  late final CurvedAnimation sentence;
+
+  /// What was recited, and the run of days it belongs to.
+  late final CurvedAnimation tally;
+
+  /// Whether the whole reveal has landed.
+  bool get isDone => _controller.isCompleted;
+
+  void addStatusListener(AnimationStatusListener listener) =>
+      _controller.addStatusListener(listener);
+
+  void removeStatusListener(AnimationStatusListener listener) =>
+      _controller.removeStatusListener(listener);
+
+  CurvedAnimation _beat(int index) => CurvedAnimation(
+    parent: _controller,
+    curve: Interval(
+      index * _stagger,
+      index * _stagger + _fade,
+      // Entering, so it decelerates in.
+      curve: WirdiMotion.easingDecelerate,
+    ),
+  );
+
+  /// Runs the reveal, once, for the wird that has just ended.
+  ///
+  /// A reader who has turned animations off in the OS, and a theme whose
+  /// completion beat is zero, both land on the same thing: the finished step,
+  /// whole, on the frame it is reached.
+  void start(BuildContext context) {
+    if (_controller.isAnimating || _controller.value > 0) return;
+    final Duration run = MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : Theme.of(context).extension<WirdiMotion>()!.completionReveal;
+    if (run == Duration.zero) {
+      _controller.value = 1;
+      return;
+    }
+    _controller.duration = run;
+    _controller.forward();
+  }
+
+  /// Puts it back, for a wird started over.
+  ///
+  /// Guarded on the value rather than called unconditionally: this runs on
+  /// every tap of the wird, and a reset notifies every listener it has.
+  void rewind() {
+    if (_controller.value != 0) _controller.reset();
+  }
+
+  void dispose() {
+    praise.dispose();
+    sentence.dispose();
+    tally.dispose();
+    _controller.dispose();
+  }
+}
+
+/// The screen coming apart, on the way out of a finished wird.
+///
+/// Painted over the route rather than clipped out of it, so the counting path
+/// pays nothing for it: at rest there is no painter, and the builder runs once
+/// because nothing notifies it until the way out is taken.
+///
+/// The shape it wraps the route in is the same whether or not it is running.
+/// It has to be: a subtree whose ancestors change is a subtree rebuilt from
+/// nothing, and the thing under this one is the [FutureBuilder] holding the
+/// open player — which would come back as the spinner it started as, on the
+/// frame the first brick came out.
+class _Dismantle extends StatelessWidget {
+  const _Dismantle({required this.animation, required this.child});
+
+  final Animation<double> animation;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colors = Theme.of(context).colorScheme;
+
+    return AnimatedBuilder(
+      animation: animation,
+      // Handed through the builder untouched: the wall comes down over a
+      // subtree that is not rebuilt for it.
+      child: child,
+      builder: (BuildContext context, Widget? child) {
+        final double t = animation.value;
+        return IgnorePointer(
+          // A wall coming down takes no taps, and the undo and the skips
+          // underneath it are no longer anybody's business.
+          ignoring: t > 0,
+          child: CustomPaint(
+            foregroundPainter: t == 0
+                ? null
+                : _DismantlePainter(
+                    t: t,
+                    brick: colors.primary,
+                    stone: colors.surfaceContainerHigh,
+                    ground: colors.surface,
+                  ),
+            child: child,
+          ),
         );
       },
     );
   }
+}
+
+/// The wall coming down, course by course, from the top.
+///
+/// The wird was built out of this screen and it is taken apart the same way.
+/// Every brick does two things in its own short run: it turns from whatever
+/// the screen was showing there into a voussoir — brick or stone, alternating
+/// the way [VoussoirStripe] alternates, with a hairline of ground for mortar —
+/// and then it fades out to the bare surface underneath. Courses go from the
+/// top down and each brick lags its neighbours by a little, so the front is
+/// ragged rather than a wipe, and what is left behind it is an empty screen.
+///
+/// It paints over the route, it does not cut into it: a clip would need a path
+/// of every brick still standing on every frame, and this needs two rectangles
+/// per brick and only for the bricks actually in flight.
+class _DismantlePainter extends CustomPainter {
+  const _DismantlePainter({
+    required this.t,
+    required this.brick,
+    required this.stone,
+    required this.ground,
+  });
+
+  /// Four voussoirs long and one high: the stripe's own unit, at the size a
+  /// thing you can watch come out of a wall has to be.
+  static const double brickWidth = VoussoirStripe.segmentWidth * 4;
+  static const double courseHeight = WirdiMetrics.space4;
+
+  /// The gap between one brick and the next, in ground colour.
+  static const double mortar = 1;
+
+  /// How long one brick takes, as a fraction of the whole run, and how far it
+  /// can lag the course it belongs to. What is left over is the sweep from the
+  /// top of the screen to the bottom — so the last brick of the last course
+  /// finishes exactly as the run does, and nothing is left standing.
+  static const double _brickRun = 0.18;
+  static const double _lag = 0.08;
+
+  /// Of a brick's own run, how much is spent turning to brick. The rest is
+  /// spent being taken away.
+  static const double _forming = 0.45;
+
+  /// How far the wall has come down, 0 to 1.
+  final double t;
+
+  /// The alternating courses, and what is underneath them.
+  final Color brick;
+  final Color stone;
+  final Color ground;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (t <= 0 || size.isEmpty) return;
+
+    final int courses = (size.height / courseHeight).ceil();
+    final double sweep = 1 - _brickRun - _lag;
+    double headOf(int course) =>
+        (courses <= 1 ? 0.0 : course / (courses - 1)) * sweep;
+
+    final Paint fill = Paint();
+
+    // Everything above the front is gone, and gone is one rectangle rather
+    // than a few hundred.
+    int course = 0;
+    while (course < courses && headOf(course) + _lag + _brickRun <= t) {
+      course++;
+    }
+    if (course > 0) {
+      canvas.drawRect(
+        Rect.fromLTWH(
+          0,
+          0,
+          size.width,
+          math.min(course * courseHeight, size.height),
+        ),
+        fill..color = ground,
+      );
+    }
+
+    for (; course < courses; course++) {
+      final double head = headOf(course);
+      // The front has not reached this course, and it reaches the ones below
+      // it later still.
+      if (head > t) break;
+      final double top = course * courseHeight;
+      // A running bond: every other course is offset by half a brick, which is
+      // what stops the joints lining up into columns.
+      final double left = course.isEven ? 0.0 : -brickWidth / 2;
+      final int bricks = ((size.width - left) / brickWidth).ceil();
+      for (int i = 0; i < bricks; i++) {
+        final double p = ((t - head - _lag * _stagger(course, i)) / _brickRun)
+            .clamp(0.0, 1.0);
+        if (p <= 0) continue;
+        final Rect rect = Rect.fromLTWH(
+          left + i * brickWidth,
+          top,
+          brickWidth,
+          courseHeight,
+        );
+        // The ground, arriving at the rate the brick forms: under the face it
+        // is not seen, and in the mortar it is the joint being drawn.
+        final double formed = math.min(1.0, p / _forming);
+        canvas.drawRect(rect, fill..color = ground.withValues(alpha: formed));
+        final double gone = ((p - _forming) / (1 - _forming)).clamp(0.0, 1.0);
+        if (gone < 1) {
+          final Color face = (course + i).isEven ? brick : stone;
+          canvas.drawRect(
+            rect.deflate(mortar),
+            fill
+              ..color = Color.lerp(
+                face,
+                ground,
+                gone,
+              )!.withValues(alpha: formed),
+          );
+        }
+      }
+    }
+  }
+
+  /// How far a brick lags its course, 0 to 1.
+  ///
+  /// A hash rather than a [math.Random]: the painter runs again on every frame
+  /// and a brick has to come out at the same moment on each of them.
+  static double _stagger(int course, int brick) {
+    final int hash = (course * 73856093) ^ (brick * 19349663);
+    return (hash & 0xFF) / 0xFF;
+  }
+
+  @override
+  bool shouldRepaint(_DismantlePainter old) =>
+      old.t != t ||
+      old.brick != brick ||
+      old.stone != stone ||
+      old.ground != ground;
 }
 
 /// Everything below the app bar, rebuilt on every count.
@@ -160,9 +498,17 @@ class _WirdPlayerScreenState extends ConsumerState<WirdPlayerScreen> {
 /// is neither re-shaped nor re-laid-out. What actually changes is the count,
 /// the stripe, and whether two buttons are enabled.
 class _Player extends StatelessWidget {
-  const _Player({required this.player, required this.onLeave});
+  const _Player({
+    required this.player,
+    required this.reveal,
+    required this.onLeave,
+  });
 
   final WirdPlayer player;
+
+  /// The finished step's three beats. Nothing but the finished step and its
+  /// header reads it, and it sits at zero for the whole of the wird.
+  final _CompletionReveal reveal;
 
   /// What the tap on the finished step does.
   final VoidCallback onLeave;
@@ -212,7 +558,7 @@ class _Player extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 if (player.finished)
-                  _CompleteHeader(player: player)
+                  _CompleteHeader(player: player, reveal: reveal)
                 else
                   _StepHeader(player: player, item: item),
                 Expanded(
@@ -229,7 +575,11 @@ class _Player extends StatelessWidget {
                               '-${player.unitIndex}',
                   ),
                   child: player.finished
-                      ? _CompleteStep(player: player, onLeave: onLeave)
+                      ? _CompleteStep(
+                          player: player,
+                          reveal: reveal,
+                          onLeave: onLeave,
+                        )
                       : _StepContent(player: player, item: item),
                 ),
                 _AdvanceBand(player: player),
@@ -428,10 +778,17 @@ String? _positionLine(WirdPlayer player) {
 /// top of the screen does not rearrange itself at the end of a wird. What it
 /// drops is the plate: a step that repeats is `x3`, and the wird as a whole is
 /// not a step that repeats.
+///
+/// It arrives in two of the reveal's three beats rather than all at once: the
+/// title with the praise below it, because they are the same statement, and
+/// the tally with the run of days, because the counting up is the last thing
+/// to happen. The layout is the same at every point of it — both lines are
+/// faded, never mounted late — so nothing under them moves.
 class _CompleteHeader extends StatelessWidget {
-  const _CompleteHeader({required this.player});
+  const _CompleteHeader({required this.player, required this.reveal});
 
   final WirdPlayer player;
+  final _CompletionReveal reveal;
 
   @override
   Widget build(BuildContext context) {
@@ -448,13 +805,19 @@ class _CompleteHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Text('Wird complete', style: theme.textTheme.titleMedium),
-          Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: Text(
-              _recited(player),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+          FadeTransition(
+            opacity: reveal.praise,
+            child: Text('Wird complete', style: theme.textTheme.titleMedium),
+          ),
+          FadeTransition(
+            opacity: reveal.tally,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Text(
+                _recited(player),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
           ),
@@ -495,10 +858,21 @@ String _recited(WirdPlayer player) {
 /// which is the one place in the app already allowed to encourage. Nothing
 /// escalates, nothing is negative, and the mark itself is the app's own
 /// material — the stripe above, solid brick because the wird filled it.
+///
+/// It arrives rather than appears — the praise, then the sentence, then the
+/// run of days, each fading in half a beat behind the last. That is the only
+/// thing the reveal does: no line moves, and the whole of it is laid out from
+/// the first frame. See [_CompletionReveal].
 class _CompleteStep extends StatefulWidget {
-  const _CompleteStep({required this.player, required this.onLeave});
+  const _CompleteStep({
+    required this.player,
+    required this.reveal,
+    required this.onLeave,
+  });
 
   final WirdPlayer player;
+
+  final _CompletionReveal reveal;
 
   final VoidCallback onLeave;
 
@@ -507,36 +881,36 @@ class _CompleteStep extends StatefulWidget {
 }
 
 class _CompleteStepState extends State<_CompleteStep> {
+  /// Whether the step will take a tap yet.
+  ///
   /// The tap that finished the wird is one of a run of taps, and at a tasbih's
   /// pace the next one is already on its way down. Without this the reciter
   /// would tap straight through the end of their wird and never see it.
   ///
-  /// [WirdiMotion.completion] because it is the same beat it always was — the
-  /// screen holding still at the end of a wird — spent guarding the step
-  /// instead of counting down to a dismissal the reciter did not ask for.
-  Timer? _grace;
+  /// It is the reveal that decides, rather than a timer of its own: the step
+  /// is closed until the last of it has landed, which is the same beat this
+  /// always was — the screen holding still at the end of a wird — now spent
+  /// putting the words on it.
   bool _ready = false;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_ready || _grace != null) return;
-    final Duration beat = Theme.of(
-      context,
-    ).extension<WirdiMotion>()!.completion;
-    if (beat == Duration.zero) {
-      _ready = true;
-      return;
-    }
-    _grace = Timer(beat, () {
-      if (mounted) setState(() => _ready = true);
-    });
+  void initState() {
+    super.initState();
+    // Already over where the theme's motion is off, or where the reciter has
+    // turned animations off in the OS.
+    _ready = widget.reveal.isDone;
+    widget.reveal.addStatusListener(_onReveal);
   }
 
   @override
   void dispose() {
-    _grace?.cancel();
+    widget.reveal.removeStatusListener(_onReveal);
     super.dispose();
+  }
+
+  void _onReveal(AnimationStatus status) {
+    final bool ready = status == AnimationStatus.completed;
+    if (ready != _ready && mounted) setState(() => _ready = ready);
   }
 
   @override
@@ -546,6 +920,7 @@ class _CompleteStepState extends State<_CompleteStep> {
     final String? run = _run(widget.player.completedStreak);
 
     final WirdiTypography type = theme.extension<WirdiTypography>()!;
+    final _CompletionReveal reveal = widget.reveal;
 
     return _TapToCount(
       onTap: _ready ? widget.onLeave : null,
@@ -555,26 +930,35 @@ class _CompleteStepState extends State<_CompleteStep> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Text(
-            'الْحَمْدُ لِلَّهِ',
-            textAlign: TextAlign.center,
-            textDirection: TextDirection.rtl,
-            style: type.completionArabic.copyWith(color: colors.primary),
+          FadeTransition(
+            opacity: reveal.praise,
+            child: Text(
+              'الْحَمْدُ لِلَّهِ',
+              textAlign: TextAlign.center,
+              textDirection: TextDirection.rtl,
+              style: type.completionArabic.copyWith(color: colors.primary),
+            ),
           ),
           const SizedBox(height: WirdiMetrics.space4),
-          Text(
-            'Consistency is the key. May it be accepted, Ameen.',
-            textAlign: TextAlign.center,
-            style: type.completionLine.copyWith(color: colors.onSurface),
+          FadeTransition(
+            opacity: reveal.sentence,
+            child: Text(
+              'Consistency is the key. May it be accepted, Ameen.',
+              textAlign: TextAlign.center,
+              style: type.completionLine.copyWith(color: colors.onSurface),
+            ),
           ),
           if (run != null)
-            Padding(
-              padding: const EdgeInsets.only(top: WirdiMetrics.space3),
-              child: Text(
-                run,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colors.onSurfaceVariant,
+            FadeTransition(
+              opacity: reveal.tally,
+              child: Padding(
+                padding: const EdgeInsets.only(top: WirdiMetrics.space3),
+                child: Text(
+                  run,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
                 ),
               ),
             ),
