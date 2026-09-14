@@ -9,25 +9,39 @@
       "transliteration": "Bismi Llāhi r-Raḥmāni r-Raḥīm."
     },
     {
-      "id": 2002,
-      "text_arabic": "بِسْمِ اللَّهِ اللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ أَقُولُ عَلَى نَفْسِي وَعَلَى دِينِي وَعَلَى أَهْلِي وَعَلَى أَوْلَادِي وَعَلَى مَالِي وَعَلَى أَصْحَابِي وَعَلَى أَدْيَانِهِمْ وَعَلَى أَمْوَالِهِمْ",
-      "translation": "A thousand times, in the name of Allah. Allah is the greatest, Allah is the greatest, Allah is the greatest. I declare this over myself, over my religion, over my family, over my children, over my wealth, over my companions, and over their religion and their wealth.",
+      "id": 2040,
+      "text_arabic": "بِسْمِ اللَّهِ",
+      "translation": "In the name of Allah.",
       "default_count": 1,
-      "transliteration": "Bismi Llāh, Allāhu akbar, Allāhu akbar, Allāhu akbar, aqūlu ʿalā nafsī wa-ʿalā dīnī wa-ʿalā ahlī wa-ʿalā awlādī wa-ʿalā mālī wa-ʿalā aṣḥābī wa-ʿalā adyānihim wa-ʿalā amwālihim."
+      "transliteration": "Bismi Llāh."
     },
     {
-      "id": 2003,
-      "text_arabic": "أَلْفَ بِسْمِ اللَّهِ اللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ أَقُولُ عَلَى نَفْسِي وَعَلَى دِينِي وَعَلَى أَهْلِي وَعَلَى أَوْلَادِي وَعَلَى مَالِي وَعَلَى أَصْحَابِي وَعَلَى أَدْيَانِهِمْ وَعَلَى أَمْوَالِهِمْ",
-      "translation": "A thousand thousand times, in the name of Allah. Allah is the greatest, Allah is the greatest, Allah is the greatest. I declare this over myself, over my religion, over my family, over my children, over my wealth, over my companions, and over their religion and their wealth.",
-      "default_count": 1,
-      "transliteration": "Alfa bismi Llāh, Allāhu akbar, Allāhu akbar, Allāhu akbar, aqūlu ʿalā nafsī wa-ʿalā dīnī wa-ʿalā ahlī wa-ʿalā awlādī wa-ʿalā mālī wa-ʿalā aṣḥābī wa-ʿalā adyānihim wa-ʿalā amwālihim."
+      "id": 2041,
+      "text_arabic": "اللَّهُ أَكْبَرُ",
+      "translation": "Allah is the greatest.",
+      "default_count": 3,
+      "transliteration": "Allāhu akbar."
     },
     {
-      "id": 2004,
-      "text_arabic": "أَلْفَ أَلْفِ بِسْمِ اللَّهِ اللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ أَقُولُ عَلَى نَفْسِي وَعَلَى دِينِي وَعَلَى أَهْلِي وَعَلَى أَوْلَادِي وَعَلَى مَالِي وَعَلَى أَصْحَابِي وَعَلَى أَدْيَانِهِمْ وَعَلَى أَمْوَالِهِمْ",
-      "translation": "A thousand thousand times, in the name of Allah. Allah is the Greatest, Allah is the Greatest, Allah is the Greatest. I declare this over myself, over my religion, over my family, over my children, over my wealth, over my companions, and over their religion and their wealth.",
+      "id": 2042,
+      "text_arabic": "أَقُولُ عَلَى نَفْسِي وَعَلَى دِينِي وَعَلَى أَهْلِي وَعَلَى أَوْلَادِي وَعَلَى مَالِي وَعَلَى أَصْحَابِي وَعَلَى أَدْيَانِهِمْ وَعَلَى أَمْوَالِهِمْ",
+      "translation": "I declare this over myself, over my religion, over my family, over my children, over my wealth, over my companions, and over their religion and their wealth.",
       "default_count": 1,
-      "transliteration": "Alfa alfi bismi Llāh, Allāhu akbar, Allāhu akbar, Allāhu akbar, aqūlu ʿalā nafsī wa-ʿalā dīnī wa-ʿalā ahlī wa-ʿalā awlādī wa-ʿalā mālī wa-ʿalā aṣḥābī wa-ʿalā adyānihim wa-ʿalā amwālihim."
+      "transliteration": "Aqūlu ʿalā nafsī wa-ʿalā dīnī wa-ʿalā ahlī wa-ʿalā awlādī wa-ʿalā mālī wa-ʿalā aṣḥābī wa-ʿalā adyānihim wa-ʿalā amwālihim."
+    },
+    {
+      "id": 2043,
+      "text_arabic": "أَلْفَ بِسْمِ اللَّهِ",
+      "translation": "A thousand times, in the name of Allah.",
+      "default_count": 1,
+      "transliteration": "Alfa bismi Llāh."
+    },
+    {
+      "id": 2044,
+      "text_arabic": "أَلْفَ أَلْفِ بِسْمِ اللَّهِ",
+      "translation": "A thousand thousand times, in the name of Allah.",
+      "default_count": 1,
+      "transliteration": "Alfa alfi bismi Llāh."
     },
     {
       "id": 2005,
