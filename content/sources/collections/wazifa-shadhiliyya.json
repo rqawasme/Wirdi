@@ -1,0 +1,227 @@
+{
+  "id": 16,
+  "name_arabic": "الْوَظِيفَةُ الشَّاذِلِيَّةُ",
+  "name_english": "Wazifa ash-Shadhiliyya",
+  "description": "The Shadhili wazifa, built around the Ṣalāt al-Mashīshiyya and closed with the prayers of Imam Abu al-Hasan al-Shadhili and a set Qur’anic recitation.",
+  "author": "Sayyidi ʿAbd al-Salam ibn Mashish",
+  "type": "wird",
+  "sort_order": 40,
+  "items": [
+    {
+      "dhikr": 8001
+    },
+    {
+      "dhikr": 2001
+    },
+    {
+      "dhikr": 8002,
+      "note": "The Ṣalāt al-Mashīshiyya of Sayyidi ʿAbd al-Salam ibn Mashish."
+    },
+    {
+      "dhikr": 8003
+    },
+    {
+      "dhikr": 8004
+    },
+    {
+      "dhikr": 8005
+    },
+    {
+      "dhikr": 8006
+    },
+    {
+      "dhikr": 8007
+    },
+    {
+      "dhikr": 8008
+    },
+    {
+      "dhikr": 8009
+    },
+    {
+      "dhikr": 8010
+    },
+    {
+      "dhikr": 8011
+    },
+    {
+      "dhikr": 8012
+    },
+    {
+      "dhikr": 8013
+    },
+    {
+      "dhikr": 8014
+    },
+    {
+      "dhikr": 8015
+    },
+    {
+      "dhikr": 8016
+    },
+    {
+      "dhikr": 8017
+    },
+    {
+      "dhikr": 8018
+    },
+    {
+      "dhikr": 8019
+    },
+    {
+      "dhikr": 8020
+    },
+    {
+      "dhikr": 8021
+    },
+    {
+      "dhikr": 8022
+    },
+    {
+      "dhikr": 8023
+    },
+    {
+      "dhikr": 8024
+    },
+    {
+      "dhikr": 8025
+    },
+    {
+      "dhikr": 8026
+    },
+    {
+      "dhikr": 8027
+    },
+    {
+      "dhikr": 8028
+    },
+    {
+      "dhikr": 8029
+    },
+    {
+      "dhikr": 8030
+    },
+    {
+      "dhikr": 8031
+    },
+    {
+      "dhikr": 8032
+    },
+    {
+      "dhikr": 8033
+    },
+    {
+      "dhikr": 8034
+    },
+    {
+      "dhikr": 8035
+    },
+    {
+      "dhikr": 8036
+    },
+    {
+      "dhikr": 8037
+    },
+    {
+      "dhikr": 8038
+    },
+    {
+      "dhikr": 8039
+    },
+    {
+      "dhikr": 8040
+    },
+    {
+      "dhikr": 8041
+    },
+    {
+      "dhikr": 8042
+    },
+    {
+      "ayah": "33:56"
+    },
+    {
+      "dhikr": 8043
+    },
+    {
+      "dhikr": 8044
+    },
+    {
+      "dhikr": 3016,
+      "count": 3,
+      "note": "The prayers of Imam Abu al-Hasan al-Shadhili that close the wazifa, each said three times."
+    },
+    {
+      "dhikr": 8045
+    },
+    {
+      "dhikr": 2011
+    },
+    {
+      "dhikr": 8046
+    },
+    {
+      "dhikr": 2036
+    },
+    {
+      "dhikr": 5012,
+      "count": 3
+    },
+    {
+      "dhikr": 7019
+    },
+    {
+      "dhikr": 7021
+    },
+    {
+      "dhikr": 8040,
+      "count": 3
+    },
+    {
+      "dhikr": 8047
+    },
+    {
+      "ayah": "2:255",
+      "note": "Shaykh Sidi Muhammad al-Jamal asked that the following be recited after the prayers."
+    },
+    {
+      "ayah": "3:18"
+    },
+    {
+      "ayah": "3:26"
+    },
+    {
+      "ayah": "3:27"
+    },
+    {
+      "ayah": "9:128"
+    },
+    {
+      "ayah": "9:129"
+    },
+    {
+      "surah": 94
+    },
+    {
+      "surah": 97
+    },
+    {
+      "surah": 106
+    },
+    {
+      "surah": 112
+    },
+    {
+      "surah": 113
+    },
+    {
+      "surah": 114
+    },
+    {
+      "surah": 1
+    },
+    {
+      "ayah": "37:180-182"
+    }
+  ]
+}
