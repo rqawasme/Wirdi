@@ -28,41 +28,56 @@ Only the raw QUL exports it was generated from are left out, and only because th
 are bulky and needed just to regenerate. See
 [`content/sources/quran/README.md`](content/sources/quran/README.md) for that.
 
-Six collections are authored and built in: the **wird of Imam al-Nawawi**; the
+The collections authored and built in are the **wird of Imam al-Nawawi**; the
 **morning** and **evening adhkar**, summarised from the works of Shaykh Abd
 al-Aziz al-Tarefe; **al-Wird al-Latif** of Imam al-Haddad, morning and evening;
-and **Hizb al-Bahr** of Imam Abu al-Hasan al-Shadhili. Each morning/evening pair
-shares one file of dhikr text — most of what is said in the morning is said
-again in the evening, and the wordings that differ (`asbahna` against
-`amsayna`, and their pairs) sit beside each other rather than being duplicated.
+**Hizb al-Bahr** of Imam Abu al-Hasan al-Shadhili; **Dala'il al-Khayrat** of
+Imam Muhammad al-Jazuli, a part for each day of the week and its closing
+supplication; the **Wazifa ash-Shadhiliyya**, built around the Salat
+al-Mashishiyya of Sayyidi Abd al-Salam ibn Mashish; and **Wird as-Sakran** of
+Imam Abu Bakr al-Sakran al-Saqqaf. That list is deliberately not counted here:
+another one is two more files in `content/sources/` — one of adhkar, one of
+collection items — so `sources/collections/` is the listing that stays true.
+Each morning/evening pair shares one file of dhikr text — most of what is said
+in the morning is said again in the evening, and the wordings that differ
+(`asbahna` against `amsayna`, and their pairs) sit beside each other rather than
+being duplicated.
 
 **A dhikr is authored once and reused.** Wirds overlap heavily: the same
 istiʿadha, the same `hasbiya Llah`, the same salawat closing half the litanies.
 Every one of those is one row with one id that each collection points at, with
-a per-item `count` where they disagree on repetitions — dhikr 2011 is recited
-by six of the six collections, at one repetition in the morning and evening
-adhkar and three everywhere else. Counting the same dhikr as two unrelated
-things, and letting two copies of a translation drift apart, is what that
-avoids. `verify_content.py` fails the build if a second copy is ever authored;
-it compares consonantal skeletons, so a copy that merely spells `Allah`
-differently or moves a comma does not slip past.
+a per-item `count` where they disagree on repetitions — dhikr 2011 turns up in
+collection after collection, said once in the morning and evening adhkar and
+three times everywhere else. Counting the same dhikr as two unrelated things,
+and letting two copies of a translation drift apart, is what that avoids.
+`verify_content.py` fails the build if a second copy is ever authored; it
+compares consonantal skeletons, so a copy that merely spells `Allah` differently
+or moves a comma does not slip past.
 
-The collections' Quranic portions are **not** transcribed either: al-Ikhlas,
-al-Falaq, al-Nas, the last two verses of al-Baqarah, the passages al-Wird
-al-Latif draws from al-Muminun, al-Rum, al-Hashr and al-Saffat, and the passages
-Hizb al-Bahr draws from Maryam, Ya Sin, Ta Ha, al-Rahman, Ghafir, al-Buruj and
-al-Araf are `surah` and `ayah` items resolved out of the imported mushaf, so
-that text exists in exactly one place in the database.
+The collections' Quranic portions are **not** transcribed either: al-Fatiha,
+al-Ikhlas, al-Falaq, al-Nas, Ayat al-Kursi, the last two verses of al-Baqarah,
+the passages al-Wird al-Latif draws from al-Muminun, al-Rum, al-Hashr and
+al-Saffat, and the passages Hizb al-Bahr draws from Maryam, Ya Sin, Ta Ha,
+al-Rahman, Ghafir, al-Buruj and al-Araf are `surah` and `ayah` items resolved
+out of the imported mushaf, so that text exists in exactly one place in the
+database.
 
-Hizb al-Bahr also quotes three passages only in part — the tail of 2:137, the
-tail of 12:64, and 33:11-12 opened on `fa-qadi` in place of the verse's own
-`hunalika`. Reciting the whole verse instead would not be the litany, so those
-are adhkar rather than `ayah` items; their text is nonetheless **sliced out of
-`sources/quran/ayahs.json`** rather than typed, so every Quranic character in
-the database still comes from the imported mushaf, and each carries a `notes`
-naming the verse it is drawn from. Its fourth partial quotation, the tail of
-9:129, is dhikr 3013 — the morning and evening adhkar recite the same words, so
-it is that one shared row rather than a fourth slice.
+Some litanies quote a verse only **in part** — the tails of 2:137, 12:64, 9:129,
+18:10 and 3:173, the opening of 28:85, the middle of 40:44, and 33:11-12 opened
+on `fa-qadi` in place of the verse's own `hunalika`. Reciting the whole verse
+instead would not be the litany, so those are adhkar rather than `ayah` items;
+their text is nonetheless **sliced out of `sources/quran/ayahs.json`** by word
+index rather than typed, so every Quranic character in the database still comes
+from the imported mushaf, and each carries a `notes` naming the verse it is
+drawn from. Where two litanies want the same slice they share the one row: the
+tail of 9:129 is dhikr 3013, authored for the morning and evening adhkar and
+pointed at by both halves of al-Wird al-Latif and by Hizb al-Bahr rather than
+sliced a second time.
+
+Words that merely lead into a passage stay adhkar too, for the same reason in
+reverse. Wird as-Sakran says `ahata bina min` and then recites al-Fatiha whole;
+the lead-in is dhikr 18002 and the Fatiha is a `surah` item, so the recitation
+keeps its order without a second copy of the surah.
 
 Every id in the database is either computed by a fixed rule or written by hand in
 the source files. Nothing autoincrements. The database is rebuilt from source
