@@ -140,19 +140,36 @@ abstract class UserRepository {
   /// are kept deliberately, so a `collection_ref` here may not resolve.
   Future<List<String>> completionDates({DateTime? from, DateTime? to});
 
-  /// The local days [id] itself was completed on, ascending, within an
-  /// inclusive window.
+  /// The local days [id] itself was completed on, ascending. [from] and [to]
+  /// are inclusive, and either may be omitted for an open bound.
   ///
   /// Unlike [completionDates], which spans everything: this is one
-  /// collection's own history, which is what a home card's week strip is
-  /// drawn from. Bounded rather than open-ended because every caller wants a
-  /// window — nothing needs a collection's whole history yet, and asking for
-  /// it would read the table.
+  /// collection's own history, which is what a home card's week strip and the
+  /// tracker's per-collection scope are drawn from.
+  ///
+  /// The bounds used to be required, on the argument that every caller wanted
+  /// a window and an open-ended read would scan the table. The tracker is the
+  /// caller that wants the whole thing: its streak, its twelve weeks, its
+  /// weekday tallies and its all-time count are four questions about the same
+  /// history, and reading it once and answering them in Dart is cheaper than
+  /// four windowed reads — which is what `currentStreakFor` was already doing
+  /// through the unwindowed query underneath this one. The table is one row
+  /// per collection per day and the index covers it.
   Future<List<String>> completionDatesFor(
     CollectionId id, {
-    required DateTime from,
-    required DateTime to,
+    DateTime? from,
+    DateTime? to,
   });
+
+  /// The collections that have ever been completed, whether or not they are
+  /// still committed — or still exist.
+  ///
+  /// What the tracker's scope picker is built from: a collection with a
+  /// history is worth being able to look at even after its commitment was
+  /// taken off. Ids here may no longer resolve, since completions outlive the
+  /// collection they belong to, so callers intersect against the collection
+  /// list rather than trusting this to name only live rows.
+  Future<Set<CollectionId>> completedCollections();
 
   /// Consecutive days up to today on which anything was completed.
   ///

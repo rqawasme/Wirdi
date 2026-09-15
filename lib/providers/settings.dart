@@ -16,7 +16,11 @@ abstract final class SettingKeys {
   static const String themeMode = 'theme.mode';
   static const String showTranslation = 'text.show_translation';
   static const String haptics = 'haptics.enabled';
-  static const String showStreak = 'streak.visible';
+  // Still `streak.visible` although the setting is now called "Show tracker":
+  // these strings are persisted, and renaming one silently resets whatever the
+  // user had chosen back to the default. The Dart name may move; the key does
+  // not.
+  static const String showTracker = 'streak.visible';
   static const String checkForUpdates = 'updates.check';
 
   // `tasbih.count` is written into the same table and is deliberately not
@@ -42,7 +46,7 @@ final class WirdiSettings {
     this.themeMode = ThemeMode.light,
     this.showTranslation = true,
     this.haptics = true,
-    this.showStreak = true,
+    this.showTracker = true,
     this.checkForUpdates = false,
     this.quranInGold = false,
     this.arabicFace = ArabicFace.notoNaskh,
@@ -72,14 +76,18 @@ final class WirdiSettings {
   /// buzzing phone is the problem.
   final bool haptics;
 
-  /// Whether the collections screen shows the streak count and the month's
-  /// calendar.
+  /// Whether the Tracker tab shows anything: the count, the calendar, the
+  /// weeks and the weekdays.
   ///
   /// Visible by default, and hideable without argument. A streak is a fact
   /// about somebody's devotional life, and some people would rather not have
   /// one counted at them — this switch turns it off and nothing anywhere asks
   /// them to turn it back on.
-  final bool showStreak;
+  ///
+  /// It gates the whole tab rather than the count alone. That is the honest
+  /// reading of what somebody turning it off is asking for, and the label says
+  /// "Show tracker" so that what it takes away is not a surprise.
+  final bool showTracker;
 
   /// Whether the app asks GitHub, once a launch, whether a newer version has
   /// been released.
@@ -118,7 +126,7 @@ final class WirdiSettings {
     ThemeMode? themeMode,
     bool? showTranslation,
     bool? haptics,
-    bool? showStreak,
+    bool? showTracker,
     bool? checkForUpdates,
     bool? quranInGold,
     ArabicFace? arabicFace,
@@ -130,7 +138,7 @@ final class WirdiSettings {
       themeMode: themeMode ?? this.themeMode,
       showTranslation: showTranslation ?? this.showTranslation,
       haptics: haptics ?? this.haptics,
-      showStreak: showStreak ?? this.showStreak,
+      showTracker: showTracker ?? this.showTracker,
       checkForUpdates: checkForUpdates ?? this.checkForUpdates,
       quranInGold: quranInGold ?? this.quranInGold,
       arabicFace: arabicFace ?? this.arabicFace,
@@ -170,9 +178,9 @@ class SettingsController extends AsyncNotifier<WirdiSettings> {
       haptics:
           _bool(await repository.setting(SettingKeys.haptics)) ??
           defaults.haptics,
-      showStreak:
-          _bool(await repository.setting(SettingKeys.showStreak)) ??
-          defaults.showStreak,
+      showTracker:
+          _bool(await repository.setting(SettingKeys.showTracker)) ??
+          defaults.showTracker,
       checkForUpdates:
           _bool(await repository.setting(SettingKeys.checkForUpdates)) ??
           defaults.checkForUpdates,
@@ -230,11 +238,11 @@ class SettingsController extends AsyncNotifier<WirdiSettings> {
     );
   }
 
-  Future<void> setShowStreak(bool value) {
+  Future<void> setShowTracker(bool value) {
     return _set(
-      SettingKeys.showStreak,
+      SettingKeys.showTracker,
       value.toString(),
-      (WirdiSettings s) => s.copyWith(showStreak: value),
+      (WirdiSettings s) => s.copyWith(showTracker: value),
     );
   }
 

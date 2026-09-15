@@ -12,6 +12,9 @@ import 'package:wirdi/theme/theme.dart';
 import 'package:wirdi/widgets/bottom_nav.dart';
 import 'package:wirdi/widgets/empty_state.dart';
 import 'package:wirdi/widgets/streak_panel.dart';
+import 'package:wirdi/widgets/tracker_chart.dart';
+import 'package:wirdi/widgets/tracker_scope_picker.dart';
+import 'package:wirdi/widgets/weekday_bars.dart';
 
 import '../support/fixtures.dart';
 
@@ -63,14 +66,9 @@ void main() {
   }
 
   group('the streak', () {
-    testWidgets('is on the tracker by default', (WidgetTester tester) async {
-      await pumpApp(tester, tab: WirdiTab.tracker);
-
-      expect(find.byType(StreakPanel), findsOneWidget);
-      expect(find.text('No days in a row'), findsOneWidget);
-    });
-
-    testWidgets('counts the days and marks them', (WidgetTester tester) async {
+    /// Completes something today and yesterday, so the tracker has a history
+    /// to draw. With none it says so instead — see the test below.
+    Future<void> seedTwoDays() async {
       final DateTime now = DateTime.now();
       final UserRepository user = dbs.userRepository();
       await user.logCompletion(
@@ -81,7 +79,32 @@ void main() {
         const BuiltinCollectionId(simpleCollectionId),
         now.subtract(const Duration(days: 1)),
       );
+    }
 
+    testWidgets('is on the tracker by default', (WidgetTester tester) async {
+      await seedTwoDays();
+      await pumpApp(tester, tab: WirdiTab.tracker);
+
+      expect(find.byType(StreakPanel), findsOneWidget);
+    });
+
+    testWidgets('says so rather than drawing an empty one', (
+      WidgetTester tester,
+    ) async {
+      // Nothing completed, ever. An empty calendar over a flat line over seven
+      // empty bars reads as three things broken; one sentence reads as a tab
+      // that has not started yet, which is the truth.
+      await pumpApp(tester, tab: WirdiTab.tracker);
+
+      expect(find.byType(EmptyState), findsOneWidget);
+      expect(find.text('Nothing tracked yet'), findsOneWidget);
+      expect(find.byType(StreakPanel), findsNothing);
+      expect(find.byType(TrackerChart), findsNothing);
+      expect(find.byType(WeekdayBars), findsNothing);
+    });
+
+    testWidgets('counts the days and marks them', (WidgetTester tester) async {
+      await seedTwoDays();
       await pumpApp(tester, tab: WirdiTab.tracker);
 
       // Two days, counted back from today. A second collection completed on
@@ -92,13 +115,19 @@ void main() {
     testWidgets('is gone entirely when the setting is off', (
       WidgetTester tester,
     ) async {
-      await dbs.userRepository().setSetting(SettingKeys.showStreak, 'false');
+      await dbs.userRepository().setSetting(SettingKeys.showTracker, 'false');
 
       await pumpApp(tester, tab: WirdiTab.tracker);
 
-      // Not greyed out, not collapsed to a number: absent.
+      // Not greyed out, not collapsed to a number: absent. The switch gates
+      // the whole tab, so the sections either side of the panel have to go
+      // with it — a chart left behind would be the setting half-working.
       expect(find.byType(StreakPanel), findsNothing);
       expect(find.textContaining('in a row'), findsNothing);
+      expect(find.byType(TrackerChart), findsNothing);
+      expect(find.byType(WeekdayBars), findsNothing);
+      expect(find.byType(TrackerScopePicker), findsNothing);
+      expect(find.textContaining('since'), findsNothing);
 
       // And the wirds are still where they were.
       await tester.tap(find.text('Collections'));
@@ -107,18 +136,22 @@ void main() {
     });
 
     testWidgets('is turned off from Settings', (WidgetTester tester) async {
+      await seedTwoDays();
       await pumpApp(tester, tab: WirdiTab.tracker);
       expect(find.byType(StreakPanel), findsOneWidget);
 
       await tester.tap(find.byTooltip('Settings'));
       await settle(tester);
-      await tester.tap(find.text('Show streak'));
+      await tester.tap(find.text('Show tracker'));
       await settle(tester);
 
+      // The label moved; the stored key deliberately did not, so a reader who
+      // had turned this off keeps it off across the rename.
       expect(
-        await dbs.userRepository().setting(SettingKeys.showStreak),
+        await dbs.userRepository().setting(SettingKeys.showTracker),
         'false',
       );
+      expect(SettingKeys.showTracker, 'streak.visible');
 
       await tester.tap(find.byTooltip('Back'));
       await settle(tester);

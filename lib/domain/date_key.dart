@@ -20,3 +20,19 @@ String dateKeyDaysBefore(DateTime from, int days) {
   final DateTime noon = DateTime(local.year, local.month, local.day, 12);
   return dateKey(noon.subtract(Duration(days: days)));
 }
+
+/// The [DateTime] weekday constant — [DateTime.monday] .. [DateTime.sunday] —
+/// of the day [key] names.
+///
+/// The one place a key is turned back into a weekday. It lives here because
+/// this file owns the conversion in both directions, and because the parse has
+/// a trap in it worth stating once rather than at every call site: the
+/// [DateTime] it builds is local midnight, which is the correct instant to ask
+/// a weekday of and the wrong one to do any arithmetic from. Stepping a day
+/// from it lands on the same calendar date across a spring-forward, which is
+/// what [dateKeyDaysBefore] exists to avoid. Ask this for the weekday; walk
+/// days with that.
+///
+/// [key] is `YYYY-MM-DD` as [dateKey] writes it. Anything else is a caller bug
+/// and throws, the same way [DateTime.parse] would.
+int weekdayOf(String key) => DateTime.parse(key).weekday;

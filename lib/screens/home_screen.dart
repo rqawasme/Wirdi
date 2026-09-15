@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/commitment.dart';
 import '../providers/home.dart';
-import '../providers/streak.dart';
+import '../providers/tracker.dart';
 import '../routes.dart';
 import '../theme/theme.dart';
 import '../widgets/collection_tile.dart';
@@ -277,7 +277,11 @@ class _Section extends ConsumerWidget {
     // this screen is stale the moment it comes back.
     if (context.mounted) {
       ref.invalidate(homeViewProvider);
-      ref.invalidate(streakViewProvider);
+      // Everything that reads completion history watches this, so the tracker
+      // refreshes without this call site having to know it exists — an
+      // invalidate per provider is the pattern that does not scale, and is how
+      // a rename came to sit stale on this screen once already.
+      ref.read(completionsRevisionProvider.notifier).bump();
     }
   }
 }

@@ -229,6 +229,15 @@ collectionCompletionDatesBetween:
     WHERE collection_ref = :ref AND date_key >= :from AND date_key <= :to
     ORDER BY date_key;
 
+-- Which collections have ever been completed, for the tracker's scope picker.
+-- One index scan rather than a completionDatesFor per collection, and it reads
+-- refs rather than days: the picker only needs to know there is a history to
+-- show, not what is in it. A ref here may no longer resolve — completions for
+-- a deleted collection are kept deliberately — so the caller intersects this
+-- against the collections that still exist.
+completedCollectionRefs:
+    SELECT DISTINCT collection_ref FROM completions;
+
 -- ---------------------------------------------------------------------------
 -- Reading position and settings
 -- ---------------------------------------------------------------------------
