@@ -35,10 +35,12 @@ al-Aziz al-Tarefe; **al-Wird al-Latif** of Imam al-Haddad, morning and evening;
 Imam Muhammad al-Jazuli, a part for each day of the week and its closing
 supplication; the **Wazifa ash-Shadhiliyya**, built around the Salat
 al-Mashishiyya of Sayyidi Abd al-Salam ibn Mashish; **Wird as-Sakran** of Imam
-Abu Bakr al-Sakran al-Saqqaf; and **Hizb al-Nasr**, the Litany of Victory, of
-Imam al-Haddad again. That list is deliberately not counted here: another one
-is two more files in `content/sources/` — one of adhkar, one of collection
-items — so `sources/collections/` is the listing that stays true.
+Abu Bakr al-Sakran al-Saqqaf; and **Hizb al-Nasr**, the Litany of Victory —
+two different litanies of that name, one by Imam al-Haddad and one by Imam
+al-Shadhili, which is why those two carry their author in the name. That list
+is deliberately not counted here: another one is two more files in
+`content/sources/` — one of adhkar, one of collection items — so
+`sources/collections/` is the listing that stays true.
 Each morning/evening pair shares one file of dhikr text — most of what is said
 in the morning is said again in the evening, and the wordings that differ
 (`asbahna` against `amsayna`, and their pairs) sit beside each other rather than
@@ -64,11 +66,11 @@ out of the imported mushaf, so that text exists in exactly one place in the
 database.
 
 Some litanies quote a verse only **in part** — the tails of 2:137, 12:64, 9:129,
-18:10, 3:173, 33:69 and 3:45, the openings of 28:85 and 6:79, the middle of
-40:44, 33:11-12 opened on `fa-qadi` in place of the verse's own `hunalika`, and
-61:13-14 opened on `nasrun` and stopped at `nahnu ansaru Llah`. Reciting the
-whole verse instead would not be the litany, so those are adhkar rather than
-`ayah` items;
+18:10, 3:173, 33:69, 3:45, 21:87 and 4:45, the openings of 28:85 and 6:79, the
+middle of 40:44, 33:11-12 opened on `fa-qadi` in place of the verse's own
+`hunalika`, and 61:13-14 opened on `nasrun` and stopped at `nahnu ansaru Llah`.
+Reciting the whole verse instead would not be the litany, so those are adhkar
+rather than `ayah` items;
 their text is nonetheless **sliced out of `sources/quran/ayahs.json`** by word
 index rather than typed, so every Quranic character in the database still comes
 from the imported mushaf, and each carries a `notes` naming the verse it is

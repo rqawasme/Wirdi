@@ -1,0 +1,284 @@
+{
+  "group": "hizb-al-nasr-shadhili",
+  "description": "Hizb al-Nasr of Imam Abu al-Hasan al-Shadhili, in the order of the recitation. Not to be confused with the Hizb al-Nasr of Imam al-Haddad, which is a different litany of the same name and lives in hizb-al-nasr.json. The one passage this wird recites in full, 6:45, is a collection item; the two it recites in part — the tails of 21:87 and 4:45 — are adhkar sliced verbatim out of sources/quran/ayahs.json by word index rather than typed. The disjoined letters are spelled as Hizb al-Bahr already spells them, in dhikr 7017 and 7018. The booklet's PDF text layer is unusable — the Arabic comes back reordered and with letters dropped — so the supplications were read off page renders, with the booklet's own line-by-line transliteration as a second channel on every line.",
+  "adhkar": [
+    {
+      "id": 20001,
+      "text_arabic": "اللَّهُمَّ بِسَطْوَةِ جَبَرُوتِ قَهْرِكَ، وَبِسُرْعَةِ إِغَاثَةِ نَصْرِكَ، وَبِغَيْرَتِكَ لِانْتِهَاكِ حُرُمَاتِكَ، وَبِحِمَايَتِكَ لِمَنِ احْتَمَى بِآيَاتِكَ",
+      "translation": "O Allah, by the might of Your overwhelming power, by the swiftness of Your rescuing victory, by Your protective wrath over the violation of Your sanctities, and by Your protection of whoever seeks refuge in Your verses.",
+      "default_count": 1,
+      "transliteration": "Allāhumma bi-saṭwati jabarūti qahrika, wa-bi-surʿati ighāthati naṣrika, wa-bi-ghayratika li-ntihāki ḥurumātika, wa-bi-ḥimāyatika li-mani ḥtamā bi-āyātik."
+    },
+    {
+      "id": 20002,
+      "text_arabic": "أَسْأَلُكَ يَا اللَّهُ يَا قَرِيبُ يَا سَمِيعُ يَا مُجِيبُ يَا سَرِيعُ يَا جَبَّارُ يَا مُنْتَقِمُ يَا قَهَّارُ يَا شَدِيدَ الْبَطْشِ",
+      "translation": "I ask You, O Allah, O Near, O Hearing, O Responding, O Swift, O Compeller, O Avenger, O Subduer, O Severe in Might.",
+      "default_count": 1,
+      "transliteration": "Asʾaluka yā Allāhu yā Qarību yā Samīʿu yā Mujību yā Sarīʿu yā Jabbāru yā Muntaqimu yā Qahhāru yā Shadīda l-baṭsh."
+    },
+    {
+      "id": 20003,
+      "text_arabic": "يَا مَنْ لَا يُعْجِزُهُ قَهْرُ الْجَبَابِرَةِ، وَلَا يَعْظُمُ عَلَيْهِ هَلَاكُ الْمُتَمَرِّدَةِ مِنَ الْمُلُوكِ وَالْأَكَاسِرَةِ",
+      "translation": "O You for whom the subduing of tyrants is no obstacle, and for whom the destruction of rebellious kings and emperors is no burden.",
+      "default_count": 1,
+      "transliteration": "Yā man lā yuʿjizuhu qahru l-jabābirah, wa-lā yaʿẓumu ʿalayhi halāku l-mutamarridah mina l-mulūki wa-l-akāsirah."
+    },
+    {
+      "id": 20004,
+      "text_arabic": "أَنْ تَجْعَلَ كَيْدَ مَنْ كَادَنِي فِي نَحْرِهِ، وَمَكْرَ مَنْ مَكَرَ بِي عَائِدًا عَلَيْهِ",
+      "translation": "Make the plotting of whoever plots against me recoil upon him, and return the deceit of whoever deceives me back upon him.",
+      "default_count": 1,
+      "transliteration": "An tajʿala kayda man kādanī fī naḥrih, wa-makra man makara bī ʿāʾidan ʿalayh."
+    },
+    {
+      "id": 20005,
+      "text_arabic": "وَحُفْرَةَ مَنْ حَفَرَ لِي وَاقِعًا فِيهَا",
+      "translation": "And cast whoever digs a pit for me into it.",
+      "default_count": 1,
+      "transliteration": "Wa-ḥufrata man ḥafara lī wāqiʿan fīhā."
+    },
+    {
+      "id": 20006,
+      "text_arabic": "وَمَنْ نَصَبَ لِي شَبَكَةَ الْخِدَاعِ اجْعَلْهُ يَا سَيِّدِي مُسَاقًا إِلَيْهَا، وَمُصَادًا فِيهَا، وَأَسِيرًا لَدَيْهَا",
+      "translation": "And whoever sets a net of trickery for me, O my Master, cause him to be driven into it, trapped within it, and held captive by it.",
+      "default_count": 1,
+      "transliteration": "Wa-man naṣaba lī shabakata l-khidāʿi jʿalhu yā sayyidī musāqan ilayhā, wa-muṣādan fīhā, wa-asīran ladayhā."
+    },
+    {
+      "id": 20007,
+      "text_arabic": "اللَّهُمَّ بِحَقِّ كٓهيعٓصٓ اِكْفِنَا هَمَّ الْعِدَا، وَلَقِّهِمُ الرَّدَى، وَاجْعَلْهُمْ لِكُلِّ حَبِيبٍ فِدَى، وَسَلِّطْ عَلَيْهِمْ عَاجِلَ النِّقْمَةِ فِي الْيَوْمِ وَالْغَدَا",
+      "translation": "O Allah, by the truth of Kāf Hā Yā ʿAyn Ṣād, protect us from the distress caused by our enemies, bring upon them ruin, make them a ransom for every beloved one, and unleash upon them swift vengeance today and tomorrow.",
+      "default_count": 1,
+      "transliteration": "Allāhumma bi-ḥaqqi Kāf Hā Yā ʿAyn Ṣād ikfinā hamma l-ʿidā, wa-laqqihimu r-radā, wa-jʿalhum li-kulli ḥabībin fidā, wa-salliṭ ʿalayhim ʿājila n-niqmati fi l-yawmi wa-l-ghadā.",
+      "notes": "كٓهيعٓصٓ is the opening of Sūrat Maryam, invoked here inside the supplication rather than recited as a verse."
+    },
+    {
+      "id": 20008,
+      "text_arabic": "اللَّهُمَّ بَدِّدْ شَمْلَهُمْ، اللَّهُمَّ فَرِّقْ جَمْعَهُمْ، اللَّهُمَّ قَلِّلْ عَدَدَهُمْ، اللَّهُمَّ فُلَّ حَدَّهُمْ",
+      "translation": "O Allah, scatter their ranks. O Allah, disperse their gathering. O Allah, reduce their numbers. O Allah, blunt their edge.",
+      "default_count": 1,
+      "transliteration": "Allāhumma baddid shamlahum, Allāhumma farriq jamʿahum, Allāhumma qallil ʿadadahum, Allāhumma fulla ḥaddahum."
+    },
+    {
+      "id": 20009,
+      "text_arabic": "اللَّهُمَّ اجْعَلِ الدَّائِرَةَ عَلَيْهِمْ، اللَّهُمَّ أَرْسِلِ الْعَذَابَ إِلَيْهِمْ، اللَّهُمَّ أَخْرِجْهُمْ عَنْ دَائِرَةِ الْحِلْمِ",
+      "translation": "O Allah, turn the tide against them. O Allah, send punishment upon them. O Allah, remove them from the realm of forbearance.",
+      "default_count": 1,
+      "transliteration": "Allāhumma jʿali d-dāʾirata ʿalayhim, Allāhumma arsili l-ʿadhāba ilayhim, Allāhumma akhrijhum ʿan dāʾirati l-ḥilm."
+    },
+    {
+      "id": 20010,
+      "text_arabic": "وَاسْلُبْهُمْ مَدَدَ الْإِمْهَالِ، وَغُلَّ أَيْدِيَهُمْ وَأَرْجُلَهُمْ، وَارْبِطْ عَلَى قُلُوبِهِمْ، وَلَا تُبَلِّغْهُمُ الْآمَالَ",
+      "translation": "And deprive them of prolonged respite, shackle their hands and feet, bind their hearts, and do not let them attain their hopes.",
+      "default_count": 1,
+      "transliteration": "Wa-slubhum madada l-imhāl, wa-ghulla aydiyahum wa-arjulahum, wa-rbiṭ ʿalā qulūbihim, wa-lā tuballighhumu l-āmāl."
+    },
+    {
+      "id": 20011,
+      "text_arabic": "اللَّهُمَّ مَزِّقْهُمْ كُلَّ مُمَزَّقٍ، مَزَّقْتَهُ لِأَعْدَائِكَ انْتِصَارًا لِأَنْبِيَائِكَ وَرُسُلِكَ، وَلِأَوْلِيَائِكَ وَعِبَادِكَ الْمُؤْمِنِينَ",
+      "translation": "O Allah, tear them apart completely, as You tore apart Your enemies in support of Your prophets and messengers, and for Your saints and believing slaves.",
+      "default_count": 1,
+      "transliteration": "Allāhumma mazziqhum kulla mumazzaq, mazzaqtahu li-aʿdāʾika ntiṣāran li-anbiyāʾika wa-rusulik, wa-li-awliyāʾika wa-ʿibādika l-muʾminīn."
+    },
+    {
+      "id": 20012,
+      "text_arabic": "اللَّهُمَّ انْتَصِرْ لِي انْتِصَارَكَ لِأَحْبَابِكَ عَلَى أَعْدَائِكَ",
+      "translation": "O Allah, come to my aid as You come to the aid of Your beloved ones against Your enemies.",
+      "default_count": 1,
+      "transliteration": "Allāhumma ntaṣir lī ntiṣāraka li-aḥbābika ʿalā aʿdāʾik."
+    },
+    {
+      "id": 20013,
+      "text_arabic": "اللَّهُمَّ لَا تُمَكِّنِ الْأَعْدَاءَ فِيَّ، وَلَا تُسَلِّطْهُمْ عَلَيَّ بِذُنُوبِي",
+      "translation": "O Allah, do not allow enemies to overpower me, nor grant them authority over me because of my sins.",
+      "default_count": 1,
+      "transliteration": "Allāhumma lā tumakkini l-aʿdāʾa fiyya, wa-lā tusalliṭhum ʿalayya bi-dhunūbī."
+    },
+    {
+      "id": 20014,
+      "text_arabic": "حُمَّ الْأَمْرُ وَجَاءَ النَّصْرُ، فَعَلَيَّ لَا يُنْصَرُونَ",
+      "translation": "The matter is decreed and victory has arrived; they shall have no victory over me.",
+      "default_count": 1,
+      "transliteration": "Ḥumma l-amru wa-jāʾa n-naṣr, fa-ʿalayya lā yunṣarūn.",
+      "notes": "The wird of Imam al-Shadhili says فَعَلَيَّ, “over me”. Hizb al-Bahr says the same words in the plural, فَعَلَيْنَا, and carries them as dhikr 7013."
+    },
+    {
+      "id": 20015,
+      "text_arabic": "حمٓ عٓسٓقٓ",
+      "translation": "Ḥā Mīm ʿAyn Sīn Qāf.",
+      "default_count": 1,
+      "transliteration": "Ḥā Mīm ʿAyn Sīn Qāf.",
+      "notes": "The opening of Sūrat al-Shūrā. Hizb al-Bahr recites the same two sets with حِمَايَتُنَا joined on, as dhikr 7018; here the litany makes them two steps."
+    },
+    {
+      "id": 20016,
+      "text_arabic": "حِمَايَتُنَا مِمَّا نَخَافُ",
+      "translation": "It is our protection against what we fear.",
+      "default_count": 1,
+      "transliteration": "Ḥimāyatunā mimmā nakhāf."
+    },
+    {
+      "id": 20017,
+      "text_arabic": "اللَّهُمَّ قِنَا شَرَّ الْأَسْوَاءِ، وَلَا تَجْعَلْنَا مَحَلًّا لِلْبَلْوَى",
+      "translation": "O Allah, protect us from evils, and do not make us a place upon which affliction descends.",
+      "default_count": 1,
+      "transliteration": "Allāhumma qinā sharra l-aswāʾ, wa-lā tajʿalnā maḥallan li-l-balwā."
+    },
+    {
+      "id": 20018,
+      "text_arabic": "اللَّهُمَّ أَعْطِنَا أَمَلَ الرَّجَاءِ، وَفَوْقَ الْأَمَلِ",
+      "translation": "O Allah, grant us what we hope for, and even beyond our hopes.",
+      "default_count": 1,
+      "transliteration": "Allāhumma aʿṭinā amala r-rajāʾi, wa-fawqa l-amal."
+    },
+    {
+      "id": 20019,
+      "text_arabic": "يَا هُو",
+      "translation": "O He.",
+      "default_count": 3,
+      "transliteration": "Yā Hū."
+    },
+    {
+      "id": 20020,
+      "text_arabic": "يَا مَنْ بِفَضْلِهِ لِفَضْلِهِ نَسْأَلُ",
+      "translation": "O You by whose grace we ask for Your grace.",
+      "default_count": 1,
+      "transliteration": "Yā man bi-faḍlihi li-faḍlihi nasʾal."
+    },
+    {
+      "id": 20021,
+      "text_arabic": "نَسْأَلُكَ الْعَجَلَ الْعَجَلَ الْعَجَلَ",
+      "translation": "We ask You to hasten! Hasten! Hasten!",
+      "default_count": 1,
+      "transliteration": "Nasʾaluka l-ʿajala, l-ʿajala, l-ʿajal."
+    },
+    {
+      "id": 20022,
+      "text_arabic": "إِلَهِي الْإِجَابَةَ الْإِجَابَةَ",
+      "translation": "My God, answer! Answer!",
+      "default_count": 1,
+      "transliteration": "Ilāhi l-ijābata l-ijābah."
+    },
+    {
+      "id": 20023,
+      "text_arabic": "يَا مَنْ أَجَابَ نُوحًا فِي قَوْمِهِ",
+      "translation": "O You who answered Nuh’s prayer concerning his people.",
+      "default_count": 1,
+      "transliteration": "Yā man ajāba Nūḥan fī qawmih."
+    },
+    {
+      "id": 20024,
+      "text_arabic": "يَا مَنْ نَصَرَ إِبْرَاهِيمَ عَلَى أَعْدَائِهِ",
+      "translation": "O You who granted victory to Ibrahim over his enemies.",
+      "default_count": 1,
+      "transliteration": "Yā man naṣara Ibrāhīma ʿalā aʿdāʾih."
+    },
+    {
+      "id": 20025,
+      "text_arabic": "يَا مَنْ رَدَّ يُوسُفَ عَلَى يَعْقُوبَ",
+      "translation": "O You who returned Yusuf to Ya’qub.",
+      "default_count": 1,
+      "transliteration": "Yā man radda Yūsufa ʿalā Yaʿqūb."
+    },
+    {
+      "id": 20026,
+      "text_arabic": "يَا مَنْ كَشَفَ الضُّرَّ عَنْ أَيُّوبَ",
+      "translation": "O You who lifted affliction from Ayyub.",
+      "default_count": 1,
+      "transliteration": "Yā man kashafa ḍ-ḍurra ʿan Ayyūb."
+    },
+    {
+      "id": 20027,
+      "text_arabic": "يَا مَنْ أَجَابَ دَعْوَةَ زَكَرِيَّا",
+      "translation": "O You who answered the call of Zakariyya.",
+      "default_count": 1,
+      "transliteration": "Yā man ajāba daʿwata Zakariyyā."
+    },
+    {
+      "id": 20028,
+      "text_arabic": "يَا مَنْ قَبِلَ تَسْبِيحَ يُونُسَ بْنِ مَتَّى",
+      "translation": "O You who accepted the glorification of Yunus son of Matta.",
+      "default_count": 1,
+      "transliteration": "Yā man qabila tasbīḥa Yūnusa bni Mattā."
+    },
+    {
+      "id": 20029,
+      "text_arabic": "أَسْأَلُكَ بِأَسْرَارِ أَصْحَابِ هَذِهِ الدَّعَوَاتِ الْمُسْتَجَابَاتِ",
+      "translation": "I ask You by the secrets of those who made these answered supplications.",
+      "default_count": 1,
+      "transliteration": "Asʾaluka bi-asrāri aṣḥābi hādhihi d-daʿawāti l-mustajābāt."
+    },
+    {
+      "id": 20030,
+      "text_arabic": "أَنْ تَتَقَبَّلَ مَا بِهِ دَعَوْنَاكَ، وَأَنْ تُعْطِيَنَا مَا سَأَلْنَاكَ",
+      "translation": "That You accept our supplications to You, and grant us what we have asked of You.",
+      "default_count": 1,
+      "transliteration": "An tataqabbala mā bihi daʿawnāk, wa-an tuʿṭiyanā mā saʾalnāk."
+    },
+    {
+      "id": 20031,
+      "text_arabic": "وَأَنْجِزْ لَنَا وَعْدَكَ الَّذِي وَعَدْتَهُ لِعِبَادِكَ الْمُؤْمِنِينَ",
+      "translation": "And fulfil for us the promise You made to Your believing slaves.",
+      "default_count": 1,
+      "transliteration": "Wa-anjiz lanā waʿdaka lladhī waʿadtahu li-ʿibādika l-muʾminīn."
+    },
+    {
+      "id": 20032,
+      "text_arabic": "لَّآ إِلَٰهَ إِلَّآ أَنتَ سُبۡحَٰنَكَ إِنِّي كُنتُ مِنَ ٱلظَّٰلِمِينَ",
+      "translation": "“There is no god but You. Glory be to You. Indeed, I have been among the wrongdoers.”",
+      "default_count": 1,
+      "transliteration": "Lā ilāha illā anta, subḥānaka innī kuntu mina ẓ-ẓālimīn.",
+      "notes": "The closing portion of Qur’an 21:87, from لَّآ onwards, recited on its own."
+    },
+    {
+      "id": 20033,
+      "text_arabic": "اِنْقَطَعَتْ آمَالُنَا وَعِزَّتِكَ إِلَّا مِنْكَ، وَخَابَ رَجَاؤُنَا وَحَقِّكَ إِلَّا فِيكَ",
+      "translation": "By Your might, our hopes have been cut off from all but You; and by Your truth, we place no hope in any but You.",
+      "default_count": 1,
+      "transliteration": "Inqaṭaʿat āmālunā wa-ʿizzatika illā minka, wa-khāba rajāʾunā wa-ḥaqqika illā fīk."
+    },
+    {
+      "id": 20034,
+      "text_arabic": "إِنْ أَبْطَأَتْ غَارَةُ الْأَرْحَامِ وَابْتَعَدَتْ، فَأَقْرَبُ الشَّيْءِ مِنَّا غَارَةُ اللَّهِ",
+      "translation": "If the aid of our kinsfolk is delayed and remains distant, then the nearest aid to us is the aid of Allah.",
+      "default_count": 1,
+      "transliteration": "In abṭaʾat ghāratu l-arḥāmi wa-btaʿadat, fa-aqrabu sh-shayʾi minnā ghāratu Llāh."
+    },
+    {
+      "id": 20035,
+      "text_arabic": "يَا غَارَةَ اللَّهِ جِدِّي السَّيْرَ مُسْرِعَةً فِي حَلِّ عُقْدَتِنَا، يَا غَارَةَ اللَّهِ",
+      "translation": "O succour of Allah, hasten swiftly to untie our knot, O succour of Allah!",
+      "default_count": 1,
+      "transliteration": "Yā ghārata Llāhi jiddi s-sayra musriʿatan fī ḥalli ʿuqdatinā, yā ghārata Llāh."
+    },
+    {
+      "id": 20036,
+      "text_arabic": "عَدَا الْعَادُونَ وَجَارُوا، وَرَجَوْنَا اللَّهَ مُجِيرًا",
+      "translation": "The aggressors have attacked and acted unjustly, and we look to Allah as our Protector.",
+      "default_count": 1,
+      "transliteration": "ʿAdā l-ʿādūna wa-jārū, wa-rajawnā Llāha mujīrā."
+    },
+    {
+      "id": 20037,
+      "text_arabic": "وَكَفَىٰ بِٱللَّهِ وَلِيّٗا وَكَفَىٰ بِٱللَّهِ نَصِيرٗا",
+      "translation": "“Allah is sufficient as Guardian, and Allah is sufficient as Helper.”",
+      "default_count": 1,
+      "transliteration": "Wa-kafā bi-Llāhi waliyyā, wa-kafā bi-Llāhi naṣīrā.",
+      "notes": "The closing portion of Qur’an 4:45, from وَكَفَىٰ onwards, recited on its own."
+    },
+    {
+      "id": 20038,
+      "text_arabic": "اِسْتَجِبْ لِي",
+      "translation": "Answer me!",
+      "default_count": 1,
+      "transliteration": "Istajib lī."
+    },
+    {
+      "id": 20039,
+      "text_arabic": "آمِينَ",
+      "translation": "Ameen.",
+      "default_count": 3,
+      "transliteration": "Āmīn."
+    }
+  ]
+}
