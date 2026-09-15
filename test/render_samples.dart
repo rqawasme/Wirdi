@@ -39,6 +39,7 @@ import 'package:wirdi/providers/settings.dart';
 import 'package:wirdi/routes.dart';
 import 'package:wirdi/theme/theme.dart';
 import 'package:wirdi/widgets/bottom_nav.dart';
+import 'package:wirdi/widgets/tracker_scope_picker.dart';
 import 'package:wirdi/wirdi_app.dart';
 
 /// Where the PNGs go. Under build/, which is gitignored.
@@ -180,6 +181,30 @@ void main() {
     // One finished, one part-way, the rest untouched: the three states a tile
     // has, on one screen.
     await data.userRepository.logCompletion(kursi, DateTime.now());
+
+    // Enough history for the tracker to have a shape. Ten weeks of most days
+    // for the app-wide view, with gaps, so the chart is a line that moves
+    // rather than a flat one — a picture of a chart with no variation in it
+    // proves only that it drew something. Every third day is skipped, and one
+    // fortnight is missed outright.
+    final DateTime today = DateTime.now();
+    for (int back = 1; back < 70; back++) {
+      if (back % 3 == 0) continue;
+      if (back >= 28 && back < 42) continue;
+      await data.userRepository.logCompletion(
+        nawawi,
+        today.subtract(Duration(days: back)),
+      );
+    }
+    // And the Friday wird kept on its own days, which is what the tracker's
+    // per-collection scope is for: under a calendar-day run this reads as one,
+    // and it should read as ten.
+    for (int week = 0; week < 10; week++) {
+      final DateTime friday = today.subtract(
+        Duration(days: (today.weekday - DateTime.friday + 7) % 7 + week * 7),
+      );
+      await data.userRepository.logCompletion(kahf, friday);
+    }
     final ResolvedCollection resolvedMorning = await data.collectionRepository
         .resolve(morning);
     await data.userRepository.saveProgress(
@@ -218,7 +243,25 @@ void main() {
     await shootSheet(0, '01b2-commit-sheet-every-day');
     await shootSheet(1, '01b3-commit-sheet-one-day');
     await openTab(WirdiTab.tasbih, '01c-tasbih');
-    await openTab(WirdiTab.tracker, '01d-tracker');
+
+    // The tracker is a scrolling screen rather than one panel, so it gets a
+    // taller viewport: the point of these shots is the whole screen at once,
+    // and a picture cut off above the weekday bars would hide exactly the kind
+    // of layout fault they exist to catch.
+    tester.view.physicalSize = const Size(400, 1600);
+    await tester.tap(find.text(WirdiTab.tracker.label));
+    await settle(tester);
+    await shoot(tester, '01d-tracker');
+
+    // And the per-collection scope, which is reckoned against the days that
+    // collection comes round on rather than against every day.
+    await tester.tap(find.byType(TrackerScopePicker));
+    await settle(tester);
+    await tester.tap(find.text('Surah al-Kahf'));
+    await settle(tester);
+    await shoot(tester, '01d2-tracker-collection');
+
+    tester.view.physicalSize = const Size(400, 880);
     await openTab(WirdiTab.home, '01e-home-again');
 
     final ProviderContainer container = ProviderScope.containerOf(

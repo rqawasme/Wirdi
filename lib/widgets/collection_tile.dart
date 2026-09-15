@@ -42,6 +42,7 @@ class CollectionTile extends StatelessWidget {
     this.completedToday = false,
     this.week = const <bool>[],
     this.streak = 0,
+    this.streakUnit,
     this.onTap,
   });
 
@@ -85,9 +86,16 @@ class CollectionTile extends StatelessWidget {
   /// Empty to draw no strip at all.
   final List<bool> week;
 
-  /// Consecutive days up to today on which *this* collection was completed.
-  /// Zero when today is the first day, or when the run was broken.
+  /// Consecutive days *it came round on*, up to today, on which this
+  /// collection was completed. Zero when today is the first, or when the run
+  /// was broken.
   final int streak;
+
+  /// The singular noun [streak] is counted in, when it is not "day".
+  ///
+  /// Set for a collection committed to one weekday, whose run is counted in
+  /// that day. Null everywhere else, which is almost everywhere.
+  final String? streakUnit;
 
   final VoidCallback? onTap;
 
@@ -165,6 +173,7 @@ class CollectionTile extends StatelessWidget {
                         const SizedBox(height: WirdiMetrics.space2),
                         _Encouragement(
                           streak: streak,
+                          unit: streakUnit,
                           completedToday: completedToday,
                           style: type.caption.copyWith(
                             color: scheme.onSurfaceVariant,
@@ -339,31 +348,45 @@ class _WeekStrip extends StatelessWidget {
 
 /// A word about the run of days, above the count.
 ///
-/// **This is the one place in the app that encourages.** Everywhere else —
-/// the greeting, the tracker, `StreakPanel`, which argues the case at length
-/// — a streak is a number stated flatly and never commented on, because the
-/// standard streak component is engineered around loss aversion and pointing
-/// that at somebody's devotional life is a different thing from pointing it at
-/// a language app. A card that says "keep it going" is a deliberate departure
-/// from that, made knowingly and after the argument was put; if the position
-/// is ever restored, this widget is the whole of what has to go.
+/// This was once the only place in the app that encouraged, and the comment
+/// here said so at length: everywhere else a streak was a number stated flatly
+/// and never commented on, and a card saying "keep going" was a knowing
+/// departure from that.
 ///
-/// Two rules it does keep, because they are what stops encouragement becoming
-/// pressure. Nothing here escalates: the line reads the same at three hundred
-/// days as at three, so there is no tier to reach and none to fall out of. And
-/// nothing here is negative — a broken run is an invitation to start, never a
-/// warning, a countdown, or a remark about the days that were missed.
+/// The tracker now encourages too, in a line under its count, and the position
+/// has been restated rather than abandoned. What the app is against is
+/// **gamification** — a number engineered to be lost, because loss aversion is
+/// what keeps somebody opening a language app and is not a thing to point at
+/// somebody's devotional life. It is not against warmth. Habit-building is
+/// what the tracker is for, and a screen that reports at you in a flat voice
+/// is not more respectful, only colder.
+///
+/// So the two rules this widget already kept are the rules everywhere now, and
+/// they are what stops encouragement becoming pressure. Nothing escalates: the
+/// line reads the same at three hundred days as at three, so there is no tier
+/// to reach and none to fall out of. And nothing is negative — a broken run is
+/// an invitation to start, never a warning, a countdown, or a remark about the
+/// days that were missed. `test/app/tracker_voice_test.dart` holds the line on
+/// the tab; `StreakPanel` argues the case.
 class _Encouragement extends StatelessWidget {
   const _Encouragement({
     required this.streak,
     required this.completedToday,
     required this.style,
+    this.unit,
   });
 
-  /// Consecutive days up to today, this collection's own.
+  /// Consecutive days it came round on, up to today — this collection's own.
   final int streak;
 
   final bool completedToday;
+
+  /// The singular noun the run is counted in, when it is not "day".
+  ///
+  /// A wird committed to Fridays alone is only ever on this screen on a
+  /// Friday, and its run is eight Fridays rather than eight days — there were
+  /// fifty-six, and fifty-five of them it was never owed on.
+  final String? unit;
 
   final TextStyle style;
 
@@ -391,6 +414,23 @@ class _Encouragement extends StatelessWidget {
   /// which is not a coincidence — the card is sized for one, and a sentence
   /// that wraps to two costs the name a line of its own.
   String get _line {
+    final String? unit = this.unit;
+    if (unit != null) {
+      // Same four states and the same two rules, counted in the day it comes
+      // round on. Kept separate from the sentences below rather than
+      // parameterised into them, because "Day one" and "A day begun" are
+      // idioms about days and do not survive the substitution.
+      final String many = '${unit}s';
+      if (completedToday) {
+        return streak == 1 ? 'A $unit kept.' : '$streak $many and counting.';
+      }
+      return switch (streak) {
+        0 => 'A good day to begin.',
+        1 => 'The first. Keep going.',
+        _ => '$streak $many. Keep going.',
+      };
+    }
+
     if (completedToday) {
       return switch (streak) {
         1 => 'A day begun.',

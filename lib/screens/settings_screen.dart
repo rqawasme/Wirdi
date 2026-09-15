@@ -101,15 +101,15 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Show streak'),
+                  title: const Text('Show tracker'),
                   // Says what it shows, and nothing about what turning it off
                   // would cost. Nothing is lost: completions are recorded
-                  // either way, and the count is here again if it is wanted.
+                  // either way, and it is all here again if it is wanted.
                   subtitle: const Text(
-                    'Days in a row, and a calendar of this month',
+                    'Days in a row, the calendar, and the weeks behind you',
                   ),
-                  value: settings.showStreak,
-                  onChanged: controller.setShowStreak,
+                  value: settings.showTracker,
+                  onChanged: controller.setShowTracker,
                 ),
                 // Absent on iOS and in a build with no updater compiled in,
                 // rather than present and inert: a switch that cannot do

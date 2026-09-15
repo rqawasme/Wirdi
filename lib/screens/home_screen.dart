@@ -3,13 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/commitment.dart';
 import '../providers/home.dart';
-import '../providers/streak.dart';
+import '../providers/tracker.dart';
 import '../routes.dart';
 import '../theme/theme.dart';
 import '../widgets/collection_tile.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/failure_screen.dart';
 import '../widgets/update_banner.dart';
+import '../widgets/weekday_name.dart';
 
 /// What the user committed to today, how far through each commitment they are,
 /// and a way into one.
@@ -254,6 +255,7 @@ class _Section extends ConsumerWidget {
                   completedToday: tile.completedToday,
                   week: tile.week,
                   streak: tile.streak,
+                  streakUnit: _streakUnit(context, tile.days),
                   onTap: () => _open(context, ref, tile),
                 ),
             ],
@@ -261,6 +263,20 @@ class _Section extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  /// The noun a tile's run is counted in.
+  ///
+  /// A collection that comes round on one day of the week has a run measured
+  /// in that day, and it is only ever on this screen on that day — so the card
+  /// says "3 Fridays. Keep going." rather than a count of days it was never
+  /// owed on. The same reading the tracker gives it, because a tile and a tab
+  /// disagreeing about the same wird on the same afternoon is worse than
+  /// either answer.
+  String? _streakUnit(BuildContext context, Weekdays days) {
+    final List<int> weekdays = days.weekdays;
+    if (weekdays.length != 1) return null;
+    return weekdayName(context, weekdays.single);
   }
 
   Future<void> _open(
@@ -277,7 +293,11 @@ class _Section extends ConsumerWidget {
     // this screen is stale the moment it comes back.
     if (context.mounted) {
       ref.invalidate(homeViewProvider);
-      ref.invalidate(streakViewProvider);
+      // Everything that reads completion history watches this, so the tracker
+      // refreshes without this call site having to know it exists — an
+      // invalidate per provider is the pattern that does not scale, and is how
+      // a rename came to sit stale on this screen once already.
+      ref.read(completionsRevisionProvider.notifier).bump();
     }
   }
 }

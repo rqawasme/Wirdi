@@ -5,6 +5,7 @@ import '../../domain/commitment.dart';
 import '../../domain/date_key.dart';
 import '../../domain/progress.dart';
 import '../../domain/repositories.dart';
+import '../../domain/tracker_stats.dart' show maxStreakDays;
 import '../mappers.dart';
 // `reading_position` makes drift generate a table class called
 // `ReadingPosition`, which collides with the domain model of that name.
@@ -34,9 +35,11 @@ class DriftUserRepository implements UserRepository {
   /// And far above. date_key is YYYY-MM-DD, so string order is date order.
   static const String _maxDateKey = '9999-99-99';
 
-  /// How far back [currentStreak] is willing to count. Twenty years of daily
-  /// practice is a generous ceiling and keeps the walk bounded.
-  static const int _maxStreakDays = 366 * 20;
+  /// How far back [currentStreak] is willing to count.
+  ///
+  /// Shared with `dueStreak`, which walks the same days under a weekday mask.
+  /// Two ceilings on one question would be two answers to it.
+  static const int _maxStreakDays = maxStreakDays;
 
   @override
   Future<WirdProgress?> progress(CollectionId id) async {
@@ -106,16 +109,27 @@ class DriftUserRepository implements UserRepository {
   @override
   Future<List<String>> completionDatesFor(
     CollectionId id, {
-    required DateTime from,
-    required DateTime to,
+    DateTime? from,
+    DateTime? to,
   }) {
     return _db
         .collectionCompletionDatesBetween(
           ref: id.canonical,
-          from: dateKey(from),
-          to: dateKey(to),
+          from: from == null ? _minDateKey : dateKey(from),
+          to: to == null ? _maxDateKey : dateKey(to),
         )
         .get();
+  }
+
+  @override
+  Future<Set<CollectionId>> completedCollections() async {
+    final List<String> refs = await _db.completedCollectionRefs().get();
+    return <CollectionId>{
+      // `tryParse` rather than `parse`: a ref that cannot be read is a stored
+      // value gone wrong, and dropping it is better than failing to draw the
+      // picker over it.
+      for (final String ref in refs) ?CollectionId.tryParse(ref),
+    };
   }
 
   @override

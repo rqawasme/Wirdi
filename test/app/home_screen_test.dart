@@ -484,6 +484,35 @@ void main() {
       }
     });
 
+    testWidgets('a wird that comes round weekly counts in that day', (
+      WidgetTester tester,
+    ) async {
+      // 2 September 2026 is a Wednesday. A collection committed to Wednesdays
+      // and kept on the last three of them has a run of three — and is only
+      // ever on this screen on a Wednesday anyway, so that is the only reading
+      // of it a card can honestly give.
+      //
+      // Under the calendar-day run this replaces, the same history read as
+      // "Day one": the twenty days in between were counted as gaps although
+      // the wird was never owed on any of them. The tracker now says three
+      // Wednesdays, and a tile and a tab disagreeing about the same wird on
+      // the same afternoon is worse than either answer.
+      final UserRepository user = dbs.userRepository(clock: () => now);
+      await user.commit(
+        mixed,
+        DailySection.today,
+        days: Weekdays.of(<int>[DateTime.wednesday]),
+      );
+      for (final int back in <int>[7, 14, 21]) {
+        await user.logCompletion(mixed, now.subtract(Duration(days: back)));
+      }
+
+      await pumpApp(tester);
+
+      expect(find.text('3 Wednesdays. Keep going.'), findsOneWidget);
+      expect(find.text('Day one. Keep going.'), findsNothing);
+    });
+
     testWidgets('a finished run says so, and does not say it twice', (
       WidgetTester tester,
     ) async {

@@ -3129,6 +3129,14 @@ abstract class _$UserDatabase extends GeneratedDatabase {
     ).map((QueryRow row) => row.read<String>('date_key'));
   }
 
+  Selectable<String> completedCollectionRefs() {
+    return customSelect(
+      'SELECT DISTINCT collection_ref FROM completions',
+      variables: [],
+      readsFrom: {completions},
+    ).map((QueryRow row) => row.read<String>('collection_ref'));
+  }
+
   Selectable<ReadingPositionRow> currentReadingPosition() {
     return customSelect(
       'SELECT * FROM reading_position WHERE id = 1',
