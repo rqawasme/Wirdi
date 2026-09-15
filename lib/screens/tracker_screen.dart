@@ -15,6 +15,7 @@ import '../widgets/streak_panel.dart';
 import '../widgets/tracker_chart.dart';
 import '../widgets/tracker_scope_picker.dart';
 import '../widgets/weekday_bars.dart';
+import '../widgets/weekday_name.dart';
 
 /// How the habit is going.
 ///
@@ -218,7 +219,7 @@ class _Body extends ConsumerWidget {
     }
     if (bestIndex < 0 || best <= 0 || ties > 1) return '';
 
-    final String name = _weekdayName(context, bestIndex + 1);
+    final String name = weekdayName(context, bestIndex + 1);
     return 'You are strongest on ${name}s.';
   }
 
@@ -229,7 +230,7 @@ class _Body extends ConsumerWidget {
   /// fifty-six and fifty-five of them were never owed.
   String? _streakUnit(BuildContext context, TrackerView view) {
     final int? only = view.onlyWeekday;
-    return only == null ? null : _weekdayName(context, only);
+    return only == null ? null : weekdayName(context, only);
   }
 
   String _note(TrackerView view) {
@@ -262,14 +263,6 @@ class _Body extends ConsumerWidget {
         ? 'Every one of the last seven days.'
         : 'You have practised on ${view.lastSeven} of the last seven days.';
   }
-}
-
-String _weekdayName(BuildContext context, int weekday) {
-  // MaterialLocalizations has no standalone weekday-name lookup, so the name
-  // is read off a real date with that weekday. 5 January 2026 is a Monday, so
-  // adding weekday - 1 lands on the day wanted.
-  final DateTime day = DateTime(2026, 1, 4 + weekday);
-  return MaterialLocalizations.of(context).formatFullDate(day).split(',').first;
 }
 
 class _SectionHeader extends StatelessWidget {

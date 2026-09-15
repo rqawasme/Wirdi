@@ -675,41 +675,119 @@ it means removing the item and adding it again. Doing that in the UI would mean
 membership and its id silently, so it is not done. Phase 7 wants
 `CollectionRepository.updateItem(id, itemId, {count, note})`.
 
-### Streaks
+### The Tracker
 
-A count of consecutive days, and a calendar of the current month with completed
-days marked in `primary`.
+The fourth tab, and the screen that answers "how is this going". Four things,
+in the order the question is usually asked: how long the run is, which days of
+the month it covered, what the last twelve weeks look like as a shape, and
+which days of the week are where it slips. A picker at the top switches all
+four between the app as a whole and one collection.
 
-Deliberately nothing else. The standard streak component is engineered to be
-lost — a flame that grows, a tier that unlocks, a warning at the end of a day —
-because loss aversion is what makes the number keep somebody opening the app.
-That is defensible for a language learner. It is not defensible applied to
-somebody's relationship with their own devotional practice.
+**Everything, and one collection.** "Everything" asks whether the habit is
+going at all — a day counts if anything was completed on it. It has no due
+rule, so it cannot miss: the app was never owed a day. A collection is reckoned
+against the days it actually comes round on, and that distinction is the reason
+the tab was rewritten. `currentStreakFor` counts consecutive *calendar* days,
+so a wird committed to Fridays could never show a run longer than one — not
+because the reader kept breaking it, but because the question was wrong.
+`lib/domain/tracker_stats.dart` counts in **due days** instead: Saturday is not
+a miss for a Friday wird, it is not an anything. `DueDays` holds that rule in
+one object and the run, the weeks and the weekday tallies are all built on it,
+because three functions each deciding due-ness for themselves is three chances
+for them to disagree.
 
-So: the count is set in the same type as a collection's name and does not change
-appearance as it grows; a completed day is the same mark on day 2 as on day 200;
-a zero reads "No days in a row" and stops there; there is no notification of any
-kind. `test/app/streak_panel_test.dart` asserts that a 365-day streak renders
-identically to a 7-day one, and that no text on the panel matches the loss
-vocabulary.
+The home tile counts the same way, so that a card and a tab cannot say
+different things about the same wird on the same afternoon — it reads "3
+Fridays. Keep going." where it used to read "Day one."
+
+**It encourages, and it does not gamify.** The position this section used to
+take was that the standard streak component is engineered to be lost — a flame
+that grows, a tier that unlocks, a warning at the end of a day — because loss
+aversion is what keeps somebody opening a language app, and that is not a thing
+to point at somebody's relationship with their own devotional practice. That
+argument stands. What it was overreaching to forbid was *warmth*: habit-building
+is what the reader opened the tab for, and reporting at them in a flat voice is
+not more respectful, only colder.
+
+So the tab may say "You have practised on 5 of the last seven days", and says
+"A good day to begin again" where a run has ended. What it may not do is
+escalate, rank, warn, or mark a failure. Concretely, and pinned by
+`test/app/tracker_voice_test.dart`:
+
+- no tier, badge, best or record — nothing to reach, so nothing to fall out of
+- the count is set in the same type as a collection's name and does not change
+  appearance as it grows; a 365-day history renders exactly like a week's
+- no loss vocabulary, no countdown, nothing "at risk"
+- nothing red, and no icon anywhere on the tab — the month arrows are chevrons
+  set in type, because an icon here is one step from a flame here
+- still no notifications, of any kind, anywhere in the app
+
+**A missed due day gets no mark.** There are two marks on the calendar and only
+two: a filled square for a day completed, and a hairline outline for today. A
+day that was due and not done looks exactly like a day that never came round.
+Which days were owed is genuinely useful in the *numbers* — the run, the weekly
+denominator, the weekday rate — and accusatory on the *grid*, where a row of
+outlined failures laid out by date is a list of accusations and the reader
+already knows. As a side effect this is also what keeps the anchor below from
+mattering very much.
 
 The calendar borrows no days from the months either side — a grid showing 31
 January in the same colour as 1 February invites the reader to count across a
-boundary it is not showing — so the corner cells are blank.
+boundary it is not showing — so the corner cells are blank. It pages back
+without limit and stops at this month going forward: a grid of days that have
+not happened reads as a list of things already failed.
 
-The whole panel comes off in Settings, defaulting on. It lives on the Tracker
-tab; the greeting's third line says the same thing about the app-wide run, in
-12dp quiet ink, and reads the same at 365 days as at 2.
+**The chart shows twelve weeks that are over.** The week in progress is not on
+it. Plotted at its running total it would read as a collapse every Monday and a
+recovery every Sunday, forever, and the two usual ways out — a dashed last
+segment, a hollow last marker — both say "unfinished", which is a half-step
+toward the countdown this app does not do. Today is on the calendar directly
+above it.
 
-**Home's cards are the exception, and they are an exception on purpose.** Each
-one carries a line about that collection's own run which encourages rather than
-reports — "3 days. Keep going." That contradicts the argument above, and it was
-made anyway, knowingly: the case was put and the call was to encourage on the
-card. What the argument still buys is the shape of the sentence. Nothing on a
-card escalates, so there is no tier to reach and none to fall out of, and
-nothing on a card is negative, so a broken run reads as an invitation to begin
-rather than as a loss to be warned about. If the position is ever restored,
-`_Encouragement` in `collection_tile.dart` is the whole of what has to go.
+Its y-axis is fixed at the days the scope was actually due, never fitted to the
+data: fitted, a week with one day in it fills the frame, and the chart flatters.
+A week that ended before the first completion is not drawn at all rather than
+drawn at zero — that week really did have nothing in it, and a zero there would
+be the app inventing a dip out of not having been installed yet.
+
+There is no charting package, and no calendar package. The line is thirty lines
+of `CustomPaint` following `_VoussoirPainter`'s contract — resolved colours in
+through the constructor, a real `shouldRepaint`, nothing animated. The weekday
+bars are composed widgets, because seven labelled columns get their text layout
+and their locale weekday names for free that way and stay the same shape as the
+calendar's cells. The bars normalise by **rate**, not by the largest tally:
+under a sparse mask the largest tally is the only one there is, and a
+Friday-only wird would show one full bar and six empty ones and have said
+nothing.
+
+**No schema change.** The whole history for a scope is read once —
+`completionDatesDescending` was already reading all of it for the streak — and
+every figure is derived from that one `Set<String>` in Dart, so paging a month
+costs no query at all. `lib/providers/tracker.dart` says why it departs from
+`streakViewProvider`'s windowed read. The one thing added to `user.drift` is a
+`SELECT DISTINCT collection_ref` for the picker, which is a query and not a
+migration.
+
+**The anchor is `min(committed at, first completed)`.** `uncommit` deletes the
+row outright, so re-committing mints a fresh `created_at` and anchoring to that
+alone would drop months of real practice behind it; anchoring to the first
+completion alone leaves a collection committed this morning with nothing to
+anchor to. There is no history of `days`, so a mask changed in September reads
+January through today's mask — unfixable without a `commitment_history` table,
+and not worth one for this tab.
+
+**The whole tab comes off in Settings**, defaulting on. The switch is called
+"Show tracker" and takes everything with it, which is the honest reading of
+what somebody turning it off is asking for. Its stored key is still
+`streak.visible`: these strings are persisted, and renaming one silently resets
+whatever the reader had chosen.
+
+**Home's cards encourage too, and that is no longer the exception it was.**
+Each one carries a line about that collection's own run — "3 days. Keep going."
+Nothing on a card escalates, so there is no tier to reach and none to fall out
+of, and nothing on a card is negative, so a broken run reads as an invitation to
+begin rather than as a loss to be warned about. Those are the two rules, and
+they are now the rules on the tracker as well.
 
 ### Measuring it
 

@@ -8,6 +8,7 @@ import '../domain/date_key.dart';
 import '../domain/playback_step.dart';
 import '../domain/progress.dart';
 import '../domain/repositories.dart';
+import '../domain/tracker_stats.dart';
 import 'collections.dart';
 import 'data_providers.dart';
 import 'streak.dart';
@@ -64,8 +65,14 @@ final class CommittedCollection {
   /// about one collection can honestly ask.
   final List<bool> week;
 
-  /// Consecutive days up to today on which this collection was completed.
-  /// Its own run, not the app's — see [UserRepository.currentStreakFor].
+  /// Consecutive days *it came round on*, up to today, on which this
+  /// collection was completed. Its own run, not the app's.
+  ///
+  /// Counted in due days rather than calendar days — see [dueStreak]. A wird
+  /// committed to Fridays has a run of Fridays, and the Saturdays between them
+  /// are not gaps in it. Under the calendar-day reading this used to take, such
+  /// a collection could never show a run longer than one, which read as the
+  /// reader failing at something they were in fact keeping.
   final int streak;
 
   CollectionId get id => summary.id;
@@ -164,6 +171,13 @@ final FutureProvider<HomeView> homeViewProvider = FutureProvider<HomeView>((
       await user.progress(summary.id),
     );
 
+    // This collection's whole history, read once and asked three questions:
+    // the week strip, the run, and whether it was done today. The unbounded
+    // read is what `currentStreakFor` was doing underneath anyway.
+    final Set<String> history = (await user.completionDatesFor(
+      summary.id,
+    )).toSet();
+
     committed.add(
       CommittedCollection(
         summary: summary,
@@ -171,9 +185,24 @@ final FutureProvider<HomeView> homeViewProvider = FutureProvider<HomeView>((
         days: commitment.days,
         totalCount: _repetitions(resolved.steps),
         doneCount: _repetitionsDone(resolved.steps, progress),
-        completedToday: await user.isCompletedToday(summary.id),
-        week: await _week(user, summary.id, today),
-        streak: await user.currentStreakFor(summary.id),
+        completedToday: history.contains(dateKey(today)),
+        week: _week(history, today),
+        // Counted in days it came round on, the way the tracker counts it. A
+        // calendar-day run on a collection committed to Fridays could never
+        // read higher than one, so the tile and the tracker would have said
+        // different things about the same wird on the same afternoon.
+        streak: dueStreak(
+          DueDays(
+            completed: history,
+            days: commitment.days,
+            start: earlierDayKey(
+              dateKey(commitment.createdAt),
+              history.isEmpty ? null : history.reduce(_earlier),
+            ),
+            today: dateKey(today),
+          ),
+          now: today,
+        ),
       ),
     );
   }
@@ -240,26 +269,15 @@ final class HomeCommitments {
 
 /// The last seven days for one collection, oldest first.
 ///
-/// One query per committed collection, inside the loop that already resolves
-/// each of them: the resolve is many reads and this is one index seek on
-/// `idx_completions_ref_date`, so batching the seven-day window across every
-/// collection into a single scan would be optimising the cheap half. If Home
-/// ever gets slow, the resolve is where to look.
-Future<List<bool>> _week(
-  UserRepository user,
-  CollectionId id,
-  DateTime today,
-) async {
-  final Set<String> done = (await user.completionDatesFor(
-    id,
-    from: today.subtract(const Duration(days: weekStripDays - 1)),
-    to: today,
-  )).toSet();
-  return <bool>[
-    for (int back = weekStripDays - 1; back >= 0; back--)
-      done.contains(dateKeyDaysBefore(today, back)),
-  ];
-}
+/// Cut from the history the caller already holds rather than read back out of
+/// the database: the run needs the whole thing anyway, and a windowed query for
+/// seven days of it would be a second read for a subset of the first.
+List<bool> _week(Set<String> history, DateTime today) => <bool>[
+  for (int back = weekStripDays - 1; back >= 0; back--)
+    history.contains(dateKeyDaysBefore(today, back)),
+];
+
+String _earlier(String a, String b) => a.compareTo(b) <= 0 ? a : b;
 
 /// Every repetition in the collection: each step's own count, summed.
 int _repetitions(List<PlaybackStep> steps) {

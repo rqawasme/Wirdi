@@ -185,25 +185,32 @@ class _Bar extends StatelessWidget {
             borderRadius: WirdiMetrics.chip,
           ),
         ),
-        if (cameRound)
-          Align(
+        // `widthFactor: 1` is load-bearing, not tidiness. Without it the box
+        // below is laid out under a loose width constraint, and a
+        // `DecoratedBox` with no child collapses to nothing under one — which
+        // draws seven empty tracks and no bars at all, on every screen, while
+        // every figure behind them is correct.
+        if (cameRound && factor > 0)
+          FractionallySizedBox(
+            widthFactor: 1,
+            heightFactor: factor.clamp(0, 1),
             alignment: Alignment.bottomCenter,
-            child: FractionallySizedBox(
-              heightFactor: factor.clamp(0, 1),
-              alignment: Alignment.bottomCenter,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: filled,
-                  borderRadius: WirdiMetrics.chip,
-                ),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: filled,
+                borderRadius: WirdiMetrics.chip,
               ),
             ),
           ),
+        // A weekday that came round and was never kept. A stub rather than
+        // nothing, so that a zero reads as a zero and not as a column that
+        // went missing.
         if (cameRound && factor <= 0)
           Align(
             alignment: Alignment.bottomCenter,
             child: SizedBox(
               height: WeekdayBars.emptyStub,
+              width: double.infinity,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: filled,

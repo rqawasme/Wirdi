@@ -38,6 +38,15 @@ class TrackerChart extends StatelessWidget {
   /// above and the weekdays below stay on the same screen.
   static const double chartHeight = WirdiMetrics.space6 * 4;
 
+  /// What a chart with only two values to say gets instead.
+  ///
+  /// A collection that comes round once a week has an axis of 0 and 1, so the
+  /// line can only ever be at the floor or the ceiling. Drawn at full height
+  /// that is a flat rule pinned to the top of a tall empty box, which reads as
+  /// something failing to render rather than as ten weeks kept. Short, the
+  /// same marks read as what they are.
+  static const double binaryHeight = WirdiMetrics.space6 * 2;
+
   /// Oldest first.
   final List<WeekPoint> weeks;
 
@@ -73,7 +82,7 @@ class TrackerChart extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               SizedBox(
-                height: chartHeight,
+                height: maxPerWeek <= 1 ? binaryHeight : chartHeight,
                 child: _hasShape
                     ? CustomPaint(
                         painter: _ChartPainter(
