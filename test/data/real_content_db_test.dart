@@ -121,9 +121,21 @@ void _tests(File file) {
     // name is what they look for. Renumbering one silently repoints saved
     // commitments at different content, which is the whole reason ids here are
     // authored rather than generated.
-    expect(<String>[
-      for (final CollectionSummary s in await repo.all()) s.id.canonical,
-    ], containsAll(<String>['b:2', 'b:3', 'b:4', 'b:5', 'b:6', 'b:7', 'b:16']));
+    expect(
+      <String>[
+        for (final CollectionSummary s in await repo.all()) s.id.canonical,
+      ],
+      containsAll(<String>[
+        'b:2',
+        'b:3',
+        'b:4',
+        'b:5',
+        'b:6',
+        'b:7',
+        'b:16',
+        'b:17',
+      ]),
+    );
     expect(
       <String>[for (final CollectionSummary s in await repo.all()) s.name],
       containsAll(<String>[
@@ -134,6 +146,7 @@ void _tests(File file) {
         'al-Wird al-Latif (evening)',
         'Hizb al-Bahr',
         'Wazifa ash-Shadhiliyya',
+        'Wird as-Sakran',
       ]),
     );
   });
