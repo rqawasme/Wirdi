@@ -35,10 +35,11 @@ al-Aziz al-Tarefe; **al-Wird al-Latif** of Imam al-Haddad, morning and evening;
 Imam Muhammad al-Jazuli, a part for each day of the week and its closing
 supplication; the **Wazifa ash-Shadhiliyya**, built around the Salat
 al-Mashishiyya of Sayyidi Abd al-Salam ibn Mashish; **Wird as-Sakran** of Imam
-Abu Bakr al-Sakran al-Saqqaf; and **Hizb al-Nasr**, the Litany of Victory —
-two different litanies of that name, one by Imam al-Haddad and one by Imam
-al-Shadhili, which is why those two carry their author in the name. That list
-is deliberately not counted here: another one is two more files in
+Abu Bakr al-Sakran al-Saqqaf; **Hizb al-Nasr**, the Litany of Victory — two
+different litanies of that name, one by Imam al-Haddad and one by Imam
+al-Shadhili, which is why those two carry their author in the name; and **Dua
+al-Nasiri**, the Prayer of the Oppressed, of Imam Muhammad ibn Nasir al-Dar'i.
+That list is deliberately not counted here: another one is two more files in
 `content/sources/` — one of adhkar, one of collection items — so
 `sources/collections/` is the listing that stays true.
 Each morning/evening pair shares one file of dhikr text — most of what is said
