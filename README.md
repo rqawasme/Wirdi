@@ -37,8 +37,9 @@ supplication; the **Wazifa ash-Shadhiliyya**, built around the Salat
 al-Mashishiyya of Sayyidi Abd al-Salam ibn Mashish; **Wird as-Sakran** of Imam
 Abu Bakr al-Sakran al-Saqqaf; **Hizb al-Nasr**, the Litany of Victory — two
 different litanies of that name, one by Imam al-Haddad and one by Imam
-al-Shadhili, which is why those two carry their author in the name; and **Dua
-al-Nasiri**, the Prayer of the Oppressed, of Imam Muhammad ibn Nasir al-Dar'i.
+al-Shadhili, which is why those two carry their author in the name; **Dua
+al-Nasiri**, the Prayer of the Oppressed, of Imam Muhammad ibn Nasir al-Dar'i;
+and the two daily **Ratibs**, of Imam al-Haddad and of Habib Umar al-Attas.
 That list is deliberately not counted here: another one is two more files in
 `content/sources/` — one of adhkar, one of collection items — so
 `sources/collections/` is the listing that stays true.
@@ -67,9 +68,10 @@ out of the imported mushaf, so that text exists in exactly one place in the
 database.
 
 Some litanies quote a verse only **in part** — the tails of 2:137, 12:64, 9:129,
-18:10, 3:173, 33:69, 3:45, 21:87 and 4:45, the openings of 28:85 and 6:79, the
-middle of 40:44, 33:11-12 opened on `fa-qadi` in place of the verse's own
-`hunalika`, and 61:13-14 opened on `nasrun` and stopped at `nahnu ansaru Llah`.
+18:10, 3:173, 33:69, 3:45, 21:87, 4:45 and 2:285, the openings of 28:85 and
+6:79, the middle of 40:44, 33:11-12 opened on `fa-qadi` in place of the verse's
+own `hunalika`, and 61:13-14 opened on `nasrun` and stopped at `nahnu ansaru
+Llah`.
 Reciting the whole verse instead would not be the litany, so those are adhkar
 rather than `ayah` items;
 their text is nonetheless **sliced out of `sources/quran/ayahs.json`** by word

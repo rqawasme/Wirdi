@@ -137,6 +137,8 @@ void _tests(File file) {
         'b:18',
         'b:19',
         'b:20',
+        'b:21',
+        'b:22',
       ]),
     );
     expect(
@@ -153,6 +155,8 @@ void _tests(File file) {
         'Hizb al-Nasr (al-Haddad)',
         'Hizb al-Nasr (al-Shadhili)',
         'Dua al-Nasiri',
+        'Ratib al-Haddad',
+        'Ratib al-Attas',
       ]),
     );
   });
