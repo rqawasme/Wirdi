@@ -116,13 +116,19 @@ class WirdPlayer extends ChangeNotifier {
   /// long enough that a fast thumb is not writing to SQLite on every one.
   static const Duration defaultSaveDebounce = Duration(milliseconds: 500);
 
-  /// The most segments the progress stripe is cut into.
+  /// The most segments the wird's stripe is cut into.
   ///
   /// Thirty-three because that is the length of a tasbih and about the largest
   /// number where a segment still reads as a segment. A collection with fewer
   /// steps than this gets one segment per step; a longer one fills
   /// proportionally, so a wird of forty-five steps lights a segment roughly
   /// every step and a half.
+  ///
+  /// The band's stripe is not capped this way. It is cut by [stepTaps], one
+  /// segment per tap however many that is, because a segment there is feedback
+  /// for the tap that just landed rather than a step to be counted by eye — and
+  /// a hundred-count step that moved once every three taps, which is what this
+  /// cap did to it, reads as a bar that is ignoring two taps in three.
   static const int maxStripeSegments = 33;
 
   final ResolvedCollection collection;
@@ -206,16 +212,27 @@ class WirdPlayer extends ChangeNotifier {
   /// number that counted ayahs would say twelve and mean something else.
   int get remaining => math.max(0, step.count - _currentCount);
 
+  /// Every tap the current step takes: its repetitions, a unit at a time.
+  ///
+  /// A surah of four ayahs said three times is twelve, which is the number of
+  /// times a thumb lands before the step is done.
+  int get stepTaps => isEmpty ? 0 : step.count * step.unitCount;
+
+  /// How many of those taps have landed.
+  ///
+  /// Clamped to [stepTaps] rather than trusted to stop there: the finished step
+  /// holds its count at the target with the unit index wherever the last tap
+  /// left it, which would otherwise read as one tap past the end.
+  int get stepTapsDone => isEmpty
+      ? 0
+      : math.min(stepTaps, _currentCount * step.unitCount + _unitIndex);
+
   /// How far into the current step, 0 to 1. Counts units, so a surah moves the
   /// stripe on every ayah rather than once per reading.
   double get stepProgress {
     if (isEmpty) return 0;
-    final int units = step.count * step.unitCount;
-    if (units <= 0) return 1;
-    return ((_currentCount * step.unitCount + _unitIndex) / units).clamp(
-      0.0,
-      1.0,
-    );
+    if (stepTaps <= 0) return 1;
+    return stepTapsDone / stepTaps;
   }
 
   /// How far through the whole collection, 0 to 1. What the stripe shows.

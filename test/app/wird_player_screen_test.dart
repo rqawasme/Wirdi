@@ -444,6 +444,50 @@ void main() {
     });
   });
 
+  group("the band's stripe", () {
+    testWidgets('is cut into one segment per tap of the step, and moves on '
+        'every one of them', (WidgetTester tester) async {
+      // Step two of fourteen: a dhikr said a hundred times.
+      await openAt(tester, 1);
+
+      // The step's scale, not the wird's, and uncapped: a hundred taps, a
+      // hundred segments. Capped at thirty-three it moved every third tap.
+      expect(_stepStripe(tester).segments, 100);
+      expect(_stepStripe(tester).lit, 0);
+
+      final Finder text = find.text('PLACEHOLDER dhikr 1002 translation');
+      for (int tap = 1; tap <= 30; tap++) {
+        await tester.tap(text);
+        await tester.pump();
+        expect(
+          _stepStripe(tester).lit,
+          tap,
+          reason: 'tap $tap left the stripe where it was',
+        );
+      }
+
+      expect(find.text('70'), findsOneWidget);
+    });
+
+    testWidgets('moves on a tap the numeral does not answer', (
+      WidgetTester tester,
+    ) async {
+      // Step five: surah 112, four ayahs, read once this time round the block.
+      await openAt(tester, 4);
+      expect(find.text('1'), findsOneWidget);
+      expect(_stepStripe(tester).segments, 4, reason: 'four ayahs, four taps');
+      expect(_stepStripe(tester).lit, 0);
+
+      await tester.tap(find.text('PLACEHOLDER ayah 112:1 translation'));
+      await settle(tester);
+
+      // Still one reading left, and the stripe one segment along: the tap
+      // landed, and the band says so even though the numeral could not.
+      expect(find.text('1'), findsOneWidget);
+      expect(_stepStripe(tester).lit, 1);
+    });
+  });
+
   group('finishing', () {
     testWidgets('the last step logs the completion and shows the finished '
         'step, which closes on a tap', (WidgetTester tester) async {
@@ -696,11 +740,36 @@ double _offsetOf(WidgetTester tester) {
       .pixels;
 }
 
-/// The progress stripe under the app bar. There is one, and it is the counter's.
+/// The wird's progress stripe, under the app bar.
 VoussoirStripe _stripe(WidgetTester tester) {
-  return tester.widget<VoussoirStripe>(
+  return _progressStripeIn(tester, find.byType(AppBar));
+}
+
+/// The step's progress stripe, along the top edge of the advance band.
+///
+/// Found through the band's live region, which is the screen's only one: the
+/// two stripes are the same widget and differ only in what they measure.
+VoussoirStripe _stepStripe(WidgetTester tester) {
+  return _progressStripeIn(
+    tester,
     find.byWidgetPredicate(
-      (Widget widget) => widget is VoussoirStripe && widget.value != null,
+      (Widget widget) =>
+          widget is Semantics && widget.properties.liveRegion == true,
+    ),
+  );
+}
+
+VoussoirStripe _progressStripeIn(WidgetTester tester, Finder of) {
+  return tester.widget<VoussoirStripe>(
+    find.descendant(
+      of: of,
+      // Either kind of progress stripe, and never a rule: the wird's is given
+      // a fraction and the band's is given the count.
+      matching: find.byWidgetPredicate(
+        (Widget widget) =>
+            widget is VoussoirStripe &&
+            (widget.value != null || widget.lit != null),
+      ),
     ),
   );
 }
