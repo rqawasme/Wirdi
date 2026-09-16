@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wirdi/data/wirdi_data.dart';
 import 'package:wirdi/domain/domain.dart';
+import 'package:wirdi/player/wird_player.dart';
 import 'package:wirdi/providers/data_providers.dart';
 import 'package:wirdi/routes.dart';
 import 'package:wirdi/screens/wird_player_screen.dart';
@@ -444,6 +445,44 @@ void main() {
     });
   });
 
+  group("the band's stripe", () {
+    testWidgets('is cut into one segment per tap of the step', (
+      WidgetTester tester,
+    ) async {
+      // Step two of fourteen: a dhikr said a hundred times.
+      await openAt(tester, 1);
+
+      // The step's, not the wird's: a hundred taps, capped at thirty-three.
+      expect(_stepStripe(tester).segments, WirdPlayer.maxStripeSegments);
+      expect(_stepStripe(tester).value, 0);
+
+      await tester.tap(find.text('PLACEHOLDER dhikr 1002 translation'));
+      await tester.pump();
+
+      // One tap of a hundred, on the step's own scale rather than the wird's.
+      expect(find.text('99'), findsOneWidget);
+      expect(_stepStripe(tester).value, closeTo(0.01, 0.0001));
+    });
+
+    testWidgets('moves on a tap the numeral does not answer', (
+      WidgetTester tester,
+    ) async {
+      // Step five: surah 112, four ayahs, read once this time round the block.
+      await openAt(tester, 4);
+      expect(find.text('1'), findsOneWidget);
+      expect(_stepStripe(tester).segments, 4, reason: 'four ayahs, four taps');
+      expect(_stepStripe(tester).value, 0);
+
+      await tester.tap(find.text('PLACEHOLDER ayah 112:1 translation'));
+      await settle(tester);
+
+      // Still one reading left, and the stripe a quarter along: the tap
+      // landed, and the band says so even though the numeral could not.
+      expect(find.text('1'), findsOneWidget);
+      expect(_stepStripe(tester).value, closeTo(0.25, 0.0001));
+    });
+  });
+
   group('finishing', () {
     testWidgets('the last step logs the completion and shows the finished '
         'step, which closes on a tap', (WidgetTester tester) async {
@@ -696,11 +735,32 @@ double _offsetOf(WidgetTester tester) {
       .pixels;
 }
 
-/// The progress stripe under the app bar. There is one, and it is the counter's.
+/// The wird's progress stripe, under the app bar.
 VoussoirStripe _stripe(WidgetTester tester) {
-  return tester.widget<VoussoirStripe>(
+  return _progressStripeIn(tester, find.byType(AppBar));
+}
+
+/// The step's progress stripe, along the top edge of the advance band.
+///
+/// Found through the band's live region, which is the screen's only one: the
+/// two stripes are the same widget and differ only in what they measure.
+VoussoirStripe _stepStripe(WidgetTester tester) {
+  return _progressStripeIn(
+    tester,
     find.byWidgetPredicate(
-      (Widget widget) => widget is VoussoirStripe && widget.value != null,
+      (Widget widget) =>
+          widget is Semantics && widget.properties.liveRegion == true,
+    ),
+  );
+}
+
+VoussoirStripe _progressStripeIn(WidgetTester tester, Finder of) {
+  return tester.widget<VoussoirStripe>(
+    find.descendant(
+      of: of,
+      matching: find.byWidgetPredicate(
+        (Widget widget) => widget is VoussoirStripe && widget.value != null,
+      ),
     ),
   );
 }

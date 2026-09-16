@@ -116,7 +116,7 @@ class WirdPlayer extends ChangeNotifier {
   /// long enough that a fast thumb is not writing to SQLite on every one.
   static const Duration defaultSaveDebounce = Duration(milliseconds: 500);
 
-  /// The most segments the progress stripe is cut into.
+  /// The most segments a progress stripe is cut into.
   ///
   /// Thirty-three because that is the length of a tasbih and about the largest
   /// number where a segment still reads as a segment. A collection with fewer
@@ -234,6 +234,16 @@ class WirdPlayer extends ChangeNotifier {
   /// [maxStripeSegments].
   int get stripeSegments =>
       isEmpty ? 1 : math.max(1, math.min(steps.length, maxStripeSegments));
+
+  /// How many segments the band's own stripe is cut into: one per tap of the
+  /// current step, up to [maxStripeSegments].
+  ///
+  /// Taps and not repetitions, so a surah recited three times lights a segment
+  /// on every ayah. This stripe answers "did that tap land"; one that moved
+  /// only when a reading ended would answer it four taps late.
+  int get stepSegments => isEmpty
+      ? 1
+      : math.max(1, math.min(step.count * step.unitCount, maxStripeSegments));
 
   /// The content behind the current step: the dhikr, the ayah or the surah,
   /// with its count, note and hydrated source.

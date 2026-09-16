@@ -935,6 +935,67 @@ void main() {
       expect(player.collectionProgress, 0.25);
     });
   });
+
+  group("the band's stripe", () {
+    test('is one segment per tap of the step, up to thirty-three', () {
+      final WirdPlayer player = playerFor(
+        collectionOf(<CollectionEntry>[
+          dhikrItem(1001, position: 1, count: 33),
+          dhikrItem(1002, position: 2, count: 100),
+          surahItem(112, position: 3, ayahCount: 4, count: 3),
+        ]),
+      );
+      expect(player.stepSegments, 33, reason: 'a tasbih is a tap a segment');
+
+      player.skipForward();
+      expect(
+        player.stepSegments,
+        WirdPlayer.maxStripeSegments,
+        reason: 'a hundred fills proportionally rather than in a hundred parts',
+      );
+
+      player.skipForward();
+      expect(
+        player.stepSegments,
+        12,
+        reason: 'four ayahs over three rounds is twelve taps',
+      );
+    });
+
+    test('lights a segment on every tap, ayahs included', () {
+      final WirdPlayer player = playerFor(
+        collectionOf(<CollectionEntry>[
+          surahItem(112, position: 1, ayahCount: 4, count: 3),
+        ]),
+      );
+
+      expect(player.stepProgress, 0);
+
+      // The numeral in the band still says three; the stripe is what moves.
+      player.increment();
+      expect(player.remaining, 3);
+      expect(player.stepProgress, closeTo(1 / 12, 0.0001));
+
+      player.increment();
+      player.increment();
+      player.increment();
+      // A reading done: the numeral drops and the stripe is a third along.
+      expect(player.remaining, 2);
+      expect(player.stepProgress, closeTo(1 / 3, 0.0001));
+    });
+
+    test('is solid on the finished step', () {
+      final WirdPlayer player = playerFor(
+        collectionOf(<CollectionEntry>[dhikrItem(1001, position: 1, count: 3)]),
+      );
+
+      player.increment();
+      player.increment();
+      player.increment();
+      expect(player.finished, isTrue);
+      expect(player.stepProgress, 1);
+    });
+  });
 }
 
 /// A [ResolvedCollection] built in Dart, the way `playback_steps_test` does:

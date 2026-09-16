@@ -991,11 +991,17 @@ class _CompleteStepState extends State<_CompleteStep> {
 /// one would say less than the sentence does. Nothing here animates, the
 /// numeral least of all, and the number is stated rather than commented on —
 /// there is no "last one" and no colour change as it runs down.
+///
+/// Its top edge is the step's progress stripe. The number says how many are
+/// left and the edge says how far in, so a tap that does not change the
+/// numeral — an ayah of a surah being read three times — still shows up as a
+/// segment lighting directly above it.
 class _AdvanceBand extends StatelessWidget {
   const _AdvanceBand({required this.player});
 
-  /// Fixed, and deep enough to read as a part of the screen rather than a
-  /// strip of chrome. It does not move as the count runs down.
+  /// The content's own depth, under the stripe: fixed, and deep enough to read
+  /// as a part of the screen rather than a strip of chrome. It does not move
+  /// as the count runs down.
   static const double height = 88;
 
   final WirdPlayer player;
@@ -1012,14 +1018,6 @@ class _AdvanceBand extends StatelessWidget {
       label: _semanticLabel(),
       child: ExcludeSemantics(
         child: Container(
-          // A floor rather than a fixed height: 88 at every ordinary text
-          // size, and room to grow instead of overflow for a reader who has
-          // turned the OS scale all the way up.
-          constraints: const BoxConstraints(minHeight: height),
-          padding: const EdgeInsets.symmetric(
-            horizontal: WirdiMetrics.readingColumnPadding,
-            vertical: WirdiMetrics.space3,
-          ),
           decoration: BoxDecoration(
             // A tonal step and a hairline, squared and flush to both edges.
             // No shadow, and no radius: it is a part of the screen, not a
@@ -1032,52 +1030,86 @@ class _AdvanceBand extends StatelessWidget {
               ),
             ),
           ),
-          // The same three slots on every step, the finished one included: the
-          // brick figure, the word under it, and the line that names the
-          // gesture. At the end the figure is a check rather than a numeral —
-          // the band would say "0 left" otherwise, which reads as nothing
-          // having been done at all — and the gesture it names is the way out.
-          child: Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              if (player.finished)
-                Icon(
-                  Icons.check,
-                  // Sized off the numeral it stands in for, so the band's
-                  // first column is the same width at the end as all the way
-                  // through it.
-                  size: type.counter.fontSize,
-                  color: colors.primary,
-                )
-              else
-                Text(
-                  '${player.remaining}',
-                  style: type.counter.copyWith(color: colors.primary),
-                ),
-              const SizedBox(width: WirdiMetrics.space3),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(
-                      player.finished ? 'done' : 'left',
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        color: colors.onSurface,
+              // The hairline, filling in. Flush under the border and flush to
+              // both edges, so at nothing counted it is the band's tonal top
+              // edge and no new component has arrived; a segment lights on the
+              // tap that consumes a unit, and it is solid when the step is.
+              // One segment per tap up to thirty-three, so a tasbih moves it
+              // on every one and a count of a hundred every third.
+              //
+              // The wird's stripe is under the app bar and this one is the
+              // step's, which is the same division of labour as the numeral
+              // below it: the top of the screen is how far through the whole,
+              // the bottom is how far through what is in front of you.
+              VoussoirStripe.progress(
+                value: player.stepProgress,
+                segments: player.stepSegments,
+              ),
+              // A floor rather than a fixed height: 88 at every ordinary text
+              // size, and room to grow instead of overflow for a reader who
+              // has turned the OS scale all the way up.
+              ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: height),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: WirdiMetrics.readingColumnPadding,
+                    vertical: WirdiMetrics.space3,
+                  ),
+                  // The same three slots on every step, the finished one
+                  // included: the brick figure, the word under it, and the
+                  // line that names the gesture. At the end the figure is a
+                  // check rather than a numeral — the band would say "0 left"
+                  // otherwise, which reads as nothing having been done at all
+                  // — and the gesture it names is the way out.
+                  child: Row(
+                    children: <Widget>[
+                      if (player.finished)
+                        Icon(
+                          Icons.check,
+                          // Sized off the numeral it stands in for, so
+                          // the band's first column is the same width at
+                          // the end as it is all the way through.
+                          size: type.counter.fontSize,
+                          color: colors.primary,
+                        )
+                      else
+                        Text(
+                          '${player.remaining}',
+                          style: type.counter.copyWith(color: colors.primary),
+                        ),
+                      const SizedBox(width: WirdiMetrics.space3),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Text(
+                              player.finished ? 'done' : 'left',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: colors.onSurface,
+                              ),
+                            ),
+                            Text(
+                              switch (player) {
+                                WirdPlayer(finished: true) =>
+                                  'Tap anywhere above to close',
+                                WirdPlayer(isMultiUnit: true) =>
+                                  'Tap anywhere above to go to the next ayah',
+                                _ => 'Tap anywhere above to count',
+                              },
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colors.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    Text(
-                      switch (player) {
-                        WirdPlayer(finished: true) =>
-                          'Tap anywhere above to close',
-                        WirdPlayer(isMultiUnit: true) =>
-                          'Tap anywhere above to go to the next ayah',
-                        _ => 'Tap anywhere above to count',
-                      },
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],

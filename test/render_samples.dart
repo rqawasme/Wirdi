@@ -434,9 +434,10 @@ void main() {
     await openPlayer(morning, '02a-morning-adhkar');
     await openPlayer(morning, '02b-morning-surah', stepIndex: 5);
     await openPlayer(evening, '02c-evening-adhkar', stepIndex: 11);
-    // A step said three times, part-way counted, so the stripe has something
-    // to show.
-    await openPlayer(wird, '03-player-counting', stepIndex: 10, taps: 1);
+    // A step said seven times with three of them counted, so both stripes
+    // have something to show: the wird's under the app bar, and the step's
+    // along the top edge of the band, three segments of seven lit.
+    await openPlayer(wird, '03-player-counting', stepIndex: 46, taps: 3);
 
     // The same wird's other two kinds of step: an ayah said seven times, and a
     // surah said three times over.
