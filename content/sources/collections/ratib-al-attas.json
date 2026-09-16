@@ -1,0 +1,123 @@
+{
+  "id": 22,
+  "name_arabic": "رَاتِبُ الْعَطَّاسِ",
+  "name_english": "Ratib al-Attas",
+  "description": "The daily litany of Habib Umar ibn Abd al-Rahman al-Attas, known as Qutb al-Anfas: al-Fatiha, the closing verses of al-Hashr, a long sequence of short remembrances at set counts, and dedications of the Fatiha to the Prophet, the Alawi masters and the author.",
+  "author": "Habib Umar ibn Abd al-Rahman al-Attas",
+  "type": "wird",
+  "sort_order": 46,
+  "items": [
+    {
+      "dhikr": 23001
+    },
+    {
+      "surah": 1
+    },
+    {
+      "dhikr": 5001
+    },
+    {
+      "ayah": "59:21-24"
+    },
+    {
+      "dhikr": 5001
+    },
+    {
+      "dhikr": 3016,
+      "count": 3
+    },
+    {
+      "dhikr": 2011
+    },
+    {
+      "dhikr": 23002
+    },
+    {
+      "dhikr": 2001,
+      "count": 3
+    },
+    {
+      "dhikr": 23003
+    },
+    {
+      "dhikr": 23004
+    },
+    {
+      "dhikr": 23005
+    },
+    {
+      "dhikr": 22004
+    },
+    {
+      "dhikr": 22003,
+      "count": 4
+    },
+    {
+      "dhikr": 23006
+    },
+    {
+      "dhikr": 23007
+    },
+    {
+      "dhikr": 22017
+    },
+    {
+      "dhikr": 23008
+    },
+    {
+      "dhikr": 8046,
+      "count": 7
+    },
+    {
+      "dhikr": 23009
+    },
+    {
+      "dhikr": 23010
+    },
+    {
+      "dhikr": 23011
+    },
+    {
+      "dhikr": 23012
+    },
+    {
+      "dhikr": 23013
+    },
+    {
+      "dhikr": 23019
+    },
+    {
+      "ayah": "2:286"
+    },
+    {
+      "dhikr": 23014
+    },
+    {
+      "surah": 1
+    },
+    {
+      "dhikr": 23015
+    },
+    {
+      "surah": 1
+    },
+    {
+      "dhikr": 23016
+    },
+    {
+      "surah": 1
+    },
+    {
+      "dhikr": 23017
+    },
+    {
+      "surah": 1
+    },
+    {
+      "dhikr": 23018
+    },
+    {
+      "surah": 1
+    }
+  ]
+}

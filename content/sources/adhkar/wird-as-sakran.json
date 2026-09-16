@@ -1,0 +1,78 @@
+{
+  "group": "wird-as-sakran",
+  "description": "Wird as-Sakran of Imam Abu Bakr al-Sakran ibn ʿAbd al-Rahman al-Saqqaf, in the order of the recitation. The three passages the litany recites from the Qur'an in full — al-Fatiha, Ayat al-Kursi and 37:180-182 — are collection items rather than adhkar, so none of that text is transcribed here; what is left of those steps are the words that lead into them, which the reciter does say aloud. The two phrases said three times over carry the repetition in default_count rather than in a tripled text, as ordinary repeated adhkar do.",
+  "adhkar": [
+    {
+      "id": 18001,
+      "text_arabic": "اللَّهُمَّ إِنِّي أَحْتَطْتُ بِدَرْبِ اللَّهِ، طُولُهُ مَا شَاءَ اللَّهُ، قُفْلُهُ لَا إِلَهَ إِلَّا اللَّهُ، بَابُهُ مُحَمَّدٌ رَسُولُ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَآلِهِ وَسَلَّمَ، سَقْفُهُ لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ الْعَلِيِّ الْعَظِيمِ",
+      "translation": "O Allah, I have fortified myself within Allah’s protective enclosure, its length is as Allah wills, its lock is “there is no deity except Allah,” its door is “Muhammad is the Messenger of Allah”, may Allah send prayers upon him and his family and grant them peace, and its roof is “there is no power and no strength except through Allah, the Most High, the Magnificent.”",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī aḥtaṭtu bi-darbi Llāh, ṭūluhu mā shāʾa Llāh, qufluhu lā ilāha illā Llāh, bābuhu Muḥammadun rasūlu Llāh, ṣallā Llāhu ʿalayhi wa-ālihi wa-sallam, saqfuhu lā ḥawla wa-lā quwwata illā bi-Llāhi l-ʿAliyyi l-ʿAẓīm."
+    },
+    {
+      "id": 18002,
+      "text_arabic": "أَحَاطَ بِنَا مِنْ",
+      "translation": "He encompassed us with:",
+      "default_count": 1,
+      "transliteration": "Aḥāṭa binā min",
+      "notes": "The words that lead into al-Fatiha, which is recited next and in full."
+    },
+    {
+      "id": 18003,
+      "text_arabic": "سُورٌ",
+      "translation": "A wall (of protection).",
+      "default_count": 3,
+      "transliteration": "Sūrun."
+    },
+    {
+      "id": 18004,
+      "text_arabic": "وَآيَةُ",
+      "translation": "And the verse:",
+      "default_count": 1,
+      "transliteration": "Wa-āyatu",
+      "notes": "The words that lead into Ayat al-Kursi, which is recited next and in full."
+    },
+    {
+      "id": 18005,
+      "text_arabic": "بِنَا اسْتَدَارَتْ كَمَا اسْتَدَارَتِ الْمَلَائِكَةُ بِمَدِينَةِ الرَّسُولِ، بِلَا خَنْدَقٍ وَلَا سُورٍ، مِنْ كُلِّ قَدَرٍ مَقْدُورٍ، وَحَذَرٍ مَحْذُورٍ، وَمِنْ جَمِيعِ الشُّرُورِ",
+      "translation": "This verse surrounds us, just as the angels surrounded the city of the Messenger, without trench or wall, protecting us from every destined decree, every feared danger and all evils.",
+      "default_count": 1,
+      "transliteration": "Binā stadārat kamā stadārati l-malāʾikatu bi-madīnati r-rasūli, bi-lā khandaqin wa-lā sūrin, min kulli qadarin maqdūrin, wa-ḥadharin maḥdhūrin, wa-min jamīʿi sh-shurūr."
+    },
+    {
+      "id": 18006,
+      "text_arabic": "تَتَرَّسْنَا بِاللَّهِ",
+      "translation": "We shield ourselves with Allah.",
+      "default_count": 3,
+      "transliteration": "Tatarrasnā bi-Llāh."
+    },
+    {
+      "id": 18007,
+      "text_arabic": "مِنْ عَدُوِّنَا وَعَدُوِّ اللَّهِ، مِنْ سَاقِ عَرْشِ اللَّهِ إِلَى قَاعِ أَرْضِ اللَّهِ، بِمِائَةِ أَلْفِ أَلْفِ أَلْفِ لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ الْعَلِيِّ الْعَظِيمِ",
+      "translation": "(We seek protection) from our enemy and the enemy of Allah, from the support of Allah’s Throne to the depths of Allah’s earth, with a hundred thousand thousand thousand of “there is no power and no might except with Allah, the Most High, the Most Great.”",
+      "default_count": 1,
+      "transliteration": "Min ʿaduwwinā wa-ʿaduwwi Llāhi, min sāqi ʿarshi Llāhi ilā qāʿi arḍi Llāhi, bi-miʾati alfi alfi alfi, lā ḥawla wa-lā quwwata illā bi-Llāhi l-ʿAliyyi l-ʿAẓīm."
+    },
+    {
+      "id": 18008,
+      "text_arabic": "صَنْعَتُهُ لَا تَنْقَطِعُ بِمِائَةِ أَلْفِ أَلْفِ أَلْفِ لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ الْعَلِيِّ الْعَظِيمِ، عَزِيمَتُهُ لَا تَنْشَقُّ بِمِائَةِ أَلْفِ أَلْفِ أَلْفِ لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ الْعَلِيِّ الْعَظِيمِ",
+      "translation": "Its construction never ceases with a hundred thousand thousand thousand repetitions of “there is no power and no might except with Allah, the Most High, the Most Great.” Its resolve is never broken with a hundred thousand thousand thousand repetitions of “there is no power and no might except with Allah, the Most High, the Most Great.”",
+      "default_count": 1,
+      "transliteration": "Ṣanʿatuhu lā tanqaṭiʿu bi-miʾati alfi alfi alfi, lā ḥawla wa-lā quwwata illā bi-Llāhi l-ʿAliyyi l-ʿAẓīmi, ʿazīmatuhu lā tanshaqqu bi-miʾati alfi alfi alfi, lā ḥawla wa-lā quwwata illā bi-Llāhi l-ʿAliyyi l-ʿAẓīm."
+    },
+    {
+      "id": 18009,
+      "text_arabic": "اللَّهُمَّ إِنْ أَحَدٌ أَرَادَنِي بِسُوءٍ مِنَ الْجِنِّ وَالْإِنْسِ وَالْوُحُوشِ وَغَيْرِهِمْ مِنْ سَائِرِ الْمَخْلُوقَاتِ مِنْ بَشَرٍ أَوْ شَيْطَانٍ أَوْ سُلْطَانٍ أَوْ وَسْوَاسٍ، فَارْدُدْ نَظَرَهُمْ فِي انْتِكَاسٍ، وَقُلُوبَهُمْ فِي وَسْوَاسٍ، وَأَيْدِيَهُمْ فِي إِفْلَاسٍ، وَأَوْبِقْهُمْ مِنَ الرِّجْلِ إِلَى الرَّأْسِ، لَا فِي سَهْلٍ يَقْطَعُ، وَلَا فِي جَبَلٍ يَطْلُعُ بِمِائَةِ أَلْفِ أَلْفِ أَلْفِ لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ الْعَلِيِّ الْعَظِيمِ",
+      "translation": "O Allah, if anyone seeks to harm me, from jinn or mankind, from beasts or any of Your creation, whether human, devil, ruler, or evil whisperer, then turn their sight back in defeat, their hearts into disquiet, and their hands into helplessness. Ruin them completely from foot to head, so that they cannot cross plains nor ascend mountains, with a hundred thousand thousand thousand of “there is no power and no might except with Allah, the Most High, the Most Great.”",
+      "default_count": 1,
+      "transliteration": "Allāhumma in aḥadun arādanī bi-sūʾin mina l-jinni wa-l-insi wa-l-wuḥūshi wa-ghayrihim min sāʾiri l-makhlūqāti min basharin aw shayṭānin aw sulṭānin aw waswāsin, fa-rdud naẓarahum fī ntikāsin, wa-qulūbahum fī waswāsin, wa-aydiyahum fī iflāsin, wa-awbiqhum mina r-rijli ilā r-raʾsi, lā fī sahlin yaqṭaʿu, wa-lā fī jabalin yaṭluʿu, bi-miʾati alfi alfi alfi, lā ḥawla wa-lā quwwata illā bi-Llāhi l-ʿAliyyi l-ʿAẓīm."
+    },
+    {
+      "id": 18010,
+      "text_arabic": "فِي كُلِّ لَحْظَةٍ أَبَدًا، عَدَدَ خَلْقِهِ، وَرِضَى نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ",
+      "translation": "At every moment, forever, by the number of His creation, by His pleasure, by the weight of His Throne, and by the ink of His words.",
+      "default_count": 1,
+      "transliteration": "Fī kulli laḥẓatin abadan, ʿadada khalqihi, wa-riḍā nafsihi, wa-zinata ʿarshihi, wa-midāda kalimātih."
+    }
+  ]
+}

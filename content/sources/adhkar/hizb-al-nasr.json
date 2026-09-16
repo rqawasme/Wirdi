@@ -1,0 +1,94 @@
+{
+  "group": "hizb-al-nasr",
+  "description": "Hizb al-Nasr of Imam Abd Allah ibn Alawi al-Haddad, in the order of the recitation. Not to be confused with the Hizb al-Nasr of Imam al-Shadhili, which is a different litany of the same name and lives in hizb-al-nasr-shadhili.json. The passages the litany recites in full — 48:1-3, 2:255 and 59:21-24 — are collection items rather than adhkar. The passages it recites only in part are adhkar, but their text is sliced verbatim out of sources/quran/ayahs.json by word index rather than typed, and each carries a note naming the verse and where the wird cuts it. The booklet's PDF text layer is unusable — the Arabic comes back reordered and with letters dropped, so that محمد reads ممد and العالمين reads لعالمي — so the supplications were read off page renders at 420 dpi, with the booklet's own line-by-line transliteration as a second channel on every line.",
+  "adhkar": [
+    {
+      "id": 19001,
+      "text_arabic": "وَكَانَ عِندَ ٱللَّهِ وَجِيهٗا",
+      "translation": "And he was honoured in Allah’s sight.",
+      "default_count": 1,
+      "transliteration": "Wa-kāna ʿinda Llāhi wajīhan.",
+      "notes": "The closing portion of Qur’an 33:69, recited on its own."
+    },
+    {
+      "id": 19002,
+      "text_arabic": "وَجِيهٗا فِي ٱلدُّنۡيَا وَٱلۡأٓخِرَةِ وَمِنَ ٱلۡمُقَرَّبِينَ",
+      "translation": "Honoured in this world and the Hereafter, and among those brought near.",
+      "default_count": 1,
+      "transliteration": "Wajīhan fi d-dunyā wa-l-ākhirati wa-mina l-muqarrabīn.",
+      "notes": "The portion of Qur’an 3:45 from وَجِيهٗا to the end of the verse, recited on its own."
+    },
+    {
+      "id": 19003,
+      "text_arabic": "وَجَّهۡتُ وَجۡهِيَ لِلَّذِي فَطَرَ ٱلسَّمَٰوَٰتِ وَٱلۡأَرۡضَ",
+      "translation": "I have turned my face towards Him Who created the heavens and the earth.",
+      "default_count": 1,
+      "transliteration": "Wajjahtu wajhiya li-lladhī faṭara s-samāwāti wa-l-arḍ.",
+      "notes": "Qur’an 6:79 from وَجَّهۡتُ to وَٱلۡأَرۡضَ. The wird leaves the verse’s own إِنِّي before it and stops short of حَنِيفٗا."
+    },
+    {
+      "id": 19004,
+      "text_arabic": "نَصۡرٞ مِّنَ ٱللَّهِ وَفَتۡحٞ قَرِيبٞۗ وَبَشِّرِ ٱلۡمُؤۡمِنِينَ يَٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُواْ كُونُوٓاْ أَنصَارَ ٱللَّهِ كَمَا قَالَ عِيسَى ٱبۡنُ مَرۡيَمَ لِلۡحَوَارِيِّـۧنَ مَنۡ أَنصَارِيٓ إِلَى ٱللَّهِۖ قَالَ ٱلۡحَوَارِيُّونَ نَحۡنُ أَنصَارُ ٱللَّهِ",
+      "translation": "Help from Allah and a victory close at hand. Give glad tidings to the believers. O you who believe, be helpers of Allah, as Isa son of Maryam said to the disciples, “Who will be my helpers in the cause of Allah?” The disciples said, “We are Allah’s helpers.”",
+      "default_count": 1,
+      "transliteration": "Naṣrun mina Llāhi wa-fatḥun qarībun wa-bashshiri l-muʾminīn, yā ayyuha lladhīna āmanū kūnū anṣāra Llāhi kamā qāla ʿĪsā bnu Maryama li-l-ḥawāriyyīna man anṣārī ila Llāh, qāla l-ḥawāriyyūna naḥnu anṣāru Llāh.",
+      "notes": "Qur’an 61:13-14. The wird opens on نَصۡرٞ, leaving the verse’s own وَأُخۡرَىٰ تُحِبُّونَهَا before it, and stops at نَحۡنُ أَنصَارُ ٱللَّهِ."
+    },
+    {
+      "id": 19005,
+      "text_arabic": "أُعِيذُ نَفْسِي بِاللَّهِ تَعَالَى مِنْ كُلِّ مَا يَسْمَعُ بِأُذُنَيْنِ وَيُبْصِرُ بِعَيْنَيْنِ وَيَمْشِي بِرِجْلَيْنِ وَيَبْطِشُ بِيَدَيْنِ وَيَتَكَلَّمُ بِشَفَتَيْنِ، حَصَّنْتُ نَفْسِي بِاللَّهِ الْخَالِقِ الْأَكْبَرِ مِنْ شَرِّ مَا أَخَافُ وَأَحْذَرُ مِنَ الْجِنِّ وَالْإِنْسِ وَأَنْ يَحْضُرُونِ، عَزَّ جَارُهُ وَجَلَّ ثَنَاؤُهُ وَتَقَدَّسَتْ أَسْمَاؤُهُ وَلَا إِلَهَ غَيْرُهُ",
+      "translation": "I seek refuge for myself in Allah the Exalted from everything that hears with two ears, sees with two eyes, walks with two legs, strikes with two hands, and speaks with two lips. I fortify myself with Allah, the Supreme Creator, from the evil of what I fear and dread, from the jinn and humans, and from their coming into my presence. Exalted is His protection, majestic is His praise, sanctified are His names, and there is no deity other than Him.",
+      "default_count": 1,
+      "transliteration": "Uʿīdhu nafsī bi-Llāhi taʿālā min kulli mā yasmaʿu bi-udhunayn wa-yubṣiru bi-ʿaynayn wa-yamshī bi-rijlayn wa-yabṭishu bi-yadayn wa-yatakallamu bi-shafatayni, ḥaṣṣantu nafsī bi-Llāhi l-Khāliqi l-Akbari min sharri mā akhāfu wa-aḥdharu mina l-jinni wa-l-insi wa-an yaḥḍurūni, ʿazza jāruh wa-jalla thanāʾuh wa-taqaddasat asmāʾuh wa-lā ilāha ghayruh."
+    },
+    {
+      "id": 19006,
+      "text_arabic": "اللَّهُمَّ إِنِّي أَجْعَلُكَ فِي نُحُورِ أَعْدَائِي وَأَعُوذُ بِكَ مِنْ شُرُورِهِمْ وَتَحَيُّلِهِمْ وَمَكْرِهِمْ وَمَكَائِدِهِمْ، أَطْفِئْ نَارَ مَنْ أَرَادَ بِي عَدَاوَةً مِنَ الْجِنِّ وَالْإِنْسِ، يَا حَافِظُ يَا حَفِيظُ يَا كَافِي يَا مُحِيطُ، سُبْحَانَكَ يَا رَبِّ مَا أَعْظَمَ شَأْنَكَ وَأَعَزَّ سُلْطَانَكَ، تَحَصَّنْتُ بِاللَّهِ وَبِأَسْمَاءِ اللَّهِ وَبِآيَاتِ اللَّهِ وَمَلَائِكَةِ اللَّهِ وَأَنْبِيَاءِ اللَّهِ وَرُسُلِ اللَّهِ وَالصَّالِحِينَ مِنْ عِبَادِ اللَّهِ، حَصَّنْتُ نَفْسِي بِلَا إِلَهَ إِلَّا اللَّهُ مُحَمَّدٌ رَسُولُ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَآلِهِ وَسَلَّمَ",
+      "translation": "O Allah, I place You before my enemies, and I seek refuge in You from their evils, their scheming, their plots, and their deceit. Extinguish the fire of anyone from among the jinn or humans who intends enmity toward me. O Protector, O Guardian, O Sufficient One, O Encompassing One. Glory be to You, my Lord, how great is Your majesty and how mighty is Your authority. I fortify myself with Allah, with the names of Allah, with the verses of Allah, with the angels of Allah, with the prophets of Allah, with the messengers of Allah, and with the righteous slaves of Allah. I protect myself with: there is no deity except Allah, Muhammad is the Messenger of Allah, may Allah send prayers and peace upon him and his family.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī ajʿaluka fī nuḥūri aʿdāʾī wa-aʿūdhu bika min shurūrihim wa-taḥayyulihim wa-makrihim wa-makāʾidihim, aṭfiʾ nāra man arāda bī ʿadāwatan mina l-jinni wa-l-insi, yā Ḥāfiẓu yā Ḥafīẓu yā Kāfī yā Muḥīṭu, subḥānaka yā Rabbī mā aʿẓama shaʾnaka wa-aʿazza sulṭānaka, taḥaṣṣantu bi-Llāhi wa-bi-asmāʾi Llāhi wa-bi-āyāti Llāhi wa-malāʾikati Llāhi wa-anbiyāʾi Llāhi wa-rusuli Llāhi wa-ṣ-ṣāliḥīna min ʿibādi Llāhi, ḥaṣṣantu nafsī bi-lā ilāha illā Llāhu Muḥammadun rasūlu Llāhi ṣalla Llāhu ʿalayhi wa-ālihi wa-sallam."
+    },
+    {
+      "id": 19007,
+      "text_arabic": "اللَّهُمَّ احْرُسْنِي بِعَيْنِكَ الَّتِي لَا تَنَامُ وَاكْنُفْنِي بِكَنَفِكَ الَّذِي لَا يُرَامُ وَارْحَمْنِي بِقُدْرَتِكَ عَلَيَّ فَلَا أَهْلِكَ وَأَنْتَ ثِقَتِي وَرَجَائِي",
+      "translation": "O Allah, guard me with Your eye that never sleeps, shelter me with Your protection that cannot be overcome, and have mercy on me by Your power over me so that I do not perish, while You are my trust and my hope.",
+      "default_count": 1,
+      "transliteration": "Allāhumma ḥrusnī bi-ʿaynika llatī lā tanām wa-knufnī bi-kanafika lladhī lā yurāmu wa-rḥamnī bi-qudratika ʿalayya fa-lā ahlika wa-anta thiqatī wa-rajāʾī."
+    },
+    {
+      "id": 19008,
+      "text_arabic": "يَا غِيَاثَ الْمُسْتَغِيثِينَ",
+      "translation": "O Reliever of those who seek relief.",
+      "default_count": 3,
+      "transliteration": "Yā Ghiyātha l-Mustaghīthīn."
+    },
+    {
+      "id": 19009,
+      "text_arabic": "يَا دَرَكَ الْهَالِكِينَ",
+      "translation": "O Rescuer of the doomed.",
+      "default_count": 3,
+      "transliteration": "Yā Daraka l-Hālikīn."
+    },
+    {
+      "id": 19010,
+      "text_arabic": "اِكْفِنِي شَرَّ كُلِّ طَارِقٍ يَطْرُقُ بِلَيْلٍ أَوْ نَهَارٍ إِلَّا طَارِقًا يَطْرُقُ بِخَيْرٍ، إِنَّكَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      "translation": "Protect me from the evil of every visitor who comes by night or by day, except a visitor who comes with good. Indeed, You are powerful over all things.",
+      "default_count": 1,
+      "transliteration": "Ikfinī sharra kulli ṭāriqin yaṭruqu bi-laylin aw nahārin illā ṭāriqan yaṭruqu bi-khayrin, innaka ʿalā kulli shayʾin Qadīr."
+    },
+    {
+      "id": 19011,
+      "text_arabic": "يَا كَافِي يَا وَافِي يَا حَمِيدُ يَا مَجِيدُ، ارْفَعْ عَنِّي كُلَّ تَعَبٍ شَدِيدٍ وَاكْفِنِي مِنَ الْحَدِّ وَالْحَدِيدِ وَالْمَرَضِ الشَّدِيدِ وَالْجَيْشِ الْعَدِيدِ، وَاجْعَلْ لِي نُورًا مِنْ نُورِكَ وَعِزًّا مِنْ عِزِّكَ وَنَصْرًا مِنْ نَصْرِكَ وَبَهَاءً مِنْ بَهَائِكَ وَعَطَاءً مِنْ عَطَائِكَ وَحِرَاسَةً مِنْ حِرَاسَتِكَ وَتَأْيِيدًا مِنْ تَأْيِيدِكَ، يَا ذَا الْجَلَالِ وَالْإِكْرَامِ وَالْمَوَاهِبِ الْعِظَامِ، أَسْأَلُكَ أَنْ تَكْفِيَنِي مِنْ شَرِّ كُلِّ ذِي شَرٍّ إِنَّكَ أَنْتَ اللَّهُ الْخَالِقُ الْأَكْبَرُ",
+      "translation": "O Sufficient One, O Perfect One, O Praiseworthy One, O Glorious One, lift from me every severe hardship, protect me from the blade and from iron, from intense illness, and from a numerous army. Grant me light from Your light, honour from Your honour, victory from Your victory, radiance from Your radiance, giving from Your giving, protection from Your protection, and support from Your support. O Possessor of Majesty and Honour, and of great gifts, I ask You to suffice me against the evil of every possessor of evil. Truly, You are Allah, the Supreme Creator.",
+      "default_count": 1,
+      "transliteration": "Yā Kāfī, yā Wāfī, yā Ḥamīdu, yā Majīdu, rfaʿ ʿannī kulla taʿabin shadīdin wa-kfinī mina l-ḥaddi wa-l-ḥadīdi wa-l-maraḍi sh-shadīdi wa-l-jayshi l-ʿadīdi, wa-jʿal lī nūran min nūrika wa-ʿizzan min ʿizzika wa-naṣran min naṣrika wa-bahāʾan min bahāʾika wa-ʿaṭāʾan min ʿaṭāʾika wa-ḥirāsatan min ḥirāsatika wa-taʾyīdan min taʾyīdika, yā Dha l-Jalāli wa-l-Ikrāmi wa-l-mawāhibi l-ʿiẓāmi, asʾaluka an takfiyanī min sharri kulli dhī sharrin, innaka anta Llāhu l-Khāliqu l-Akbar."
+    },
+    {
+      "id": 19012,
+      "text_arabic": "وَصَلَّى اللَّهُ عَلَى سَيِّدِنَا مُحَمَّدٍ وَآلِهِ وَصَحْبِهِ وَسَلَّمَ تَسْلِيمًا كَثِيرًا طَيِّبًا مُبَارَكًا فِيهِ، وَالْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ ظَاهِرًا وَبَاطِنًا وَعَلَى كُلِّ حَالٍ",
+      "translation": "And may Allah send abundant, pure and blessed prayers and peace upon our master Muhammad, his family and his companions. And all praise is due to Allah, Lord of the worlds, outwardly and inwardly, and in every state.",
+      "default_count": 1,
+      "transliteration": "Wa-ṣalla Llāhu ʿalā sayyidinā Muḥammadin wa-ālihi wa-ṣaḥbihi wa-sallama taslīman kathīran ṭayyiban mubārakan fīhi, wa-l-ḥamdu li-Llāhi Rabbi l-ʿālamīna ẓāhiran wa-bāṭinan wa-ʿalā kulli ḥāl."
+    }
+  ]
+}

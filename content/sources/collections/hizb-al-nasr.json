@@ -1,0 +1,62 @@
+{
+  "id": 18,
+  "name_arabic": "حِزْبُ النَّصْرِ",
+  "name_english": "Hizb al-Nasr (al-Haddad)",
+  "description": "The Litany of Victory of Imam Abd Allah ibn Alawi al-Haddad, one of two litanies of that name: Quranic passages of victory and of Allah’s names, followed by supplications for refuge from the harm of enemies among the jinn and mankind.",
+  "author": "Imam Abd Allah ibn Alawi al-Haddad",
+  "type": "wird",
+  "sort_order": 42,
+  "items": [
+    {
+      "dhikr": 2001
+    },
+    {
+      "ayah": "48:1-3"
+    },
+    {
+      "dhikr": 19001
+    },
+    {
+      "dhikr": 19002
+    },
+    {
+      "dhikr": 19003
+    },
+    {
+      "dhikr": 2001
+    },
+    {
+      "dhikr": 19004
+    },
+    {
+      "ayah": "2:255"
+    },
+    {
+      "ayah": "59:21-24"
+    },
+    {
+      "dhikr": 19005
+    },
+    {
+      "dhikr": 19006
+    },
+    {
+      "dhikr": 19007
+    },
+    {
+      "dhikr": 19008
+    },
+    {
+      "dhikr": 19009
+    },
+    {
+      "dhikr": 19010
+    },
+    {
+      "dhikr": 19011
+    },
+    {
+      "dhikr": 19012
+    }
+  ]
+}

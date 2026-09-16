@@ -1,0 +1,140 @@
+{
+  "group": "ratib-al-attas",
+  "description": "Ratib al-Attas of Habib Umar ibn Abd al-Rahman al-Attas, in the order of the recitation. The passages it recites whole — al-Fatiha, 59:21-24 and 2:286 — are collection items; the one it recites in part, the tail of 2:285, is sliced verbatim out of sources/quran/ayahs.json by word index rather than typed. Its dedications are followed by a surah item for the same reason as in ratib-al-haddad.json. Several rows are not authored here at all but point at rows that already exist: see the collection file.",
+  "adhkar": [
+    {
+      "id": 23001,
+      "text_arabic": "الْفَاتِحَةْ إِلَى حَضْرَةِ سَيِّدِنَا وَحَبِيبِنَا مُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَآلِهِ وَصَحْبِهِ وَسَلَّمَ، وَإِلَى رُوحِ سَيِّدِنَا الْحَبِيبِ عُمَرَ بْنِ عَبْدِ الرَّحْمَانِ الْعَطَّاسِ صَاحِبِ الرَّاتِبِ، وَالشَّيْخِ عَلِيّ بْنِ عَبْدِ اللَّهِ بَارَاسْ، وَإِلَى رُوحِ سَيِّدِنَا الْإِمَامِ الْحَبِيبِ أَحْمَدَ بْنِ حَسَنِ بْنِ عَبْدِ اللَّهِ الْعَطَّاسِ، الْفَاتِحَةْ",
+      "translation": "May the Fatihah be offered to the presence of our master and beloved Muhammad, may Allah send prayers and peace upon him, his family and his companions, and to the soul of our master Habib Umar ibn Abd al-Rahman al-Attas, the author of this Ratib, and to the soul of Shaykh Ali ibn Abd Allah Ba Ras, and to the soul of our master Imam Habib Ahmad ibn Hasan ibn Abd Allah al-Attas. Al-Fatihah.",
+      "default_count": 1,
+      "transliteration": "Al-Fātiḥah ilā ḥaḍrati sayyidinā wa-ḥabībinā Muḥammadin ṣallā Llāhu ʿalayhi wa-ālihi wa-ṣaḥbihi wa-sallama, wa-ilā rūḥi sayyidinā l-Ḥabībi ʿUmara bni ʿAbdi r-Raḥmāni l-ʿAṭṭās, ṣāḥibi r-rātib, wa-sh-shaykhi ʿAliyyi bni ʿAbdi Llāhi Bā Rās, wa-ilā rūḥi sayyidinā l-imāmi l-Ḥabībi Aḥmada bni Ḥasani bni ʿAbdi Llāhi l-ʿAṭṭās. Al-Fātiḥah."
+    },
+    {
+      "id": 23002,
+      "text_arabic": "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ الْعَلِيِّ الْعَظِيمِ",
+      "translation": "In the name of Allah, the Most Compassionate, the Most Merciful. There is no power and no strength except through Allah, the Most High, the Magnificent.",
+      "default_count": 10,
+      "transliteration": "Bismi Llāhi r-Raḥmāni r-Raḥīmi, wa-lā ḥawla wa-lā quwwata illā bi-Llāhi l-ʿAliyyi l-ʿAẓīm."
+    },
+    {
+      "id": 23003,
+      "text_arabic": "بِسْمِ اللَّهِ تَحَصَّنَّا بِاللَّهِ، بِسْمِ اللَّهِ تَوَكَّلْنَا بِاللَّهِ",
+      "translation": "In the name of Allah, we seek protection through Allah, in the name of Allah, we place our trust in Allah.",
+      "default_count": 3,
+      "transliteration": "Bismi Llāhi taḥaṣṣannā bi-Llāhi, bismi Llāhi tawakkalnā bi-Llāhi."
+    },
+    {
+      "id": 23004,
+      "text_arabic": "بِسْمِ اللَّهِ آمَنَّا بِاللَّهِ وَمَنْ يُؤْمِنْ بِاللَّهِ لَا خَوْفُ عَلَيْهِ",
+      "translation": "In the name of Allah, we believe in Allah, and whoever believes in Allah, no fear shall be upon them.",
+      "default_count": 3,
+      "transliteration": "Bismi Llāhi āmannā bi-Llāhi wa-man yuʾmin bi-Llāhi lā khawfun ʿalayh."
+    },
+    {
+      "id": 23005,
+      "text_arabic": "سُبْحَانَ اللَّهِ عَزَّ اللَّهُ، سُبْحَانَ اللَّهِ جَلَّ اللَّهُ",
+      "translation": "Glory be to Allah, Allah is Mighty, glory be to Allah, Allah is Majestic.",
+      "default_count": 3,
+      "transliteration": "Subḥāna Llāhi ʿazza Llāhu, subḥāna Llāhi jalla Llāh."
+    },
+    {
+      "id": 23006,
+      "text_arabic": "يَا لَطِيفًا بِخَلْقِهِ يَا عَلِيمًا بِخَلْقِهِ يَا خَبِيرًا بِخَلْقِهِ الْطُفْ بِنَا يَا لَطِيفُ يَا عَلِيمُ يَا خَبِيرُ",
+      "translation": "O You Who are Gentle with Your creation, O You Who are All-Knowing of Your creation, O You Who are All-Aware of Your creation, be gentle with us, O Most Gentle, O All-Knowing, O All-Aware.",
+      "default_count": 3,
+      "transliteration": "Yā Laṭīfan bi-khalqihi yā ʿAlīman bi-khalqihi yā Khabīran bi-khalqihi ulṭuf binā yā Laṭīfu yā ʿAlīmu yā Khabīr."
+    },
+    {
+      "id": 23007,
+      "text_arabic": "يَا لَطِيفًا لَمْ يَزَلْ الْطُفْ بِنَا فِيمَا نَزَلْ إِنَّكَ لَطِيفٌ لَمْ تَزَلْ الْطُفْ بِنَا وَالْمُسْلِمِينَ",
+      "translation": "O Ever-Gentle One, be gentle with us regarding what has befallen us. Indeed, You are Ever-Gentle. Be gentle with us and with the Muslims.",
+      "default_count": 3,
+      "transliteration": "Yā Laṭīfan lam yazal ulṭuf binā fīmā nazal innaka Laṭīfun lam tazal ulṭuf binā wa-l-muslimīn."
+    },
+    {
+      "id": 23008,
+      "text_arabic": "مُحَمَّدٌ رَسُولُ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَآلِهِ وَسَلَّمَ",
+      "translation": "Muhammad is the Messenger of Allah. May Allah send prayers and peace upon him and his family.",
+      "default_count": 1,
+      "transliteration": "Muḥammadun Rasūlu Llāhi ṣallā Llāhu ʿalayhi wa-ālihi wa-sallam."
+    },
+    {
+      "id": 23009,
+      "text_arabic": "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ، اللَّهُمَّ صَلِّ عَلَيْهِ وَسَلِّمْ",
+      "translation": "O Allah, send prayers upon Muhammad, O Allah, send prayers and peace upon him.",
+      "default_count": 10,
+      "transliteration": "Allāhumma ṣalli ʿalā Muḥammadin, Allāhumma ṣalli ʿalayhi wa-sallim."
+    },
+    {
+      "id": 23010,
+      "text_arabic": "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ، يَا رَبِّ صَلِّ عَلَيْهِ وَسَلِّمْ",
+      "translation": "O Allah, send prayers upon Muhammad, O Lord, send prayers and peace upon him.",
+      "default_count": 1,
+      "transliteration": "Allāhumma ṣalli ʿalā Muḥammadin, yā Rabbi ṣalli ʿalayhi wa-sallim."
+    },
+    {
+      "id": 23011,
+      "text_arabic": "أَسْتَغْفِرُ اللَّهَ",
+      "translation": "I seek Allah’s forgiveness.",
+      "default_count": 11,
+      "transliteration": "Astaghfiru Llāh."
+    },
+    {
+      "id": 23012,
+      "text_arabic": "تَائِبُونَ إِلَى اللَّهِ",
+      "translation": "We turn in repentance to Allah.",
+      "default_count": 3,
+      "transliteration": "Tāʾibūna ilā Llāh."
+    },
+    {
+      "id": 23013,
+      "text_arabic": "يَا اللَّهُ بِهَا، يَا اللَّهُ بِهَا، يَا اللَّهُ بِحُسْنِ الْخَاتِمَةِ",
+      "translation": "O Allah, we ask You for it! O Allah, we ask You for it! O Allah, we ask You for a good ending.",
+      "default_count": 3,
+      "transliteration": "Yā Allāhu bihā, yā Allāhu bihā, yā Allāhu bi-ḥusni l-khātimah."
+    },
+    {
+      "id": 23014,
+      "text_arabic": "الْفَاتِحَةْ إِلَى رُوحِ سَيِّدِنَا رَسُولِ اللَّهِ سَيِّدِنَا مُحَمَّدِ بْنِ عَبْدِ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ وَآلِهِ وَأَصْحَابِهِ وَأَزْوَاجِهِ وَذُرِّيَّتِهِ، أَنَّ اللَّهَ يُعْلِي دَرَجَاتِهِمْ فِي الْجَنَّةِ وَيَنْفَعُنَا بِأَسْرَارِهِمْ وَأَنْوَارِهِمْ وَعُلُومِهِمْ فِي الدِّينِ وَالدُّنْيَا وَالْآخِرَةِ وَيَجْعَلُنَا مِنْ حِزْبِهِمْ وَيَرْزُقُنَا مَحَبَّتَهُمْ وَيَتَوَفَّانَا عَلَى مِلَّتِهِمْ وَيَحْشُرُنَا فِي زُمْرَتِهِمْ، الْفَاتِحَةْ",
+      "translation": "May the Fatihah be offered to the soul of our master, the Messenger of Allah, our master Muhammad ibn Abd Allah, may Allah send prayers and peace upon him, and to his family, companions, wives, and descendants, that Allah may raise their ranks in Paradise, benefit us through their secrets, lights, and knowledge in religion, this world, and the Hereafter, make us among their company, grant us love for them, cause us to die upon their way, and gather us among their company. Al-Fatihah.",
+      "default_count": 1,
+      "transliteration": "Al-Fātiḥah ilā rūḥi sayyidinā Rasūli Llāhi sayyidinā Muḥammadi bni ʿAbdi Llāhi ṣallā Llāhu ʿalayhi wa-sallama, wa-ālihi wa-aṣḥābihi wa-azwājihi wa-dhurriyyatihi, anna Llāha yuʿlī darajātihim fī l-jannati wa-yanfaʿunā bi-asrārihim wa-anwārihim wa-ʿulūmihim fī d-dīni wa-d-dunyā wa-l-ākhirati wa-yajʿalunā min ḥizbihim wa-yarzuqunā maḥabbatahum wa-yatawaffānā ʿalā millatihim wa-yaḥshurunā fī zumratihim. Al-Fātiḥah."
+    },
+    {
+      "id": 23015,
+      "text_arabic": "الْفَاتِحَةْ إِلَى رُوحِ سَيِّدِنَا الْمُهَاجِرِ إِلَى اللَّهِ أَحْمَدَ بْنِ عِيسَى وَإِلَى رُوحِ سَيِّدِنَا الْأُسْتَاذِ الْأَعْظَمِ الْفَقِيهِ الْمُقَدَّمِ مُحَمَّدِ بْنِ عَلِيّ بَاعَلَوِيّ، وَأُصُولِهِمْ وَفُرُوعِهِمْ وَذَوِي الْحُقُوقِ عَلَيْهِمْ أَجْمَعِينَ، أَنَّ اللَّهَ يَغْفِرُ لَهُمْ وَيَرْحَمُهُمْ وَيُعْلِي دَرَجَاتِهِمْ فِي الْجَنَّةِ وَيَنْفَعُنَا بِأَسْرَارِهِمْ وَأَنْوَارِهِمْ وَعُلُومِهِمْ فِي الدِّينِ وَالدُّنْيَا وَالْآخِرَةِ، الْفَاتِحَةْ",
+      "translation": "May the Fatihah be offered to the soul of our master Ahmad ibn Isa, the Emigrant to Allah, and to the soul of our master, the Greatest Teacher, al-Faqih al-Muqaddam Muhammad ibn Ali Ba Alawi, and to all their ancestors, descendants, and all those who have rights over them, that Allah may forgive them, have mercy upon them, raise their ranks in Paradise, and benefit us through their secrets, lights, and knowledge in religion, this world, and the Hereafter. Al-Fatihah.",
+      "default_count": 1,
+      "transliteration": "Al-Fātiḥah ilā rūḥi sayyidinā l-muhājiri ilā Llāhi Aḥmada bni ʿĪsā wa-ilā rūḥi sayyidinā l-ustādhi l-aʿẓami l-Faqīhi l-Muqaddami Muḥammadi bni ʿAliyyi Bā ʿAlawiyyi, wa-uṣūlihim wa-furūʿihim wa-dhawi l-ḥuqūqi ʿalayhim ajmaʿīna, anna Llāha yaghfiru lahum wa-yarḥamuhum wa-yuʿlī darajātihim fī l-jannati wa-yanfaʿunā bi-asrārihim wa-anwārihim wa-ʿulūmihim fī d-dīni wa-d-dunyā wa-l-ākhirati. Al-Fātiḥah."
+    },
+    {
+      "id": 23016,
+      "text_arabic": "الْفَاتِحَةْ إِلَى رُوحِ سَيِّدِنَا وَحَبِيبِنَا وَبَرَكَتِنَا صَاحِبِ الرَّاتِبِ قُطْبِ الْأَنْفَاسِ الْحَبِيبِ عُمَرَ بْنِ عَبْدِ الرَّحْمَانِ الْعَطَّاسِ، وَإِلَى رُوحِ الشَّيْخِ عَلِيّ بْنِ عَبْدِ اللَّهِ بَارَاسْ، وَإِلَى رُوحِ الْحَبِيبِ أَحْمَدَ بْنِ حَسَنِ بْنِ عَبْدِ اللَّهِ الْعَطَّاسِ، وَأُصُولِهِمْ وَفُرُوعِهِمْ وَذَوِي الْحُقُوقِ عَلَيْهِمْ أَجْمَعِينَ، أَنَّ اللَّهَ يَغْفِرُ لَهُمْ وَيَرْحَمُهُمْ وَيُعْلِي دَرَجَاتِهِمْ فِي الْجَنَّةِ وَيَنْفَعُنَا بِأَسْرَارِهِمْ وَأَنْوَارِهِمْ وَعُلُومِهِمْ وَنَفَحَاتِهِمْ فِي الدِّينِ وَالدُّنْيَا وَالْآخِرَةِ، الْفَاتِحَةْ",
+      "translation": "May the Fatihah be offered to the soul of our master, our beloved, and our source of blessing, the author of this Ratib, Qutb al-Anfas, Habib Umar ibn Abd al-Rahman al-Attas, and to the soul of Shaykh Ali ibn Abd Allah Ba Ras, and to the soul of Habib Ahmad ibn Hasan ibn Abd Allah al-Attas, and to all their ancestors, descendants, and all those who have rights over them, that Allah may forgive them, have mercy upon them, raise their ranks in Paradise, and benefit us through their secrets, lights, knowledge, and spiritual breezes in religion, this world, and the Hereafter. Al-Fatihah.",
+      "default_count": 1,
+      "transliteration": "Al-Fātiḥah ilā rūḥi sayyidinā wa-ḥabībinā wa-barakatinā ṣāḥibi r-rātibi quṭbi l-anfāsi l-Ḥabībi ʿUmara bni ʿAbdi r-Raḥmāni l-ʿAṭṭās, wa-ilā rūḥi sh-shaykhi ʿAliyyi bni ʿAbdi Llāhi Bā Rās, wa-ilā rūḥi l-Ḥabībi Aḥmada bni Ḥasani bni ʿAbdi Llāhi l-ʿAṭṭās, wa-uṣūlihim wa-furūʿihim wa-dhawi l-ḥuqūqi ʿalayhim ajmaʿīna, anna Llāha yaghfiru lahum wa-yarḥamuhum wa-yuʿlī darajātihim fī l-jannati wa-yanfaʿunā bi-asrārihim wa-anwārihim wa-ʿulūmihim wa-nafaḥātihim fī d-dīni wa-d-dunyā wa-l-ākhirati. Al-Fātiḥah."
+    },
+    {
+      "id": 23017,
+      "text_arabic": "الْفَاتِحَةْ إِلَى أَرْوَاحِ الْأَوْلِيَاءِ وَالشُّهَدَاءِ وَالصَّالِحِينَ وَالْأَئِمَّةِ الرَّاشِدِينَ، وَإِلَى أَرْوَاحِ وَالِدِينَا وَمَشَايِخِنَا وَذَوِي الْحُقُوقِ عَلَيْنَا وَعَلَيْهِمْ أَجْمَعِينَ، ثُمَّ إِلَى أَرْوَاحِ أَمْوَاتِ الْمُؤْمِنِينَ وَالْمُؤْمِنَاتِ وَالْمُسْلِمِينَ وَالْمُسْلِمَاتِ، أَنَّ اللَّهَ يَغْفِرُ لَهُمْ وَيَرْحَمُهُمْ وَيُعْلِي دَرَجَاتِهِمْ فِي الْجَنَّةِ وَيُعِيدُ عَلَيْنَا مِنْ أَسْرَارِهِمْ وَأَنْوَارِهِمْ وَعُلُومِهِمْ وَبَرَكَاتِهِمْ فِي الدِّينِ وَالدُّنْيَا وَالْآخِرَةِ، الْفَاتِحَةْ",
+      "translation": "May the Fatihah be offered to the souls of the awliya, the martyrs, the righteous, and the rightly guided imams, and to the souls of our parents, our shaykhs, and all those who have rights over us and over them, then to the souls of the deceased believing men and women and Muslim men and women, that Allah may forgive them, have mercy upon them, raise their ranks in Paradise, and bestow upon us from their secrets, lights, knowledge, and blessings in religion, this world, and the Hereafter. Al-Fatihah.",
+      "default_count": 1,
+      "transliteration": "Al-Fātiḥah ilā arwāḥi l-awliyāʾi wa-sh-shuhadāʾi wa-ṣ-ṣāliḥīna wa-l-aʾimmati r-rāshidīn, wa-ilā arwāḥi wālidīnā wa-mashāʾikhinā wa-dhawi l-ḥuqūqi ʿalaynā wa-ʿalayhim ajmaʿīna, thumma ilā arwāḥi amwāti l-muʾminīna wa-l-muʾmināti wa-l-muslimīna wa-l-muslimāti, anna Llāha yaghfiru lahum wa-yarḥamuhum wa-yuʿlī darajātihim fī l-jannati wa-yuʿīdu ʿalaynā min asrārihim wa-anwārihim wa-ʿulūmihim wa-barakātihim fī d-dīni wa-d-dunyā wa-l-ākhirati. Al-Fātiḥah."
+    },
+    {
+      "id": 23018,
+      "text_arabic": "الْفَاتِحَةْ بِالْقَبُولِ وَتَمَامِ كُلِّ سُولٍ وَمَأْمُولٍ وَصَلَاحِ الشَّأْنِ ظَاهِرًا وَبَاطِنًا فِي الدِّينِ وَالدُّنْيَا وَالْآخِرَةِ، دَافِعَةً لِكُلِّ شَرٍّ جَالِبَةً لِكُلِّ خَيْرٍ لَنَا وَلِوَالِدِينَا وَأَوْلَادِنَا وَأَحْبَابِنَا وَمَشَايِخِنَا فِي الدِّينِ مَعَ اللُّطْفِ وَالْعَافِيَةِ وَعَلَى نِيَّةِ أَنَّ اللَّهَ يُنَوِّرُ قُلُوبَنَا وَقَوَالِبَنَا مَعَ الْهُدَى وَالتُّقَى وَالْعَفَافِ وَالْغِنَى وَالْمَوْتِ عَلَى دِينِ الْإِسْلَامِ وَالْإِيمَانِ بِلَا مِحْنَةٍ وَلَا امْتِحَانٍ بِحَقِّ سَيِّدِ وَلَدِ عَدْنَانَ وَعَلَى كُلِّ نِيَّةٍ صَالِحَةٍ، وَإِلَى حَضْرَةِ النَّبِيِّ مُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَآلِهِ وَسَلَّمَ، الْفَاتِحَةْ",
+      "translation": "May the Fatihah be offered for acceptance, the complete fulfilment of every need and hope, and the rectification of all our affairs, outwardly and inwardly, in religion, this world, and the Hereafter, repelling every evil and bringing every good to us, our parents, our children, our loved ones, and our shaykhs in religion, together with Divine gentleness and well-being, and with the intention that Allah illuminate our hearts and bodies, grant us guidance, piety, chastity, self-sufficiency, and death upon the religion of Islam and faith, without tribulation or trial, by the rank of the master of the descendants of Adnan, and for every righteous intention, and may it be offered to the presence of the Prophet Muhammad, may Allah send prayers and peace upon him and his family. Al-Fatihah.",
+      "default_count": 1,
+      "transliteration": "Al-Fātiḥah bi-l-qabūli wa-tamāmi kulli sūlin wa-maʾmūlin wa-ṣalāḥi sh-shaʾni ẓāhiran wa-bāṭinan fī d-dīni wa-d-dunyā wa-l-ākhirati, dāfiʿatan li-kulli sharrin jālibatan li-kulli khayrin lanā wa-li-wālidīnā wa-awlādinā wa-aḥbābinā wa-mashāʾikhinā fī d-dīni maʿa l-luṭfi wa-l-ʿāfiyati wa-ʿalā niyyati anna Llāha yunawwiru qulūbanā wa-qawālibanā, maʿa l-hudā wa-t-tuqā wa-l-ʿafāfi wa-l-ghinā wa-l-mawti ʿalā dīni l-Islāmi wa-l-imāni bi-lā miḥnatin wa-lā mtiḥānin bi-ḥaqqi sayyidi waladi ʿAdnāna wa-ʿalā kulli niyyatin ṣāliḥatin, wa-ilā ḥaḍrati n-nabiyyi Muḥammadin ṣallā Llāhu ʿalayhi wa-ālihi wa-sallama. Al-Fātiḥah."
+    },
+    {
+      "id": 23019,
+      "text_arabic": "غُفۡرَانَكَ رَبَّنَا وَإِلَيۡكَ ٱلۡمَصِيرُ",
+      "translation": "“Grant us Your forgiveness, our Lord. To You is our return.”",
+      "default_count": 1,
+      "transliteration": "Ghufrānaka Rabbanā wa-ilayka l-maṣīr.",
+      "notes": "The closing portion of Qur’an 2:285, recited on its own; 2:286 follows it in full as an ayah item."
+    }
+  ]
+}

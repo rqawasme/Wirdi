@@ -1,0 +1,126 @@
+{
+  "id": 21,
+  "name_arabic": "رَاتِبُ الْحَدَّادِ",
+  "name_english": "Ratib al-Haddad",
+  "description": "The daily litany of Imam Abd Allah ibn Alawi al-Haddad, recited after Isha: al-Fatiha, Ayat al-Kursi and the close of al-Baqara, a sequence of short remembrances mostly said three times over, the three quls, and dedications of the Fatiha to the Prophet, the Alawi masters and the author.",
+  "author": "Imam Abd Allah ibn Alawi al-Haddad",
+  "type": "wird",
+  "sort_order": 45,
+  "items": [
+    {
+      "dhikr": 22001
+    },
+    {
+      "surah": 1
+    },
+    {
+      "ayah": "2:255"
+    },
+    {
+      "ayah": "2:285-286"
+    },
+    {
+      "dhikr": 22002
+    },
+    {
+      "dhikr": 22003
+    },
+    {
+      "dhikr": 22004
+    },
+    {
+      "dhikr": 22005
+    },
+    {
+      "dhikr": 22006
+    },
+    {
+      "dhikr": 3016,
+      "count": 3
+    },
+    {
+      "dhikr": 2011
+    },
+    {
+      "dhikr": 22007
+    },
+    {
+      "dhikr": 22008
+    },
+    {
+      "dhikr": 22009
+    },
+    {
+      "dhikr": 22010
+    },
+    {
+      "dhikr": 22011
+    },
+    {
+      "dhikr": 22012
+    },
+    {
+      "dhikr": 22013
+    },
+    {
+      "dhikr": 22014
+    },
+    {
+      "dhikr": 22015
+    },
+    {
+      "dhikr": 22016
+    },
+    {
+      "dhikr": 22017,
+      "count": 50
+    },
+    {
+      "dhikr": 22018
+    },
+    {
+      "surah": 112,
+      "count": 3
+    },
+    {
+      "surah": 113
+    },
+    {
+      "surah": 114
+    },
+    {
+      "dhikr": 22019
+    },
+    {
+      "surah": 1
+    },
+    {
+      "dhikr": 22020
+    },
+    {
+      "surah": 1
+    },
+    {
+      "dhikr": 22021
+    },
+    {
+      "surah": 1
+    },
+    {
+      "dhikr": 22022
+    },
+    {
+      "surah": 1,
+      "note": "The reader praises Allah here, then makes whatever supplications they wish."
+    },
+    {
+      "dhikr": 22023
+    },
+    {
+      "surah": 1
+    },
+    {
+      "dhikr": 22024
+    }
+  ]
+}

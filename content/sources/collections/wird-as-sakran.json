@@ -1,0 +1,56 @@
+{
+  "id": 17,
+  "name_arabic": "وِرْدُ السَّكْرَانِ",
+  "name_english": "Wird as-Sakran",
+  "description": "The litany of Imam Abu Bakr al-Sakran ibn ʿAbd al-Rahman al-Saqqaf, recited in the morning after Fajr and before sunrise, and again between Maghrib and Isha. Among its reported benefits is protection from enemies and from those who seek to cause harm, whether among men or jinn.",
+  "author": "Imam Abu Bakr al-Sakran ibn ʿAbd al-Rahman al-Saqqaf",
+  "type": "wird",
+  "sort_order": 41,
+  "items": [
+    {
+      "dhikr": 2001
+    },
+    {
+      "dhikr": 18001
+    },
+    {
+      "dhikr": 18002
+    },
+    {
+      "surah": 1
+    },
+    {
+      "dhikr": 18003
+    },
+    {
+      "dhikr": 18004
+    },
+    {
+      "ayah": "2:255"
+    },
+    {
+      "dhikr": 18005
+    },
+    {
+      "dhikr": 18006
+    },
+    {
+      "dhikr": 18007
+    },
+    {
+      "dhikr": 18008
+    },
+    {
+      "dhikr": 18009
+    },
+    {
+      "dhikr": 2037
+    },
+    {
+      "ayah": "37:180-182"
+    },
+    {
+      "dhikr": 18010
+    }
+  ]
+}

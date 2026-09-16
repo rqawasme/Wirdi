@@ -1,0 +1,504 @@
+{
+  "group": "dua-al-nasiri",
+  "description": "The Duʿāʾ al-Nāṣirī of Imam Muhammad ibn Nasir al-Darʿi, one dhikr per couplet, in the order of the recitation. The poem quotes no Qur'an, so every row here is the poet's own words and nothing is sliced out of the mushaf. This booklet's PDF text layer is corrupt in all three channels — the Arabic comes back with its glyphs reordered and with diacritics mapped onto letters (a kasra arrives as ر), and even the Latin is mis-mapped, so the title prints as 'The Prāyer of the Oppreṣṣed' — so the whole text was read off page renders. Couplet 66 is the one place the booklet's Arabic and its own transliteration disagree; the note on that row records it.",
+  "adhkar": [
+    {
+      "id": 21001,
+      "text_arabic": "يَا مَنْ إِلَى رَحْمَتِهِ الْمَفَرُّ، وَمَنْ إِلَيْهِ يَلْجَأُ الْمُضْطَرُّ",
+      "translation": "O You to whose mercy we flee, and to whom the distressed turn for refuge.",
+      "default_count": 1,
+      "transliteration": "Yā man ilā raḥmatihi l-mafarru, wa-man ilayhi yaljaʾu l-muḍṭarru."
+    },
+    {
+      "id": 21002,
+      "text_arabic": "وَيَا قَرِيبَ الْعَفْوِ يَا مَوْلَاهُ، وَيَا مُغِيثَ كُلِّ مَنْ دَعَاهُ",
+      "translation": "O You whose pardon is near, O our Master, O Helper of all who call upon You.",
+      "default_count": 1,
+      "transliteration": "Wa-yā qarība l-ʿafwi yā mawlāhu, wa-yā mughītha kulli man daʿāhu."
+    },
+    {
+      "id": 21003,
+      "text_arabic": "بِكَ اسْتَغَثْنَا يَا مُغِيثَ الضُّعَفَا، فَحَسْبُنَا يَا رَبِّ أَنْتَ وَكَفَى",
+      "translation": "Through You we have sought help, O Helper of the weak, You alone are enough for us, O Lord, You suffice.",
+      "default_count": 1,
+      "transliteration": "Bika staghathnā yā mughītha ḍ-ḍuʿafā, fa-ḥasbunā yā Rabbi anta wa-kafā."
+    },
+    {
+      "id": 21004,
+      "text_arabic": "فَلَا أَجَلَّ مِنْ عَظِيمِ قُدْرَتِكْ، وَلَا أَعَزَّ مِنْ عَزِيزِ سَطْوَتِكْ",
+      "translation": "There is none greater than Your mighty power, and none more glorious than the majesty of Your might.",
+      "default_count": 1,
+      "transliteration": "Fa-lā ajalla min ʿaẓīmi qudratik, wa-lā aʿazza min ʿazīzi saṭwatik."
+    },
+    {
+      "id": 21005,
+      "text_arabic": "لِعِزِّ مُلْكِكَ الْمُلُوكُ تَخْضَعُ، تَخْفِضُ قَدْرَ مَنْ تَشَا وَتَرْفَعُ",
+      "translation": "To the majesty of Your dominion, kings bow down; You lower the rank of whom You will, and You raise.",
+      "default_count": 1,
+      "transliteration": "Li-ʿizzi mulkika l-mulūku takhḍaʿu, takhfiḍu qadra man tashā wa-tarfaʿu."
+    },
+    {
+      "id": 21006,
+      "text_arabic": "وَالْأَمْرُ كُلُّهُ إِلَيْكَ رَدُّهُ، وَبِيَدَيْكَ حَلُّهُ وَعَقْدُهُ",
+      "translation": "All matters return to You alone, in Your hands lies their unravelling and their binding.",
+      "default_count": 1,
+      "transliteration": "Wa-l-amru kulluhu ilayka radduhu, wa-bi-yadayka ḥalluhu wa-ʿaqduhu."
+    },
+    {
+      "id": 21007,
+      "text_arabic": "وَقَدْ رَفَعْنَا أَمْرَنَا إِلَيْكَ، وَقَدْ شَكَوْنَا ضُعْفَنَا عَلَيْكَ",
+      "translation": "We have raised our affairs to You, and to You we have laid bare our weakness.",
+      "default_count": 1,
+      "transliteration": "Wa-qad rafaʿnā amranā ilayka, wa-qad shakawnā ḍuʿfanā ʿalayka."
+    },
+    {
+      "id": 21008,
+      "text_arabic": "فَارْحَمْنَا يَا مَنْ لَّا يَزَالُ عَالِمَا، بِضُعْفِنَا وَلَا يَزَالُ رَاحِمَا",
+      "translation": "Have mercy on us, O You who are ever aware of our weakness and ever merciful.",
+      "default_count": 1,
+      "transliteration": "Fa-rḥamnā yā man lā yazālu ʿālimā, bi-ḍuʿfinā wa-lā yazālu rāḥimā."
+    },
+    {
+      "id": 21009,
+      "text_arabic": "أُنْظُرْ إِلَى مَا مَسَّنَا مِنَ الْوَرَى، فَحَالُنَا مِنْ بَيْنِهِمْ كَمَا تَرَى",
+      "translation": "Look upon what we have suffered at people’s hands, for our condition among them is as You see.",
+      "default_count": 1,
+      "transliteration": "Unẓur ilā mā massanā mina l-warā, fa-ḥālunā min baynihim kamā tarā."
+    },
+    {
+      "id": 21010,
+      "text_arabic": "قَدْ قَلَّ جَمْعُنَا وَقَلَّ وَفْرُنَا، وَانْحَطَّ مَا بَيْنَ الْجُمُوعِ قَدْرُنَا",
+      "translation": "Our numbers have dwindled, and our resources are scarce; our standing among the crowds has diminished.",
+      "default_count": 1,
+      "transliteration": "Qad qalla jamʿunā wa-qalla wafrunā, wa-nḥaṭṭa mā bayna l-jumūʿi qadrunā."
+    },
+    {
+      "id": 21011,
+      "text_arabic": "وَاسْتَضْعَفُونَا شَوْكَةً وَشِدَّةْ، وَاسْتَنْقَصُونَا عُدَّةً وَعِدَّةْ",
+      "translation": "They deemed us weak in might and strength, and found us lacking in equipment and numbers.",
+      "default_count": 1,
+      "transliteration": "Wa-staḍʿafūnā shawkatan wa-shiddah, wa-stanqaṣūnā ʿuddatan wa-ʿiddah."
+    },
+    {
+      "id": 21012,
+      "text_arabic": "فَنَحْنُ يَا مَنْ مُلْكُهُ لَا يُسْلَبُ، لُذْنَا بِجَاهِكَ الَّذِي لَا يُغْلَبُ",
+      "translation": "So, O You whose dominion cannot be taken away, we have sought refuge in Your invincible honour.",
+      "default_count": 1,
+      "transliteration": "Fa-naḥnu yā man mulkuhu lā yuslabu, ludhnā bi-jāhika lladhī lā yughlabu."
+    },
+    {
+      "id": 21013,
+      "text_arabic": "إِلَيْكَ يَا غَوْثَ الْفَقِيرِ نَسْتَنِدْ، عَلَيْكَ يَا كَهْفَ الضَّعِيفِ نَعْتَمِدْ",
+      "translation": "To You, O Helper of the poor, we lean; upon You, O Refuge of the weak, we rely.",
+      "default_count": 1,
+      "transliteration": "Ilayka yā ghawtha l-faqīri nastanid, ʿalayka yā kahfa ḍ-ḍaʿīfi naʿtamid."
+    },
+    {
+      "id": 21014,
+      "text_arabic": "أَنْتَ الَّذِيْ نَدْعُو لِكَشْفِ الْغَمَرَاتْ، أَنْتَ الَّذِي نَرْجُو لِدَفْعِ الْحَسَرَاتْ",
+      "translation": "You are the One we call upon to remove overwhelming hardships, You are the One in whom we hope for the removal of sorrows.",
+      "default_count": 1,
+      "transliteration": "Anta lladhī nadʿū li-kashfi l-ghamarāt, anta lladhī narjū li-dafʿi l-ḥasarāt."
+    },
+    {
+      "id": 21015,
+      "text_arabic": "أَنْتَ الْعِنَايَةُ الَّتِي لَا نَرْتَجِي، حِمَايَةً مِنْ غَيْرِ بَابِهَا تَجِي",
+      "translation": "You are the care, and we hope for no protection that comes from any door but Yours.",
+      "default_count": 1,
+      "transliteration": "Anta l-ʿināyatu llatī lā nartajī, ḥimāyatan min ghayri bābihā tajī."
+    },
+    {
+      "id": 21016,
+      "text_arabic": "أَنْتَ الَّذِي نَسْعَى بِبَابِ فَضْلِهِ، أَكْرَمُ مَنْ أَغْنَى بِفَيْضِ نَيْلِهِ",
+      "translation": "You are the One we strive to reach through the door of Your grace, the most generous, who enriches with the abundance of His bounty.",
+      "default_count": 1,
+      "transliteration": "Anta lladhī nasʿā bi-bābi faḍlihi, akramu man aghnā bi-fayḍi naylihi."
+    },
+    {
+      "id": 21017,
+      "text_arabic": "أَنْتَ الَّذِي تَهْدِي إِذَا ضَلَلْنَا، أَنْتَ الَّذِي تَعْفُو إِذَا زَلَلْنَا",
+      "translation": "You are the One who guides us when we go astray, You are the One who forgives us when we slip.",
+      "default_count": 1,
+      "transliteration": "Anta lladhī tahdī idhā ḍalalnā, anta lladhī taʿfū idhā zalalnā."
+    },
+    {
+      "id": 21018,
+      "text_arabic": "وَسِعْتَ كُلَّ مَا خَلَقْتَ عِلْمًا، وَرَأْفَةً وَرَحْمَةً وَحِلْمًا",
+      "translation": "You encompass all that You have created in knowledge, compassion, mercy, and forbearance.",
+      "default_count": 1,
+      "transliteration": "Wasiʿta kulla mā khalaqta ʿilmā, wa-raʾfatan wa-raḥmatan wa-ḥilmā."
+    },
+    {
+      "id": 21019,
+      "text_arabic": "وَلَيْسَ مِنَّا فِي الْوُجُودِ أَحْقَرُ، وَلَا لِمَا عِنْدَكَ مِنَّا أَفْقَرُ",
+      "translation": "There is none in existence more insignificant than us, nor anyone more in need than us of what is with You.",
+      "default_count": 1,
+      "transliteration": "Wa-laysa minnā fī l-wujūdi aḥqaru, wa-lā limā ʿindaka minnā afqaru."
+    },
+    {
+      "id": 21020,
+      "text_arabic": "يَا وَاسِعَ الْإِحْسَانِ يَا مَنْ خَيْرُهُ، عَمَّ الْوَرَى وَلَا يُنَادَى غَيْرُهُ",
+      "translation": "O Boundless in kindness, O whose goodness encompasses all people, and none else is called upon.",
+      "default_count": 1,
+      "transliteration": "Yā wāsiʿa l-iḥsāni yā man khayruhu, ʿamma l-warā wa-lā yunādā ghayruhu."
+    },
+    {
+      "id": 21021,
+      "text_arabic": "يَا مُنْقِذَ الْغَرْقَى وَيَا حَنَّانُ، يَا مُنْجِيَ الْهَلْكَى وَيَا مَنَّانُ",
+      "translation": "O Rescuer of the drowning, O Most Compassionate, O Deliverer of those facing destruction, O Bestower of grace.",
+      "default_count": 1,
+      "transliteration": "Yā munqidha l-gharqā wa-yā Ḥannānu, yā munjiya l-halkā wa-yā Mannānu."
+    },
+    {
+      "id": 21022,
+      "text_arabic": "ضَاقَ النِّطَاقُ يَا سَمِيْعُ يَا مُجِيبْ، عَزَّ الدَّوَاءُ يَا سَرِيعُ يَا قَرِيبْ",
+      "translation": "The way has become constricted, O Hearer, O Responder, and the remedy has become scarce, O Swift, O Near.",
+      "default_count": 1,
+      "transliteration": "Ḍāqa n-niṭāqu yā Samīʿu yā Mujīb, ʿazza d-dawāʾu yā Sarīʿu yā Qarīb."
+    },
+    {
+      "id": 21023,
+      "text_arabic": "وَقَدْ مَدَدْنَا رَبَّنَا الْأَكُفَّ، وَمِنْكَ رَبَّنَا رَجَوْنَا اللُّطْفَ",
+      "translation": "Our Lord, we have stretched out our hands, and from You, our Lord, we hope for Your gentleness.",
+      "default_count": 1,
+      "transliteration": "Wa-qad madadnā Rabbana l-akuffa, wa-minka Rabbanā rajawnā l-luṭfa."
+    },
+    {
+      "id": 21024,
+      "text_arabic": "فَالْطُفْ بِنَا فِيمَا بِهِ قَضَيْتَ، وَرَضِّنَا بِمَا بِهِ رَضِيتَ",
+      "translation": "So be gentle with us in what You have decreed, and make us content with that which You are pleased with.",
+      "default_count": 1,
+      "transliteration": "Fa-lṭuf binā fīmā bihi qaḍayta, wa-raḍḍinā bimā bihi raḍīta."
+    },
+    {
+      "id": 21025,
+      "text_arabic": "وَأَبْدِلِ اللَّهُمَّ حَالَ الْعُسْرِ، بِالْيُسْرِ وَامْدُدْنَا بِرِيحِ النَّصْرِ",
+      "translation": "And, O Allah, change our state of hardship to ease, and grant us the breeze of victory.",
+      "default_count": 1,
+      "transliteration": "Wa-abdili Llāhumma ḥāla l-ʿusri, bi-l-yusri wa-mdudnā bi-rīḥi n-naṣri."
+    },
+    {
+      "id": 21026,
+      "text_arabic": "وَاجْعَلْ لَّنَا عَلَى الْبُغَاةِ الْغَلَبَةْ، وَاقْصُرْ أَذَى الشَّرِّ عَلَى مَنْ طَلَبَهْ",
+      "translation": "And grant us triumph over the oppressors, and confine the harm of evil to those who seek it.",
+      "default_count": 1,
+      "transliteration": "Wa-jʿal lanā ʿalā l-bughāti l-ghalabah, wa-qṣur adhā sh-sharri ʿalā man ṭalabah."
+    },
+    {
+      "id": 21027,
+      "text_arabic": "وَاقْهَرْ عِدَانَا يَا عَزِيزُ قَهْرَا، يَفْصِمُ حَبْلَهُمْ وَيُصْمِي الظَّهْرَا",
+      "translation": "Subdue our enemies, O Mighty One, with overwhelming force, that severs their cord and strikes their backs.",
+      "default_count": 1,
+      "transliteration": "Wa-qhar ʿidānā yā ʿAzīzu qahrā, yafṣimu ḥablahum wa-yuṣmī ẓ-ẓahrā."
+    },
+    {
+      "id": 21028,
+      "text_arabic": "وَاعْكِسْ مُرَادَهُمْ وَخَيِّبْ سَعْيَهُمْ، وَاهْزِمْ جُيُوشَهُمْ وَأَفْسِدْ رَأْيَهُمْ",
+      "translation": "Reverse their intentions and frustrate their efforts, defeat their armies and confuse their counsel.",
+      "default_count": 1,
+      "transliteration": "Wa-ʿkis murādahum wa-khayyib saʿyahum, wa-hzim juyūshahum wa-afsid raʾyahum."
+    },
+    {
+      "id": 21029,
+      "text_arabic": "وَعَجِّلِ اللَّهُمَّ فِيهِمْ نِقْمَتَكْ، فَإِنَّهُمْ لَا يُعْجِزُونَ قُدْرَتَكْ",
+      "translation": "And hasten, O Allah, Your punishment upon them, for they cannot thwart Your power.",
+      "default_count": 1,
+      "transliteration": "Wa-ʿajjili Llāhumma fīhim niqmatak, fa-innahum lā yuʿjizūna qudratak."
+    },
+    {
+      "id": 21030,
+      "text_arabic": "يَا رَبِّ يَا رَبِّ بِحَبْلِ عِصْمَتِكْ، قَدِ اعْتَصَمْنَا وَبِعِزِّ نُصْرَتِكْ",
+      "translation": "O Lord, O Lord, by the rope of Your protection we have held fast, and by the might of Your support.",
+      "default_count": 1,
+      "transliteration": "Yā Rabbi yā Rabbi bi-ḥabli ʿiṣmatik, qadi ʿtaṣamnā wa-bi-ʿizzi nuṣratik."
+    },
+    {
+      "id": 21031,
+      "text_arabic": "فَكُنْ لَنَا وَلَا تَكُنْ عَلَيْنَا، وَلَا تَكِلْنَا طَرْفَةً إِلَيْنَا",
+      "translation": "So be for us and not against us, and do not leave us to ourselves for even the blink of an eye.",
+      "default_count": 1,
+      "transliteration": "Fa-kun lanā wa-lā takun ʿalaynā, wa-lā takilnā ṭarfatan ilaynā."
+    },
+    {
+      "id": 21032,
+      "text_arabic": "فَمَا أَطَقْنَا قُوَّةً لِلدَّفْعِ، وَلَا اسْتَطَعْنَا حِيلَةً لِلنَّفْعِ",
+      "translation": "We possess no strength to repel, nor have we any means to benefit ourselves.",
+      "default_count": 1,
+      "transliteration": "Fa-mā aṭaqnā quwwatan li-d-dafʿi, wa-lā staṭaʿnā ḥīlatan li-n-nafʿi."
+    },
+    {
+      "id": 21033,
+      "text_arabic": "وَمَا قَصَدْنَا غَيْرَ بَابِكَ الْكَرِيمْ، وَمَا رَجَوْنَا غَيْرَ فَضْلِكَ الْعَمِيمْ",
+      "translation": "We aimed for none but Your noble door, and hoped for none but Your vast grace.",
+      "default_count": 1,
+      "transliteration": "Wa-mā qaṣadnā ghayra bābika l-karīm, wa-mā rajawnā ghayra faḍlika l-ʿamīm."
+    },
+    {
+      "id": 21034,
+      "text_arabic": "فَمَا رَجَتْ مِنْ خَيْرِكَ الظُّنُونُ، بِنَفْسِ مَا تَقُولُ كُنْ يَكُونُ",
+      "translation": "Whatever hopes expect of Your goodness is attained, by the very word You utter: “Be,” and it is.",
+      "default_count": 1,
+      "transliteration": "Famā rajat min khayrika ẓ-ẓunūnu, bi-nafsi mā taqūlu kun yakūnu."
+    },
+    {
+      "id": 21035,
+      "text_arabic": "يَا رَبِّ يَا رَبِّ بِكَ التَّوَصُّلُ، لِمَا لَدَيْكَ وَبِكَ التَّوَسُّلُ",
+      "translation": "O Lord, O Lord, through You is our attainment of what is with You, and through You is our seeking of a means of approach.",
+      "default_count": 1,
+      "transliteration": "Yā Rabbi yā Rabbi bika t-tawaṣṣulu, limā ladayka wa-bika t-tawassulu."
+    },
+    {
+      "id": 21036,
+      "text_arabic": "يَا رَبِّ أَنْتَ رُكْنُنَا الرَّفِيعُ، يَا رَبِّ أَنْتَ حِصْنُنَا الْمَنِيعُ",
+      "translation": "O Lord, You are our exalted refuge, O Lord, You are our strong fortress.",
+      "default_count": 1,
+      "transliteration": "Yā Rabbi anta ruknunā r-rafīʿu, yā Rabbi anta ḥiṣnunā l-manīʿu."
+    },
+    {
+      "id": 21037,
+      "text_arabic": "يَا رَبِّ يَا رَبِّ أَنِلْنَا الْأَمْنَا، إِذَا ارْتَحَلْنَا وَإِذَا أَقَمْنَا",
+      "translation": "O Lord, O Lord, grant us safety, when we depart and when we settle.",
+      "default_count": 1,
+      "transliteration": "Yā Rabbi yā Rabbi anilnā l-amnā, idhā rtaḥalnā wa-idhā aqamnā."
+    },
+    {
+      "id": 21038,
+      "text_arabic": "يَا رَبِّ وَاحْفَظْ زَرْعَنَا وَضَرْعَنَا، وَاحْفَظْ تِجَارَنَا وَوَفِّرْ جَمْعَنَا",
+      "translation": "O Lord, protect our crops and livestock, protect our merchants and increase our numbers.",
+      "default_count": 1,
+      "transliteration": "Yā Rabbi wa-ḥfaẓ zarʿanā wa-ḍarʿanā, wa-ḥfaẓ tijāranā wa-waffir jamʿanā."
+    },
+    {
+      "id": 21039,
+      "text_arabic": "وَاجْعَلْ بِلَادَنَا بِلَادَ الدِّينِ، وَرَاحَةَ الْمُحْتَاجِ وَالْمِسْكِينِ",
+      "translation": "Make our land a land of faith, and a place of comfort for the needy and the poor.",
+      "default_count": 1,
+      "transliteration": "Wa-jʿal bilādanā bilāda d-dīni, wa-rāḥata l-muḥtāji wa-l-miskīni."
+    },
+    {
+      "id": 21040,
+      "text_arabic": "وَاجْعَلْ لَهَا بَيْنَ الْبِلَادِ صَوْلَةْ، وَحُرْمَةً وَمَنْعَةً وَدَوْلَةْ",
+      "translation": "Grant it strength among the nations, and sanctity, protection, and sovereignty.",
+      "default_count": 1,
+      "transliteration": "Wa-jʿal lahā bayna l-bilādi ṣawlah, wa-ḥurmatan wa-manʿatan wa-dawlah."
+    },
+    {
+      "id": 21041,
+      "text_arabic": "وَاجْعَلْ مِنَ السِّرِّ الْمَصُونِ عِزَّهَا، وَاجْعَلْ مِنَ السِّتْرِ الْجَمِيْلِ حِرْزَهَا",
+      "translation": "Make its honour arise from the guarded secret, and its protection from the beautiful covering.",
+      "default_count": 1,
+      "transliteration": "Wa-jʿal mina s-sirri l-maṣūni ʿizzahā, wa-jʿal mina s-sitri l-jamīli ḥirzahā."
+    },
+    {
+      "id": 21042,
+      "text_arabic": "وَاجْعَلْ بِصَادٍ وَبِقَافٍ وَبِنُونْ، أَلْفَ حِجَابٍ مِنْ وَرَائِهَا يَكُونْ",
+      "translation": "And by ṣād, qāf, and nūn, let there be a thousand veils shielding it from behind.",
+      "default_count": 1,
+      "transliteration": "Wa-jʿal bi-ṣādin wa-bi-qāfin wa-bi-nūn, alfa ḥijābin min warāʾihā yakūn."
+    },
+    {
+      "id": 21043,
+      "text_arabic": "بِجَاهِ نُورِ وَجْهِكَ الْكَرِيْمِ، وَجَاهِ سِرِّ مُلْكِكَ الْعَظِيمِ",
+      "translation": "By the rank of the light of Your noble face, and by the rank of the secret of Your mighty dominion.",
+      "default_count": 1,
+      "transliteration": "Bi-jāhi nūri wajhika l-karīmi, wa-jāhi sirri mulkika l-ʿaẓīmi."
+    },
+    {
+      "id": 21044,
+      "text_arabic": "وَجَاهِ لَا إِلَهَ إِلَّا اللَّهُ، وَجَاهِ خَيْرِ الْخَلْقِ يَا رَبَّاهُ",
+      "translation": "And by the rank of “There is no god but Allah”, and by the rank of the best of creation, O our Lord.",
+      "default_count": 1,
+      "transliteration": "Wa-jāhi lā ilāha illa Llāhu, wa-jāhi khayri l-khalqi yā Rabbāhu."
+    },
+    {
+      "id": 21045,
+      "text_arabic": "وَجَاهِ مَا بِهِ دَعَاكَ الْأَنْبِيَا، وَجَاهِ مَا بِهِ دَعَاكَ الْأَوْلِيَا",
+      "translation": "And by the rank with which the Prophets called upon You, and by the rank with which the saints supplicated to You.",
+      "default_count": 1,
+      "transliteration": "Wa-jāhi mā bihi daʿāka l-anbiyā, wa-jāhi mā bihi daʿāka l-awliyā."
+    },
+    {
+      "id": 21046,
+      "text_arabic": "وَجَاهِ قَدْرِ الْقُطْبِ وَالْأَوْتَادِ، وَجَاهِ حَالِ الْجَرِسِ وَالْأَفْرَادِ",
+      "translation": "And by the rank of the station of the Qutb and the Awtad, and by the rank of the state of divine reverberation and the Afrad.",
+      "default_count": 1,
+      "transliteration": "Wa-jāhi qadri l-quṭbi wa-l-awtādi, wa-jāhi ḥāli l-jarsi wa-l-afrādi."
+    },
+    {
+      "id": 21047,
+      "text_arabic": "وَجَاهِ الْأَخْيَارِ وَجَاهِ النُّجَبَا، وَجَاهِ الْأَبْدَالِ وَجَاهِ النُّقَبَا",
+      "translation": "And by the rank of the Akhyar and the Nujaba, and by the rank of the Abdal and the Nuqaba.",
+      "default_count": 1,
+      "transliteration": "Wa-jāhi l-akhyāri wa-jāhi n-nujabā, wa-jāhi l-abdāli wa-jāhi n-nuqabā."
+    },
+    {
+      "id": 21048,
+      "text_arabic": "وَجَاهِ كُلِّ عَابِدٍ وَذَاكِرْ، وَجَاهِ كُلِّ حَامِدٍ وَشَاكِرْ",
+      "translation": "And by the rank of every worshiper and one who remembers You, and the rank of every one who praises and thanks You.",
+      "default_count": 1,
+      "transliteration": "Wa-jāhi kulli ʿābidin wa-dhākir, wa-jāhi kulli ḥāmidin wa-shākir."
+    },
+    {
+      "id": 21049,
+      "text_arabic": "وَجَاهِ كُلِّ مَنْ رَفَعْتَ قَدْرَهُ، مِمَّنْ سَتَرْتَ أَوْ نَشَرْتَ ذِكْرَهُ",
+      "translation": "And by the rank of all whom You have raised in station, those whom You have concealed or made their remembrance known.",
+      "default_count": 1,
+      "transliteration": "Wa-jāhi kulli man rafaʿta qadrahu, mimman satarta aw nasharta dhikrahu."
+    },
+    {
+      "id": 21050,
+      "text_arabic": "وَجَاهِ آيَاتِ الْكِتَابِ الْمُحْكَمِ، وَجَاهِ الِاسْمِ الْأَعْظَمِ الْمُعَظَّمِ",
+      "translation": "And by the rank of the verses of the firmly established Book, and the rank of Your Greatest, Most Exalted Name.",
+      "default_count": 1,
+      "transliteration": "Wa-jāhi āyāti l-kitābi l-muḥkami, wa-jāhi l-ismi l-aʿẓami l-muʿaẓẓami."
+    },
+    {
+      "id": 21051,
+      "text_arabic": "يَا رَبِّ يَا رَبِّ وَقَفْنَا فُقَرَا، بَيْنَ يَدَيْكَ ضُعَفَاءَ حُقَرَا",
+      "translation": "O Lord, O Lord, we stand before You as the poor, weak and humble in Your presence.",
+      "default_count": 1,
+      "transliteration": "Yā Rabbi yā Rabbi waqafnā fuqarā, bayna yadayka ḍuʿafāʾa ḥuqarā."
+    },
+    {
+      "id": 21052,
+      "text_arabic": "وَقَدْ دَعَوْنَاكَ دُعَاءَ مَنْ دَعَا، رَبًّا كَرِيمًا لَا يَرُدُّ مَنْ سَعَى",
+      "translation": "And we have called upon You with the supplication of one who calls upon a Generous Lord, who does not turn away one who seeks Him.",
+      "default_count": 1,
+      "transliteration": "Wa-qad daʿawnāka duʿāʾa man daʿā, Rabban karīman lā yaruddu man saʿā."
+    },
+    {
+      "id": 21053,
+      "text_arabic": "فَاقْبَلْ دُعَاءَنَا بِمَحْضِ الْفَضْلِ، قَبُولَ مَنْ أَلْغَى حِسَابَ الْعَدْلِ",
+      "translation": "So accept our supplication through pure grace, with an acceptance that sets aside the reckoning of justice.",
+      "default_count": 1,
+      "transliteration": "Fa-qbal duʿāʾanā bi-maḥḍi l-faḍli, qabūla man alghā ḥisāba l-ʿadli."
+    },
+    {
+      "id": 21054,
+      "text_arabic": "وَامْنُنْ عَلَيْنَا مِنَّةَ الْكَرِيمِ، وَاعْطِفْ عَلَيْنَا عَطْفَةَ الْحَلِيمِ",
+      "translation": "Bestow upon us the favour of the Generous, and show us the compassion of the Forbearing.",
+      "default_count": 1,
+      "transliteration": "Wa-mnun ʿalaynā minnata l-karīmi, wa-ʿṭif ʿalaynā ʿaṭfata l-ḥalīmi."
+    },
+    {
+      "id": 21055,
+      "text_arabic": "وَانْشُرْ عَلَيْنَا يَا رَحِيمُ رَحْمَتَكْ، وَابْسُطْ عَلَيْنَا يَا كَرِيمُ نِعْمَتَكْ",
+      "translation": "And spread Your mercy upon us, O Merciful, and extend Your blessings over us, O Generous One.",
+      "default_count": 1,
+      "transliteration": "Wa-nshur ʿalaynā yā Raḥīmu raḥmatak, wa-bsuṭ ʿalaynā yā Karīmu niʿmatak."
+    },
+    {
+      "id": 21056,
+      "text_arabic": "وَخِرْ لَنَا فِي سَائِرِ الْأَقْوَالِ، وَاخْتَرْ لَنَا فِي سَائِرِ الْأَفْعَالِ",
+      "translation": "And ordain what is best for us in all our words, and choose what is best for us in all our deeds.",
+      "default_count": 1,
+      "transliteration": "Wa-khir lanā fī sāʾiri l-aqwāli, wa-khtar lanā fī sāʾiri l-afʿāli."
+    },
+    {
+      "id": 21057,
+      "text_arabic": "يَا رَبِّ وَاجْعَلْ دَأْبَنَا التَّمَسُّكَا، بِالسُّنَّةِ الْغَرَّاءِ وَالتَّنَسُّكَا",
+      "translation": "O Lord, make our constant endeavour to hold fast to the radiant Sunnah and to practice devotion.",
+      "default_count": 1,
+      "transliteration": "Yā Rabbi wa-jʿal daʾbanā t-tamassukā, bi-s-sunnati l-gharrāʾi wa-t-tanassukā."
+    },
+    {
+      "id": 21058,
+      "text_arabic": "وَاحْصُرْ لَنَا أَغْرَاضَنَا الْمُخْتَلِفَةْ، فِيكَ وَعَرِّفْنَا تَمَامَ الْمَعْرِفَةْ",
+      "translation": "And confine all our varied aims to You, and grant us complete knowledge.",
+      "default_count": 1,
+      "transliteration": "Wa-ḥṣur lanā aghrāḍanā l-mukhtalifah, fīka wa-ʿarrifnā tamāma l-maʿrifah."
+    },
+    {
+      "id": 21059,
+      "text_arabic": "وَاجْمَعْ لَنَا مَا بَيْنَ عِلْمٍ وَعَمَلْ، وَاصْرِفْ إِلَى دَارِ الْبَقَا مِنَّا الْأَمَلْ",
+      "translation": "And unite for us knowledge and action, and direct our hope toward the eternal abode.",
+      "default_count": 1,
+      "transliteration": "Wa-jmaʿ lanā mā bayna ʿilmin wa-ʿamal, wa-ṣrif ilā dāri l-baqā minnā l-amal."
+    },
+    {
+      "id": 21060,
+      "text_arabic": "وَانْهَجْ بِنَا يَا رَبِّ نَهْجَ السُّعَدَا، وَاخْتِمْ لَنَا يَا رَبِّ خَتْمَ الشُّهَدَا",
+      "translation": "And guide us, O Lord, along the path of the blessed, and grant us, O Lord, the end of the martyrs.",
+      "default_count": 1,
+      "transliteration": "Wa-nhaj binā yā Rabbi nahja s-suʿadā, wa-khtim lanā yā Rabbi khatma sh-shuhadā."
+    },
+    {
+      "id": 21061,
+      "text_arabic": "وَاجْعَلْ بَنِينَا فُضَلَاءَ صُلَحَا، وَعُلَمَاءَ عَامِلِينَ نُصَحَا",
+      "translation": "And make our children virtuous and righteous, and scholars who act upon their knowledge and give sincere counsel.",
+      "default_count": 1,
+      "transliteration": "Wa-jʿal banīnā fuḍalāʾa ṣulaḥā, wa-ʿulamāʾa ʿāmilīna nuṣaḥā."
+    },
+    {
+      "id": 21062,
+      "text_arabic": "وَأَصْلِحِ اللَّهُمَّ حَالَ الْأَهْلِ، وَيَسِّرِ اللَّهُمَّ جَمْعَ الشَّمْلِ",
+      "translation": "And, O Allah, reform the condition of our families, and, O Allah, facilitate the reunion of those who have been separated.",
+      "default_count": 1,
+      "transliteration": "Wa-aṣliḥi Llāhumma ḥāla l-ahli, wa-yassiri Llāhumma jamʿa sh-shamli."
+    },
+    {
+      "id": 21063,
+      "text_arabic": "يَا رَبِّ وَافْتَحْ فَتْحَكَ الْمُبِينَ، لِمَنْ تَوَلَّى وَأَعَزَّ الدِّينَ",
+      "translation": "O Lord, grant Your clear victory to the one who turns to You and honours the faith.",
+      "default_count": 1,
+      "transliteration": "Yā Rabbi wa-ftaḥ fatḥaka l-mubīna, li-man tawallā wa-aʿazza d-dīna."
+    },
+    {
+      "id": 21064,
+      "text_arabic": "وَانْصُرْهُ يَا ذَا الطَّوْلِ وَانْصُرْ حِزْبَهُ، وَامْلَأْ بِمَا يُرْضِيكَ عَنْهُ قَلْبَهُ",
+      "translation": "And grant victory, O Possessor of Bounty, to him and his party, and fill his heart with that which makes You pleased with him.",
+      "default_count": 1,
+      "transliteration": "Wa-nṣurhu yā dhā ṭ-ṭawli wanṣur ḥizbahu, wa-mlaʾ bimā yurḍīka ʿanhu qalbahu."
+    },
+    {
+      "id": 21065,
+      "text_arabic": "يَا رَبِّ وَانْصُرْ دِينَنَا الْمُحَمَّدِي، وَاجْعَلْ خِتَامَ عِزِّهِ كَمَا بُدِي",
+      "translation": "O Lord, grant victory to our Muhammadan faith, and make its final glory as it was at its beginning.",
+      "default_count": 1,
+      "transliteration": "Yā Rabbi wa-nṣur dīnanā l-Muḥammadī, wa-jʿal khitāma ʿizzihi kamā budī."
+    },
+    {
+      "id": 21066,
+      "text_arabic": "وَاحْفِظْهُ يَا رَبِّ بِحِفْظِ الْعُلَمَا، وَارْفَعْ مَنَارَ نُورِهِ إِلَى السَّمَا",
+      "translation": "Protect it, O Lord, through the preservation of the scholars, and raise the beacon of its light to the heavens.",
+      "default_count": 1,
+      "transliteration": "Wa-ḥfiẓhu yā Rabbi bi-ḥifẓi l-ʿulamā, wa-rfaʿ manāra nūrihi ilā s-samā.",
+      "notes": "The Arabic is pointed وَاحْفِظْهُ, with a kasra on the fāʾ; the booklet's own transliteration line reads wa-ḥfaẓhu. The pointing is followed here."
+    },
+    {
+      "id": 21067,
+      "text_arabic": "وَاعْفُ وَعَافِ وَاكْفِ وَاغْفِرْ ذَنْبَنَا، وَذَنْبَ كُلِّ مُسْلِمٍ يَا رَبَّنَا",
+      "translation": "Pardon us, grant us well-being, suffice us, and forgive our sins, and the sins of every Muslim, O our Lord.",
+      "default_count": 1,
+      "transliteration": "Waʿfu wa-ʿāfi wa-kfi wa-ghfir dhanbanā, wa-dhanba kulli muslimin yā Rabbanā."
+    },
+    {
+      "id": 21068,
+      "text_arabic": "وَصَلِّ يَا رَبِّ عَلَى الْمُخْتَارِ، صَلَاتَكَ الْكَامِلَةَ الْمِقْدَارِ",
+      "translation": "And send, O Lord, upon the Chosen One, Your prayers, perfect in their measure.",
+      "default_count": 1,
+      "transliteration": "Wa-ṣalli yā Rabbi ʿalā l-mukhtāri, ṣalātaka l-kāmilata l-miqdāri."
+    },
+    {
+      "id": 21069,
+      "text_arabic": "صَلَاتَكَ الَّتِي تَفِي بِأَمْرِهِ، كَمَا يَلِيقُ بِارْتِفَاعِ قَدْرِهِ",
+      "translation": "Your prayers that fully fulfil what is due to him, as befits the loftiness of his rank.",
+      "default_count": 1,
+      "transliteration": "Ṣalātaka llatī tafī bi-amrihi, kamā yalīqu bi-rtifāʿi qadrihi."
+    },
+    {
+      "id": 21070,
+      "text_arabic": "ثُمَّ عَلَى الْآلِ الْكِرَامِ وَعَلَى، أَصْحَابِهِ الْغُرِّ وَمَنْ لَهُمْ تَلَا",
+      "translation": "Then upon the noble family and upon his radiant companions and those who follow them.",
+      "default_count": 1,
+      "transliteration": "Thumma ʿalā l-āli l-kirāmi wa-ʿalā, aṣḥābihi l-ghurri wa-man lahum talā."
+    },
+    {
+      "id": 21071,
+      "text_arabic": "وَالْحَمْدُ لِلَّهِ الَّذِي بِحَمْدِهِ، يَبْلُغُ ذُو الْقَصْدِ تَمَامَ قَصْدِهِ",
+      "translation": "And praise be to Allah, by whose praise the one with purpose attains the fulfillment of their aim.",
+      "default_count": 1,
+      "transliteration": "Wa-l-ḥamdu li-Llāhi lladhī bi-ḥamdihi, yablughu dhū l-qaṣdi tamāma qaṣdihi."
+    }
+  ]
+}
