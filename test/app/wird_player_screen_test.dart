@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wirdi/data/wirdi_data.dart';
 import 'package:wirdi/domain/domain.dart';
-import 'package:wirdi/player/wird_player.dart';
 import 'package:wirdi/providers/data_providers.dart';
 import 'package:wirdi/routes.dart';
 import 'package:wirdi/screens/wird_player_screen.dart';
@@ -446,22 +445,28 @@ void main() {
   });
 
   group("the band's stripe", () {
-    testWidgets('is cut into one segment per tap of the step', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('is cut into one segment per tap of the step, and moves on '
+        'every one of them', (WidgetTester tester) async {
       // Step two of fourteen: a dhikr said a hundred times.
       await openAt(tester, 1);
 
-      // The step's, not the wird's: a hundred taps, capped at thirty-three.
-      expect(_stepStripe(tester).segments, WirdPlayer.maxStripeSegments);
-      expect(_stepStripe(tester).value, 0);
+      // The step's scale, not the wird's, and uncapped: a hundred taps, a
+      // hundred segments. Capped at thirty-three it moved every third tap.
+      expect(_stepStripe(tester).segments, 100);
+      expect(_stepStripe(tester).lit, 0);
 
-      await tester.tap(find.text('PLACEHOLDER dhikr 1002 translation'));
-      await tester.pump();
+      final Finder text = find.text('PLACEHOLDER dhikr 1002 translation');
+      for (int tap = 1; tap <= 30; tap++) {
+        await tester.tap(text);
+        await tester.pump();
+        expect(
+          _stepStripe(tester).lit,
+          tap,
+          reason: 'tap $tap left the stripe where it was',
+        );
+      }
 
-      // One tap of a hundred, on the step's own scale rather than the wird's.
-      expect(find.text('99'), findsOneWidget);
-      expect(_stepStripe(tester).value, closeTo(0.01, 0.0001));
+      expect(find.text('70'), findsOneWidget);
     });
 
     testWidgets('moves on a tap the numeral does not answer', (
@@ -471,15 +476,15 @@ void main() {
       await openAt(tester, 4);
       expect(find.text('1'), findsOneWidget);
       expect(_stepStripe(tester).segments, 4, reason: 'four ayahs, four taps');
-      expect(_stepStripe(tester).value, 0);
+      expect(_stepStripe(tester).lit, 0);
 
       await tester.tap(find.text('PLACEHOLDER ayah 112:1 translation'));
       await settle(tester);
 
-      // Still one reading left, and the stripe a quarter along: the tap
+      // Still one reading left, and the stripe one segment along: the tap
       // landed, and the band says so even though the numeral could not.
       expect(find.text('1'), findsOneWidget);
-      expect(_stepStripe(tester).value, closeTo(0.25, 0.0001));
+      expect(_stepStripe(tester).lit, 1);
     });
   });
 
@@ -758,8 +763,12 @@ VoussoirStripe _progressStripeIn(WidgetTester tester, Finder of) {
   return tester.widget<VoussoirStripe>(
     find.descendant(
       of: of,
+      // Either kind of progress stripe, and never a rule: the wird's is given
+      // a fraction and the band's is given the count.
       matching: find.byWidgetPredicate(
-        (Widget widget) => widget is VoussoirStripe && widget.value != null,
+        (Widget widget) =>
+            widget is VoussoirStripe &&
+            (widget.value != null || widget.lit != null),
       ),
     ),
   );

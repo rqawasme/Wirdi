@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 /// arches of the Mezquita alternate brick and stone.
 ///
 /// Used functionally rather than as ornament. In [VoussoirStripe.rule] it is a
-/// section divider; in [VoussoirStripe.progress] it is the progress bar, and
-/// the same motif carries both so that progress reads as the rule filling in
-/// rather than as a different component arriving.
+/// section divider; in [VoussoirStripe.progress] and [VoussoirStripe.counted]
+/// it is the progress bar, and the same motif carries all three so that
+/// progress reads as the rule filling in rather than as a different component
+/// arriving.
 ///
 /// Segments butt against each other with no gaps — voussoirs are wedges in an
 /// arch, not dashes. By default they are a fixed [segmentWidth], so the count
@@ -20,7 +21,8 @@ class VoussoirStripe extends StatelessWidget {
   /// [ColorScheme.surfaceContainerHigh] along its whole length.
   const VoussoirStripe.rule({super.key, this.height = ruleHeight})
     : value = null,
-      segments = null;
+      segments = null,
+      lit = null;
 
   /// A progress indicator. Segments up to [value] are
   /// [ColorScheme.primary]; the rest are [ColorScheme.surfaceContainerHigh].
@@ -43,11 +45,31 @@ class VoussoirStripe extends StatelessWidget {
     required double this.value,
     this.segments,
     this.height = progressHeight,
-  }) : assert(
+  }) : lit = null,
+       assert(
          segments == null || segments > 0,
          'a stripe has segments or it '
          'has a segment width, and zero of them is neither',
        );
+
+  /// A progress indicator for something counted, given as the count itself:
+  /// [lit] segments of [of] are [ColorScheme.primary].
+  ///
+  /// The same picture [VoussoirStripe.progress] draws, without the trip
+  /// through a fraction — which is not a detail. `lit / of * of` is not
+  /// reliably `lit` in binary floating point (37 of 100 is one of the pairs it
+  /// is not), so a stripe told its position as a fraction of a hundred stalls
+  /// on three of those hundred counts. A counter must move on every count it
+  /// is given, so a stripe that is counting something takes the count.
+  const VoussoirStripe.counted({
+    super.key,
+    required int this.lit,
+    required int of,
+    this.height = progressHeight,
+  }) : value = null,
+       segments = of,
+       assert(of > 0, 'a counted stripe has segments to count'),
+       assert(lit >= 0 && lit <= of, 'lit is a position in 0..of');
 
   /// Three base spacing units.
   static const double segmentWidth = 12;
@@ -55,16 +77,19 @@ class VoussoirStripe extends StatelessWidget {
   static const double ruleHeight = 4;
   static const double progressHeight = 6;
 
-  /// Null in rule mode. 0..1 in progress mode.
+  /// Null in rule mode and in counted mode. 0..1 in progress mode.
   final double? value;
 
   /// A fixed number of segments across the width, or null to cut them at
-  /// [segmentWidth]. Progress mode only.
+  /// [segmentWidth]. Never null in counted mode.
   final int? segments;
+
+  /// How many segments are lit, in counted mode. Null in the other two.
+  final int? lit;
 
   final double height;
 
-  bool get _isRule => value == null;
+  bool get _isRule => value == null && lit == null;
 
   @override
   Widget build(BuildContext context) {
@@ -78,6 +103,7 @@ class VoussoirStripe extends StatelessWidget {
           unfilled: scheme.surfaceContainerHigh,
           value: value,
           segments: segments,
+          lit: lit,
         ),
       ),
     );
@@ -88,7 +114,7 @@ class VoussoirStripe extends StatelessWidget {
     }
     return Semantics(
       container: true,
-      value: '${(value! * 100).round()}%',
+      value: lit == null ? '${(value! * 100).round()}%' : '$lit of $segments',
       child: stripe,
     );
   }
@@ -100,12 +126,25 @@ class _VoussoirPainter extends CustomPainter {
     required this.unfilled,
     required this.value,
     this.segments,
+    this.lit,
   });
+
+  /// The slack in the quantisation below.
+  ///
+  /// `k / n * n` is not reliably `k` in binary floating point — at 51 steps it
+  /// is 30.999999999999996 for the thirty-first — and a bare floor of that is
+  /// a segment short exactly when a step has just been completed, which is the
+  /// moment the stripe is being looked at. Small enough that it cannot light a
+  /// segment that is genuinely part way through: it takes a value within a
+  /// billionth of the boundary to round up, and a step of a thousand moves the
+  /// value by a thousandth.
+  static const double _boundarySlack = 1e-9;
 
   final Color filled;
   final Color unfilled;
   final double? value;
   final int? segments;
+  final int? lit;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -120,10 +159,14 @@ class _VoussoirPainter extends CustomPainter {
         : size.width / segments!;
 
     // Quantised down, not rounded: 96% of the way through should not look
-    // finished.
-    final int? litSegments = value == null
-        ? null
-        : (value!.clamp(0.0, 1.0) * count).floor();
+    // finished. A counted stripe was given the number outright and needs no
+    // quantising at all.
+    final int? litSegments = switch ((lit, value)) {
+      (final int lit, _) => lit,
+      (_, final double value) =>
+        (value.clamp(0.0, 1.0) * count + _boundarySlack).floor(),
+      _ => null,
+    };
 
     final Paint paint = Paint()..style = PaintingStyle.fill;
 
@@ -148,6 +191,7 @@ class _VoussoirPainter extends CustomPainter {
     return oldDelegate.filled != filled ||
         oldDelegate.unfilled != unfilled ||
         oldDelegate.value != value ||
-        oldDelegate.segments != segments;
+        oldDelegate.segments != segments ||
+        oldDelegate.lit != lit;
   }
 }

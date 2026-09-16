@@ -438,6 +438,16 @@ void main() {
     // have something to show: the wird's under the app bar, and the step's
     // along the top edge of the band, three segments of seven lit.
     await openPlayer(wird, '03-player-counting', stepIndex: 46, taps: 3);
+    // The morning adhkar's tasbih of a hundred, thirty taps in. The band's
+    // stripe is cut into a hundred, which is where a cap on the segment count
+    // showed as a bar that moved every third tap; this is the picture that
+    // says whether a segment that thin still reads as a bar filling.
+    await openPlayer(
+      morning,
+      '03b-player-counting-hundred',
+      stepIndex: 2,
+      taps: 30,
+    );
 
     // The same wird's other two kinds of step: an ayah said seven times, and a
     // surah said three times over.

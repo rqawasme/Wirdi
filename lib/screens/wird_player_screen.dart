@@ -1036,18 +1036,22 @@ class _AdvanceBand extends StatelessWidget {
             children: <Widget>[
               // The hairline, filling in. Flush under the border and flush to
               // both edges, so at nothing counted it is the band's tonal top
-              // edge and no new component has arrived; a segment lights on the
-              // tap that consumes a unit, and it is solid when the step is.
-              // One segment per tap up to thirty-three, so a tasbih moves it
-              // on every one and a count of a hundred every third.
+              // edge and no new component has arrived, and it is solid when
+              // the step is.
+              //
+              // Counted rather than given a fraction, and cut into one segment
+              // for every tap the step takes however many that is: this is the
+              // answer to "did that tap land", so every tap has to move it —
+              // including the hundredth of a hundred, and including the ayahs
+              // of a surah the numeral below cannot count.
               //
               // The wird's stripe is under the app bar and this one is the
               // step's, which is the same division of labour as the numeral
               // below it: the top of the screen is how far through the whole,
               // the bottom is how far through what is in front of you.
-              VoussoirStripe.progress(
-                value: player.stepProgress,
-                segments: player.stepSegments,
+              VoussoirStripe.counted(
+                lit: player.stepTapsDone,
+                of: player.stepTaps,
               ),
               // A floor rather than a fixed height: 88 at every ordinary text
               // size, and room to grow instead of overflow for a reader who

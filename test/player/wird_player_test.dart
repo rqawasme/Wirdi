@@ -937,7 +937,7 @@ void main() {
   });
 
   group("the band's stripe", () {
-    test('is one segment per tap of the step, up to thirty-three', () {
+    test('is one segment per tap of the step, however many that is', () {
       final WirdPlayer player = playerFor(
         collectionOf(<CollectionEntry>[
           dhikrItem(1001, position: 1, count: 33),
@@ -945,21 +945,52 @@ void main() {
           surahItem(112, position: 3, ayahCount: 4, count: 3),
         ]),
       );
-      expect(player.stepSegments, 33, reason: 'a tasbih is a tap a segment');
+      expect(player.stepTaps, 33, reason: 'a tasbih is a tap a segment');
 
       player.skipForward();
       expect(
-        player.stepSegments,
-        WirdPlayer.maxStripeSegments,
-        reason: 'a hundred fills proportionally rather than in a hundred parts',
+        player.stepTaps,
+        100,
+        reason:
+            'uncapped: the wird stripe stops at thirty-three, this one is '
+            'feedback for the tap that just landed and has to move on every '
+            'one of them',
       );
 
       player.skipForward();
       expect(
-        player.stepSegments,
+        player.stepTaps,
         12,
         reason: 'four ayahs over three rounds is twelve taps',
       );
+    });
+
+    test('moves on every one of a hundred taps, and none of them twice', () {
+      final WirdPlayer player = playerFor(
+        collectionOf(<CollectionEntry>[
+          dhikrItem(1001, position: 1, count: 100),
+          dhikrItem(1002, position: 2, count: 1),
+        ]),
+      );
+
+      // The number the band hands the stripe, tap by tap. A fraction would
+      // stall here: 29 / 100 * 100 is 28.999999999999996, and so are two more
+      // of the hundred.
+      for (int tap = 1; tap < 100; tap++) {
+        player.increment();
+        expect(
+          player.stepTapsDone,
+          tap,
+          reason: 'tap $tap of a hundred left the stripe where it was',
+        );
+      }
+
+      // The hundredth finishes the step, and the stripe belongs to the next
+      // one: empty again, because that step has had no taps.
+      player.increment();
+      expect(player.stepIndex, 1);
+      expect(player.stepTapsDone, 0);
+      expect(player.stepTaps, 1);
     });
 
     test('lights a segment on every tap, ayahs included', () {
@@ -984,15 +1015,21 @@ void main() {
       expect(player.stepProgress, closeTo(1 / 3, 0.0001));
     });
 
-    test('is solid on the finished step', () {
+    test('is solid on the finished step, and never past full', () {
       final WirdPlayer player = playerFor(
-        collectionOf(<CollectionEntry>[dhikrItem(1001, position: 1, count: 3)]),
+        collectionOf(<CollectionEntry>[
+          surahItem(112, position: 1, ayahCount: 4, count: 1),
+        ]),
       );
 
-      player.increment();
-      player.increment();
-      player.increment();
+      for (int tap = 0; tap < 4; tap++) {
+        player.increment();
+      }
       expect(player.finished, isTrue);
+      // The finished step holds its count at the target with the unit index
+      // where the last tap left it, which is one tap past the end of a stripe
+      // that did not clamp.
+      expect(player.stepTapsDone, player.stepTaps);
       expect(player.stepProgress, 1);
     });
   });
