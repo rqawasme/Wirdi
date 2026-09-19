@@ -386,8 +386,10 @@ void main() {
         final UserDhikrRef ref = await DriftUserDhikrRepository(
           db,
         ).create(const DhikrDraft(textArabic: 'PLACEHOLDER dhikr arabic'));
+        final ContentDatabase content = ContentDatabase.memory();
+        await seedContent(content);
         final DriftCollectionRepository collections = DriftCollectionRepository(
-          content: await _seededContent(),
+          content: content,
           user: db,
         );
         final UserCollectionId id = await collections.create('Mine');
@@ -395,6 +397,7 @@ void main() {
 
         final ResolvedCollection resolved = await collections.resolve(id);
         await db.close();
+        await content.close();
 
         expect(resolved.unresolved, isEmpty);
         final DhikrItem item = resolved.entries.single as DhikrItem;
@@ -403,15 +406,4 @@ void main() {
       },
     );
   });
-}
-
-/// An in-memory `content.db` with the fixture content in it.
-///
-/// Resolution reads it even for a collection made entirely of the user's own
-/// adhkar — it is what the four content batches are run against — so the
-/// repository needs one even where nothing here points into it.
-Future<ContentDatabase> _seededContent() async {
-  final ContentDatabase content = ContentDatabase.memory();
-  await seedContent(content);
-  return content;
 }

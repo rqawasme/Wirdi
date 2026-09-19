@@ -149,8 +149,9 @@ Drift's generated row types stop at the repository boundary. `lib/domain/`
 imports no drift.
 
 A collection item points at one of two things, and which one is the kind of its
-`ItemRef`: a `ContentRef` names a row of `content.db` by the integer id the build
-assigned it, and a `UserDhikrRef` names a dhikr the user wrote, which lives in
+`ItemRef`: a `ContentRef` names a row of `content.db` by the integer id the
+build assigned it, and a `UserDhikrRef` names a dhikr the user wrote, which
+lives in
 `user_adhkar` in `user.db` and so is keyed by a UUID like everything else there.
 That is the same split `CollectionId` already makes between a built-in and a
 user collection, and for the same reason: one type flows through the UI, and
@@ -734,9 +735,10 @@ recited, listed and read by exactly the code that draws one that shipped: the
 player maps a step to its entry by id and has no idea which kind it is holding.
 
 `translation` became nullable for this, and every widget that drew that line
-leaves it out rather than standing it empty. `adhkar.translation` in `content.db`
-is still NOT NULL and stays that way — the pipeline can insist, because it is
-authoring. Somebody writing down the dua they say already knows what it means,
+leaves it out rather than standing it empty. `adhkar.translation` in
+`content.db` is still NOT NULL and stays that way — the pipeline can insist,
+because it is authoring. Somebody writing down the dua they say knows what it
+means,
 and refusing to save it until they have typed a translation is asking them to do
 the content build's job. A dhikr with no translation is found by its Arabic, and
 read out by it too: `DhikrRow`'s screen-reader label falls back to the Arabic,
@@ -745,8 +747,8 @@ which leaves a reader with no Arabic voice exactly where a sighted reader is.
 **"Your adhkar" hangs off the collections list**, at the bottom, under the
 built-ins. Not a fifth tab — four is the ceiling — and not a second icon in the
 app bar, whose one collections-only action is already "New collection". A dhikr
-is edited and deleted from that screen and nowhere else: a collection *names* its
-adhkar without owning them, and offering "delete this dhikr" from inside one
+is edited and deleted from that screen and nowhere else: a collection *names*
+its adhkar without owning them, and offering "delete this dhikr" from inside one
 collection would be offering, from there, to change another.
 
 **An edit is shared, and the form says so.** A collection item names a dhikr

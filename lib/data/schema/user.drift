@@ -317,6 +317,12 @@ userDhikrUsageCounts:
 -- position in a list, and a tombstoned one would leave a hole that
 -- `setRepeatGroup`'s contiguity check trips over. The collections it touched
 -- are renumbered afterwards, in the same transaction.
+--
+-- Every collection, including a soft-deleted one — which
+-- `collectionsUsingUserDhikr` leaves out, so those are not renumbered.
+-- Deliberate: an item pointing at a row that is gone is worse than a gap in a
+-- collection nobody can see, and there is no way back to a deleted collection
+-- to see it from.
 deleteItemsForUserDhikr:
     DELETE FROM user_collection_items
     WHERE item_type = 'user_dhikr' AND user_item_id = :dhikr;
