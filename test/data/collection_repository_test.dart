@@ -9,7 +9,7 @@ import '../support/fixtures.dart';
 /// order rather than of object identity.
 String describe(CollectionEntry entry) => switch (entry) {
   DhikrItem(:final Dhikr dhikr, :final int count) =>
-    'dhikr:${dhikr.id} x$count',
+    '${dhikr.ref.canonical} x$count',
   AyahItem(:final Ayah ayah, :final int count) => 'ayah:${ayah.id} x$count',
   SurahItem(:final Surah surah, :final int count) =>
     'surah:${surah.number} x$count',
@@ -91,14 +91,14 @@ void main() {
           .toList();
 
       final DhikrItem overridden = adhkar.firstWhere(
-        (DhikrItem d) => d.dhikr.id == 1002,
+        (DhikrItem d) => d.dhikr.ref == const ContentRef.dhikr(1002),
       );
       expect(overridden.dhikr.defaultCount, 33);
       expect(overridden.count, 100);
 
       // And a dhikr with no override falls back to its own default.
       final DhikrItem defaulted = adhkar.firstWhere(
-        (DhikrItem d) => d.dhikr.id == 1003,
+        (DhikrItem d) => d.dhikr.ref == const ContentRef.dhikr(1003),
       );
       expect(defaulted.count, defaulted.dhikr.defaultCount);
       expect(defaulted.count, 3);
@@ -535,7 +535,7 @@ void main() {
           .toList();
 
       final DhikrItem cited = adhkar.firstWhere(
-        (DhikrItem d) => d.dhikr.id == 1002,
+        (DhikrItem d) => d.dhikr.ref == const ContentRef.dhikr(1002),
       );
       expect(cited.dhikr.sourceId, 1);
       expect(cited.source, isNotNull);
@@ -551,7 +551,9 @@ void main() {
       );
       final DhikrItem uncited = resolved.entries
           .whereType<DhikrItem>()
-          .firstWhere((DhikrItem d) => d.dhikr.id == 1001);
+          .firstWhere(
+            (DhikrItem d) => d.dhikr.ref == const ContentRef.dhikr(1001),
+          );
       expect(uncited.dhikr.sourceId, isNull);
       expect(uncited.source, isNull);
     });
@@ -560,11 +562,15 @@ void main() {
       final ResolvedCollection resolved = await collections.resolve(
         const BuiltinCollectionId(mixedCollectionId),
       );
-      final Map<int, int?> bySourceId = <int, int?>{
+      final Map<ItemRef, int?> bySourceId = <ItemRef, int?>{
         for (final DhikrItem d in resolved.entries.whereType<DhikrItem>())
-          d.dhikr.id: d.source?.id,
+          d.dhikr.ref: d.source?.id,
       };
-      expect(bySourceId, <int, int?>{1001: null, 1002: 1, 1003: 2});
+      expect(bySourceId, <ItemRef, int?>{
+        const ContentRef.dhikr(1001): null,
+        const ContentRef.dhikr(1002): 1,
+        const ContentRef.dhikr(1003): 2,
+      });
     });
 
     test('a user collection hydrates sources through the same path', () async {

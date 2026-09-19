@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/collection.dart';
 import '../domain/collection_id.dart';
-import '../domain/content_ref.dart';
+import '../domain/item_ref.dart';
 import '../providers/editing.dart';
 import '../theme/theme.dart';
 import '../widgets/empty_state.dart';
@@ -299,7 +299,7 @@ class _BlockRow extends StatelessWidget {
 class _Unresolved extends StatelessWidget {
   const _Unresolved({required this.refs});
 
-  final List<ContentRef> refs;
+  final List<ItemRef> refs;
 
   @override
   Widget build(BuildContext context) {

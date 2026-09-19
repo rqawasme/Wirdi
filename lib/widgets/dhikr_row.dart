@@ -24,11 +24,16 @@ class DhikrRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final WirdiTypography type = theme.extension<WirdiTypography>()!;
+    final String? translation = dhikr.translation;
 
     return Semantics(
       container: true,
       button: true,
-      label: 'Dhikr, ${dhikr.translation}',
+      // The Arabic where there is no translation, which is what a dhikr the
+      // user wrote and left untranslated has to be told apart by. A reader
+      // with no Arabic voice is then in the same position as a sighted reader
+      // looking at the row: the Arabic is all there is of it.
+      label: 'Dhikr, ${translation ?? dhikr.textArabic}',
       child: InkWell(
         onTap: onTap,
         child: Padding(
@@ -50,15 +55,17 @@ class DhikrRow extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(height: WirdiMetrics.space2),
-                Text(
-                  dhikr.translation,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                if (translation != null) ...<Widget>[
+                  const SizedBox(height: WirdiMetrics.space2),
+                  Text(
+                    translation,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),

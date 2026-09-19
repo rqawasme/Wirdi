@@ -1,4 +1,4 @@
-import 'content_ref.dart';
+import 'item_ref.dart';
 
 /// One unit of playback: an item to recite, once.
 ///
@@ -20,7 +20,7 @@ final class PlaybackStep {
   /// Index of this step in [ResolvedCollection.steps].
   final int index;
 
-  final ContentRef ref;
+  final ItemRef ref;
 
   /// How many times this item is recited within this step.
   final int count;

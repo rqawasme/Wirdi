@@ -2,7 +2,7 @@ import '../domain/collection.dart';
 import '../domain/collection_id.dart';
 import '../domain/commitment.dart';
 import '../domain/content.dart';
-import '../domain/content_ref.dart';
+import '../domain/item_ref.dart';
 import '../domain/progress.dart';
 import 'content_database.dart';
 // `reading_position` makes drift generate a table class called
@@ -48,13 +48,27 @@ Ayah ayahFromRow(AyahRow row) => Ayah(
 );
 
 Dhikr dhikrFromRow(DhikrRow row) => Dhikr(
-  id: row.id,
+  ref: ContentRef.dhikr(row.id),
   textArabic: row.textArabic,
   translation: row.translation,
   transliteration: row.transliteration,
   defaultCount: row.defaultCount,
   sourceId: row.sourceId,
   benefits: row.benefits,
+  notes: row.notes,
+);
+
+/// A dhikr the user wrote, as the same [Dhikr] an authored one becomes.
+///
+/// `reference` rather than `sourceId`, and no `benefits`: `user_adhkar` has
+/// neither column. See [Dhikr] on why one class covers both.
+Dhikr userDhikrFromRow(UserDhikrRow row) => Dhikr(
+  ref: UserDhikrRef(row.id),
+  textArabic: row.textArabic,
+  translation: row.translation,
+  transliteration: row.transliteration,
+  defaultCount: row.defaultCount,
+  reference: row.reference,
   notes: row.notes,
 );
 
@@ -131,11 +145,11 @@ Commitment? commitmentFromRow(CommitmentRow row) {
   );
 }
 
-/// `step_ref` is written by this app in [ContentRef.canonical] form. A value
+/// `step_ref` is written by this app in [ItemRef.canonical] form. A value
 /// that does not parse means the row was written by something else, so it is
 /// treated as unresumable rather than guessed at.
 WirdProgress? progressFromRow(ProgressRow row, CollectionId id) {
-  final ContentRef? ref = ContentRef.tryParse(row.stepRef);
+  final ItemRef? ref = ItemRef.tryParse(row.stepRef);
   if (ref == null) return null;
   return WirdProgress(
     collectionId: id,

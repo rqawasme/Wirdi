@@ -1,6 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wirdi/domain/domain.dart';
 
+/// The content id a step names.
+///
+/// Every step in these tests is an authored dhikr, ayah or surah, so every ref
+/// is a [ContentRef]; a cast says so once rather than at each expectation.
+int contentIdOf(ItemRef ref) => (ref as ContentRef).id;
+
 /// `steps` is derived purely from `entries`, so it can be exercised without a
 /// database.
 ResolvedCollection collectionOf(List<CollectionEntry> entries) {
@@ -15,7 +21,7 @@ ResolvedCollection collectionOf(List<CollectionEntry> entries) {
 }
 
 Dhikr dhikrOf(int id, {int defaultCount = 1}) => Dhikr(
-  id: id,
+  ref: ContentRef.dhikr(id),
   textArabic: 'PLACEHOLDER dhikr $id arabic',
   translation: 'PLACEHOLDER dhikr $id translation',
   defaultCount: defaultCount,
@@ -108,7 +114,10 @@ void main() {
 
       // Pass by pass, not item by item: the block is recited whole each round.
       expect(
-        resolved.steps.take(6).map((PlaybackStep s) => s.ref.id).toList(),
+        resolved.steps
+            .take(6)
+            .map((PlaybackStep s) => contentIdOf(s.ref))
+            .toList(),
         <int>[1001, 1002, 1003, 1001, 1002, 1003],
       );
 
@@ -149,13 +158,10 @@ void main() {
         itemOf(1003, position: 3),
       ]);
 
-      expect(resolved.steps.map((PlaybackStep s) => s.ref.id).toList(), <int>[
-        1001,
-        1002,
-        1002,
-        1002,
-        1003,
-      ]);
+      expect(
+        resolved.steps.map((PlaybackStep s) => contentIdOf(s.ref)).toList(),
+        <int>[1001, 1002, 1002, 1002, 1003],
+      );
       expect(
         resolved.steps.map((PlaybackStep s) => s.repetitionsTotal).toList(),
         <int>[1, 3, 3, 3, 1],

@@ -4,12 +4,13 @@ import 'content_database.dart';
 import 'database_files.dart';
 import 'repositories/drift_collection_repository.dart';
 import 'repositories/drift_content_repository.dart';
+import 'repositories/drift_user_dhikr_repository.dart';
 import 'repositories/drift_user_repository.dart';
 import 'sqlite_runtime.dart';
 import 'user_database.dart';
 import '../domain/repositories.dart';
 
-/// The two databases and the three repositories over them, opened together.
+/// The two databases and the four repositories over them, opened together.
 ///
 /// Built by [open] at startup, or by [WirdiData.new] from databases a test has
 /// already opened.
@@ -30,6 +31,7 @@ class WirdiData {
          user: user,
          clock: clock,
        ),
+       userDhikrRepository = DriftUserDhikrRepository(user, clock: clock),
        userRepository = DriftUserRepository(user, clock: clock);
 
   /// Copies the bundled content asset if needed, opens both databases and
@@ -57,6 +59,7 @@ class WirdiData {
 
   final ContentRepository contentRepository;
   final CollectionRepository collectionRepository;
+  final UserDhikrRepository userDhikrRepository;
   final UserRepository userRepository;
 
   Future<void> close() async {

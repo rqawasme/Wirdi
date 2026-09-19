@@ -1,5 +1,5 @@
 import 'collection_id.dart';
-import 'content_ref.dart';
+import 'item_ref.dart';
 
 /// A row that must exist in `content.db` was not there.
 ///
@@ -13,6 +13,21 @@ class ContentNotFoundException implements Exception {
 
   @override
   String toString() => 'no such ${ref.type.name} in content.db: ${ref.id}';
+}
+
+/// The dhikr the user wrote does not exist, or was soft-deleted.
+///
+/// Its own exception rather than [ContentNotFoundException], which is about
+/// `content.db` and means the caller asked for a row the content build never
+/// wrote. This one means a row somebody else on this device deleted while a
+/// screen still had it on it, which is an ordinary race and not a bug.
+class DhikrNotFoundException implements Exception {
+  const DhikrNotFoundException(this.ref);
+
+  final UserDhikrRef ref;
+
+  @override
+  String toString() => 'no such dhikr of your own: ${ref.canonical}';
 }
 
 /// The requested collection does not exist, or was soft-deleted.

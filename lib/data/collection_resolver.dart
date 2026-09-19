@@ -1,6 +1,6 @@
 import '../domain/collection.dart';
 import '../domain/content.dart';
-import '../domain/content_ref.dart';
+import '../domain/item_ref.dart';
 import 'content_database.dart';
 import 'mappers.dart';
 
@@ -13,8 +13,7 @@ import 'mappers.dart';
 final class ResolvableItem {
   const ResolvableItem({
     required this.entryId,
-    required this.itemType,
-    required this.itemId,
+    required this.ref,
     required this.position,
     this.countOverride,
     this.repeatGroup,
@@ -25,10 +24,10 @@ final class ResolvableItem {
   /// `collection_items.id` stringified, or a `user_collection_items` UUID.
   final String entryId;
 
-  /// The raw `item_type` value; null when it is not one this app knows.
-  final ContentType? itemType;
+  /// What this row points at; null when its columns name nothing this app
+  /// knows — see `itemRefFromSql`.
+  final ItemRef? ref;
 
-  final int itemId;
   final int position;
   final int? countOverride;
   final int? repeatGroup;
@@ -55,10 +54,18 @@ class CollectionResolver {
 
   final ContentDatabase _content;
 
+  /// [userAdhkar] is the adhkar the user wrote that [items] name, by UUID,
+  /// read from `user.db` by the caller and handed in here.
+  ///
+  /// Passed in rather than fetched: this class holds `content.db` and only
+  /// `content.db`. `DriftCollectionRepository` is the one place that holds
+  /// both databases, so it is the one place that can do that read — see the
+  /// note at the top of it.
   Future<ResolvedCollection> resolve(
     CollectionSummary collection,
-    List<ResolvableItem> items,
-  ) async {
+    List<ResolvableItem> items, {
+    Map<String, Dhikr> userAdhkar = const <String, Dhikr>{},
+  }) async {
     // position is authoritative; never rely on row order.
     final List<ResolvableItem> ordered = List<ResolvableItem>.of(items)
       ..sort(
@@ -69,7 +76,7 @@ class CollectionResolver {
     final _Batches batches = await _fetch(ordered);
 
     final List<CollectionEntry> entries = <CollectionEntry>[];
-    final List<ContentRef> unresolved = <ContentRef>[];
+    final List<ItemRef> unresolved = <ItemRef>[];
 
     // A repeat block is a maximal run of adjacent items sharing a repeat_group.
     // The content build guarantees built-in groups are contiguous; user rows
@@ -94,11 +101,10 @@ class CollectionResolver {
     }
 
     for (final ResolvableItem item in ordered) {
-      final CollectionItemEntry? entry = _entryFor(item, batches);
+      final CollectionItemEntry? entry = _entryFor(item, batches, userAdhkar);
       if (entry == null) {
-        if (item.itemType != null) {
-          unresolved.add(ContentRef(item.itemType!, item.itemId));
-        }
+        final ItemRef? ref = item.ref;
+        if (ref != null) unresolved.add(ref);
         continue;
       }
 
@@ -123,7 +129,7 @@ class CollectionResolver {
     return ResolvedCollection(
       collection: collection,
       entries: List<CollectionEntry>.unmodifiable(entries),
-      unresolved: List<ContentRef>.unmodifiable(unresolved),
+      unresolved: List<ItemRef>.unmodifiable(unresolved),
     );
   }
 
@@ -133,15 +139,17 @@ class CollectionResolver {
     final Set<int> surahNumbers = <int>{};
 
     for (final ResolvableItem item in items) {
-      switch (item.itemType) {
-        case ContentType.dhikr:
-          dhikrIds.add(item.itemId);
-        case ContentType.ayah:
-          ayahIds.add(item.itemId);
-        case ContentType.surah:
-          surahNumbers.add(item.itemId);
-        case null:
-          break;
+      // A user dhikr is already in hand: it came from user.db, which this
+      // class does not hold, so there is nothing here to batch for it.
+      if (item.ref case ContentRef(:final ContentType type, :final int id)) {
+        switch (type) {
+          case ContentType.dhikr:
+            dhikrIds.add(id);
+          case ContentType.ayah:
+            ayahIds.add(id);
+          case ContentType.surah:
+            surahNumbers.add(id);
+        }
       }
     }
 
@@ -182,24 +190,21 @@ class CollectionResolver {
     );
   }
 
-  CollectionItemEntry? _entryFor(ResolvableItem item, _Batches batches) {
-    switch (item.itemType) {
-      case ContentType.dhikr:
-        final Dhikr? dhikr = batches.adhkar[item.itemId];
-        if (dhikr == null) return null;
-        return DhikrItem(
-          entryId: item.entryId,
-          position: item.position,
-          // count_override wins; a dhikr's own default_count is the fallback.
-          count: item.countOverride ?? dhikr.defaultCount,
-          note: item.note,
-          dhikr: dhikr,
-          source: dhikr.sourceId == null
-              ? null
-              : batches.sources[dhikr.sourceId],
-        );
-      case ContentType.ayah:
-        final Ayah? ayah = batches.ayahs[item.itemId];
+  CollectionItemEntry? _entryFor(
+    ResolvableItem item,
+    _Batches batches,
+    Map<String, Dhikr> userAdhkar,
+  ) {
+    switch (item.ref) {
+      case ContentRef(type: ContentType.dhikr, :final int id):
+        return _dhikrEntry(item, batches.adhkar[id], batches);
+      case UserDhikrRef(:final String uuid):
+        // The same entry a built-in dhikr makes, and deliberately so: what
+        // differs is which database the row came out of, which the dhikr's own
+        // ref already says. It cites no `sources` row — see [Dhikr.reference].
+        return _dhikrEntry(item, userAdhkar[uuid], batches);
+      case ContentRef(type: ContentType.ayah, :final int id):
+        final Ayah? ayah = batches.ayahs[id];
         if (ayah == null) return null;
         return AyahItem(
           entryId: item.entryId,
@@ -208,9 +213,9 @@ class CollectionResolver {
           note: item.note,
           ayah: ayah,
         );
-      case ContentType.surah:
+      case ContentRef(type: ContentType.surah, :final int id):
         // Metadata only. The caller expands ayahs when it needs them.
-        final Surah? surah = batches.surahs[item.itemId];
+        final Surah? surah = batches.surahs[id];
         if (surah == null) return null;
         return SurahItem(
           entryId: item.entryId,
@@ -222,6 +227,19 @@ class CollectionResolver {
       case null:
         return null;
     }
+  }
+
+  DhikrItem? _dhikrEntry(ResolvableItem item, Dhikr? dhikr, _Batches batches) {
+    if (dhikr == null) return null;
+    return DhikrItem(
+      entryId: item.entryId,
+      position: item.position,
+      // count_override wins; a dhikr's own default_count is the fallback.
+      count: item.countOverride ?? dhikr.defaultCount,
+      note: item.note,
+      dhikr: dhikr,
+      source: dhikr.sourceId == null ? null : batches.sources[dhikr.sourceId],
+    );
   }
 }
 

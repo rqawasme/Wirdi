@@ -29,6 +29,7 @@ class DhikrBlock extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     final WirdiTypography type = theme.extension<WirdiTypography>()!;
     final String? transliteration = dhikr.transliteration;
+    final String? translation = dhikr.translation;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -52,9 +53,12 @@ class DhikrBlock extends StatelessWidget {
             ),
           ),
         ],
-        if (showTranslation) ...<Widget>[
+        // Nothing where a dhikr the user wrote carries no translation: the
+        // line is left out rather than stood empty, and the setting still
+        // decides whether a translation that exists is shown.
+        if (showTranslation && translation != null) ...<Widget>[
           const SizedBox(height: WirdiMetrics.space3),
-          TranslationText(dhikr.translation, style: type.translation),
+          TranslationText(translation, style: type.translation),
         ],
       ],
     );

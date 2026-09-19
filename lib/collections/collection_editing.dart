@@ -1,6 +1,6 @@
 import '../domain/collection.dart';
 import '../domain/collection_id.dart';
-import '../domain/content_ref.dart';
+import '../domain/item_ref.dart';
 import '../domain/repositories.dart';
 
 /// A refusal phrased for the person who caused it.
@@ -233,7 +233,7 @@ Future<UserCollectionId> duplicateCollection({
   }
 
   for (final CollectionItemEntry item in items) {
-    final ContentRef ref = item.ref;
+    final ItemRef ref = item.ref;
     await collections.addItem(
       id,
       ref,

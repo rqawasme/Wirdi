@@ -8,7 +8,7 @@ import '../collections/picked_item.dart';
 import '../domain/collection.dart';
 import '../domain/collection_id.dart';
 import '../domain/content.dart';
-import '../domain/content_ref.dart';
+import '../domain/item_ref.dart';
 import '../domain/repositories.dart';
 import 'data_providers.dart';
 

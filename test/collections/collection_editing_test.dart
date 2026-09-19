@@ -40,11 +40,11 @@ void main() {
     ];
   }
 
-  Future<List<ContentRef>> refsOf(ResolvedCollection collection) async {
-    return <ContentRef>[
+  Future<List<ItemRef>> refsOf(ResolvedCollection collection) async {
+    return <ItemRef>[
       for (final CollectionEntry entry in collection.entries)
         ...switch (entry) {
-          CollectionItemEntry(:final ContentRef ref) => <ContentRef>[ref],
+          CollectionItemEntry(:final ItemRef ref) => <ItemRef>[ref],
           RepeatBlock(entries: final List<CollectionItemEntry> members) =>
             members.map((CollectionItemEntry e) => e.ref),
         },

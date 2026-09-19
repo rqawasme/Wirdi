@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart' show immutable;
 
-import '../domain/content_ref.dart';
+import '../domain/item_ref.dart';
 
 /// One item a picker is handing back, with the two optional things the user
 /// can say about it on the way through.
@@ -12,7 +12,9 @@ import '../domain/content_ref.dart';
 final class PickedItem {
   const PickedItem({required this.ref, this.count, this.note});
 
-  final ContentRef ref;
+  /// What was picked: a row of `content.db`, or a dhikr the user wrote — which
+  /// is what the "Your adhkar" picker hands back.
+  final ItemRef ref;
 
   /// A `count_override`, or null to leave the item at its natural count — a
   /// dhikr's `default_count`, or once for an ayah or a surah.

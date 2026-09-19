@@ -559,6 +559,17 @@ class UserCollectionItems extends Table
     requiredDuringInsert: false,
     $customConstraints: '',
   );
+  static const VerificationMeta _userItemIdMeta = const VerificationMeta(
+    'userItemId',
+  );
+  late final GeneratedColumn<String> userItemId = GeneratedColumn<String>(
+    'user_item_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
   );
@@ -581,6 +592,7 @@ class UserCollectionItems extends Table
     repeatGroup,
     repeatGroupCount,
     note,
+    userItemId,
     updatedAt,
   ];
   @override
@@ -668,6 +680,15 @@ class UserCollectionItems extends Table
         note.isAcceptableOrUnknown(data['note']!, _noteMeta),
       );
     }
+    if (data.containsKey('user_item_id')) {
+      context.handle(
+        _userItemIdMeta,
+        userItemId.isAcceptableOrUnknown(
+          data['user_item_id']!,
+          _userItemIdMeta,
+        ),
+      );
+    }
     if (data.containsKey('updated_at')) {
       context.handle(
         _updatedAtMeta,
@@ -721,6 +742,10 @@ class UserCollectionItems extends Table
         DriftSqlType.string,
         data['${effectivePrefix}note'],
       ),
+      userItemId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_item_id'],
+      ),
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}updated_at'],
@@ -742,7 +767,8 @@ class UserCollectionItemRow extends DataClass
   final String id;
   final String collectionId;
 
-  /// 'dhikr' | 'ayah' | 'surah', referencing content.db by item_id.
+  /// 'dhikr' | 'ayah' | 'surah', referencing content.db by item_id; or
+  /// 'user_dhikr', referencing user_adhkar by user_item_id.
   final String itemType;
   final int itemId;
   final int position;
@@ -753,6 +779,21 @@ class UserCollectionItemRow extends DataClass
   /// A rubric shown with this item, mirroring collection_items.note. A user
   /// collection copied from a built-in keeps the built-in's notes.
   final String? note;
+
+  /// Set on a 'user_dhikr' row and null on every other: `user_adhkar.id`, the
+  /// UUID of a dhikr the user wrote.
+  ///
+  /// A second column rather than a wider `item_id`, because `item_id` is
+  /// INTEGER NOT NULL and widening it to TEXT means rebuilding this table —
+  /// and a table rebuild is the one migration step that cannot be made
+  /// idempotent, which is the rule every step in the ladder has to keep. See
+  /// the note on onUpgrade in user_database.dart.
+  ///
+  /// A 'user_dhikr' row carries `item_id` 0, which is not a valid id in any of
+  /// the three content spaces — surah numbers and dhikr ids start at 1, and
+  /// ayahs.id is surah * 1000 + ayah — so a row that names no content row
+  /// reads as one.
+  final String? userItemId;
   final int updatedAt;
   const UserCollectionItemRow({
     required this.id,
@@ -764,6 +805,7 @@ class UserCollectionItemRow extends DataClass
     this.repeatGroup,
     this.repeatGroupCount,
     this.note,
+    this.userItemId,
     required this.updatedAt,
   });
   @override
@@ -786,6 +828,9 @@ class UserCollectionItemRow extends DataClass
     if (!nullToAbsent || note != null) {
       map['note'] = Variable<String>(note);
     }
+    if (!nullToAbsent || userItemId != null) {
+      map['user_item_id'] = Variable<String>(userItemId);
+    }
     map['updated_at'] = Variable<int>(updatedAt);
     return map;
   }
@@ -805,6 +850,7 @@ class UserCollectionItemRow extends DataClass
       repeatGroup: serializer.fromJson<int?>(json['repeat_group']),
       repeatGroupCount: serializer.fromJson<int?>(json['repeat_group_count']),
       note: serializer.fromJson<String?>(json['note']),
+      userItemId: serializer.fromJson<String?>(json['user_item_id']),
       updatedAt: serializer.fromJson<int>(json['updated_at']),
     );
   }
@@ -821,6 +867,7 @@ class UserCollectionItemRow extends DataClass
       'repeat_group': serializer.toJson<int?>(repeatGroup),
       'repeat_group_count': serializer.toJson<int?>(repeatGroupCount),
       'note': serializer.toJson<String?>(note),
+      'user_item_id': serializer.toJson<String?>(userItemId),
       'updated_at': serializer.toJson<int>(updatedAt),
     };
   }
@@ -835,6 +882,7 @@ class UserCollectionItemRow extends DataClass
     Value<int?> repeatGroup = const Value.absent(),
     Value<int?> repeatGroupCount = const Value.absent(),
     Value<String?> note = const Value.absent(),
+    Value<String?> userItemId = const Value.absent(),
     int? updatedAt,
   }) => UserCollectionItemRow(
     id: id ?? this.id,
@@ -850,6 +898,7 @@ class UserCollectionItemRow extends DataClass
         ? repeatGroupCount.value
         : this.repeatGroupCount,
     note: note.present ? note.value : this.note,
+    userItemId: userItemId.present ? userItemId.value : this.userItemId,
     updatedAt: updatedAt ?? this.updatedAt,
   );
   UserCollectionItemRow copyWithCompanion(UserCollectionItemsCompanion data) {
@@ -871,6 +920,9 @@ class UserCollectionItemRow extends DataClass
           ? data.repeatGroupCount.value
           : this.repeatGroupCount,
       note: data.note.present ? data.note.value : this.note,
+      userItemId: data.userItemId.present
+          ? data.userItemId.value
+          : this.userItemId,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -887,6 +939,7 @@ class UserCollectionItemRow extends DataClass
           ..write('repeatGroup: $repeatGroup, ')
           ..write('repeatGroupCount: $repeatGroupCount, ')
           ..write('note: $note, ')
+          ..write('userItemId: $userItemId, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -903,6 +956,7 @@ class UserCollectionItemRow extends DataClass
     repeatGroup,
     repeatGroupCount,
     note,
+    userItemId,
     updatedAt,
   );
   @override
@@ -918,6 +972,7 @@ class UserCollectionItemRow extends DataClass
           other.repeatGroup == this.repeatGroup &&
           other.repeatGroupCount == this.repeatGroupCount &&
           other.note == this.note &&
+          other.userItemId == this.userItemId &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -932,6 +987,7 @@ class UserCollectionItemsCompanion
   final Value<int?> repeatGroup;
   final Value<int?> repeatGroupCount;
   final Value<String?> note;
+  final Value<String?> userItemId;
   final Value<int> updatedAt;
   final Value<int> rowid;
   const UserCollectionItemsCompanion({
@@ -944,6 +1000,7 @@ class UserCollectionItemsCompanion
     this.repeatGroup = const Value.absent(),
     this.repeatGroupCount = const Value.absent(),
     this.note = const Value.absent(),
+    this.userItemId = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -957,6 +1014,7 @@ class UserCollectionItemsCompanion
     this.repeatGroup = const Value.absent(),
     this.repeatGroupCount = const Value.absent(),
     this.note = const Value.absent(),
+    this.userItemId = const Value.absent(),
     required int updatedAt,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -975,6 +1033,7 @@ class UserCollectionItemsCompanion
     Expression<int>? repeatGroup,
     Expression<int>? repeatGroupCount,
     Expression<String>? note,
+    Expression<String>? userItemId,
     Expression<int>? updatedAt,
     Expression<int>? rowid,
   }) {
@@ -988,6 +1047,7 @@ class UserCollectionItemsCompanion
       if (repeatGroup != null) 'repeat_group': repeatGroup,
       if (repeatGroupCount != null) 'repeat_group_count': repeatGroupCount,
       if (note != null) 'note': note,
+      if (userItemId != null) 'user_item_id': userItemId,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -1003,6 +1063,7 @@ class UserCollectionItemsCompanion
     Value<int?>? repeatGroup,
     Value<int?>? repeatGroupCount,
     Value<String?>? note,
+    Value<String?>? userItemId,
     Value<int>? updatedAt,
     Value<int>? rowid,
   }) {
@@ -1016,6 +1077,7 @@ class UserCollectionItemsCompanion
       repeatGroup: repeatGroup ?? this.repeatGroup,
       repeatGroupCount: repeatGroupCount ?? this.repeatGroupCount,
       note: note ?? this.note,
+      userItemId: userItemId ?? this.userItemId,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -1051,6 +1113,9 @@ class UserCollectionItemsCompanion
     if (note.present) {
       map['note'] = Variable<String>(note.value);
     }
+    if (userItemId.present) {
+      map['user_item_id'] = Variable<String>(userItemId.value);
+    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<int>(updatedAt.value);
     }
@@ -1072,7 +1137,613 @@ class UserCollectionItemsCompanion
           ..write('repeatGroup: $repeatGroup, ')
           ..write('repeatGroupCount: $repeatGroupCount, ')
           ..write('note: $note, ')
+          ..write('userItemId: $userItemId, ')
           ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class UserAdhkar extends Table with TableInfo<UserAdhkar, UserDhikrRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  UserAdhkar(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _textArabicMeta = const VerificationMeta(
+    'textArabic',
+  );
+  late final GeneratedColumn<String> textArabic = GeneratedColumn<String>(
+    'text_arabic',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _translationMeta = const VerificationMeta(
+    'translation',
+  );
+  late final GeneratedColumn<String> translation = GeneratedColumn<String>(
+    'translation',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _transliterationMeta = const VerificationMeta(
+    'transliteration',
+  );
+  late final GeneratedColumn<String> transliteration = GeneratedColumn<String>(
+    'transliteration',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _defaultCountMeta = const VerificationMeta(
+    'defaultCount',
+  );
+  late final GeneratedColumn<int> defaultCount = GeneratedColumn<int>(
+    'default_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT 1',
+    defaultValue: const CustomExpression('1'),
+  );
+  static const VerificationMeta _referenceMeta = const VerificationMeta(
+    'reference',
+  );
+  late final GeneratedColumn<String> reference = GeneratedColumn<String>(
+    'reference',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  late final GeneratedColumn<int> deletedAt = GeneratedColumn<int>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    textArabic,
+    translation,
+    transliteration,
+    defaultCount,
+    reference,
+    notes,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'user_adhkar';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<UserDhikrRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('text_arabic')) {
+      context.handle(
+        _textArabicMeta,
+        textArabic.isAcceptableOrUnknown(data['text_arabic']!, _textArabicMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_textArabicMeta);
+    }
+    if (data.containsKey('translation')) {
+      context.handle(
+        _translationMeta,
+        translation.isAcceptableOrUnknown(
+          data['translation']!,
+          _translationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('transliteration')) {
+      context.handle(
+        _transliterationMeta,
+        transliteration.isAcceptableOrUnknown(
+          data['transliteration']!,
+          _transliterationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('default_count')) {
+      context.handle(
+        _defaultCountMeta,
+        defaultCount.isAcceptableOrUnknown(
+          data['default_count']!,
+          _defaultCountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reference')) {
+      context.handle(
+        _referenceMeta,
+        reference.isAcceptableOrUnknown(data['reference']!, _referenceMeta),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  UserDhikrRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return UserDhikrRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      textArabic: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}text_arabic'],
+      )!,
+      translation: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}translation'],
+      ),
+      transliteration: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}transliteration'],
+      ),
+      defaultCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}default_count'],
+      )!,
+      reference: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reference'],
+      ),
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  UserAdhkar createAlias(String alias) {
+    return UserAdhkar(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class UserDhikrRow extends DataClass implements Insertable<UserDhikrRow> {
+  final String id;
+  final String textArabic;
+  final String? translation;
+  final String? transliteration;
+  final int defaultCount;
+  final String? reference;
+  final String? notes;
+  final int createdAt;
+  final int updatedAt;
+  final int? deletedAt;
+  const UserDhikrRow({
+    required this.id,
+    required this.textArabic,
+    this.translation,
+    this.transliteration,
+    required this.defaultCount,
+    this.reference,
+    this.notes,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['text_arabic'] = Variable<String>(textArabic);
+    if (!nullToAbsent || translation != null) {
+      map['translation'] = Variable<String>(translation);
+    }
+    if (!nullToAbsent || transliteration != null) {
+      map['transliteration'] = Variable<String>(transliteration);
+    }
+    map['default_count'] = Variable<int>(defaultCount);
+    if (!nullToAbsent || reference != null) {
+      map['reference'] = Variable<String>(reference);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<int>(deletedAt);
+    }
+    return map;
+  }
+
+  factory UserDhikrRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return UserDhikrRow(
+      id: serializer.fromJson<String>(json['id']),
+      textArabic: serializer.fromJson<String>(json['text_arabic']),
+      translation: serializer.fromJson<String?>(json['translation']),
+      transliteration: serializer.fromJson<String?>(json['transliteration']),
+      defaultCount: serializer.fromJson<int>(json['default_count']),
+      reference: serializer.fromJson<String?>(json['reference']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      createdAt: serializer.fromJson<int>(json['created_at']),
+      updatedAt: serializer.fromJson<int>(json['updated_at']),
+      deletedAt: serializer.fromJson<int?>(json['deleted_at']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'text_arabic': serializer.toJson<String>(textArabic),
+      'translation': serializer.toJson<String?>(translation),
+      'transliteration': serializer.toJson<String?>(transliteration),
+      'default_count': serializer.toJson<int>(defaultCount),
+      'reference': serializer.toJson<String?>(reference),
+      'notes': serializer.toJson<String?>(notes),
+      'created_at': serializer.toJson<int>(createdAt),
+      'updated_at': serializer.toJson<int>(updatedAt),
+      'deleted_at': serializer.toJson<int?>(deletedAt),
+    };
+  }
+
+  UserDhikrRow copyWith({
+    String? id,
+    String? textArabic,
+    Value<String?> translation = const Value.absent(),
+    Value<String?> transliteration = const Value.absent(),
+    int? defaultCount,
+    Value<String?> reference = const Value.absent(),
+    Value<String?> notes = const Value.absent(),
+    int? createdAt,
+    int? updatedAt,
+    Value<int?> deletedAt = const Value.absent(),
+  }) => UserDhikrRow(
+    id: id ?? this.id,
+    textArabic: textArabic ?? this.textArabic,
+    translation: translation.present ? translation.value : this.translation,
+    transliteration: transliteration.present
+        ? transliteration.value
+        : this.transliteration,
+    defaultCount: defaultCount ?? this.defaultCount,
+    reference: reference.present ? reference.value : this.reference,
+    notes: notes.present ? notes.value : this.notes,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  UserDhikrRow copyWithCompanion(UserAdhkarCompanion data) {
+    return UserDhikrRow(
+      id: data.id.present ? data.id.value : this.id,
+      textArabic: data.textArabic.present
+          ? data.textArabic.value
+          : this.textArabic,
+      translation: data.translation.present
+          ? data.translation.value
+          : this.translation,
+      transliteration: data.transliteration.present
+          ? data.transliteration.value
+          : this.transliteration,
+      defaultCount: data.defaultCount.present
+          ? data.defaultCount.value
+          : this.defaultCount,
+      reference: data.reference.present ? data.reference.value : this.reference,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UserDhikrRow(')
+          ..write('id: $id, ')
+          ..write('textArabic: $textArabic, ')
+          ..write('translation: $translation, ')
+          ..write('transliteration: $transliteration, ')
+          ..write('defaultCount: $defaultCount, ')
+          ..write('reference: $reference, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    textArabic,
+    translation,
+    transliteration,
+    defaultCount,
+    reference,
+    notes,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is UserDhikrRow &&
+          other.id == this.id &&
+          other.textArabic == this.textArabic &&
+          other.translation == this.translation &&
+          other.transliteration == this.transliteration &&
+          other.defaultCount == this.defaultCount &&
+          other.reference == this.reference &&
+          other.notes == this.notes &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class UserAdhkarCompanion extends UpdateCompanion<UserDhikrRow> {
+  final Value<String> id;
+  final Value<String> textArabic;
+  final Value<String?> translation;
+  final Value<String?> transliteration;
+  final Value<int> defaultCount;
+  final Value<String?> reference;
+  final Value<String?> notes;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int?> deletedAt;
+  final Value<int> rowid;
+  const UserAdhkarCompanion({
+    this.id = const Value.absent(),
+    this.textArabic = const Value.absent(),
+    this.translation = const Value.absent(),
+    this.transliteration = const Value.absent(),
+    this.defaultCount = const Value.absent(),
+    this.reference = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  UserAdhkarCompanion.insert({
+    required String id,
+    required String textArabic,
+    this.translation = const Value.absent(),
+    this.transliteration = const Value.absent(),
+    this.defaultCount = const Value.absent(),
+    this.reference = const Value.absent(),
+    this.notes = const Value.absent(),
+    required int createdAt,
+    required int updatedAt,
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       textArabic = Value(textArabic),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<UserDhikrRow> custom({
+    Expression<String>? id,
+    Expression<String>? textArabic,
+    Expression<String>? translation,
+    Expression<String>? transliteration,
+    Expression<int>? defaultCount,
+    Expression<String>? reference,
+    Expression<String>? notes,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (textArabic != null) 'text_arabic': textArabic,
+      if (translation != null) 'translation': translation,
+      if (transliteration != null) 'transliteration': transliteration,
+      if (defaultCount != null) 'default_count': defaultCount,
+      if (reference != null) 'reference': reference,
+      if (notes != null) 'notes': notes,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  UserAdhkarCompanion copyWith({
+    Value<String>? id,
+    Value<String>? textArabic,
+    Value<String?>? translation,
+    Value<String?>? transliteration,
+    Value<int>? defaultCount,
+    Value<String?>? reference,
+    Value<String?>? notes,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return UserAdhkarCompanion(
+      id: id ?? this.id,
+      textArabic: textArabic ?? this.textArabic,
+      translation: translation ?? this.translation,
+      transliteration: transliteration ?? this.transliteration,
+      defaultCount: defaultCount ?? this.defaultCount,
+      reference: reference ?? this.reference,
+      notes: notes ?? this.notes,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (textArabic.present) {
+      map['text_arabic'] = Variable<String>(textArabic.value);
+    }
+    if (translation.present) {
+      map['translation'] = Variable<String>(translation.value);
+    }
+    if (transliteration.present) {
+      map['transliteration'] = Variable<String>(transliteration.value);
+    }
+    if (defaultCount.present) {
+      map['default_count'] = Variable<int>(defaultCount.value);
+    }
+    if (reference.present) {
+      map['reference'] = Variable<String>(reference.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<int>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UserAdhkarCompanion(')
+          ..write('id: $id, ')
+          ..write('textArabic: $textArabic, ')
+          ..write('translation: $translation, ')
+          ..write('transliteration: $transliteration, ')
+          ..write('defaultCount: $defaultCount, ')
+          ..write('reference: $reference, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2800,6 +3471,11 @@ abstract class _$UserDatabase extends GeneratedDatabase {
     'idx_user_collection_items_position',
     'CREATE INDEX IF NOT EXISTS idx_user_collection_items_position ON user_collection_items (collection_id, position)',
   );
+  late final Index idxUserCollectionItemsUserItem = Index(
+    'idx_user_collection_items_user_item',
+    'CREATE INDEX IF NOT EXISTS idx_user_collection_items_user_item ON user_collection_items (user_item_id)',
+  );
+  late final UserAdhkar userAdhkar = UserAdhkar(this);
   late final Progress progress = Progress(this);
   late final Completions completions = Completions(this);
   late final Index idxCompletionsRefDate = Index(
@@ -2919,10 +3595,11 @@ abstract class _$UserDatabase extends GeneratedDatabase {
     int? repeatGroup,
     int? repeatGroupCount,
     String? note,
+    String? userItemId,
     required int updatedAt,
   }) {
     return customInsert(
-      'INSERT INTO user_collection_items (id, collection_id, item_type, item_id, position, count_override, repeat_group, repeat_group_count, note, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)',
+      'INSERT INTO user_collection_items (id, collection_id, item_type, item_id, position, count_override, repeat_group, repeat_group_count, note, user_item_id, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)',
       variables: [
         Variable<String>(id),
         Variable<String>(collection),
@@ -2933,6 +3610,7 @@ abstract class _$UserDatabase extends GeneratedDatabase {
         Variable<int>(repeatGroup),
         Variable<int>(repeatGroupCount),
         Variable<String>(note),
+        Variable<String>(userItemId),
         Variable<int>(updatedAt),
       ],
       updates: {userCollectionItems},
@@ -3013,6 +3691,127 @@ abstract class _$UserDatabase extends GeneratedDatabase {
       ],
       updates: {userCollectionItems},
       updateKind: UpdateKind.update,
+    );
+  }
+
+  Selectable<UserDhikrRow> activeUserAdhkar() {
+    return customSelect(
+      'SELECT * FROM user_adhkar WHERE deleted_at IS NULL ORDER BY created_at DESC, id',
+      variables: [],
+      readsFrom: {userAdhkar},
+    ).asyncMap(userAdhkar.mapFromRow);
+  }
+
+  Selectable<UserDhikrRow> activeUserDhikr({required String id}) {
+    return customSelect(
+      'SELECT * FROM user_adhkar WHERE id = ?1 AND deleted_at IS NULL',
+      variables: [Variable<String>(id)],
+      readsFrom: {userAdhkar},
+    ).asyncMap(userAdhkar.mapFromRow);
+  }
+
+  Selectable<UserDhikrRow> userAdhkarByIds({required List<String> ids}) {
+    var $arrayStartIndex = 1;
+    final expandedids = $expandVar($arrayStartIndex, ids.length);
+    $arrayStartIndex += ids.length;
+    return customSelect(
+      'SELECT * FROM user_adhkar WHERE id IN ($expandedids) AND deleted_at IS NULL',
+      variables: [for (var $ in ids) Variable<String>($)],
+      readsFrom: {userAdhkar},
+    ).asyncMap(userAdhkar.mapFromRow);
+  }
+
+  Future<int> insertUserDhikr({
+    required String id,
+    required String textArabic,
+    String? translation,
+    String? transliteration,
+    required int defaultCount,
+    String? reference,
+    String? notes,
+    required int createdAt,
+    required int updatedAt,
+  }) {
+    return customInsert(
+      'INSERT INTO user_adhkar (id, text_arabic, translation, transliteration, default_count, reference, notes, created_at, updated_at, deleted_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, NULL)',
+      variables: [
+        Variable<String>(id),
+        Variable<String>(textArabic),
+        Variable<String>(translation),
+        Variable<String>(transliteration),
+        Variable<int>(defaultCount),
+        Variable<String>(reference),
+        Variable<String>(notes),
+        Variable<int>(createdAt),
+        Variable<int>(updatedAt),
+      ],
+      updates: {userAdhkar},
+    );
+  }
+
+  Future<int> updateUserDhikr({
+    required String textArabic,
+    String? translation,
+    String? transliteration,
+    required int defaultCount,
+    String? reference,
+    String? notes,
+    required int updatedAt,
+    required String id,
+  }) {
+    return customUpdate(
+      'UPDATE user_adhkar SET text_arabic = ?1, translation = ?2, transliteration = ?3, default_count = ?4, reference = ?5, notes = ?6, updated_at = ?7 WHERE id = ?8 AND deleted_at IS NULL',
+      variables: [
+        Variable<String>(textArabic),
+        Variable<String>(translation),
+        Variable<String>(transliteration),
+        Variable<int>(defaultCount),
+        Variable<String>(reference),
+        Variable<String>(notes),
+        Variable<int>(updatedAt),
+        Variable<String>(id),
+      ],
+      updates: {userAdhkar},
+      updateKind: UpdateKind.update,
+    );
+  }
+
+  Future<int> softDeleteUserDhikr({int? deletedAt, required String id}) {
+    return customUpdate(
+      'UPDATE user_adhkar SET deleted_at = ?1, updated_at = ?1 WHERE id = ?2 AND deleted_at IS NULL',
+      variables: [Variable<int>(deletedAt), Variable<String>(id)],
+      updates: {userAdhkar},
+      updateKind: UpdateKind.update,
+    );
+  }
+
+  Selectable<UserCollectionRow> collectionsUsingUserDhikr({String? dhikr}) {
+    return customSelect(
+      'SELECT DISTINCT c.* FROM user_collections AS c INNER JOIN user_collection_items AS i ON i.collection_id = c.id WHERE i.item_type = \'user_dhikr\' AND i.user_item_id = ?1 AND c.deleted_at IS NULL ORDER BY c.sort_order, c.created_at, c.id',
+      variables: [Variable<String>(dhikr)],
+      readsFrom: {userCollections, userCollectionItems},
+    ).asyncMap(userCollections.mapFromRow);
+  }
+
+  Selectable<UserDhikrUsageCountsResult> userDhikrUsageCounts() {
+    return customSelect(
+      'SELECT i.user_item_id AS dhikr, COUNT(*) AS uses FROM user_collection_items AS i INNER JOIN user_collections AS c ON c.id = i.collection_id WHERE i.item_type = \'user_dhikr\' AND i.user_item_id IS NOT NULL AND c.deleted_at IS NULL GROUP BY i.user_item_id',
+      variables: [],
+      readsFrom: {userCollectionItems, userCollections},
+    ).map(
+      (QueryRow row) => UserDhikrUsageCountsResult(
+        dhikr: row.readNullable<String>('dhikr'),
+        uses: row.read<int>('uses'),
+      ),
+    );
+  }
+
+  Future<int> deleteItemsForUserDhikr({String? dhikr}) {
+    return customUpdate(
+      'DELETE FROM user_collection_items WHERE item_type = \'user_dhikr\' AND user_item_id = ?1',
+      variables: [Variable<String>(dhikr)],
+      updates: {userCollectionItems},
+      updateKind: UpdateKind.delete,
     );
   }
 
@@ -3240,6 +4039,8 @@ abstract class _$UserDatabase extends GeneratedDatabase {
     userCollections,
     userCollectionItems,
     idxUserCollectionItemsPosition,
+    idxUserCollectionItemsUserItem,
+    userAdhkar,
     progress,
     completions,
     idxCompletionsRefDate,
@@ -3610,6 +4411,7 @@ typedef $UserCollectionItemsCreateCompanionBuilder =
       Value<int?> repeatGroup,
       Value<int?> repeatGroupCount,
       Value<String?> note,
+      Value<String?> userItemId,
       required int updatedAt,
       Value<int> rowid,
     });
@@ -3624,6 +4426,7 @@ typedef $UserCollectionItemsUpdateCompanionBuilder =
       Value<int?> repeatGroup,
       Value<int?> repeatGroupCount,
       Value<String?> note,
+      Value<String?> userItemId,
       Value<int> updatedAt,
       Value<int> rowid,
     });
@@ -3710,6 +4513,11 @@ class $UserCollectionItemsFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get userItemId => $composableBuilder(
+    column: $table.userItemId,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<int> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
@@ -3788,6 +4596,11 @@ class $UserCollectionItemsOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get userItemId => $composableBuilder(
+    column: $table.userItemId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
@@ -3856,6 +4669,11 @@ class $UserCollectionItemsAnnotationComposer
   GeneratedColumn<String> get note =>
       $composableBuilder(column: $table.note, builder: (column) => column);
 
+  GeneratedColumn<String> get userItemId => $composableBuilder(
+    column: $table.userItemId,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<int> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
@@ -3920,6 +4738,7 @@ class $UserCollectionItemsTableManager
                 Value<int?> repeatGroup = const Value.absent(),
                 Value<int?> repeatGroupCount = const Value.absent(),
                 Value<String?> note = const Value.absent(),
+                Value<String?> userItemId = const Value.absent(),
                 Value<int> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => UserCollectionItemsCompanion(
@@ -3932,6 +4751,7 @@ class $UserCollectionItemsTableManager
                 repeatGroup: repeatGroup,
                 repeatGroupCount: repeatGroupCount,
                 note: note,
+                userItemId: userItemId,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),
@@ -3946,6 +4766,7 @@ class $UserCollectionItemsTableManager
                 Value<int?> repeatGroup = const Value.absent(),
                 Value<int?> repeatGroupCount = const Value.absent(),
                 Value<String?> note = const Value.absent(),
+                Value<String?> userItemId = const Value.absent(),
                 required int updatedAt,
                 Value<int> rowid = const Value.absent(),
               }) => UserCollectionItemsCompanion.insert(
@@ -3958,6 +4779,7 @@ class $UserCollectionItemsTableManager
                 repeatGroup: repeatGroup,
                 repeatGroupCount: repeatGroupCount,
                 note: note,
+                userItemId: userItemId,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),
@@ -4027,6 +4849,304 @@ typedef $UserCollectionItemsProcessedTableManager =
       (UserCollectionItemRow, $UserCollectionItemsReferences),
       UserCollectionItemRow,
       PrefetchHooks Function({bool collectionId})
+    >;
+typedef $UserAdhkarCreateCompanionBuilder =
+    UserAdhkarCompanion Function({
+      required String id,
+      required String textArabic,
+      Value<String?> translation,
+      Value<String?> transliteration,
+      Value<int> defaultCount,
+      Value<String?> reference,
+      Value<String?> notes,
+      required int createdAt,
+      required int updatedAt,
+      Value<int?> deletedAt,
+      Value<int> rowid,
+    });
+typedef $UserAdhkarUpdateCompanionBuilder =
+    UserAdhkarCompanion Function({
+      Value<String> id,
+      Value<String> textArabic,
+      Value<String?> translation,
+      Value<String?> transliteration,
+      Value<int> defaultCount,
+      Value<String?> reference,
+      Value<String?> notes,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int?> deletedAt,
+      Value<int> rowid,
+    });
+
+class $UserAdhkarFilterComposer extends Composer<_$UserDatabase, UserAdhkar> {
+  $UserAdhkarFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get textArabic => $composableBuilder(
+    column: $table.textArabic,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get translation => $composableBuilder(
+    column: $table.translation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get transliteration => $composableBuilder(
+    column: $table.transliteration,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get defaultCount => $composableBuilder(
+    column: $table.defaultCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reference => $composableBuilder(
+    column: $table.reference,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $UserAdhkarOrderingComposer extends Composer<_$UserDatabase, UserAdhkar> {
+  $UserAdhkarOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get textArabic => $composableBuilder(
+    column: $table.textArabic,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get translation => $composableBuilder(
+    column: $table.translation,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get transliteration => $composableBuilder(
+    column: $table.transliteration,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get defaultCount => $composableBuilder(
+    column: $table.defaultCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reference => $composableBuilder(
+    column: $table.reference,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $UserAdhkarAnnotationComposer
+    extends Composer<_$UserDatabase, UserAdhkar> {
+  $UserAdhkarAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get textArabic => $composableBuilder(
+    column: $table.textArabic,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get translation => $composableBuilder(
+    column: $table.translation,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get transliteration => $composableBuilder(
+    column: $table.transliteration,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get defaultCount => $composableBuilder(
+    column: $table.defaultCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get reference =>
+      $composableBuilder(column: $table.reference, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+}
+
+class $UserAdhkarTableManager
+    extends
+        RootTableManager<
+          _$UserDatabase,
+          UserAdhkar,
+          UserDhikrRow,
+          $UserAdhkarFilterComposer,
+          $UserAdhkarOrderingComposer,
+          $UserAdhkarAnnotationComposer,
+          $UserAdhkarCreateCompanionBuilder,
+          $UserAdhkarUpdateCompanionBuilder,
+          (
+            UserDhikrRow,
+            BaseReferences<_$UserDatabase, UserAdhkar, UserDhikrRow>,
+          ),
+          UserDhikrRow,
+          PrefetchHooks Function()
+        > {
+  $UserAdhkarTableManager(_$UserDatabase db, UserAdhkar table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $UserAdhkarFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $UserAdhkarOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $UserAdhkarAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> textArabic = const Value.absent(),
+                Value<String?> translation = const Value.absent(),
+                Value<String?> transliteration = const Value.absent(),
+                Value<int> defaultCount = const Value.absent(),
+                Value<String?> reference = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => UserAdhkarCompanion(
+                id: id,
+                textArabic: textArabic,
+                translation: translation,
+                transliteration: transliteration,
+                defaultCount: defaultCount,
+                reference: reference,
+                notes: notes,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String textArabic,
+                Value<String?> translation = const Value.absent(),
+                Value<String?> transliteration = const Value.absent(),
+                Value<int> defaultCount = const Value.absent(),
+                Value<String?> reference = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                required int createdAt,
+                required int updatedAt,
+                Value<int?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => UserAdhkarCompanion.insert(
+                id: id,
+                textArabic: textArabic,
+                translation: translation,
+                transliteration: transliteration,
+                defaultCount: defaultCount,
+                reference: reference,
+                notes: notes,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $UserAdhkarProcessedTableManager =
+    ProcessedTableManager<
+      _$UserDatabase,
+      UserAdhkar,
+      UserDhikrRow,
+      $UserAdhkarFilterComposer,
+      $UserAdhkarOrderingComposer,
+      $UserAdhkarAnnotationComposer,
+      $UserAdhkarCreateCompanionBuilder,
+      $UserAdhkarUpdateCompanionBuilder,
+      (UserDhikrRow, BaseReferences<_$UserDatabase, UserAdhkar, UserDhikrRow>),
+      UserDhikrRow,
+      PrefetchHooks Function()
     >;
 typedef $ProgressCreateCompanionBuilder =
     ProgressCompanion Function({
@@ -4986,6 +6106,8 @@ class $UserDatabaseManager {
       $UserCollectionsTableManager(_db, _db.userCollections);
   $UserCollectionItemsTableManager get userCollectionItems =>
       $UserCollectionItemsTableManager(_db, _db.userCollectionItems);
+  $UserAdhkarTableManager get userAdhkar =>
+      $UserAdhkarTableManager(_db, _db.userAdhkar);
   $ProgressTableManager get progress =>
       $ProgressTableManager(_db, _db.progress);
   $CompletionsTableManager get completions =>
@@ -4996,4 +6118,10 @@ class $UserDatabaseManager {
       $SettingsTableManager(_db, _db.settings);
   $CommitmentsTableManager get commitments =>
       $CommitmentsTableManager(_db, _db.commitments);
+}
+
+class UserDhikrUsageCountsResult {
+  final String? dhikr;
+  final int uses;
+  UserDhikrUsageCountsResult({this.dhikr, required this.uses});
 }

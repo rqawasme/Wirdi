@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wirdi/collections/dhikr_search.dart';
 import 'package:wirdi/domain/content.dart';
+import 'package:wirdi/domain/item_ref.dart';
 
 /// Matching adhkar by their Arabic or their translation.
 ///
@@ -23,7 +24,7 @@ void main() {
 
   Dhikr dhikr(int id, {required String textArabic, required String english}) =>
       Dhikr(
-        id: id,
+        ref: ContentRef.dhikr(id),
         textArabic: textArabic,
         translation: english,
         defaultCount: 1,
@@ -45,8 +46,10 @@ void main() {
     ];
   });
 
+  /// Every fixture here is an authored dhikr, so every ref is a [ContentRef].
   List<int> ids(List<Dhikr> matches) => <int>[
-    for (final Dhikr d in matches) d.id,
+    for (final Dhikr d in matches)
+      if (d.ref case ContentRef(:final int id)) id,
   ];
 
   group('the query is folded both ways', () {

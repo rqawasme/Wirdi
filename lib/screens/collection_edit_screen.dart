@@ -611,7 +611,9 @@ class EntryLine extends StatelessWidget {
     final Color quiet = theme.colorScheme.onSurfaceVariant;
     final String? note = item.note;
 
-    final (String title, String subtitle, bool arabic) = switch (item) {
+    // A null subtitle is a dhikr the user wrote and left untranslated: the
+    // line goes rather than standing empty.
+    final (String title, String? subtitle, bool arabic) = switch (item) {
       DhikrItem(:final Dhikr dhikr) => (
         dhikr.textArabic,
         dhikr.translation,
@@ -646,13 +648,15 @@ class EntryLine extends StatelessWidget {
           )
         else
           Text(title, style: theme.textTheme.titleMedium),
-        const SizedBox(height: WirdiMetrics.space1),
-        Text(
-          subtitle,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: theme.textTheme.bodySmall?.copyWith(color: quiet),
-        ),
+        if (subtitle != null) ...<Widget>[
+          const SizedBox(height: WirdiMetrics.space1),
+          Text(
+            subtitle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall?.copyWith(color: quiet),
+          ),
+        ],
         if (note != null && note.isNotEmpty) ...<Widget>[
           const SizedBox(height: WirdiMetrics.space1),
           Text(note, style: theme.textTheme.bodySmall?.copyWith(color: quiet)),

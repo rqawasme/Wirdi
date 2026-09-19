@@ -11,6 +11,10 @@
 --
 -- Rows reference content.db by id. There are no cross-database foreign keys
 -- and no ATTACH; resolution happens in Dart.
+--
+-- One kind of row does not reference content.db at all: an item can point at a
+-- dhikr the user wrote, which lives in `user_adhkar` in this same database. See
+-- the note on `user_collection_items.user_item_id`.
 
 CREATE TABLE user_collections (
     id          TEXT    NOT NULL PRIMARY KEY,
@@ -25,7 +29,8 @@ CREATE TABLE user_collections (
 CREATE TABLE user_collection_items (
     id                 TEXT    NOT NULL PRIMARY KEY,
     collection_id      TEXT    NOT NULL REFERENCES user_collections (id),
-    -- 'dhikr' | 'ayah' | 'surah', referencing content.db by item_id.
+    -- 'dhikr' | 'ayah' | 'surah', referencing content.db by item_id; or
+    -- 'user_dhikr', referencing user_adhkar by user_item_id.
     item_type          TEXT    NOT NULL,
     item_id            INTEGER NOT NULL,
     position           INTEGER NOT NULL,
@@ -35,11 +40,67 @@ CREATE TABLE user_collection_items (
     -- A rubric shown with this item, mirroring collection_items.note. A user
     -- collection copied from a built-in keeps the built-in's notes.
     note               TEXT,
+    -- Set on a 'user_dhikr' row and null on every other: `user_adhkar.id`, the
+    -- UUID of a dhikr the user wrote.
+    --
+    -- A second column rather than a wider `item_id`, because `item_id` is
+    -- INTEGER NOT NULL and widening it to TEXT means rebuilding this table —
+    -- and a table rebuild is the one migration step that cannot be made
+    -- idempotent, which is the rule every step in the ladder has to keep. See
+    -- the note on onUpgrade in user_database.dart.
+    --
+    -- A 'user_dhikr' row carries `item_id` 0, which is not a valid id in any of
+    -- the three content spaces — surah numbers and dhikr ids start at 1, and
+    -- ayahs.id is surah * 1000 + ayah — so a row that names no content row
+    -- reads as one.
+    user_item_id       TEXT,
     updated_at         INTEGER NOT NULL
 ) AS UserCollectionItemRow;
 
 CREATE INDEX IF NOT EXISTS idx_user_collection_items_position
     ON user_collection_items (collection_id, position);
+
+-- What `user_adhkar` deletion and the "used in" count are read through: which
+-- items point at one dhikr, across every collection. Sparse in effect — only
+-- 'user_dhikr' rows carry the column.
+CREATE INDEX IF NOT EXISTS idx_user_collection_items_user_item
+    ON user_collection_items (user_item_id);
+
+-- Adhkar the user wrote themselves.
+--
+-- A collection item points at one of these exactly the way it points at a
+-- built-in dhikr; what differs is only which database holds the row and so
+-- what kind of id names it. `content.db` is replaced wholesale on an app
+-- update, which is the reason a dhikr somebody wrote cannot live there.
+--
+-- `translation` is nullable where `adhkar.translation` in content.db is not. A
+-- built-in is authored with one by a pipeline that can insist; somebody
+-- writing down the dua they say after Fajr already knows what it means, and
+-- refusing to save it until they have typed a translation is asking them to do
+-- the content build's job.
+--
+-- `reference` is free text — a hadith collection and a number, a book and a
+-- page — and deliberately not a foreign key into content.db's `sources`. A
+-- source row carries a grading, which is a scholarly claim made by the
+-- pipeline; what somebody types about where they found a dua is a note about
+-- their own copy. Storing it as one keeps the app from presenting the second
+-- as the first.
+--
+-- Soft delete, like user_collections: `deleted_at` is set and the row stays.
+-- Unlike a collection, deleting one also takes its items out of the
+-- collections that held it — see `deleteItemsForUserDhikr`.
+CREATE TABLE user_adhkar (
+    id              TEXT    NOT NULL PRIMARY KEY,
+    text_arabic     TEXT    NOT NULL,
+    translation     TEXT,
+    transliteration TEXT,
+    default_count   INTEGER NOT NULL DEFAULT 1,
+    reference       TEXT,
+    notes           TEXT,
+    created_at      INTEGER NOT NULL,
+    updated_at      INTEGER NOT NULL,
+    deleted_at      INTEGER
+) AS UserDhikrRow;
 
 -- collection_ref is CollectionId.canonical: 'b:12' or 'u:<uuid>'.
 --
@@ -144,9 +205,9 @@ nextItemPosition:
 insertUserCollectionItem:
     INSERT INTO user_collection_items
         (id, collection_id, item_type, item_id, position, count_override,
-         repeat_group, repeat_group_count, note, updated_at)
+         repeat_group, repeat_group_count, note, user_item_id, updated_at)
     VALUES (:id, :collection, :itemType, :itemId, :position, :countOverride,
-            :repeatGroup, :repeatGroupCount, :note, :updatedAt);
+            :repeatGroup, :repeatGroupCount, :note, :userItemId, :updatedAt);
 
 deleteUserCollectionItem:
     DELETE FROM user_collection_items
@@ -171,6 +232,94 @@ clearItemsRepeatGroup:
     UPDATE user_collection_items
     SET repeat_group = NULL, repeat_group_count = NULL, updated_at = :updatedAt
     WHERE collection_id = :collection AND repeat_group = :group;
+
+-- ---------------------------------------------------------------------------
+-- Adhkar the user wrote
+-- ---------------------------------------------------------------------------
+
+-- Newest first. A collection is listed in the order the user arranged it in;
+-- a dhikr they wrote has no arrangement, and the one they are looking for is
+-- overwhelmingly the one they just made.
+activeUserAdhkar:
+    SELECT * FROM user_adhkar
+    WHERE deleted_at IS NULL
+    ORDER BY created_at DESC, id;
+
+activeUserDhikr:
+    SELECT * FROM user_adhkar WHERE id = :id AND deleted_at IS NULL;
+
+-- The batched fetch collection resolution runs for the 'user_dhikr' items of
+-- one collection, mirroring `adhkarByIds` against content.db.
+--
+-- Soft-deleted rows are excluded, so an item pointing at a deleted dhikr
+-- resolves to nothing and is reported as unresolved. That should be
+-- unreachable — deleting a dhikr takes its items with it — and is the honest
+-- answer if it ever is not.
+userAdhkarByIds:
+    SELECT * FROM user_adhkar WHERE id IN :ids AND deleted_at IS NULL;
+
+insertUserDhikr:
+    INSERT INTO user_adhkar
+        (id, text_arabic, translation, transliteration, default_count,
+         reference, notes, created_at, updated_at, deleted_at)
+    VALUES (:id, :textArabic, :translation, :transliteration, :defaultCount,
+            :reference, :notes, :createdAt, :updatedAt, NULL);
+
+-- Every field at once, for the same reason `updateUserCollectionDetails`
+-- writes name and description together: the form asks all of them at once, and
+-- a half-applied answer is worse than a refused one. A null clears the field.
+updateUserDhikr:
+    UPDATE user_adhkar
+    SET text_arabic = :textArabic,
+        translation = :translation,
+        transliteration = :transliteration,
+        default_count = :defaultCount,
+        reference = :reference,
+        notes = :notes,
+        updated_at = :updatedAt
+    WHERE id = :id AND deleted_at IS NULL;
+
+softDeleteUserDhikr:
+    UPDATE user_adhkar
+    SET deleted_at = :deletedAt, updated_at = :deletedAt
+    WHERE id = :id AND deleted_at IS NULL;
+
+-- The collections that hold one dhikr, for the sentence its delete
+-- confirmation is built from and the count its row shows.
+--
+-- DISTINCT because one collection can say the same dhikr twice, and it is one
+-- collection either way. Soft-deleted collections are left out: they are not
+-- somewhere a deletion has to warn about.
+collectionsUsingUserDhikr:
+    SELECT DISTINCT c.* FROM user_collections c
+    INNER JOIN user_collection_items i ON i.collection_id = c.id
+    WHERE i.item_type = 'user_dhikr' AND i.user_item_id = :dhikr
+      AND c.deleted_at IS NULL
+    ORDER BY c.sort_order, c.created_at, c.id;
+
+-- How many items point at each dhikr the user wrote, in one read.
+--
+-- The list screen shows a count per row, and asking per row would be one
+-- statement per dhikr. Counts items and not collections: a collection that
+-- says the same dhikr twice holds two items, which is what "taking it out"
+-- will remove.
+userDhikrUsageCounts:
+    SELECT i.user_item_id AS dhikr, COUNT(*) AS uses
+    FROM user_collection_items i
+    INNER JOIN user_collections c ON c.id = i.collection_id
+    WHERE i.item_type = 'user_dhikr' AND i.user_item_id IS NOT NULL
+      AND c.deleted_at IS NULL
+    GROUP BY i.user_item_id;
+
+-- Takes a deleted dhikr out of every collection that held it.
+--
+-- Hard delete, where the dhikr itself is only soft-deleted: an item is a
+-- position in a list, and a tombstoned one would leave a hole that
+-- `setRepeatGroup`'s contiguity check trips over. The collections it touched
+-- are renumbered afterwards, in the same transaction.
+deleteItemsForUserDhikr:
+    DELETE FROM user_collection_items
+    WHERE item_type = 'user_dhikr' AND user_item_id = :dhikr;
 
 -- ---------------------------------------------------------------------------
 -- Progress and completions
