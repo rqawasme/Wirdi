@@ -8,9 +8,9 @@ collections and Quran surahs, with counters and reminders.
 
 This repository holds the **content pipeline** — the Python that turns source
 data into the SQLite database the app bundles — and the Flutter app that reads
-it: the data layer, the theme, the reading experience, and the wird player and
-its counter. Making and editing your own collections, and streaks, are not
-built yet.
+it: the data layer, the theme, the reading experience, the wird player and its
+counter, making and editing your own collections and your own adhkar, and the
+tracker the streaks are shown on.
 
 ## The content pipeline
 
@@ -120,7 +120,7 @@ Two SQLite databases, kept separate. They are never joined in SQL; there is no
 |---|---|---|
 | Access | read-only | read-write |
 | Location | bundled asset, copied to app support on first run | app **documents** directory |
-| Contents | Quran, adhkar, sources, built-in collections | user collections, commitments, progress, completions, settings |
+| Contents | Quran, adhkar, sources, built-in collections | user collections, adhkar the user wrote, commitments, progress, completions, settings |
 | Updates | replaced wholesale on app update | migrated, never replaced |
 
 `user.db` is in the documents directory specifically so iOS iCloud backup and
@@ -135,7 +135,7 @@ lib/
     content_database.dart   read-only open, schema_version assertion
     user_database.dart
     collection_resolver.dart
-    repositories/           the three repository implementations
+    repositories/           the four repository implementations
     database_files.dart     path_provider and the asset copy — the platform seam
   domain/                   hand-written models and the repository interfaces
 ```
@@ -147,6 +147,26 @@ pipeline actually produces. `tool/check_schema_parity.py` is that diff.
 
 Drift's generated row types stop at the repository boundary. `lib/domain/`
 imports no drift.
+
+A collection item points at one of two things, and which one is the kind of its
+`ItemRef`: a `ContentRef` names a row of `content.db` by the integer id the build
+assigned it, and a `UserDhikrRef` names a dhikr the user wrote, which lives in
+`user_adhkar` in `user.db` and so is keyed by a UUID like everything else there.
+That is the same split `CollectionId` already makes between a built-in and a
+user collection, and for the same reason: one type flows through the UI, and
+which kind it is tells a repository which database to ask.
+
+`ContentRef` is a subtype of `ItemRef` rather than something wrapped by one,
+which is why adding the second kind was a small change: every picker and dialog
+that constructs a `ContentRef` is untouched, and only the code that *switches*
+on a ref had to learn there are now two. `progress.step_ref` stores the
+canonical form of either, and the three content forms are byte-for-byte what
+they were, so no saved progress was invalidated.
+
+Resolution reads `user_adhkar` in `DriftCollectionRepository` and hands the rows
+to `CollectionResolver` as a prepared map. The resolver holds `content.db` and
+only `content.db`; the repository is the one class that holds both, and that
+seam is the whole reason there is no ATTACH anywhere.
 
 A resolved collection has two views of the same data: `entries` is structural,
 with `RepeatBlock`s intact, for display and editing; `steps` is that flattened
@@ -697,6 +717,95 @@ it means removing the item and adding it again. Doing that in the UI would mean
 `removeItem` + `addItem` + `reorder`, which loses the item's repeat-group
 membership and its id silently, so it is not done. Phase 7 wants
 `CollectionRepository.updateItem(id, itemId, {count, note})`.
+
+### Writing your own adhkar
+
+**The app ships with adhkar; it does not have all of them.** Somebody's
+grandfather's dua, the wording their teacher gave them, the thing they say after
+Fajr — none of that is in `content.db` and none of it can be, because that
+database is replaced wholesale on every app update. So a dhikr somebody writes
+lives in `user.db`, in `user_adhkar`, beside the collections that name it.
+
+**One `Dhikr` covers both**, the way one `CollectionSummary` covers a built-in
+collection and a user-made one. What differs is which database the row came out
+of — its `ItemRef` says — and which fields are filled: `sourceId` and `benefits`
+are the content build's, `reference` is the user's. So a dhikr somebody wrote is
+recited, listed and read by exactly the code that draws one that shipped: the
+player maps a step to its entry by id and has no idea which kind it is holding.
+
+`translation` became nullable for this, and every widget that drew that line
+leaves it out rather than standing it empty. `adhkar.translation` in `content.db`
+is still NOT NULL and stays that way — the pipeline can insist, because it is
+authoring. Somebody writing down the dua they say already knows what it means,
+and refusing to save it until they have typed a translation is asking them to do
+the content build's job. A dhikr with no translation is found by its Arabic, and
+read out by it too: `DhikrRow`'s screen-reader label falls back to the Arabic,
+which leaves a reader with no Arabic voice exactly where a sighted reader is.
+
+**"Your adhkar" hangs off the collections list**, at the bottom, under the
+built-ins. Not a fifth tab — four is the ceiling — and not a second icon in the
+app bar, whose one collections-only action is already "New collection". A dhikr
+is edited and deleted from that screen and nowhere else: a collection *names* its
+adhkar without owning them, and offering "delete this dhikr" from inside one
+collection would be offering, from there, to change another.
+
+**An edit is shared, and the form says so.** A collection item names a dhikr
+rather than holding a copy of it, so fixing a typo fixes it everywhere, and
+lowering the count lowers it for every item carrying no override of its own.
+That is the point of writing a dhikr down once, and it is also the thing
+somebody would be most surprised by, so the form carries the sentence rather
+than leaving it to be discovered.
+
+**Deleting one takes it out of the collections that held it**, in one
+transaction, renumbering each. The dhikr row is only tombstoned, as a deleted
+collection's is; its items are not, because an item is a position in a list and
+a tombstoned one would leave a gap — and `setRepeatGroup` refuses a run that is
+not contiguous *by position*, so a collection carrying one has items that look
+adjacent in the list and cannot be grouped. Progress needs no help: a row parked
+on the step that just went is refused by `resumableFrom`, which compares the ref
+it was written against.
+
+The confirmation names the collections rather than counting them, up to three of
+them: "in Morning and My wird" is a fact somebody can act on, where "in 2
+collections" makes them go and find out which.
+
+**The add sheet has a fifth door, and it is where one is written on the spot.**
+"Your adhkar" opens the ones you wrote with "Write a dhikr" above them, so one
+screen serves both adding the one from last week and writing the one you are
+holding now. Written there, it goes straight in at the count just typed into the
+form — asking for that count again one screen later would be the app forgetting
+what it had been told. Picked from the list instead, it goes through the same
+count-and-note question the content pickers ask, because that count was never
+stated anywhere.
+
+That asymmetry is not an oversight, and it leans on the gap above: there is no
+`updateItem`, so a count not set when an item is added can never be set. The
+straight-in path is only defensible because the count was set a screen earlier.
+
+**The searchable dhikr picker still means "the content library"** and does not
+list these. Two doors, two meanings — and somebody who wants theirs knows they
+are theirs. It is one provider's worth of change if that ever feels wrong in the
+hand.
+
+**No search on your own adhkar.** The flat picker has one because it is 496
+rows; this is the handful somebody wrote, and a search field over six rows is a
+control standing in front of the six.
+
+**One new column, not a widened one.** `user_collection_items.item_id` is
+`INTEGER NOT NULL`; naming a UUID through it would mean rebuilding the table,
+and a table rebuild is the one migration step that cannot be made idempotent —
+which every step in `user_database.dart`'s ladder has to be, because the upgrade
+does not run in a transaction. So `user_item_id TEXT` was added beside it, and a
+`'user_dhikr'` row carries `item_id` 0, which is not a valid id in any of the
+three content spaces.
+
+**What `tool/check_font_coverage.py` cannot cover.** It checks the text in
+`content.db` against the bundled faces, and a dhikr somebody types is not in
+there. Noto Naskh Arabic covers Arabic; a Farsi or Urdu letter (پ چ ژ گ) or an
+emoji pasted into the field is on the platform's fallback chain, which means it
+may draw differently on different devices. Nothing is broken by that and nothing
+can be done about it from inside the app — but it is the one place in this
+codebase where what is on screen is not something CI has seen.
 
 ### The Tracker
 

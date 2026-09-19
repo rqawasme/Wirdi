@@ -209,6 +209,39 @@ void main() {
       ]);
     });
 
+    test('a copy carries the adhkar the user wrote, shared not cloned', () async {
+      final UserDhikrRef mine = await insertUserDhikr(
+        dbs.user,
+        id: testUuid(7),
+        defaultCount: 3,
+      );
+      final UserCollectionId source = await editor.create('Mine');
+      await editor.addItems(source, <PickedItem>[
+        PickedItem(ref: mine),
+        const PickedItem(ref: ContentRef.dhikr(1001)),
+      ]);
+
+      final UserCollectionId copy = await editor.duplicate(
+        source,
+        name: 'Copy',
+      );
+
+      final ResolvedCollection made = await collections.resolve(copy);
+      expect(made.unresolved, isEmpty);
+      expect(
+        made.entries
+            .whereType<CollectionItemEntry>()
+            .map((CollectionItemEntry e) => e.ref.canonical)
+            .toList(),
+        <String>[mine.canonical, 'dhikr:1001'],
+      );
+
+      // One dhikr, named twice: the copy points at the same row, so editing it
+      // once changes both collections. A copy of a collection is not a copy of
+      // what it says.
+      expect((await dbs.user.activeUserAdhkar().get()), hasLength(1));
+    });
+
     test('a copy is editable where the built-in was not', () async {
       final UserCollectionId copy = await editor.duplicate(
         mixed,

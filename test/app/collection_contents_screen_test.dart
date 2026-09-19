@@ -209,6 +209,32 @@ void main() {
     );
   });
 
+  testWidgets('a dhikr the user wrote and lost is not blamed on the library', (
+    WidgetTester tester,
+  ) async {
+    // Unreachable through the app — deleting such a dhikr takes its items with
+    // it — so the row is written by hand, which is what a backup restored mid
+    // write could look like.
+    final UserCollectionId id = await data.collectionRepository.create('Mine');
+    await data.collectionRepository.addItem(id, const ContentRef.dhikr(1001));
+    await insertUserItem(
+      dbs.user,
+      id: 'i1',
+      collectionId: id.uuid,
+      position: 2,
+      itemType: 'user_dhikr',
+      itemId: 0,
+      userItemId: testUuid(9),
+    );
+    await pumpContents(tester, id);
+
+    expect(find.textContaining('One dhikr you wrote'), findsOneWidget);
+    expect(
+      find.textContaining('no longer in the content library'),
+      findsNothing,
+    );
+  });
+
   testWidgets('it opens a collection of the user\'s own as readily as a '
       'built-in', (WidgetTester tester) async {
     final UserCollectionId id = await data.collectionRepository.create('Mine');
