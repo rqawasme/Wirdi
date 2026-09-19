@@ -2,14 +2,18 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 
 import 'domain/collection_id.dart';
+import 'domain/content.dart';
 import 'dev/dev_screen.dart';
+import 'screens/adhkar_screen.dart';
 import 'screens/app_shell.dart';
 import 'screens/collection_contents_screen.dart';
 import 'screens/collection_edit_screen.dart';
+import 'screens/dhikr_edit_screen.dart';
 import 'screens/pickers/ayah_picker_screen.dart';
 import 'screens/pickers/dhikr_picker_screen.dart';
 import 'screens/pickers/from_collection_picker_screen.dart';
 import 'screens/pickers/surah_picker_screen.dart';
+import 'screens/pickers/user_dhikr_picker_screen.dart';
 import 'screens/reading_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/surah_list_screen.dart';
@@ -42,18 +46,29 @@ abstract final class Routes {
   /// Editing one of the user's own collections.
   static const String collectionEdit = '/collection/edit';
 
-  /// The four item pickers. Each is pushed to answer one question and popped
+  /// The adhkar the user wrote: all of them, with what holds each, and the way
+  /// to write another. Reached from the collections list, which is the tab
+  /// about what the app contains.
+  static const String adhkar = '/adhkar';
+
+  /// Writing one, or editing one already written.
+  static const String dhikrEdit = '/adhkar/edit';
+
+  /// The five item pickers. Each is pushed to answer one question and popped
   /// with a `List<PickedItem>`, or with nothing if it was backed out of.
   ///
-  /// Two of them are about adhkar, and they answer different questions.
+  /// Three of them are about adhkar, and they answer different questions.
   /// [pickDhikr] is the flat list of every dhikr in the content build, with a
   /// search over it, for somebody who can remember a word. [pickFromCollection]
   /// browses them by the built-in wird they come from, for somebody who can
-  /// remember the wird and not the words.
+  /// remember the wird and not the words. [pickUserDhikr] is the ones the user
+  /// wrote, which are in neither of those because they are in the other
+  /// database — and it is also where a new one is written on the spot.
   static const String pickSurah = '/pick/surah';
   static const String pickAyah = '/pick/ayah';
   static const String pickDhikr = '/pick/dhikr';
   static const String pickFromCollection = '/pick/from-collection';
+  static const String pickUserDhikr = '/pick/your-dhikr';
 
   static const String surahList = '/quran';
   static const String reading = '/reading';
@@ -92,6 +107,19 @@ final class CollectionEditArguments {
   const CollectionEditArguments({required this.collectionId});
 
   final UserCollectionId collectionId;
+}
+
+/// Which dhikr a [Routes.dhikrEdit] push is editing, or none for a new one.
+@immutable
+final class DhikrEditArguments {
+  const DhikrEditArguments({this.dhikr});
+
+  /// The dhikr to open the form on, or null to open it empty.
+  ///
+  /// The whole [Dhikr] and not its ref: the screen it came from has it already,
+  /// and pushing the ref would mean a read to get back what was on screen when
+  /// the button was tapped.
+  final Dhikr? dhikr;
 }
 
 /// Where a [Routes.reading] push is going.
@@ -175,6 +203,31 @@ abstract final class WirdiRouter {
         return _page(
           settings,
           (BuildContext _) => const FromCollectionPickerScreen(),
+        );
+
+      case Routes.pickUserDhikr:
+        return _page(
+          settings,
+          (BuildContext _) => const UserDhikrPickerScreen(),
+        );
+
+      case Routes.adhkar:
+        return _page(settings, (BuildContext _) => const AdhkarScreen());
+
+      case Routes.dhikrEdit:
+        final Object? arguments = settings.arguments;
+        // Null is the new-dhikr case, so only a wrong type is a mistake.
+        if (arguments != null && arguments is! DhikrEditArguments) {
+          throw ArgumentError.value(
+            arguments,
+            'settings.arguments',
+            'pushing ${Routes.dhikrEdit} needs DhikrEditArguments or nothing',
+          );
+        }
+        return _page(
+          settings,
+          (BuildContext _) =>
+              DhikrEditScreen(dhikr: (arguments as DhikrEditArguments?)?.dhikr),
         );
 
       case Routes.surahList:

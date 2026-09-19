@@ -94,13 +94,14 @@ class _CollectionEditScreenState extends ConsumerState<CollectionEditScreen> {
   // Adding
   // ---------------------------------------------------------------------
 
-  /// The four pickers, as a sheet rather than a menu: they are four equal
+  /// The five pickers, as a sheet rather than a menu: they are five equal
   /// choices and one of them is the answer, which is a sheet's shape.
   ///
   /// Scrollable, and scroll-controlled, because of the fourth one. Three tiles
   /// with subtitles fit under any text scale; four do not at the large
   /// accessibility sizes, and a sheet that overflows is a sheet with a choice
-  /// hidden under the bottom edge.
+  /// hidden under the bottom edge. The fifth rides on that, and is the reason
+  /// the scroll is not a precaution any more.
   Future<void> _add() async {
     final String? route = await showModalBottomSheet<String>(
       context: context,
@@ -131,6 +132,17 @@ class _CollectionEditScreenState extends ConsumerState<CollectionEditScreen> {
                 title: const Text('Dhikr'),
                 subtitle: const Text('Every dhikr there is, searchable'),
                 onTap: () => Navigator.pop(context, Routes.pickDhikr),
+              ),
+              // Last, and its own door: the adhkar in the three above are the
+              // ones the app shipped with, and these are the ones somebody
+              // wrote. Keeping them apart is what lets the searchable list go
+              // on meaning "the content library" — and this is also where a
+              // dhikr is written on the spot, for somebody who reached for the
+              // add button holding words that are not in the app at all.
+              ListTile(
+                title: const Text('Your adhkar'),
+                subtitle: const Text('The ones you wrote, or write one now'),
+                onTap: () => Navigator.pop(context, Routes.pickUserDhikr),
               ),
             ],
           ),

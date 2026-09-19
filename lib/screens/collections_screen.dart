@@ -99,6 +99,12 @@ class _CollectionList extends ConsumerWidget {
         if (mine.isEmpty) const _NoneOfYourOwn() else ..._rows(mine),
         const _GroupLabel('Built-in'),
         ..._rows(builtin),
+        // After the shelf, not above it: what somebody opens this tab for is a
+        // collection, and their own adhkar are the ingredients rather than the
+        // dish. A row in the list rather than a second icon in the app bar —
+        // the bar's one collections-only action is already "New collection",
+        // and this is not a thing anybody does twice in a morning.
+        const _YourAdhkarRow(),
       ],
     );
   }
@@ -313,6 +319,34 @@ class _CommitButton extends ConsumerWidget {
     await ref
         .read(homeCommitmentsProvider)
         .commit(listing.id, choice.section, days: choice.days);
+  }
+}
+
+/// The way through to the adhkar the user wrote.
+///
+/// Counts nothing. A number here would be read as a count of collections,
+/// which is what every other row in this list carries, and the screen behind
+/// it says how many there are the moment it opens.
+class _YourAdhkarRow extends StatelessWidget {
+  const _YourAdhkarRow();
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.only(top: WirdiMetrics.space5),
+      child: ListTile(
+        leading: const Icon(Icons.edit_note_outlined),
+        title: const Text('Your adhkar'),
+        subtitle: const Text('Adhkar you wrote, to put in your collections'),
+        trailing: Icon(
+          Icons.chevron_right,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+        onTap: () => Navigator.pushNamed(context, Routes.adhkar),
+      ),
+    );
   }
 }
 

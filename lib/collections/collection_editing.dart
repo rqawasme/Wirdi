@@ -10,6 +10,10 @@ import '../domain/repositories.dart';
 /// front of somebody who has just dragged a row. Everything in this file that
 /// can refuse, refuses with one of these, and the editor screen shows
 /// [message] verbatim.
+///
+/// `dhikr_editing.dart` refuses with the same type rather than one of its own:
+/// the screens that write a dhikr are the screens that edit collections, and
+/// one error means each of them catches one thing.
 class CollectionEditingError implements Exception {
   const CollectionEditingError(this.message);
 

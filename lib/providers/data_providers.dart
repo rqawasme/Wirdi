@@ -49,6 +49,13 @@ final Provider<CollectionRepository> collectionRepositoryProvider =
       name: 'collectionRepository',
     );
 
+/// The adhkar the user wrote, over `user.db`.
+final Provider<UserDhikrRepository> userDhikrRepositoryProvider =
+    Provider<UserDhikrRepository>(
+      (Ref ref) => ref.watch(wirdiDataProvider).userDhikrRepository,
+      name: 'userDhikrRepository',
+    );
+
 /// Progress, completions, reading position and settings.
 final Provider<UserRepository> userRepositoryProvider =
     Provider<UserRepository>(
