@@ -1,0 +1,715 @@
+{
+  "group": "sunnah-duas",
+  "description": "Supplications of the Prophet ﷺ from the Sunnah, as collected on Life With Allah (lifewithallah.com, Main Adhkar → Sunnah Duas), with that page's translation, transliteration and virtue for each. Not a wird: no built-in collection points here. These are in the library so people building their own collections have them to choose from. Four duʿāʾ on the page are not here because the library already has them - Sayyid al-Istighfar (3001), Yā Ḥayyu yā Qayyūm (3008), the ʿāfiyah duʿāʾ of the morning and evening (3005) and the refuge from hamm and ḥazan (5020). Each dhikr's notes carry the page's heading for it.",
+  "adhkar": [
+    {
+      "id": 24001,
+      "text_arabic": "اَللّٰهُمَّ أَنْتَ الْمَلِكُ لَا إِلٰهَ إِلَّا أَنْتَ، أَنْتَ رَبِّيْ وَأَنَا عَبْدُكَ، ظَلَمْتُ نَفْسِيْ وَاعْتَرَفْتُ بِذَنْبِيْ، فَاغْفِرْ لِيْ ذُنُوْبِيْ جَمِيْعًا، إِنَّهُ لَا يَغْفِرُ الذُّنُوْبَ إِلَّا أَنْتَ، وَاهْدِنِيْ لِأَحْسَنِ الْأَخْلَاقِ لَا يَهْدِيْ لِأَحْسَنِهَا إِلَّا أَنْتَ، وَاصْرِفْ عَنِّيْ سَيِّئَهَا لَا يَصْرِفُ عَنِّيْ سَيِّئَهَا إِلَّا أَنْتَ، لَبَّيْكَ وَسَعْدَيْكَ، وَالْخَيْرُ كُلُّهُ فِيْ يَدَيْكَ، وَالشَّرُّ لَيْسَ إِلَيْكَ، أَنَا بِكَ وَإِلَيْكَ، تَبَارَكْتَ وَتَعَالَيْتَ، أَسْتَغْفِرُكَ وَأَتُوْبُ إِلَيْكَ",
+      "translation": "O Allah, You are the King, there is no god worthy of worship except You. You are my Lord and I am Your slave. I have wronged myself and I confess my sins. Forgive all of my sins; indeed no one forgives sins except You. Guide me to the best of character, for no one guides to the best of it except You; and turn the evil of it away from me, for no one turns it away except You. Here I am at Your service, seeking Your pleasure; all good is in Your hands and no evil is attributed to You. I am from You and I am returning to You. You are Most Blessed and You are Most Exalted. I seek Your forgiveness and repent to You.",
+      "default_count": 1,
+      "transliteration": "Allāhumma Antal-Maliku lā ilāha illā Ant, Anta Rabbī wa ana ʿabduk, ẓalamtu nafsī waʿtaraftu bi-dhambī, fa-ghfir lī dhunūbī jamīʿā, innahū lā yaghfiru-dh-dhunūba illā Ant, wa-hdinī li-aḥsani-l-akhlāqi lā yahdī li-aḥsanihā illā Ant, wa-ṣrif ʿannī sayyi’ahā lā yaṣrifu ʿannī sayyi’ahā illā Ant, labbayka wa saʿdayk, wal-khayru kulluhū fī yadayk, wa-sh-sharru laysa ilayk, ana bika wa ilayk, tabārakta wa taʿālayt, astaghfiruka wa atūbu ilayk.",
+      "source_id": 16,
+      "benefits": "ʿAlī b. Abī Ṭālib (raḍiy Allāhu ‘anhu) narrates: “When the Messenger of Allah ﷺ would stand for prayer, he would say:\nوَجَّهْتُ وَجْهِيَ لِلَّذِي فَطَرَ السَّمَوَاتِ وَالأَرْضَ حَنِيفًا وَمَا أَنَا مِنَ الْمُشْرِكِينَ إِنَّ صَلاَتِي وَنُسُكِي وَمَحْيَاىَ وَمَمَاتِي لِلَّهِ رَبِّ الْعَالَمِينَ لاَ شَرِيكَ لَهُ وَبِذَلِكَ أُمِرْتُ وَأَنَا مِنَ الْمُسْلِمِينَ\n(I have turned my face towards the One who created the heavens and the earth, turned away from all that is false having surrendered to Allah, and I am not of the polytheists. My ṣalāh, my sacrifice, my life and my death are all for Allah, Lord of the worlds, who has no partners. I have been commanded of this, and I am of those who submit.)\nHe would then say [the above].\nWhen he would do rukū, he would say:\nاللَّهُمَّ لَكَ رَكَعْتُ وَبِكَ آمَنْتُ وَلَكَ أَسْلَمْتُ خَشَعَ لَكَ سَمْعِي وَبَصَرِي وَمُخِّي وَعَظْمِي وَعَصَبِي\n(O Allah, for You Alone I have bowed in prayer, in You Alone I have believed, and to You Alone I have submitted. My hearing, sight, mind, bones and nerves are humble to You.)\nWhen he would raise his head from rukū, he would say:\nاللَّهُمَّ رَبَّنَا لَكَ الْحَمْدُ مِلْءَ السَّمَوَاتِ وَمِلْءَ الأَرْضِ وَمِلْءَ مَا بَيْنَهُمَا وَمِلْءَ مَا شِئْتَ مِنْ شَىْءٍ بَعْدُ\n(O Allah, Our Lord, for You Alone is all praise; praise which fills the heavens, which fills the earth, which fills whatever is in between them, and which fills whatever You wish after that.)\nWhen he would do sajdah, he would say:\nاللَّهُمَّ لَكَ سَجَدْتُ وَبِكَ آمَنْتُ وَلَكَ أَسْلَمْتُ سَجَدَ وَجْهِي لِلَّذِي خَلَقَهُ وَصَوَّرَهُ وَشَقَّ سَمْعَهُ وَبَصَرَهُ تَبَارَكَ اللَّهُ أَحْسَنُ الْخَالِقِينَ\n(O Allah, for You Alone I have prostrated, in You Alone I have believed, and to You Alone I have submitted. My face has prostrated to the One who created and fashioned it, and who formed its hearing and sight. Blessed is Allah, the Best of Creators.)\nThe last thing he would say after the tashahhud and the salām would be:\nاللَّهُمَّ اغْفِرْ لِي مَا قَدَّمْتُ وَمَا أَخَّرْتُ وَمَا أَسْرَرْتُ وَمَا أَعْلَنْتُ وَمَا أَسْرَفْتُ وَمَا أَنْتَ أَعْلَمُ بِهِ مِنِّي أَنْتَ الْمُقَدِّمُ وَأَنْتَ الْمُؤَخِّرُ لاَ إِلَهَ إِلاَّ أَنْتَ\n(O Allah, forgive me for what I have done in the past and for what I am yet to do, for what I have done privately and for what I have done publicly, for my excesses and for that which You know more than me. You are the One who brings forward and the One who puts behind, and there is no god worthy of worship except You.)\n(Muslim 771)",
+      "notes": "Praising Allah, Forgiveness and Good Character"
+    },
+    {
+      "id": 24002,
+      "text_arabic": "اَللّٰهُمَّ اغْفِرْ لِيْ خَطِيْئَتِيْ وَجَهْلِيْ وَإِسْرَافِيْ فِيْ أَمْرِيْ، وَمَا أَنْتَ أَعْلَمُ بِهِ مِنِّيْ، اَللّٰهُمَّ اغْفِرْ لِيْ جِدِّيْ وَهَزْلِيْ وَخَطَئِيْ وَعَمْدِيْ وَكُلُّ ذٰلِكَ عِنْدِيْ، اَللّٰهُمَّ اغْفِرْ لِيْ مَا قَدَّمْتُ وَمَا أَخَّرْتُ، وَمَا أَسْرَرْتُ وَمَا أَعْلَنْتُ، وَمَا أَنْتَ أَعْلَمُ بِهِ مِنِّيْ، أَنْتَ الْمُقَدِّمُ وَأَنْتَ الْمُؤَخِّرُ، وَأَنْتَ عَلَىٰ كُلِّ شَيْءٍ قَدِيْرٌ",
+      "translation": "O Allah, forgive my mistakes, ignorance, transgression in my matters, and what You are more Knowledgeable of than me. O Allah, forgive me for what I did in earnestness and in jest; unintentionally or intentionally; as I have committed all of these (types of sins). O Allah, forgive me for what I have already done, what I am yet to do, what I did publicly, what I did privately, and what You are more Knowledgeable of than me. You are the One who brings forward and You are the One who defers. You are All-Powerful over everything.",
+      "default_count": 1,
+      "transliteration": "Allāhumma-ghfirlī khaṭī’atī wa jahlī wa isrāfī fī amrī, wa mā Anta aʿlamu bihī minnī, Allāhumma-ghfir lī jiddī wa hazlī wa khaṭa’ī wa ʿamdī wa kullu dhālika ʿindī, Allāhumma-ghfirlī mā qaddamtu wa mā akh-khart, wa mā asrartu wa mā aʿlant, wa mā Anta aʿlamu bihī minnī, Anta-l-Muqaddimu wa Anta-l-Muakh-khir, wa Anta ʿalā kulli shay’in Qadīr.",
+      "source_id": 17,
+      "benefits": "Abū Mūsā al-‘Ashʿarī (raḍiy Allāhu ‘anhu) reported from his father that the Messenger of Allah ﷺ would supplicate with [the above]. (Muslim 2719)",
+      "notes": "Comprehensive Forgiveness"
+    },
+    {
+      "id": 24003,
+      "text_arabic": "اَللّٰهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّيْ",
+      "translation": "O Allah, You are the Ever-Pardoning, You love to pardon so pardon me.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innaka ʿAffuwwun tuḥibb-ul-ʿafwa faʿfu ʿannī.",
+      "source_id": 18,
+      "benefits": "ʿĀ’isha (raḍiy Allāhu ‘anhā) narrated: “I said: ‘O Messenger of Allah ﷺ, if I know when the Night of al-Qadr is, then what should I say in it?” He said: ‘Say: [the above].’” (Tirmidhī 3513)",
+      "notes": "Forgiveness"
+    },
+    {
+      "id": 24004,
+      "text_arabic": "اَللّٰهُمَّ رَبَّ مُحَمَّدٍ اغْفِرْ لِيْ ذَنْبِيْ، وَأَذْهِبْ غَيْظَ قَلْبِيْ، وَأَعِذْنِيْ مِنْ مُضِلَّاتِ الْفِتَنِ",
+      "translation": "O Allah, Lord of Muḥammad forgive my sins, remove the anger of my heart and protect me from misleading trials.",
+      "default_count": 1,
+      "transliteration": "Allāhumma Rabba Muḥammad, ighfir lī dhambī, wa adh-hib ghayẓa qalbī, wa aʿidhnī min muḍillāti-l-fitan.",
+      "source_id": 19,
+      "benefits": "Muhammad b. Abī Bakr (raḥimahullāh) narrates that when ʿĀ’isha (raḍiy Allāhu ‘anhā) would become angry, the Messenger of Allah ﷺ would stroke her nose and then say (to her): “O ʿUwaysh! Say: [the above].” (Ibn al-Sunnī 456)",
+      "notes": "Forgiveness, Anger and Trials"
+    },
+    {
+      "id": 24005,
+      "text_arabic": "اَللّٰهُمَّ اغْفِرْ لِيْ ذَنْبِيْ كُلَّهُ، دِقَّهُ وَجِلَّهُ، وَأَوَّلَهُ وَآخِرَهُ، وَعَلَانِيَتَهُ وَسِرَّهُ",
+      "translation": "O Allah, forgive for me all of my sins: the minor and major, the first and the last, the public and the private.",
+      "default_count": 1,
+      "transliteration": "Allāhumma-ghfir lī dhambī kullah, diqqahū wa jillah, wa awwalahū wa ākhirah, wa ʿalāniyatahū wa sirrah.",
+      "source_id": 20,
+      "benefits": "Abū Hurayrah (raḍiy Allāhu ‘anhu) narrates that the Messenger of Allah ﷺ would say [the above] in sujūd.” (Muslim 483)",
+      "notes": "Forgiveness For All Types of Sins"
+    },
+    {
+      "id": 24006,
+      "text_arabic": "اَللّٰهُمَّ إِنّيْ ظَلَمْتُ نَفْسِيْ ظُلْمًا كَثِيْرًا، وَلَا يَغْفِرُ الذُّنُوْبَ إِلَّا أَنْتَ، فَاغْفِرْ لِيْ مَغْفِرَةً مِّنْ عِنْدِكَ، وَارْحَمْنِيْ، إِنَّكَ أَنْتَ الْغَفُوْرُ الرَّحِيْمُ",
+      "translation": "O Allah, I have wronged myself greatly and no one forgives sins except You; so grant me forgiveness from You and have mercy upon me. You are the Most Forgiving, the Most Merciful.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī ẓalamtu nafsī ẓulman kathīrā, wa lā yaghfiru-dh-dhunūba illā Ant, fa-ghfir lī maghfirata-m-min ʿindik, war-ḥamnī, innaka Anta-l-Ghafūru-r-Raḥīm.",
+      "source_id": 21,
+      "benefits": "Abū Bakr al-Ṣiddīq (raḍiy Allāhu ‘anhu) narrates: “I asked the Messenger of Allah ﷺ to teach me a du’ā so that I may invoke Allah with it in my salāh. He told me to say: [the above].” (Bukhārī 834)",
+      "notes": "Acknowledgement of Your Sins, Forgiveness & Mercy"
+    },
+    {
+      "id": 24007,
+      "text_arabic": "اَللّٰهُمَّ اغْفِرْ لِيْ، وَارْحَمْنِيْ، وَعَافِنيْ، وَاهْدِنِيْ وَارْزُقْنِيْ",
+      "translation": "O Allah, forgive me, have mercy on me, grant me wellbeing, guide me and grant me sustenance.",
+      "default_count": 1,
+      "transliteration": "Allāhumma-ghfir lī, war-ḥamnī, wa ʿāfinī, wah-dinī war-zuqnī.",
+      "source_id": 22,
+      "benefits": "ʿAbdullāh b. ʿAbbās (radiy Allāhū ‘anhumā): “The Prophet ﷺ used to say [the above] between the two prostrations.” (Abū Dāwūd 850)",
+      "notes": "Forgiveness, Mercy & Guidance"
+    },
+    {
+      "id": 24008,
+      "text_arabic": "اَللّٰهُمَّ بَاعِدْ بَيْنِيْ وَبَيْنَ خَطَايَاىَ كَمَا بَاعَدْتَ بَيْنَ الْمَشْرِقِ وَالْمَغْرِبِ، اللَّهُمَّ نَقِّنِيْ مِنَ الْخَطَايَا كَمَا يُنَقَّى الثَّوْبُ الأَبْيَضُ مِنَ الدَّنَسِ، اللَّهُمَّ اغْسِلْنِيْ مِنْ خَطَايَاىَ بِالْمَاءِ وَالثَّلْجِ وَالْبَرَدِ",
+      "translation": "O Allah, distance me from my sins as You have distanced the East from the West. O Allah, purify me from my sins as white cloth is purified from dirt. O Allah, wash away my sins with water, snow and hail.",
+      "default_count": 1,
+      "transliteration": "Allāhumma bāʿid baynī wa bayna khaṭāyāya kamā bāʿadta bayna-l-mashriqi wa-l-maghrib, Allāhumma naq-qinī min khaṭāyāya kamā yunaq-qa-th-thawbul-abyaḍu mina-d-danas, Allāhumma-ghsilnī min khaṭāyāya bil-māi’ wa-th-thalji wal-barad.",
+      "source_id": 23,
+      "benefits": "Abū Hurayrah (raḍiy Allāhu ‘anhu) narrates: “The Messenger of Allah ﷺ would pause between the opening takbīr and the recitation. said: ‘May my father and mother be sacrificed for you, the pause between the opening takbir and the recitation, what do you say?’ He replied: ‘I say [the above].’ (Bukhārī 744, Muslim 598)",
+      "notes": "A Deep Cleansing of Sins"
+    },
+    {
+      "id": 24009,
+      "text_arabic": "اَللّٰهُمَّ اغْفِرْ لِلْمُؤْمِنِيْنَ وَالْمُؤْمِنَاتِ",
+      "translation": "O Allah, forgive the believing men and the believing women.",
+      "default_count": 1,
+      "transliteration": "Allāhumma-ghfir lil-mu’minīna wa-l-mu’mināt.",
+      "source_id": 24,
+      "benefits": "Umm Salamah (raḍiy Allāhu ‘anhā) narrates that the Messenger of Allah ﷺ said: “Whoever says [the above] everyday, he will receive a reward for every believer.” (Tabarānī in Muʿjam al-Kabīr 23/370)\nʿUbādah (raḍiy Allāhu ‘anhu) narrates that the Messenger of Allah ﷺ said: “Whoever seeks forgiveness for the believing men and women, Allah will write a good deed for every believing man and woman.” (Tabarānī in Musnad al-Shāmiyyīn 2155)",
+      "notes": "Forgiveness for the Believers"
+    },
+    {
+      "id": 24010,
+      "text_arabic": "اَللّٰهُمَّ إنِّيْ أَسْأَلُكَ إِيْمَانًا لَّا يَرْتَدُّ، وَنَعِيْمًا لَّا يَنْفَدُ، وَمُرَافَقَةَ نَبِيِّنَا مُحَمَّدٍ فِيْ أَعْلَىٰ جَنَّةِ الْخُلْدِ",
+      "translation": "O Allah, I beg you for faith which does not waver, blessings which do not cease, and the company of our Prophet Muhammad ﷺ in the loftiest abode of the Eternal Garden.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī as’aluka īmāna-l-lā yartad, wa naʿīma-l-lā yanfad, wa murāfaqata Nabiyyanā Muḥammadin fī aʿlā Jannati-l-khuld.",
+      "source_id": 25,
+      "notes": "Unwavering Iman, Blessings & The Prophet’s Company in Paradise"
+    },
+    {
+      "id": 24011,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَسْأَلُكَ الْفِرْدَوْسَ أَعْلَى الْجَنَّةِ",
+      "translation": "O Allah, I beg you for al-Firdaws, the loftiest abode of Paradise.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī as’alukal-Firdawsa aʿlāl-Jannah.",
+      "source_id": 26,
+      "benefits": "Abū Hurayrah (raḍiy Allāhu ‘anhu) narrated that the Prophet ﷺ said, “Whoever believes in Allah and His Messenger, offers prayer perfectly and fasts the month of Ramadan, will rightfully be granted Paradise by Allah, no matter whether he fights in Allah’s Cause or remains in the land where he is born.” The people said, “O Messenger of Allah! Shall we inform the people of this good news?” He said, “Paradise has one-hundred grades which Allah has reserved for the warriors who fight in His Cause, and the distance between each of two grades is like the distance between the Heaven and the Earth. So, when you ask Allah (for something), ask for al-Firdaws which is the best and highest part of Paradise.” The sub-narrator added, “I think the Prophet ﷺ also said, ‘Above it (i.e. al-Firdaws) is the Throne of Beneficent (i.e. Allah), and from it originate the rivers of Paradise.”) (Bukhārī 2790)\nMuʿādh b. Jabal (raḍiy Allāhu ‘anhu) narrated that the Messenger of Allah ﷺ said: “When you ask Allah, ask for al-Firdaws (the highest level of Jannah).” (Tirmidhī 2530)",
+      "notes": "Asking for Jannah al-Firdaws"
+    },
+    {
+      "id": 24012,
+      "text_arabic": "اَللّٰهُمَّ رَبَّ جَبْرَائِيْلَ وَمِيْكَائِيْلَ وَرَبَّ إِسْرَافِيْلَ، أَعُوْذُ بِكَ مِنْ حَرِّ النَّارِ، وَمِنْ عَذَابِ الْقَبْرِ",
+      "translation": "O Allah, Lord of Jabrā’īl and Mīkā’īl, and the Lord of Isrāfīl, I seek Your protection from the heat of the Hell-fire and from the punishment of the grave.",
+      "default_count": 1,
+      "transliteration": "Allāhumma Rabba Jabrā’īla wa Mīkā’īla wa Rabba Isrāfīl, aʿūdhu bika min ḥarri-n-Nār, wa min ʿadhābil-qabr.",
+      "source_id": 27,
+      "benefits": "ʿĀ’isha (raḍiy Allāhu ‘anhā) narrates that the Messenger of Allah ﷺ said [the above]. (Nasā’ī 5519)",
+      "notes": "Protection From Hell-Fire & the Punishment of The Grave"
+    },
+    {
+      "id": 24013,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَعُوْذُ بِكَ مِنْ عَذَابِ جَهَنَّمَ، وَمِنْ عَذَابِ الْقَبْرِ، وَمِنْ فِتْنَةِ الْمَحْيَا وَالْمَمَاتِ، وَمِنْ شَرِّ فِتْنَةِ الْمَسِيْحِ الدَّجَّالِ",
+      "translation": "O Allah, I seek Your protection from the punishment of the Hell-fire, and from the punishment of the grave, and from the trials of life and death, and from the evil of the tribulation of Dajjāl, the false Messiah.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī aʿūdhu bika min ʿadhābi Jahannam, wa min ʿadhābil-qabr, wa min fitnati-l-maḥyā wal-mamāt, wa min sharri fitnati-l-Masīḥi-d-Dajjāl.",
+      "source_id": 28,
+      "benefits": "Abū Hurayrah (raḍiy Allāhu ‘anhu) narrates that the Messenger of Allah ﷺ said: “When any one of you utters the tashahhud (in salah), he should seek refuge with Allah from four and should say [the above].” (Muslim 588)",
+      "notes": "Protection From Hell-Fire, Punishment of the Grave & Trials"
+    },
+    {
+      "id": 24014,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَعُوْذُ بِكَ مِنْ ضِيْقِ الدُّنْيَا وَضِيْقِ يَوْمِ الْقِيَامَةِ",
+      "translation": "O Allah, I seek Your protection from the anguish of the world and the anguish of the Day of Judgement.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī aʿūdhu bika min ḍīqi-d-dunyā wa ḍīqi yawmi-l-qiyāmah.",
+      "source_id": 29,
+      "benefits": "Sharīq al-Hawzānī (raḥimahullāh) narrates that I entered upon Aisha (raḍiy Allāhu ‘anhā) and I asked her: “With which supplication did the Messenger of Allah ﷺ begin his Salāh when he woke up at night?” She replied: “You have asked me regarding something which no one has asked me before.” When he woke up at night, he uttered: Allāhu Akbar (Allah is the Greatest) ten times, and uttered Alḥamdullillāh (All praise be to Allah) ten times, and said Subḥāna-llāhi wa bi ḥamdih. (Allah is free from imperfection, and all praise is due to Him.) ten times, and said: Subḥānal Malik al-Quddūs (How perfect is the Sovereign, the Most Holy) ten times, and asked Allah’s forgiveness ten times, and said: “There is no god but Allah” ten times, and then said: [the above] ten times. He then began the Salāh. (Abū Dāwūd 5085)",
+      "notes": "Protection From The Anguish of the World & Hereafter"
+    },
+    {
+      "id": 24015,
+      "text_arabic": "اَللّٰهُمَّ إنَّا نَسْأَلُكَ مُوْجِبَاتِ رَحْمَتِكَ، وَعَزَائِمَ مَغْفِرَتِكَ، وَالسَّلَامَةَ مِنْ كُلِّ إِثْمٍ، وَالْغَنِِيْمَةَ مِنْ كُلِّ بِرٍّ، وَالْفَوْزَ بِالْجَنَّةِ، وَالنَّجَاةَ مِنَ النَّارِ",
+      "translation": "O Allah, we beg You for all that which will necessitate Your mercy and the determination to do all that which will necessitate Your forgiveness; for protection from every sin and accomplishment of every good; for attainment of Paradise and for freedom from Hell-fire.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innā nas’aluka mūjibāti raḥmatik, wa ʿazā’ima maghfiratik, wa-s-salāmata min kulli ithm, wal-ghanīmata min kulli birr, wal-fawza bil-Jannah, wa-n-najāta mina-n-nār.",
+      "source_id": 30,
+      "benefits": "Abdullah b. Mas’ūd (raḍiy Allāhu ‘anhu) says: “From the supplication of the Messenger of Allah ﷺ was: [the above]. (Hākim 1/525)",
+      "notes": "Attainment of Every Good"
+    },
+    {
+      "id": 24016,
+      "text_arabic": "اَللّٰهُمَّ حَاسِبْنِيْ حِسَابًا يَّسِيْرًا",
+      "translation": "O Allah, grant me an easy reckoning.",
+      "default_count": 1,
+      "transliteration": "Allāhumma ḥāsibnī ḥisāba-y-yasīrā.",
+      "source_id": 31,
+      "benefits": "ʿĀ’isha (raḍiy Allāhu ‘anhā) narrates: “I said: ‘O Messenger of Allah ﷺ, what is an easy reckoning?’ He said: ‘(An easy reckoning is) that Allah looks inside His book (of deeds) and pardons him, for one who his taken to task and interrogated on that Day, O ʿĀ’isha, will be destroyed. And anything that afflicts a Muslim, Allah will expiate his sins as much as the prick of a thorn.” (Ahmad 24215)\nʿĀ’isha (raḍiy Allāhu ‘anhā) narrates: “Once the Prophet ﷺ said: ‘Whoever will be called to account (about his deeds on the Day of Resurrection) will surely be punished.’ I said: ‘Doesn’t Allah say: “He surely will receive an easy reckoning.” (84.8) The Prophet ﷺ replied, ‘This means only the presentation of the accounts but whoever will be taken to account and interrogated, will certainly be ruined.’ (Bukhārī 103)",
+      "notes": "Easy Reckoning"
+    },
+    {
+      "id": 24017,
+      "text_arabic": "اَللّٰهُمَّ ابْسُطْ عَلَيْنَا مِنْ بَرَكَاتِكَ وَرَحْمَتِكَ وَفَضْلِكَ وَرِزْقِكَ، اَللّٰهُمَّ إِنِّيْ أَسْأَلُكَ النَّعِيْمَ الْمُقِيْمَ الَّذِيْ لَا يَحُوْلُ وَلَا يَزُوْلُ، اَللّٰهُمَّ إِنِّيْ أَسْأَلُكَ النَّعِيْمَ يَوْمَ الْعَيْلَةِ، وَالْأَمْنَ يَوْمَ الْخَوْفِ، اَللّٰهُمَّ إِنِّيْ عَائِذٌ بِكَ مِنْ شَرِّ مَا أَعْطَيْتَنَا وَشَرِّ مَا مَنَعْتَنَا، اَللّٰهُمَّ حَبِّبْ إِلَيْنَا الْإِيْمَانَ وَزَيِّنْهُ فِيْ قُلُوْبِنَا، وَكَرِّهْ إِلَيْنَا الْكُفْرَ وَالْفُسُوْقَ وَالْعِصْيَانَ، وَاجْعَلْنَا مِنَ الرَّاشِدِيْنَ، اَللّٰهُمَّ تَوَفَّنَا مُسْلِمِيْنَ، وَأَحْيِنَا مُسْلِمِيْنَ، وَأَلْحِقْنَا بِالصَّالِحِيْنَ، غَيْرَ خَزَايَا وَلَا مَفْتُوْنِيْنَ، اَللّٰهُمَّ قَاتِلِ الْكَفَرَةَ الَّذِيْنَ يُكَذِّبُوْنَ رُسُلَكَ، وَيَصُدُّوْنَ عَنْ سَبِيْلِكَ، وَاجْعَلْ عَلَيْهِمْ رِجْزَكَ وَعَذَابَكَ، اَللّٰهُمَّ قَاتِلِ الْكَفَرَةَ الَّذِيْنَ أُوْتُوا الْكِتَابَ، إِلٰهَ الْحَقِّ",
+      "translation": "O Allah, grant us Your blessings, Your mercy, Your grace and Your sustenance in abundance. O Allah, I beg you for eternal blessings which do not change nor disappear. O Allah, I beg you for blessings on the day of intense need and safety on the day of fear (i.e. Day of Judgement). O Allah, I seek Your protection from the evil of what You have granted us and the evil of what You have withheld from us. O Allah, endear faith to us and beautify it in our hearts. Make disbelief, sins and disobedience hateful to us, and make us of the rightly guided ones. O Allah, grant us death as Muslims, make us live as Muslims and join us with the righteous without being humiliated or tested. O Allah, fight the disbelievers who reject Your Messengers and avert from Your path. Inflict upon them Your punishment and vengeance. O Allah, fight the disbelievers who were given the Book, O the True God.",
+      "default_count": 1,
+      "transliteration": "Allāhumma-b-suṭ ʿalaynā min barakātika wa raḥmatika wa faḍlika wa rizqik, Allāhumma innī as’aluka-n-naʿīmal-muqīma-l-ladhī lā yaḥūlu wa lā yazūl, Allāhumma innī as’aluka-n-naʿīma yawmal-ʿaylah, wa-l-amna yawma-l-khawf, Allāhumma innī ʿā’idhu-m-bika min sharri mā aʿṭaytanā wa sharri mā manaʿtanā, Allāhumma ḥab-bib ilaynal-īmāna wa zay-yinhu fī qulūbinā, wa kar-rih ilayna-l-kufra wal-fusūqa wa-l-ʿiṣyān, waj-ʿalnā mina-r-rāshidīn, Allāhumma tawaf-fanā Muslimīn, wa aḥyinā Muslimīn, wa alḥiqnā bi-ṣ-ṣāliḥīn, ghayra khazāyā wa lā maftūnīn, Allāhumma qātili-l-kafarata-l-ladhīna yukadh-dhibūna rusulak, wa yaṣuddūna ʿan sabīlik, waj-ʿal ʿalayhim rijzaka wa ʿadhābak, Allāhumma qātilil-kafarata-l-ladhīna ūtu-l-kitāb, ilāha-l-ḥaqq.",
+      "source_id": 32,
+      "benefits": "Rifā’ah az-Zuraqī (raḍiy Allāhu ‘anhu) narrates: “When it was the day of (the battle of) Uhud and the polytheists retreated, the Messenger of Allah ﷺ said: ‘Arrange yourselves (in rows) so I can praise my Lord.’ So the Companions (radiy Allāhū ‘anhum) stood behind him in rows. Then the Messenger of Allah ﷺ said: “O Allah, for You Alone is all praise. O Allah, none can restrict what You expand and none can expand what You have restricted. None can guide whom You have left astray, and none can mislead whom You have guided. None can give what You withhold, and none can withhold what You bestow. None can bring near what You have distanced and none can distance what You have brought near.” Then he said: [the above].” (Aḥmad 15066)",
+      "notes": "The Prophet’s Comprehensive Duʿa After the Battle of Uhud"
+    },
+    {
+      "id": 24018,
+      "text_arabic": "اَللّٰهُمَّ آتِنِيْ أَفْضَلَ مَا تُؤْتِيْ عِبَادَكَ الصَّالِحِيْنَ",
+      "translation": "O Allah, grant me the best of what You grant Your righteous slaves.",
+      "default_count": 1,
+      "transliteration": "Allāhumma ātinī afḍala mā tuʿtī ʿibādaka-ṣ-ṣāliḥīn.",
+      "source_id": 33,
+      "benefits": "Sa’d (raḍiy Allāhu ‘anhu) narrates that a man came for Salāh while Messenger of Allah ﷺ was performing Salāh. The man said [the above] when he reached the row. When the Messenger of Allah ﷺ concluded the Salāh, he asked: “Who spoke just now?” The man said: “It was me O Messenger of Allah ﷺ. He ﷺ said: “Then your horse will be killed and you will be martyred in the path of Allah.” (Ibn Hibbān 1609)",
+      "notes": "Best of What the Righteous are Granted"
+    },
+    {
+      "id": 24019,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَسْأَلُكَ شَهَادَةً فِيْ سَبِيْلِكَ",
+      "translation": "O Allah, I beg you for martyrdom in Your path.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī as’aluka shahādatan fī sabīlik.",
+      "source_id": 34,
+      "benefits": "The Messenger of Allah ﷺ said: “Whoever asks for martyrdom with sincerity will be ranked by Allah among the martyrs even if he died on his bed.” (Muslim 1909)\nZayd b. Aslam (raḥimahullāh) narrates that ʿUmar b. Khattab (raḍiy Allāhu ‘anhu) would say [the above] and add: “and death in the city of your beloved.” (Muwatta 1003)",
+      "notes": "Asking For Martyrdom"
+    },
+    {
+      "id": 24020,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَسْأَلُكَ عِيْشَةً نَّقِيَّةً، وَمِيْتَةً سَوِيَّةً، وَمَرَدًّا غَيْرَ مُخْزٍ وَّلَا فَاضِحٍ",
+      "translation": "O Allah, I beg you for a pure life, a good death, and a return (to You) which is neither humiliating nor disgraceful.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī as’aluka ʿīshata-n-naqiyyah, wa mītatan sawiyyah, wa marad-dan ghayra mukhzi-w-wa lā fāḍiḥ.",
+      "source_id": 35,
+      "benefits": "ʿAbdullāh b. Masʿūd (raḍiy Allāhu ‘anhu) narrates that the du’ā of the Prophet ﷺ in the two Eid’s was: [the above]. He would also add: “O Allah, do not give us a sudden death, and do not take us unexpectedly, and do not hurry us from (fulfilling) a right or (making a) bequest. O Allah, we ask you for chastity, self-sufficiency, taqwā (fear), guidance, and a good-ending in this world and the Hereafter. And we seek refuge in you from doubt, opposing (the truth), ostentation and fame in your religion. O Turner of hearts, do not let our hearts deviate after you have guided us. Grant us Your mercy. You are indeed the Giver of all bounties.” (Tabarānī in Mu’jam al-Awsat 7572)",
+      "notes": "A Goodly Life & Death"
+    },
+    {
+      "id": 24021,
+      "text_arabic": "اَللّٰهُمَّ جَدِّدِ الْإِيْمَانَ فِيْ قَلْبِيْ",
+      "translation": "O Allah, keep faith rejuvenated in my heart.",
+      "default_count": 1,
+      "transliteration": "Allāhumma jaddidi-l-īmāna fī qalbī.",
+      "source_id": 36,
+      "benefits": "ʿAbdullāh b. ʿUmar (radiy Allāhū ‘anhumā) narrates that the Messenger of Allah ﷺ said: “Indeed, īmān (faith) wears out in your hearts the way a piece of cloth wears out. So ask Allah to rejuvenate īmān (faith) in your hearts.” (Hākim 1/4)",
+      "notes": "Renewal of Iman"
+    },
+    {
+      "id": 24022,
+      "text_arabic": "اَللّٰهُمَّ احْفَظْنِيْ بِالْإِسْلَامِ قَائِمًا، وَاحْفَظْنِيْ بِالْإِسْلَامِ قَاعِدًا، وَاحْفَظْنِيْ بِالْإِسْلَامِ رَاقِدًا، وَلَا تُشْمِتْ بِيَ عَدُوًّا وَّلَا حَاسِدًا، اَللَّهُمَّ إِنِّيْ أَسْأَلُكَ مِنْ كُلِّ خَيْرٍ خَزَائِنُهُ بِيَدِكَ، وَأَعُوْذُ بِكَ مِنْ كُلِّ شَرٍّ خَزَائِنُهُ بِيَدِكَ",
+      "translation": "O Allah, safeguard me with Islam whilst I am standing. Safeguard me with Islam whilst I am sitting. Safeguard me with Islam whilst I am sleeping, and do not let an enemy or envier gloat over my misery. O Allah, I beg You for all good, the treasures of which are in Your Hand. I seek Your protection from all evil, the treasures of which are in Your Hand.",
+      "default_count": 1,
+      "transliteration": "Allāhumma-ḥ-faẓnī bi-l-Islāmi qā’imā, wa-ḥ-faẓnī bi-l-Islāmi qāʿidā, wa-ḥ-faẓnī bi-l-Islāmi rāqidā, wa lā tushmit biya ʿaduw-wa-w-wa lā ḥāsidā, Allāhumma innī as’aluka min kulli khayrin khazā’inuhu bi-yadik, wa aʿūdhu bika min kulli sharrin khazā’inuhu bi-yadik.",
+      "source_id": 30,
+      "benefits": "ʿAbdullāh b. Masʿūd (radiy Allāhū ‘anhu) narrates that the Messenger of Allah ﷺ would say [the above]. (Hākim 1/525)",
+      "notes": "Safeguarding of My Islam & Asking For All Good"
+    },
+    {
+      "id": 24023,
+      "text_arabic": "يَا مُقَلِّبَ الْقُلُوْبِ ثَبِّتْ قَلْبِيْ عَلَىٰ دِيْنِكَ",
+      "translation": "O Allah, Turner of hearts, make my heart firm upon Your religion.",
+      "default_count": 1,
+      "transliteration": "Yā Muqalliba-l-qulūbi thabbit qalbī ʿalā dīnik.",
+      "source_id": 37,
+      "benefits": "Shahr bin Hawshab (raḥimahullāh) said: “I said to Umm Salamah (raḍiy Allāhu ‘anhā): ‘O Mother of the Believers! What was the supplication that the Messenger of Allah ﷺ said most frequently when he was with you?” She said: ‘The supplication he said most frequently was: ’[the above]’” She said: ‘So I said: “O Messenger of Allah, why do you supplicate [the above] so frequently [the above]? He said: ‘O Umm Salamah! Verily, there is no human being except that his heart is between Two Fingers of the Fingers of Allah, so whomsoever He wills He makes steadfast, and whomever He wills He causes to deviate.’” (Tirmidhī 3522)",
+      "notes": "Steadfastness on Din"
+    },
+    {
+      "id": 24024,
+      "text_arabic": "اَللّٰهُمَّ مُصَرِّفَ الْقُلُوْبِ صَرِّفْ قُلُوْبَنَا عَلَىٰ طَاعَتِكَ",
+      "translation": "O Allah, Changer of hearts, direct our hearts to Your obedience.",
+      "default_count": 1,
+      "transliteration": "Allāhumma Muṣarrifa-l-qulūbi ṣarrif qulūbanā ʿalā ṭāʿatik.",
+      "source_id": 38,
+      "benefits": "ʿAbdullāh b. ʿAmr (raḍiy Allāhu ‘anhuma) reported that the Messenger of Allah ﷺ said: “Verily, the hearts of the children of Adam, all of them, are between the two fingers of the Merciful as one heart. He directs them wherever He wills.” (Muslim 2654)",
+      "notes": "Steadfastness on Obedience"
+    },
+    {
+      "id": 24025,
+      "text_arabic": "يَا وَلِيَّ الْإسْلَامِ وَأَهْلِهِ، ثَبِّتْنِيْ بِهِ حَتَّىٰ أَلْقَاكَ",
+      "translation": "O Guardian of Islam and its followers, keep me firm on it (Islam) until I meet You.",
+      "default_count": 1,
+      "transliteration": "Yā Waliyyal-Islāmi wa ahlih, thab-bitnī bihī ḥattā alqāk.",
+      "source_id": 39,
+      "benefits": "Anas b. Mālik (raḍiy Allāhu ‘anhu) narrates that the Messenger of Allah ﷺ would say [the above]. (Tabarānī in Mu’jam al-Awsat 653)",
+      "notes": "Steadfastness on Islam"
+    },
+    {
+      "id": 24026,
+      "text_arabic": "اَللّٰهُمَّ أَحْسِنْ عَاقِبَتَنَا فِي الْأُمُوْرِ كُلِّهَا، وَأَجِرْنَا مِنْ خِزْيِ الدُّنْيَا وَعَذَابِ الْآخِرَةِ",
+      "translation": "O Allah, grant us the best outcome in all of our affairs, and protect us from the humiliation of this world and the punishment of the hereafter.",
+      "default_count": 1,
+      "transliteration": "Allāhumma aḥsin ʿāqibatanā fi-l-umūri kullihā, wa ajirnā min khizyi-d-dunyā wa ʿadhābi-l-ākhirah.",
+      "source_id": 40,
+      "benefits": "Busr b. Abī Artāt (raḍiy Allāhu ‘anhu) narrates that I heard the Messenger of Allah ﷺ supplicate with [the above]. (Aḥmad 17628)",
+      "notes": "Best Outcomes & Protection from Humiliation"
+    },
+    {
+      "id": 24027,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَسْأَلُكَ الثَّبَاتَ فِي الْأَمْرِ، وَالْعَزِيْمَةَ عَلَى الرُّشْدِ، وَأَسْأَلُكَ مُوْجِبَاتِ رَحْمَتِكَ، وَعَزَائِمَ مَغْفِرَتِكَ، وَأَسْأَلُكَ شُكْرَ نِعْمَتِكَ، وَحُسْنَ عِبَادَتِكَ، وَأَسْأَلُكَ قَلْبًا سَلِيْمًا، وَلِسَانًا صَادِقًا، وَأَسْأَلُكَ مِنْ خَيْرِ مَا تَعْلَمُ، وَأَعُوْذُ بِكَ مِنْ شَرِّ مَا تَعْلَمُ، وَأَسْتَغْفِرُكَ لِمَا تَعْلَمُ، إِنَّكَ أَنْتَ عَلَّامُ الْغُيُوْبِ",
+      "translation": "O Allah, I beg you for steadfastness in all matters and the determination to take the right course. I ask You for all that which will necessitate Your mercy and the determination to do all that which will necessitate Your forgiveness. I ask You to make me grateful for Your blessings and to worship You in an excellent manner. I ask You for a sound heart and a truthful tongue. I ask You for the good of what You know, I seek Your protection from the evil of what You know, and I seek Your forgiveness for what You know. Indeed, You are the All-Knowing of the unseen.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī as’aluka-th-thabāta fil-amr, wa-l-ʿazīmata ʿala-r-rushd, wa as’aluka mūjibāti raḥmatik, wa ʿazā’ima maghfiratik, wa as’aluka shukra niʿmatik, wa ḥusna ʿibādatik, wa as’aluka qalban salīmā, wa lisānan ṣādiqā, wa as’aluka min khayri mā taʿlam, wa aʿūdhu bika min sharri mā taʿlam, wa astaghfiruka limā taʿlam, innaka Anta ʿAllāmul-ghuyūb.",
+      "source_id": 41,
+      "benefits": "Shaddād b. Aws (raḍiy Allāhu ‘anhu) narrates that the Messenger of Allah ﷺ was teaching this duā to me. he said: “O Shaddād, when you see people collecting gold & silver as their treasures, then consider [the above] as your treasure.” (Ahmad 17155)",
+      "notes": "A Priceless Treasure"
+    },
+    {
+      "id": 24028,
+      "text_arabic": "رَبِّ أَعِنِّيْ وَلَا تُعِنْ عَلَيَّ، وَانْصُرْنِيْ وَلَا تَنْصُرْ عَلَيَّ، وَامْكُرْ لِيْ وَلَا تَمْكُرْ عَلَيَّ، وَاهْدِنِيْ وَيَسِّرِ الْهُدَىٰ لِيْ، وَانْصُرْنِيْ عَلَىٰ مَنْ بَغَىٰ عَلَيَّ، رَبِّ اجْعَلْنِيْ لَكَ شَكَّارًا، لَكَ ذَكَّارًا، لَكَ رَهَّابًا، لَكَ مِطْوَاعًا، لَكَ مُخْبِتًا، إِلَيْكَ أَوَّاهًا مُّنِيْبًا، رَبِّ تَقَبَّلْ تَوْبَتِيْ، وَاغْسِلْ حَوْبَتِيْ، وَأَجِبْ دَعْوَتِيْ، وَثَبِّتْ حُجَّتِيْ، وَسَدِّدْ لِسَانِيْ، وَاهْدِ قَلْبِيْ، وَاسْلُلْ سَخِيْمَةَ صَدْرِيْ",
+      "translation": "My Lord, help me and do not help others against me. Grant me victory and do not grant victory to others over me. Plan in my favour and do not plan for others against me. Guide me and ease guidance for me. Help me against those who oppress me. My Lord, make me one who is extremely grateful to You, who remembers you always, who perpetually fears You, who is fully obedient to You, who is humble before You, who constantly cries and pleads with You, and who repeatedly turns to You in repentance. My Lord, accept my repentance, wash away my sins, accept my supplications, strengthen my case, rectify my speech, guide my heart, and remove the malice from my heart.",
+      "default_count": 1,
+      "transliteration": "Rabbi aʿinnī wa lā tuʿin ʿalayya, wan-ṣurnī wa lā tanṣur ʿalayya, wa-mkur lī wa lā tamkur ʿalayya, wa-hdinī wa yas-siri-l-hudā lī, wan-ṣurnī ʿalā ma-m-baghā ʿalayya, Rabbi-j-ʿalnī laka shakkārā, laka dhak-kārā, laka rahhābā, laka miṭwāʿā, laka mukhbitā, ilayka aw-wāha-m-munībā, Rabbi taqabbal tawbatī, wa-ghsil ḥawbatī, wa ajib daʿwatī, wa thab-bit ḥujjatī, wa saddid lisānī, wahdi qalbī, waslul sakhīmata ṣadrī.",
+      "source_id": 42,
+      "benefits": "Ibn ʿAbbās (raḍiy Allāhu ‘anhu) narrates that the Messenger of Allah ﷺ would supplicate with [the above]. (Tirmidhī 3551)",
+      "notes": "Becoming A Godly Person"
+    },
+    {
+      "id": 24029,
+      "text_arabic": "اَللّٰهُمَّ أَعِنِّيْ عَلَىٰ ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ",
+      "translation": "O Allah, help me in remembering You, in being grateful to You, and in worshipping You in an excellent manner.",
+      "default_count": 1,
+      "transliteration": "Allāhumma aʿinnī ʿalā dhikrika wa shukrika wa ḥusni ʿibādatik.",
+      "source_id": 43,
+      "benefits": "Mu’ādh b. Jabal (raḍiy Allāhu ‘anhu) reported that the Messenger of Allah ﷺ took me by the hand and he said, “O Mu’ādh, I swear by Allah that I love you. I swear by Allah that I love you. O Mu’ādh, I advise you not to forget supplicating after every prayer by saying: [the above]. (Abū Dāwūd 1522)",
+      "notes": "Seeking Help For Excellence In Worship"
+    },
+    {
+      "id": 24030,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَسْأَلُكَ فِعْلَ الْخَيْرَاتِ، وَتَرْكَ الْمُنْكَرَاتِ، وَحُبَّ الْمَسَاكِيْنِ، وَأَنْ تَغْفِرَ لِيْ وَتَرْحَمَنِيْ، وَإِذَا أَرَدْتَ فِتْنَةَ قَوْمٍ فَتَوَفَّنِيْ غَيْرَ مَفْتُوْنٍ، وَأَسْأَلُكَ حُبَّكَ، وَحُبَّ مَنْ يُّحِبُّكَ، وَحُبَّ عَمَلٍ يُّقَرِّبُنِيْ إِلَىٰ حُبِّكَ",
+      "translation": "O Allah, I beg You to enable me to do good deeds, abstain from evil acts, and love the poor; and that You forgive me and have mercy upon me. When You intend to test a people, then grant me death without being tested. I ask You for Your love, the love of those who love you, and the love of deeds which will bring me closer to Your love.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī as’aluka fiʿla-l-khayrāt, wa tarka-l-munkarāt, wa ḥubba-l-masākīn, wa an taghfira lī wa tarḥamanī, wa idhā arad-ta fitnata qawmin fa-tawaffanī ghayra maftūn, wa as’aluka ḥubbak, wa ḥubba ma-y-yuḥibbuk, wa ḥubba ʿamali-y-yuqarribunī ilā ḥubbik.",
+      "source_id": 44,
+      "benefits": "Mu’ādh b. Jabl (raḍiy Allāhu ‘anhu) narrates: “One morning, the Messenger of Allah ﷺ was prevented from coming to us for the Fajr Salāh, until we were just about to look for the eye of the sun (meaning sunrise). Then he came out quickly and the Salāh was prepared for.\nThe Messenger of Allah ﷺ performed the Salah, and he performed his Salah in a relatively quick manner. When he said the salām, he called out to us saying: ‘Stay in your rows as you are.’ Then he turned to us and said: ‘I am going to narrate to you what kept me from you this morning: I got up during the night, I performed wudhu and prayed as much as I was able to, and I dozed off during my Salāh, and fell in a deep asleep. Then I saw my Lord, Blessed and Most High, in the best of appearances. He said: ‘O Muhammad!’ I said: ‘My Lord here I am my Lord!’ He said: ‘What is it that the most exalted group busy themselves with?’ I said: ‘I do not know Lord.’ And He said it three times.” He said: “So I saw Him place His Palm between my shoulders, and I sensed the coolness of His Fingertips between my breast. Then everything was disclosed for me, and I became aware. So He said: ‘O Muhammad!’ I said: ‘Here I am my Lord!’ He said: ‘What is it that the most exalted group busy themselves with?’ I said: ‘In the acts that atone.’ He said: ‘And what are they?’ I said: ‘The footsteps to the congregation, the gatherings in the Masājid after the Salāh, doing wudhu perfectly during difficulties.’ He said: ‘Then what else?’ I said: ‘Feeding others, being lenient in speech, and Salāh during the night while the people are sleeping.’ He said: ‘Ask.’ I said: [the above]’” The Messenger of Allah ﷺ said: “Indeed it is true, so study it and learn it.” (Tirmidhī 3235)",
+      "notes": "Duʿa for Allah’s Love & Protection From Trials"
+    },
+    {
+      "id": 24031,
+      "text_arabic": "اَللّٰهُمَّ ارْزُقْنِيْ حُبَّكَ، وَحُبَّ مَنْ يَّنْفَعُنِيْ حُبُّهُ عِنْدَكَ، اَللّٰهُمَّ مَا رَزَقْتَنِيْ مِمَّا أُحِبُّ فَاجْعَلْهُ قُوَّةً لِّيْ فِيْمَا تُحِبُّ، اَللّٰهُمَّ مَا زَوَيْتَ عَنِّيْ مِمَّا أُحِبُّ فَاجْعَلْهُ فَرَاغًا لِّيْ فِيْمَا تُحِبُّ",
+      "translation": "O Allah, grant me Your love and the love of those whose love will benefit me with You. O Allah, whatever You have provided me of the things that I love, make them a source of strength for me in pursuing what You love. O Allah, whatever you have withheld from me from what I love, make its absence a means for me to pursue what You love.",
+      "default_count": 1,
+      "transliteration": "Allāhumma-r-zuqnī ḥubbak, wa ḥubba ma-y-yanfaʿunī ḥubbuhu ʿindak, Allāhumma mā razaqtanī mim-mā uḥibbu fa-jʿalhu quwwata-l-lī fīmā tuḥibb, Allāhumma mā zawayta ʿannī mim-mā uḥibbu fa-jʿalhu farāgha-l-lī fīmā tuḥibb.",
+      "source_id": 45,
+      "benefits": "ʿAbdullāh b. Yazīd Al-Khatmī Al-Ansarī (raḍiy Allāhu ‘anhu) narrated that the Messenger of Allah used to say [the above] in his supplication. (Tirmidhī 3491)",
+      "notes": "Loving Allah & What He Loves"
+    },
+    {
+      "id": 24032,
+      "text_arabic": "اَللّٰهُمَّ بِعِلْمِكَ الْغَيْبَ، وَقُدْرَتِكَ عَلَى الْخَلْقِ، أَحْيِنِيْ مَا عَلِمْتَ الْحَيَاةَ خَيْرًا لِّيْ، وَتَوَفَّنِيْ إِذَا عَلِمْتَ الْوَفَاةَ خَيْرًا لِّيْ، اَللّٰهُمَّ وَأَسْأَلُكَ خَشْيَتَكَ فِي الْغَيْبِ وَالشَّهَادَةِ، وَأَسْأَلُكَ كَلِمَةَ الْحَقِّ فِي الرِّضَا وَالْغَضَبِ، وَأَسْأَلُكَ الْقَصْدَ فِي الْفَقْرِ وَالْغِنَىٰ، وَأَسْأَلُكَ نَعِيْمًا لَّا يَنْفَدُ، وَأَسْأَلُكَ قُرَّةَ عَيْنٍ لَّا تَنْقَطِعُ، وَأَسْأَلُكَ الرِّضَا بَعْدَ الْقَضَاءِ، وَأَسْأَلُكَ بَرْدَ الْعَيْشِ بَعْدَ الْمَوْتِ، وَأَسْأَلُكَ لَذَّةَ النَّظَرِ إِلَىٰ وَجْهِكَ، وَالشَّوْقَ إِلَىٰ لِقَائِكَ، فِيْ غَيْرِ ضَرَّاءَ مُضِرَّةٍ، وَلَا فِتْنَةٍ مُّضِلَّةٍ، اَللّٰهُمَّ زَيِّنَّا بِزِيْنَةِ الْإِيْمَانِ، وَاجْعَلْنَا هُدَاةً مُّهْتَدِيْنَ",
+      "translation": "O Allah, with Your knowledge of the unseen and Your absolute power over the creation, let me live in this world as long as You know my living is good for me; and give me death when You know death is better for me. O Allah, I ask You for Your fear in private and in public, and for the word of truth in times of joy and anger. I ask You for moderation in poverty and in wealth. I ask You for endless blessings and perpetual delights. I ask You to make me pleased with destiny; for a cool and comfortable life after death; for the pleasure of seeing Your Face; and for the longing to meet You, without any painful ordeals and tribulations that misguide. O Allah, adorn us with the beauty of faith, and make us those who guide others and are guided themselves.",
+      "default_count": 1,
+      "transliteration": "Allāhumma bi-ʿilmika-l-ghayb, wa qudratika ʿala-l-khalq, aḥyinī mā ʿalimta-l-ḥayāta khayra-l-lī, wa tawaffanī idhā ʿalimta-l-wafāta khayra-l-lī, Allāhumma wa as’aluka khashyataka fi-l-ghaybi wa-sh-shahādah, wa as’aluka kalimata-l-ḥaqqi fi-r-riḍā wa-l-ghaḍab, wa as’aluka-l-qaṣda fi-l-faqr wa-l-ghinā, wa as’aluka naʿīma-l-lā yanfad, wa as’aluka qurrata ʿayni-l-lā tanqaṭiʿ, wa as’aluka-r-riḍā baʿda-l-qaḍā, wa as’aluka barda-l-ʿayshi baʿda-l-mawt, wa as’aluka ladh-dhata-n-naẓari ilā wajhik, wa-sh-shawqa ilā liqā’ik, fī ghayri ḍarrā’a muḍirrah, wa lā fitnati-m-muḍillah, Allāhumma zayyinnā bi-zīnati-l-īmān, wa-jʿalnā hudāta-m-muhtadīn.",
+      "source_id": 46,
+      "benefits": "ʿAtā b. As-Sā’ib narrated that his father said: “ʿAmmār b. Yāsir (raḍiy Allāhu ‘anhu) led us in prayer and he made it brief. Some of the people said to him: ‘You made the prayer short (or brief).’ He said: ‘Nevertheless I still recited supplications that I heard from the Messenger of Allah ﷺ.’ When he got up and left, a man- he was my father but he did not name himself- followed him and asked him about that supplication, then he came and told the people [the above].” (Nasā’ī 1305)",
+      "notes": "The Ultimate Duʿa"
+    },
+    {
+      "id": 24033,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَسْأَلُكَ مِنَ الْخَيْرِ كُلِّهِ عَاجِلِهِ وَآجِلِهِ، مَا عَلِمْتُ مِنْهُ وَمَا لَمْ أَعْلَمْ، وَأَعُوْذُ بِكَ مِنَ الشَّرِّ كُلِّهِ عَاجِلِهِ وَآجِلِهِ، مَا عَلِمْتُ مِنْهُ وَمَا لَمْ أَعْلَمْ، اَللّٰهُمَّ إِنِّيْ أَسْأَلُكَ مِنْ خَيْرِ مَا سَأَلَكَ عَبْدُكَ وَنَبِيُّكَ، وَأَعُوْذُ بِكَ مِنْ شَرِّ مَا عَاذَ مِنْهُ عَبْدُكَ وَنَبِيُّكَ، اَللّٰهُمَّ إِنِّيْ أَسْأَلُكَ الْجَنَّةَ، وَمَا قَرَّبَ إِلَيْهَا مِنْ قَوْلٍ أَوْ عَمَلٍ، وَأَعُوْذُ بِكَ مِنَ النَّارِ، وَمَا قَرَّبَ إِلَيْهَا مِنْ قَوْلٍ أَوْ عَمَلٍ، وَأَسْأَلُكَ أَنْ تَجْعَلَ كُلَّ قَضَاءٍ قَضَيْتَهُ لِيْ خَيْرًا",
+      "translation": "O Allah, I beg You for all good: the immediate and the delayed, what I know of and what I do not know. I seek Your protection from all evil: the immediate and the delayed, what I know of and what I do not know. O Allah, I beg You for the good which Your slave and Prophet ﷺ asked from You, and I seek Your protection from the evil which Your slave and Prophet ﷺ sought protection for from You. O Allah, I beg You for Paradise, and whatever words or actions lead to it. I seek Your protection from Hell-fire, and whatever words or actions lead to it. I ask You to decree good for me in everything You foreordain for me.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī as’aluka mina-l-khayri kullihī ʿājilihī wa ājilih, mā ʿalimtu minhu wa mā lam aʿlam, wa aʿūdhu bika mina-sh-sharri kullih ʿājilihī wa ājilih, mā ʿalimtu minhu wa mā lam aʿlam, Allāhumma innī as’aluka min khayri mā sa’alaka ʿabduka wa Nabiyyuk, wa aʿūdhu bika min sharri mā ʿādha minhu ʿabduka wa Nabiyyuk, Allāhumma innī as’aluka-l-Jannah, wa mā qarraba ilayhā min qawlin aw ʿamal, wa aʿūdhu bika mina-n-nār, wa mā qarraba ilayhā min qawlin aw ʿamal, wa as’aluka an tajʿala kulla qaḍā’in qaḍaytahū lī khayrā.",
+      "source_id": 47,
+      "benefits": "‘Āishah narrates that the Messenger of Allah ﷺ taught her [the above]. (Ahmad 25019)",
+      "notes": "Asking for Good & Protection From Evil"
+    },
+    {
+      "id": 24034,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَسْأَلُكَ خَيْرَ الْمَسْأَلَةِ، وَخَيْرَ الدُّعَاءِ، وَخَيْرَ النَّجَاحِ، وَخَيْرَ الْعَمَلِ، وَخَيْرَ الثَّوَابِ، وَخَيْرَ الْحَيَاةِ، وَخَيْرَ الْمَمَاتِ، وَثَبِّتْنِيْ، وَثَقِّلْ مَوَازِيْنِيْ، وَحَقِّقْ إِيْمَانِيْ، وَارْفَعْ دَرَجَاتِيْ، وَتَقَبَّلْ صَلَاتِيْ، وَاغْفِرْ خَطِيْئَتِيْ، وَأَسْأَلُكَ الدَّرَجَاتِ الْعُلَا مِنَ الْجَنَّةِ، اَللّٰهُمَّ إِنِّيْ أَسْأَلُكَ فَوَاتِحَ الْخَيْرِ، وَخَوَاتِمَهُ، وَجَوَامِعَهُ، وَأَوَّلَهُ، وَظَاهِرَهُ، وَبَاطِنَهُ، وَالدَّرَجَاتِ الْعُلَا مِنَ الْجَنَّةِ آمِيْن، اَللّٰهُمَّ إِنِّيْ أَسْأَلُكَ خَيْرَ مَا آتِيْ، وَخَيْرَ مَا أَفْعَلُ، وَخَيْرَ مَا أَعْمَلُ، وَخَيْرَ مَا بَطَنَ، وَخَيْرَ مَا ظَهَرَ، وَالدَّرَجَاتِ الْعُلَا مِنَ الْجَنَّةِ آمِيْن، اَللّٰهُمَّ إنِّيْ أَسْأَلُكَ أنْ تَرْفَعَ ذِكْرِيْ، وَتَضَعَ وِزْرِيْ، وَتُصْلِحَ أَمْرِيْ، وَتُطَهِّرَ قَلْبِيْ، وَتُحَصِّنَ فَرْجِيْ، وَتُنَوِّرَ لِيْ قَلْبِيْ، وَتَغْفِرَ لِيْ ذَنْبِيْ، وَأَسْأَلُكَ الدَّرَجَاتِ الْعُلَا مِنَ الْجَنَّةِ آمِيْن، اَللّٰهُمَّ إنِّيْ أَسْأَلُكَ أنْ تُبَارِكَ لِيْ فِيْ نَفْسِيْ، وَفِيْ سَمْعِيْ، وَفِيْ بَصَرِيْ، وَفِيْ رُوْحِيْ، وَفِيْ خَلْقِيْ، وَفِيْ خُلُقِيْ، وَفِيْ أَهْلِيْ، وَفِيْ مَحْيَايَ، وَفِيْ مَمَاتِيْ، وَفِيْ عَمَلِيْ، فَتَقَبَّلْ حَسَنَاتِيْ، وَأَسْأَلُكَ الدَّرَجَاتِ الْعُلَا مِنَ الْجَنَّةِ، آمِيْن",
+      "translation": "O Allah, I beg You for the best of what can be asked for, the best supplication, the ultimate success, the best deeds, the best reward, the best life, and the best death. Keep me steadfast, make my scales heavy, establish my belief, elevate my ranks, accept my salāh, forgive my sins and I ask You for lofty ranks in Paradise. O Allah, I beg you for good beginnings, good endings, good in its entirety, its first, its apparent and its hidden; and lofty ranks in Paradise. Āmīn. O Allah, I beg you for the best of what I can do, perform and accomplish, the best of what is hidden or apparent; and lofty ranks in Paradise. Āmīn. O Allah, I beg you to elevate my mention, remove my burden, rectify my affairs, purify my heart, protect my chastity, enlighten my heart, forgive my sins and I ask You for lofty ranks in Paradise. Āmīn. O Allah, I beg you to bless for me my inner self, my hearing, my sight, my soul, my appearance, my character, my family, my life, my death and my deeds. Accept my good deeds and I ask You for lofty ranks in Paradise. Āmīn.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī as’aluka khayra-l-mas’alah, wa khayra-d-duʿā’, wa khayra-n-najaḥ, wa khayra-l-ʿamal, wa khayra-th-thawāb, wa khayra-l-ḥayāh, wa khayra-l-mamāt, wa thabbitnī, wa thaqqil mawāzīnī, wa ḥaqqiq īmānī, wa-r-faʿ darajātī, wa taqabbal ṣalātī, wa-ghfir khaṭī’atī, wa as’aluka-d-darajāti-l-ʿulā mina-l-Jannah, Allāhumma innī as’aluka fawātiḥa-l-khayr, wa khawātimah, wa jawāmiʿah, wa awwalah, wa ẓāhirah, wa bāṭinah, wa-d-darajāti-l-ʿulā mina-l-Jannati āmīn, Allāhumma innī as’aluka khayra mā ātī, wa khayra mā afʿal, wa khayra mā aʿmal, wa khayra mā baṭan, wa khayra mā ẓahar, wa-d-darajāti-l-ʿulā mina-l-Jannati, āmīn, Allāhumma innī as’aluka an tarfaʿa dhikrī, wa taḍaʿa wizrī, wa tuṣliḥa amrī, wa tuṭahhira qalbī, wa tuḥaṣṣina farjī, wa tunawwira lī qalbī, wa taghfira lī dhambī, wa as’aluka-d-darajāti-l-ʿulā mina-l-Jannati, āmīn, Allāhumma innī as’aluka an tubārika lī fī nafsī, wa fī samʿī, wa fī baṣarī, wa fī rūḥī, wa fī khalqī, wa fī khuluqī, wa fī ahlī, wa fī maḥyāya, wa fī mamātī, wa fi ʿamalī, fa-taqabbal ḥasanātī, wa as’aluka-d-darajāti-l-ʿulā mina-l-Jannati, āmīn.",
+      "source_id": 48,
+      "benefits": "Umm Salamah (raḍiy Allāhu ‘anhā) narrates that the Prophet ﷺ said: “This is what Muhammad asks from His Lord: [the above].”(Hākim 1867)",
+      "notes": "A Comprehensive Duʿa"
+    },
+    {
+      "id": 24035,
+      "text_arabic": "اَللّٰهُمَّ اجْعَلْ لِيْ فِيْ قَلْبِيْ نُوْرًا، وَفِيْ لِسَانِيْ نُوْرًا، وَفِيْ سَمْعِيْ نُوْرًا، وَفِيْ بَصَرِيْ نُوْرًا، وَمِنْ فَوْقِيْ نُوْرًا، وَمِنْ تَحْتِيْ نُوْرًا، وَعَنْ يَّمِيْنِيْ نُوْرًا، وَعَنْ شِمَالِيْ نُوْرًا، وَمِنْ بَيْنِ يَدَيَّ نُوْرًا، وَمِنْ خَلْفِيْ نُوْرًا، وَاجْعَلْ فِيْ نَفْسِيْ نُوْرًا، وَأَعْظِمْ لِيْ نُوْرًا",
+      "translation": "O Allah, place light in my heart, light in my tongue, light in my hearing and light in my sight. Place light above me, light beneath me, light on my right, light on my left, light in front of me, and light behind me. Place light in my self and magnify for me light.",
+      "default_count": 1,
+      "transliteration": "Allāhumma-jʿal lī fī qalbī nūrā, wa fī lisānī nūrā, wa fī samʿī nūrā, wa fī baṣarī nūrā, wa min fawqī nūrā, wa min taḥtī nūrā, wa ʿay-yamīnī nūrā, wa ʿan shimālī nūrā, wa mim-bayni yadayya nūrā, wa min khalfī nūrā, wa-jʿal fī nafsī nūrā, wa aʿẓim lī nūrā.",
+      "source_id": 49,
+      "benefits": "Kurayb reported that ʿAbdullāh b. ʿAbbās (radiy Allāhū ‘anhumā) reported that he spent (one night) in the house of the Messenger of Allah ﷺ. He said: “The Messenger of Allah ﷺ stood near the water-skin and poured water out of it and performed ablution in which he neither used excess of water nor too little of it. He also mentioned that on that night the Messenger of Allah ﷺ made supplication before Allah in nineteen words. Kuraib reported: I remember twelve words out of these, but have forgotten the rest. The Messenger of Allah ﷺ said: [the above].” (Muslim 763)\nIt is mentioned in another version of this narration:\nʿAbdullāh b. ʿAbbās (radiy Allāhū ‘anhumā) reported that he spent (one night) in the house of the Messenger of Allah ﷺ. He ﷺ got up, brushed his teeth and performed ablution and said: “In the creation of the heavens and the earth, and the alternation of the night and the day, there are indeed signs for people of understanding.” (Quran: 3:190), to the end of the Surah. He then stood up and prayed two rak’ahs, standing, bowing and prostrating at length in them. Then he finished, went to sleep and snored. He did that three times, six rak’ahs altogether, each time cleaning his teeth, performing ablution, and reciting these verses. Then he observed three rak’ahs of Witr. The Mu’adhdhin then pronounced the Adhan and he went out for Salah and was saying: [similiar to the above].” (Muslim 763)",
+      "notes": "All-Encompassing Nur (Light)"
+    },
+    {
+      "id": 24036,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ عَبْدُكَ، وَابْنُ عَبْدِكَ، وَابْنُ أَمَتِكَ، نَاصِيَتِيْ بِيَدِكَ، مَاضٍ فِيَّ حُكْمُكَ، عَدْلٌ فِيَّ قَضَاؤُكَ، أَسْأَلُكَ بِكُلِّ اسْمٍ هُوَ لَكَ، سَمَّيْتَ بِهِ نَفْسَكَ، أَوْ عَلَّمْتَهُ أَحَدًا مِّنْ خَلْقِكَ، أَوْ أَنْزَلْتَهُ فِيْ كِتَابِكَ، أَوِ اسْتَأْثَرْتَ بِهِ فِيْ عِلْمِ الْغَيْبِ عِنْدَكَ، أَنْ تَجْعَلَ الْقُرْآنَ رَبِيْعَ قَلْبِيْ، وَنُوْرَ صَدْرِيْ، وَجَلَاءَ حُزْنِيْ، وَذَهَابَ هَمِّيْ",
+      "translation": "O Allah, I am Your slave and the son of Your male slave and the son of Your female slave. My forehead is in Your Hand (i.e. you have control over me). I am subject to Your judgement and Your decree concerning me is just. I ask You – by every name that is Yours, by which You have named Yourself, or taught any one of Your creation, or revealed in Your Book, or kept unto Yourself in the knowledge of the unseen that is with You – to make the Qur’ān the spring of my heart, the light of my chest, the banisher of my grief and the reliever of my anxiety.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī ʿabduk, wa-bnu ʿabdik, wa-bnu amatik, nāṣiyatī bi-yadik, māḍin fiyya ḥukmuk, ʿadlun fiyya qaḍā’uk, as’aluka bi-kulli-smin huwa lak, sammayta bihi nafsak, aw ʿallamtahū aḥadam-min khalqik, aw anzaltahū fī Kitābik, awi-sta’tharta bihī fī ʿilmi-l-ghaybi ʿindak, an tajʿala-l-Qur’āna rabīʿa qalbī, wa nūra ṣadrī wa jalā’a ḥuznī, wa dhahāba hammī.",
+      "source_id": 50,
+      "benefits": "The Messenger of Allah ﷺ said: “There is no one amongst you who, when he is stricken with grief and anxiety, says [the above] except that Allah will remove his grief and anxiety, and will give him joy instead.” The companions said, ‘O Messenger of Allah, should we not learn these words?’ He ﷺ replied, ‘Of course! One who hears it should learn it.’” (Ahmad 3712)",
+      "notes": "The Qur’an: the Banisher of Grief & Anxiety"
+    },
+    {
+      "id": 24037,
+      "text_arabic": "اَللّٰهُمَّ أَصْلِحْ لِيْ دِيْنِيَ الَّذِيْ هُوَ عِصْمَةُ أَمْرِيْ، وَأَصْلِحْ لِيْ دُنْيَايَ الَّتِيْ فِيْهَا مَعَاشِيْ، وَأَصْلِحْ لِيْ آخِرَتِيَ الَّتِيْ فِيْهَا مَعَادِيْ، وَاجْعَلِ الْحَيَاةَ زِيَادَةً لِّيْ فِيْ كُلِّ خَيْرٍ، وَاجْعَلِ الْمَوْتَ رَاحَةً لِّيْ مِنْ كُلِّ شَرٍّ",
+      "translation": "O Allah, rectify my religion for me which is the protection of my affairs. Rectify my world for me wherein is my livelihood. Rectify my hereafter for me, to which is my return. Make my life a means of increase for me in every good, and make death a respite for me from every evil.",
+      "default_count": 1,
+      "transliteration": "Allāhumma aṣliḥ lī dīniya-l-ladhī huwa ʿiṣmatu amrī, wa aṣliḥ lī dunyāya-l-latī fīhā maʿāshī, wa aṣliḥ lī ākhiratiya-l-latī fīhā maʿādī, wa-jʿali-l-ḥayāta ziyādata-l-lī fī kulli khayr, wa-jʿali-l-mawta rāḥata-l-lī min kulli sharr.",
+      "source_id": 51,
+      "benefits": "Abū Hurayrah (raḍiy Allāhu ‘anhu) mentions that the Messenger of Allah ﷺ would say (supplicate): [the above]. (Muslim 2720)",
+      "notes": "Goodness in Din, Dunya & the Hereafter"
+    },
+    {
+      "id": 24038,
+      "text_arabic": "اَللّٰهُمَّ اقْسِمْ لَنَا مِنْ خَشْيَتِكَ مَا يَحُوْلُ بِهِ بَيْنَنَا وَبَيْنَ مَعَاصِيْكَ، وَمِنْ طَاعَتِكَ مَا تُبَلِّغُنَا بِهِ جَنَّتَكَ، وَمِنَ الْيَقِيْنِ مَا تُهَوِّنُ بِهِ عَلَيْنَا مَصَائِبَ الدُّنْيَا، اَللّٰهُمَّ مَتِّعْنَا بِأَسْمَاعِنَا، وَأَبْصَارِنَا، وَقُوَّتِنَا مَا أَحْيَيْتَنَا، وَاجْعَلْهُ الْوَارِثَ مِنَّا، وَاجْعَلْ ثَأْرَنَا عَلَىٰ مَنْ ظَلَمَنَا، وَانْصُرْنَا عَلَىٰ مَنْ عَادَانَا، وَلَا تَجْعَلْ مُصِيْبَتَنَا فِيْ دِيْنِنَا، وَلَا تَجْعَلِ الدُّنْيَا أَكْبَرَ هَمِّنَا، وَلَا مَبْلَغَ عِلْمِنَا، وَلَا تُسَلِّطْ عَلَيْنَا مَنْ لَّا يَرْحَمُنَا",
+      "translation": "O Allah, apportion for us enough fear and awe of You to prevent us from sinning against You, and enough obedience to You to make us reach Your Paradise, and enough certainty to make the difficulties of this world easy for us. O Allah, let us enjoy our hearing and sight and strength as long as You allow us to live, and make it an inheritance for us. Let our retaliation be upon those who have wronged us, and help us against those who harbour enmity towards us. Let not our afflictions be in our religion. Do not make the world our biggest concern or the full extent of our knowledge, and do not give power over us to anyone who will not have mercy on us.",
+      "default_count": 1,
+      "transliteration": "Allāhumma-q-sim lanā min khashyatika mā yaḥūlu bihī baynanā wa bayna maʿāṣīk, wa min ṭāʿatika mā tuballighunā bihī jannatak, wa mina-l-yaqīni mā tuhawwinu bihī ʿalaynā maṣā’iba-d-dunyā, allāhumma mattiʿnā bi asmāʿinā, wa abṣārinā, wa quwwātinā mā aḥyaytanā, wa-j-ʿalhu-l-wāritha minnā, wa-j-ʿal tha’ranā ʿalā man ẓalamanā, wa-n-ṣurnā ʿalā man ʿādānā, wa lā tajʿal muṣībatanā fī dīninā, wa lā tajʿali-d-dunyā akbara hamminā, wa lā mablagha ʿilminā, wa lā tusalliṭ ʿalaynā mal-lā yarḥamunā.",
+      "source_id": 52,
+      "benefits": "‘Abdullāh b. ‘Umar (radiy Allāhū ‘anhumā) said: “Rarely would the Messenger of Allah ﷺ rise from a gathering without supplicating for his companions with [the above].” (Tirmidhī 3502)",
+      "notes": "A Comprehensive Duʿa"
+    },
+    {
+      "id": 24039,
+      "text_arabic": "اَللّٰهُمَّ اهْدِنِيْ فِيْمَنْ هَدَيْتَ، وَعَافِنِيْ فِيْمَنْ عَافَيْتَ، وَتَوَلَّنِيْ فِيْمَنْ تَوَلَّيْتَ، وَبَارِكْ لِيْ فِيْمَا أَعْطَيْتَ، وَقِنِيْ شَرَّ مَا قَضَيْتَ، إِنَّكَ تَقْضِيْ وَلَا يُقْضَىٰ عَلَيْكَ، وَإِنَّهُ لَا يَذِلُّ مَنْ وَّالَيْتَ، وَلَا يَعِزُّ مَنْ عَادَيْتَ، تَبَارَكْتَ رَبَّنَا وَتَعَالَيْتَ",
+      "translation": "O Allah, guide me amongst those You have guided, grant me wellbeing amongst those You have granted wellbeing, befriend me amongst those You have befriended. Bless me in what You have given me and protect me from the evil of what You have decreed. You are the One who decrees and You are not decreed against. Whomsoever You befriend will never be disgraced, and whomsoever You oppose will never be honoured. You are the Most Blessed, our Lord and You are the Most Exalted.",
+      "default_count": 1,
+      "transliteration": "Allāhumma-hdinī fīman hadayt, wa ʿāfinī fīman ʿāfayt, wa tawallanī fīman tawallayt, wa bārik lī fīmā aʿṭayt, wa qinī sharra mā qaḍayt, innaka taqḍī wa lā yuqḍā ʿalayk, wa innahu lā yadhillu ma-w-wālayt, wa lā yaʿizzu man ʿādayt, tabārakta Rabbanā wa taʿālayt.",
+      "source_id": 53,
+      "benefits": "Ḥasan b. Alī (radiy Allāhū ‘anhumā) narrates that the Messenger of Allah ﷺ taught me some words that I say during the witr Salah. (The version of Ibn Jawwās has: I say them in the Qunūt (supplication) of the witr Salah.) They were: [the above]. (Abū Dāwūd 1425)",
+      "notes": "Guidance, Well-Being, Blessings & Protection"
+    },
+    {
+      "id": 24040,
+      "text_arabic": "اَللّٰهُمَّ رَبَّ جَبْرَائِيْلَ، وَمِيْكَائِيْلَ، وإِسْرَافِيْلَ، فَاطِرَ السَّمٰوَاتِ وَالْأَرْضِ، عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، أَنْتَ تَحْكُمُ بَيْنَ عِبَادِكَ فِيْمَا كَانُوْا فِيْهِ يَخْتَلِفُوْنَ، اِهْدِنِيْ لِمَا اخْتُلِفَ فِيْهِ مِنَ الْحَقِّ بِإِذْنِكَ، إِنَّكَ تَهْدِيْ مَنْ تَشَاءُ إِلَىٰ صِرَاطٍ مُّسْتَقِيْمٍ",
+      "translation": "O Allah, Lord of Jabrā’īl, Mīkā’īl and Isrāfīl, Creator of the heavens and the earth, Knower of the unseen and seen; You will judge between Your servants in what they used to differ. Guide me in what is contentious to the truth, by Your will. Indeed, You guide whomsoever You wish to a straight path.",
+      "default_count": 1,
+      "transliteration": "Allāhumma Rabba Jabrā’īla, wa Mīkā’īla, wa Isrāfīl, fāṭira-s-samāwāti wa-l-arḍ, ʿālima-l-ghaybi wa-sh-shahādah, Anta taḥkumu bayna ʿibādika fīmā kānū fīhi yakhtalifūn, ihdinī lima-khtulifa fīhi mina-l-ḥaqqi bi-idhnik, innaka tahdī man tashā’u ilā Ṣirāṭi-m-Mustaqīm.",
+      "source_id": 54,
+      "benefits": "ʿAbdur Rahmān b. Awf (raḍiy Allāhu ‘anhu) narrated: I asked ‘Ā’isha (raḍiy Allāhu ‘anhā), the mother of the believers, (to tell me) the words with which the Messenger of Allah ﷺ commenced the Salāh when he got up at night. She said: “When he got up at night he would commence his Salāh with [the above] words. (Muslim 770)",
+      "notes": "Guidance to the Truth"
+    },
+    {
+      "id": 24041,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَسْأَلُكَ الْهُدَىٰ وَالتُّقَىٰ وَالْعَفَافَ وَالْغِنَىٰ",
+      "translation": "O Allah, I beg You for guidance, taqwā (piety), chastity and self-sufficiency.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī as’aluka-l-hudā wa-t-tuqā wa-l-ʿafāfa wa-l-ghinā.",
+      "source_id": 55,
+      "benefits": "ʿAbdullāh b. Masʿūd (raḍiy Allāhu ‘anhu) reported that the Messenger of Allah ﷺ used to supplicate with [the above] words. (Muslim 2721, Tirmidhi 3489)",
+      "notes": "Guidance, Piety, Chastity & Self-Sufficiency"
+    },
+    {
+      "id": 24042,
+      "text_arabic": "اَللّٰهُمَّ اهْدِنِيْ وَسَدِّدْنِيْ، اَللّٰهُمَّ إِنِّيْ أَسْأَلُكَ الْهُدَىٰ وَالسَّدَادَ",
+      "translation": "O Allah, guide me and grant me firmness. O Allah, I beg You for guidance and firmness (on the straight path).",
+      "default_count": 1,
+      "transliteration": "Allāhumma-hdinī wa saddidnī, Allāhumma innī as’aluka-l-hudā wa-s-sadād.",
+      "source_id": 56,
+      "benefits": "Ali (raḍiy Allāhu ‘anhu) reported that the Messenger of Allah ﷺ said to him: “Say: [the above] and when you make a mention of guidance, keep in mind the (Straight) Path and when you consider the Straight (Path), keep in mind the straightness of the arrow.” (Muslim 2725)",
+      "notes": "Guidance & Steadfastness"
+    },
+    {
+      "id": 24043,
+      "text_arabic": "اَللّٰهُمَّ أَلْهِمْنِيْ رُشْدِيْ، وَأَعِذْنِيْ مِنْ شَرِّ نَفْسِيْ",
+      "translation": "O Allah, inspire me with sound guidance and protect me from the evil of my self.",
+      "default_count": 1,
+      "transliteration": "Allāhumma alhimnī rushdī, wa aʿidhnī min sharri nafsī.",
+      "source_id": 57,
+      "benefits": "ʿImrān b. Husayn (raḍiy Allāhu ‘anhu) narrated: “The Prophet ﷺ said to my father: ‘O Husayn, how many deities do you worship now?‘ He said: ‘Seven. Six in the earth, and one above the heavens.’ He ﷺ said: ‘So which of them do you take for your ardent requests and fears?’ He said: ‘The one above the heavens.’ He ﷺ said: ‘O Husayn, if you accept Islam, I would teach you two phrases that would benefit you.’” He (the narrator) said: “So when Husayn accepted Islam, he said: ‘O Messenger of Allah, teach me the two phrases you promised me.’ So he ﷺ said: [the above].” (Tirmidhī 3483)",
+      "notes": "Guidance & Protection from Evil"
+    },
+    {
+      "id": 24044,
+      "text_arabic": "اَللّٰهُمَّ لَكَ أَسْلَمْتُ، وَبِكَ آمَنْتُ، وَعَلَيْكَ تَوَكَّلْتُ، وَإِلَيْكَ أَنَبْتُ، وَبِكَ خَاصَمْتُ، اَللّٰهُمَّ إِنِّيْ أَعُوْذُ بِعِزَّتِكَ لَا إِلٰهَ إِلَّا أَنْتَ أَنْ تُضِلَّنِيْ، أَنْتَ الْحَيُّ الَّذِيْ لَا يَمُوْتُ، وَالْجِنُّ وَالْإِنْسُ يَمُوْتُوْنَ",
+      "translation": "O Allah, to You Alone I submit, in You Alone I believe, upon You Alone I place my trust, to You Alone I turn repeatedly in repentance, and for You Alone I advocate. O Allah, I seek protection – with Your honour, there is no god worthy of worship except You – from misguidance. You are the Ever-Living who does not die, whereas the jinn and mankind die.",
+      "default_count": 1,
+      "transliteration": "Allāhumma laka aslamtu wa bika āmant, wa ʿalayka tawakkaltu wa ilayka anabtu wa bika khaṣamt, Allāhumma innī aʿūdhu bi-ʿizzatika lā ilāha illā Anta an tuḍillannī, Anta-l-Ḥayyu-l-ladhī lā yamūt, wa-l-jinnu wa-l-insu yamūtūn.",
+      "source_id": 58,
+      "benefits": "Ibn ‘Abbās (radiy Allāhū ‘anhumā) reported that the Messenger of Allah ﷺ used to say: [the above]. (Muslim 2717)",
+      "notes": "Protection from Misguidance"
+    },
+    {
+      "id": 24045,
+      "text_arabic": "اَللّٰهُمَّ فَقِّهْنِيْ فِي الدِّيْنِ",
+      "translation": "O Allah, grant me a deep understanding of the religion.",
+      "default_count": 1,
+      "transliteration": "Allāhumma faqqihnī fi-d-dīn.",
+      "source_id": 59,
+      "benefits": "Ibn ‘Abbās (radiy Allāhū ‘anhumā) reported: “Once the Prophet (ﷺ) entered a lavatory and I placed water for his ablution. He asked, “Who placed it?” He was informed accordingly and so he said, “O Allah! Grant him (Ibn ‘Abbas) a deep understanding of the religion.”(Bukhārī 143)\nIn another narration Ibn ‘Abbās (radiy Allāhū ‘anhumā) reported: Once the Prophet ﷺ embraced me and said, “O Allah! Bestow on him the knowledge of the Book (Qur’an). ” (Bukhārī 75)",
+      "notes": "Deep Understanding of the Din"
+    },
+    {
+      "id": 24046,
+      "text_arabic": "اَللّٰهُمَّ انْفَعْنِيْ بِمَا عَلَّمْتَنِيْ، وَعَلِّمْنِيْ مَا يَنْفَعُنِيْ، وَزِدْنِيْ عِلْمًا",
+      "translation": "O Allah, benefit me with what you have taught me, teach me what will benefit me, and increase me in knowledge.",
+      "default_count": 1,
+      "transliteration": "Allāhumma-nfaʿnī bimā ʿallamtanī, wa ʿallimnī mā yanfaʿunī, wa zidnī ʿilmā.",
+      "source_id": 60,
+      "benefits": "Abū Hurayra (raḍiy Allāhu ‘anhu) reported: The Messenger of Allah ﷺ said: [the above]. He then said: “All praise is due to Allah in every circumstance and I seek refuge in Allah from the condition of the people of the Hellfire.” (Tirmidhī 3599)",
+      "notes": "Beneficial Knowledge"
+    },
+    {
+      "id": 24047,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَسْأَلُكَ عِلْمًا نَّافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلًا مُّتَقَبَّلًا",
+      "translation": "O Allah, I ask You for beneficial knowledge, wholesome sustenance, and deeds which are accepted.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī as’aluka ʿilma-n-nāfiʿā, wa rizqan ṭayyibā, wa ʿamala-m-mutaqabbalā.",
+      "source_id": 61,
+      "benefits": "Umm Salamah (raḍiy Allāhu ‘anhā) narrated that when the Prophet ﷺ performed the fajr Salāh, he would say [the above] while doing salām. (Ibn Mājah 925)",
+      "notes": "Beneficial Knowledge, Pure Sustenance & Accepted Deeds"
+    },
+    {
+      "id": 24048,
+      "text_arabic": "اَللّٰهُمَّ آتِ نَفْسِيْ تَقْوَاهَا، وَزَكِّهَا أَنْتَ خَيْرُ مَنْ زَكَّاهَا، أَنْتَ وَلِيُّهَا وَمَوْلَاهَا، اَللّٰهُمَّ إِنِّىْ أَعُوْذُ بِكَ مِنْ عِلْمٍ لَّا يَنْفَعُ، وَمِنْ قَلْبٍ لَّا يَخْشَعُ، وَمِنْ نَّفْسٍ لَّا تَشْبَعُ، وَمِنْ دَعْوَةٍ لَّا يُسْتَجَابُ لَهَا",
+      "translation": "O Allah, grant my soul taqwā (piety) and purify it, for You are the Best of those who can purify it. You are its Protector and Master. O Allah, I seek Your protection from knowledge which does not benefit, a heart which does not submit, a soul which is not satisfied and a supplication which is not accepted.",
+      "default_count": 1,
+      "transliteration": "Allāhumma āti nafsī taqwāhā, wa zakkihā Anta khayru man zakkāhā, Anta Walliyuhā wa Mawlāhā, Allāhumma innī aʿūdhu bika min ʿilmi-l-lā yanfaʿ, wa min qalbi-l-lā yakhshaʿ, wa min nafsi-l-lā tashbaʿ, wa min daʿwati-l-lā yustajābu lahā.",
+      "source_id": 62,
+      "benefits": "Zayd b. Arqam (raḍiy Allāhu ‘anhā) reported that the Messenger of Allah ﷺ would supplicate, “O Allah, I seek refuge in you from disability, laziness, cowardice, miserliness, old age, and the punishment of the grave. Then he said [the above].” (Muslim 2722)",
+      "notes": "Purification of the Heart"
+    },
+    {
+      "id": 24049,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَعُوْذُ بِكَ مِنْ عِلْمٍ لَّا يَنْفَعُ، وَعَمَلٍ لَّا يُرْفَعُ، وَقَلْبٍ لَّا يَخْشَعُ، وَقَوْلٍ لَّا يُسْمَعُ",
+      "translation": "O Allah, I seek Your protection from knowledge which does not benefit, actions which are not raised (to You), a heart which does not humble itself (in Your awe), and an utterance which is not accepted.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī aʿūdhu bika min ʿilmi-l-lā yanfaʿ, wa ʿamali-l-lā yurfaʿ, wa qalbi-l-lā yakhshaʿ, wa qawli-l-lā yusmaʿ.",
+      "source_id": 63,
+      "benefits": "Anas b. Mālik (raḍiy Allāhu ‘anhā) reports that the Messenger of Allah ﷺ would say [the above]. (Ahmad 13003)",
+      "notes": "Protection from Four Superficial Actions"
+    },
+    {
+      "id": 24050,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَعُوْذُ بِكَ مِنْ صَلَاةٍ لَّا تَنْفَعُ",
+      "translation": "O Allah, I seek Your protection from a prayer which does not benefit.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī aʿūdhu bika min ṣalāti-l-lā tanfaʿ.",
+      "source_id": 64,
+      "benefits": "Anas b. Mālik (raḍiy Allāhu ‘anhā) reports that the Messenger of Allah ﷺ would say [the above]. (Abū Dāwūd 1549)",
+      "notes": "Protection from a Prayer Which Does Not Benefit"
+    },
+    {
+      "id": 24051,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَعُوْذُ بِكَ أَنْ أُشْرِكَ بِكَ وَأَنَا أَعْلَمُ، وَأَسْتَغْفِرُكَ لِمَا لَا أَعْلَمُ",
+      "translation": "O Allah, I seek Your protection from knowingly associating partners with You and seek Your forgiveness for unknowingly (doing so).",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī aʿūdhu bika an ushrika bika wa ana aʿlam, wa astaghfiruka limā lā aʿlam.",
+      "source_id": 65,
+      "benefits": "The Messenger of Allah ﷺ said: “O people, beware of this shirk, for it is more subtle than the footsteps of an ant.” The one whom Allah willed should speak asked him: “How can we beware of it when it is more subtle than the footsteps of an ant, O Messenger of Allah?” He replied: “Say [the above].” (Ahmad 3731)\nMa’qil b. Yasār (raḍiy Allāhu ‘anhu) narrated: “I walked with Abū Bakr Siddīq (raḍiy Allāhu ‘anhu) to the Messenger of Allah ﷺ. He ﷺ said: “O Abū Bakr! This shirk is more subtle than the footsteps of an ant.” Abū Bakr asked, “Is shirk not only when a person ascribes a partner with Allah?” The Messenger of Allah ﷺ replied: By the One in whose hands my life is, shirk is more subtle than the footsteps of an ant. Shall I not guide you towards something which if you say, it will remove it’s minor and major? He ﷺ said: “Say [the above].” (Al-Adab al-Mufrad 716, Ibn al-Sunnī 258)",
+      "notes": "Protection from Shirk & Riya"
+    },
+    {
+      "id": 24052,
+      "text_arabic": "اَللّٰهُمَّ إِنّيْ أَعُوْذُ بِكَ مِنَ الْبُخْلِ، وَأَعُوْذُ بِكَ مِنَ الْجُبْنِ، وَأَعُوْذُ بِكَ أَنْ أُرَدَّ إِلَىٰ أَرْذَلِ الْعُمُرِ، وَأَعُوْذُ بِكَ مِنْ فِتْنَةِ الدُّنْيَا، وَأَعُوْذُ بِكَ مِنْ عَذَابِ الْقَبْرِ",
+      "translation": "O Allah, I seek Your protection from miserliness and I seek Your protection from cowardice. I seek Your protection from being returned to the worst part of life (old age), I seek Your protection from the trials of the world, and I seek Your protection from the punishment of the grave.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī aʿūdhu bika mina-l-bukhl, wa aʿūdhu bika mina-l-jubn, wa aʿūdhu bika an uradda ilā ardhali-l-ʿumur, wa aʿūdhu bika min fitnati-d-dunyā, wa aʿūdhu bika min ʿadhābi-l-qabr.",
+      "source_id": 66,
+      "benefits": "Saʿd b. Abī Waqqās (radiy Allāhū ‘anhu) would instruct (to seek refuge) about five things [the above] and he would narrate it from the Messenger of Allah ﷺ . (Bukhārī 6370)",
+      "notes": "Protection from Evil Traits & Endings"
+    },
+    {
+      "id": 24053,
+      "text_arabic": "اَللّٰهُمَّ إنِّيْ أَعُوْذُ بِكَ مِنَ الْعَجْزِ، وَالْكَسَلِ، وَالجُبْنِ، وَالْبُخْلِ، وَالْهَرَمِ، وَالْقَسْوَةِ، وَالْغَفْلَةِ، وَالْعَيْلَةِ، والذِّلَّةِ، وَالْمَسْكَنَةِ، وَأَعُوْذُ بِكَ مِنَ الْفَقْرِ، وَالْكُفْرِ، وَالْفُسُوْقِ، وَالشِّقَاقِ، وَالنِّفَاقِ، وَالسُّمْعَةِ، وَالرِّيَاءِ، وَأعُوْذُ بِكَ مِنَ الصَّمَمِ، وَالْبَكَمِ، وَالْجُنُوْنِ، وَالْجُذَامِ، وَالْبَرَصِ، وَسَيِّىءِ الْأَسْقَامِ",
+      "translation": "O Allah, I seek Your protection from inability, laziness, cowardice, miserliness, senility, hard heartedness, heedlessness, economic dependence, humiliation and destitution. I seek Your protection from poverty, disbelief, disobedience, discord, hypocrisy, seeking fame and ostentation. I seek Your protection from deafness, dumbness, insanity, leprosy, vitiligo and from all harmful diseases.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī aʿūdhu bika mina-l-ʿajzi, wa-l-kasal, wa-l-jubn, wa-l-bukhl, wa-l-haram, wa-l-qaswah, wa-l-ghaflah, wa-l-ʿaylah, wa-dh-dhillah, wa-l-maskanah, wa aʿūdhu bika mina-l-faqr, wa-l-kufr, wa-l-fusūq, wa-sh-shiqāq, wa-n-nifāq, wa-s-sumʿah, wa-r-riyā’, wa aʿūdhu bika mina-ṣ-ṣamam, wa-l-bakam, wa-l-junūn, wa-l-judhām, wa-l-baraṣ, wa sayyi’i-l-asqām.",
+      "source_id": 67,
+      "benefits": "Anas b. Mālik (raḍiy Allāhu ‘anhu) narrates that the Messenger of Allah ﷺ said [the above]. (Hākim 1944)",
+      "notes": "Protection from Physical & Spiritual Illnesses"
+    },
+    {
+      "id": 24054,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَعُوْذُ بِكَ مِنَ الْهَرَمِ، وَالتَّرَدِّيْ، وَالْهَدْمِ، وَالْغَمِّ، وَالْحَرِيْقِ، وَالْغَرَقِ، وَأَعُوْذُ بِكَ أَنْ يَّتَخَبَّطَنِيَ الشَّيْطَانُ عِنْدَ الْمَوْتِ وَأَنْ أُقْتَلَ فِيْ سَبِيْلِكَ مُدْبِرًا، وَأَعُوْذُ بِكَ أَنْ أَمُوْتَ لَدِيْغًا",
+      "translation": "O Allah, I seek Your protection from senility, from death by falling from a height or being crushed to death; from dying of sorrow, being burnt or drowning to death. I seek Your protection from being struck by shayṭān at the time of death and that I am killed. I seek Your protection from dying whilst I am fleeing from the battlefield. I seek Your protection from dying from a venomous sting.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī aʿūdhu bika mina-l-haram, wa-t-taraddī, wa-l-hadm, wa-l-ghamm, wa-l-ḥarīq, wa-l-gharaq, wa aʿūdhu bika ay-yatakhabbaṭaniya-sh-shayṭānu ʿinda-l-mawt wa an uqtala fī sabīlika mudbirā, wa aʿūdhu bika an amūta ladīghā.",
+      "source_id": 68,
+      "benefits": "Abu Al-Yasār (raḍiy Allāhu ‘anhu) narrates that the Messenger of Allah ﷺ used to say [the above]. (Nasā’ī 5531)",
+      "notes": "Protection from Bad Endings"
+    },
+    {
+      "id": 24055,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَعُوْذُ بِكَ مِنْ شَرِّ مَا عَمِلْتُ، وَمِنْ شَرِّ مَا لَمْ أَعْمَلْ",
+      "translation": "O Allah, I seek Your protection from the evil of what I have done, and from the evil of what I have not done.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī aʿūdhu bika min sharri mā ʿamiltu, wa min sharri mā lam aʿmal.",
+      "source_id": 69,
+      "benefits": "Farwā’ b. Nawfal reported: “I asked ‘Ā’isha (raḍiy Allāhu ‘anhā) about the supplication that the Messenger of Allah ﷺ made. She said that he used to say: [the above].” (Muslim 2716)",
+      "notes": "Protection from Evil Actions"
+    },
+    {
+      "id": 24056,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَعُوْذُ بِكَ مِنْ شَرِّ سَمْعِيْ، وَمِنْ شَرِّ بَصَرِيْ، وَمِنْ شَرِّ لِسَانِيْ، وَمِنْ شَرِّ قَلْبِيْ، وَمِنْ شَرِّ مَنِيِّيْ",
+      "translation": "O Allah, I seek Your protection from the evil of my hearing, the evil of my sight, the evil of my tongue, the evil of my heart and the evil of my semen.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī aʿūdhu bika min sharri samʿī, wa min sharri baṣarī, wa min sharri lisānī, wa min sharri qalbī, wa min sharri maniyyī.",
+      "source_id": 70,
+      "benefits": "Shakal b. Ḥumayd (raḍiy Allāhu ‘anhu) said: I came to the Prophet ﷺ and said: ‘O Messenger of Allah, teach me a way of seeking refuge so that I may seek refuge by it. He (Shakal) said: ‘So he took my hand and said: ‘Say: [the above].’” (Tirmidhī 3492)",
+      "notes": "Protection from the Evil of My Organs"
+    },
+    {
+      "id": 24057,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَعُوْذُ بِكَ مِنْ مُنْكَرَاتِ الْأَخْلَاقِ، وَالْأَعْمَالِ، وَالْأَهْوَاءِ",
+      "translation": "O Allah, I seek Your protection from evil character, evil actions and evil desires.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī aʿūdhu bika min munkarāti-l-akhlāq, wa-l-aʿmāl, wa-l-ahwā’.",
+      "source_id": 71,
+      "benefits": "Ziyād b. ʿIlāqah (raḍiy Allāhu ‘anhu) narrated from his uncle, that he said: “The Prophet ﷺ used to say: [the above].” (Tirmidhī 3591)",
+      "notes": "Protection from Evil Character, Actions & Desires"
+    },
+    {
+      "id": 24058,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَعُوْذُ بِكَ مِنْ زَوَالِ نِعْمَتِكَ، وَتَحَوُّلِ عَافِيَتِكَ، وَفُجَاءَةِ نِقْمَتِكَ، وَجَمِيْعِ سَخَطِكَ",
+      "translation": "O Allah, I seek Your protection from the loss of Your favours, the removal of Your complete protection, Your sudden punishment and all that which may incur Your displeasure.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī aʿūdhu bika min zawāli niʿmatik, wa taḥawwuli ʿāfiyatik, wa fujā’ati niqmatik, wa jamīʿi sakhaṭik.",
+      "source_id": 72,
+      "benefits": "ʿAbdullah b. ʿUmar (radiy Allāhū ‘anhumā) reported that from the supplication of the Messenger of Allah ﷺ was [the above]. (Muslim 2739, Abū Dāwūd 1545)",
+      "notes": "Protection from Allah’s Anger & Removal of Blessings"
+    },
+    {
+      "id": 24059,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَعُوْذُ بِكَ مِنَ الْجُوْعِ، فَإِنَّهُ بِئْسَ الضَّجِيْعُ، وَأَعُوْذُ بِكَ مِنَ الْخِيَانَةِ، فَإِنَّهَا بِئْسَتِ الْبِطَانَةُ",
+      "translation": "O Allah, I seek Your protection from hunger, as it is indeed an evil companion and I seek Your protection from treachery, as it is an evil confidante.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī aʿūdhu bika mina-l-jūʿ, fa-innahū bi’sa-ḍ-ḍajīʿ, wa aʿūdhu bika mina-l-khiyānah, fa-innahā bi’sati-l-biṭānah.",
+      "source_id": 73,
+      "benefits": "Abū Hurayrah (raḍiy Allāhu ‘anhu) narrated that The Messenger of Allah ﷺ used to say: [the above]. (Nasā’ī 5468)",
+      "notes": "Protection From Hunger & Treachery"
+    },
+    {
+      "id": 24060,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَعُوْذُ بِكَ مِنْ يَّوْمِ السُّوْءِ، وَمِنْ لَيْلَةِ السُّوْءِ، وَمِنْ سَاعَةِ السُّوْءِ، وَمِنْ صَاحِبِ السُّوْءِ، وَمِنْ جَارِ السُّوْءِ فِيْ دَارِ الْمُقامَةِ",
+      "translation": "O Allah, I seek Your protection from bad days, bad nights, bad moments, bad companions, and from bad neighbours in (permanent) places of residence.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī aʿūdhu bika mi-y-yawmi-s-sū’, wa mi-l-laylati-s-sū’, wa min sāʿti-s-sū’, wa min ṣāḥibi-s-sū’, wa min jāri-s-sū’i fī dāri-l-muqāmah",
+      "source_id": 74,
+      "benefits": "ʿUqbah b. ʿĀmir (raḍiy Allāhu ‘anhu) narrates that the Messenger of Allah ﷺ would say [the above]. (Tabarānī 810)",
+      "notes": "Protection from Bad Days, Companions & Neighbours"
+    },
+    {
+      "id": 24061,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَعُوْذُ بِكَ مِنْ جَارِ السُّوْءِ، وَمِنْ زَوْجٍ تُشَيِّبُنِيْ قَبْلَ المَشِيْبِ، وَمِنْ وَّلَدٍ يَّكُوْنُ عَليَّ رَبًّا، وَمِنْ مَّالٍ يَّكُوْنُ عَلَيَّ عَذَابًا، وَمِنْ خَلِيْلٍ مَّاكِرٍ عَيْنُهُ تَرَانِيْ، وَقَلْبُهُ يَرْعَانِيْ، إِنْ رَأَىٰ حَسَنَةً دَفَنَهَا، وَإِذَا رَأَىٰ سَيِّئَةً أَذَاعَهَا",
+      "translation": "O Allah, I seek Your protection from an evil neighbour; from a spouse who will age me ahead of time; from a child who will rule over me; from wealth that will become a punishment for me; from a cunning friend whose eyes see me yet his heart keeps guard over me: if he sees any good, he conceals it and if he sees any bad, he announces it.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī aʿūdhu bika min jāri-s-sū’, wa min zawjin tushayyibunī qabla-l-mashīb, wa min waladi-y-yakūnu ʿalayya rabbā, wa mi-m-māli-y-yakūnu ʿalayya ʿadhābā, wa min khalīli-m-mākir, ʿaynuhu tarānī, wa qalbuhū yarʿānī, ir-ra’ā ḥasanatan dafanahā wa idhā ra’ā sayyi’atan adhāʿahā.",
+      "source_id": 75,
+      "benefits": "Abū Hurayrah (raḍiy Allāhu ‘anhu) narrates that [the above] was from the supplication of the Messenger of Allah ﷺ. (Tabarānī in al-Du’ā 1339)",
+      "notes": "Protection from Bad Neighbours & Family Members"
+    },
+    {
+      "id": 24062,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَعُوْذُ بِكَ مِنْ جَهْدِ الْبَلَاءِ، وَدَرَكِ الشَّقَاءِ، وَسُوْءِ الْقَضَاءِ، وَشَمَاتَةِ الْأَعْدَاءِ",
+      "translation": "O Allah, I seek Your protection from severe trials, wretchedness, bad fate and that my enemies rejoice in my misery.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī aʿūdhu bika min jahdi-l-balā’, wa daraki-sh-shaqā’, wa sūi’-l-qaḍā’, wa shamātati-l-aʿdā’.",
+      "source_id": 76,
+      "benefits": "Abū Hurayrah (raḍiy Allāhu ‘anhu) narrates that the Messenger of Allah ﷺ used to seek refuge with Allah from [the above]. (Bukhārī 6347)",
+      "notes": "Protection from Trials, Wretchedness, Bad Fate & the Gloating of Enemies"
+    },
+    {
+      "id": 24063,
+      "text_arabic": "اَللّٰهُمَّ إِنِّيْ أَعُوْذُ بِكَ مِنَ الْفَقْرِ، وَالْقِلَّةِ، وَالذِّلَّةِ، وَأَعُوْذُ بِكَ مِنْ أَنْ أَظْلِمَ أَوْ أُظْلَمَ",
+      "translation": "O Allah, I seek Your protection from poverty, scarcity, humiliation; and I seek Your protection from oppressing or being oppressed.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innī aʿūdhu bika mina-l-faqr, wa-l-qillah, wa-dh-dhillah, wa aʿūdhu bika min an aẓlima aw uẓlam.",
+      "source_id": 77,
+      "benefits": "Abū Hurayrah (raḍiy Allāhu ‘anhu) narrates that the Messenger of Allah ﷺ used to say [the above]. (Abū Dāwūd 1544)",
+      "notes": "Protection from Poverty, Humiliation & Oppression"
+    },
+    {
+      "id": 24064,
+      "text_arabic": "اَللّٰهُمَّ اكْفِنِيْ بِحَلَالِكَ عَنْ حَرَامِكَ، وَأَغْنِنِيْ بِفَضْلِكَ عَمَّنْ سِوَاكَ",
+      "translation": "O Allah, suffice me with Your lawful against Your prohibited, and make me independent of all those besides You.",
+      "default_count": 1,
+      "transliteration": "Allāhumma-k-finī bi-ḥalālika ʿan ḥarāmik, wa aghninī bi-faḍlika ʿamman siwāk.",
+      "source_id": 78,
+      "benefits": "Alī (raḍiy Allāhu ‘anhu) narrated that a Mukatib came to him and said: “Indeed I am not capable of my Kitabah (a contract of manumission between a master and a slave according to which the slave is required to pay a certain sum of money during a specific time period in exchange for freedom) so aid me.” He said: “Should I not teach you words that the Messenger of Allah ﷺ taught me? If you had a debt upon you similar to the mountain of Sīr, Allah would fulfill it for you. He said: ‘Say: [the above]. (Tirmidhī 3563)",
+      "notes": "Protection from Becoming Dependent on Others"
+    },
+    {
+      "id": 24065,
+      "text_arabic": "اَللّٰهُمَّ قَنِّعْنِيْ بِمَا رَزَقْتَنِيْ، وَبَارِكْ لِيْ فِيْهِ، وَاخْلُفْ عَلَيٰ كُلِّ غَائِبَةٍ لِّيْ بِخَيْرٍ",
+      "translation": "O Allah, make me content with what You have granted me, bless me in it and be a protector for me in that which is absent from me (i.e. family and wealth).",
+      "default_count": 1,
+      "transliteration": "Allāhumma qanniʿnī bimā razaqtanī, wa bārik lī fīhī, wa-khluf ʿalā kulli ghā’ibati-l-lī bi-khayr.",
+      "source_id": 79,
+      "benefits": "Ibn ʿAbbās (radiy Allāhū ‘anhumā) narrates that the Prophet ﷺ would supplicate with [the above]. (Hākim 1/455)",
+      "notes": "Contentment & Allah’s Protection"
+    },
+    {
+      "id": 24066,
+      "text_arabic": "اَللّٰهُمَّ اغْفِرْ لِيْ ذَنْبِيْ، وَوَسِّعْ لِيْ فِيْ دَارِيْ، وَبَارِكْ لِيْ فِيْمَا رَزَقْتَنِيْ",
+      "translation": "O Allah, forgive my sins, make my home spacious and bless me in what You have granted me.",
+      "default_count": 1,
+      "transliteration": "Allāhumma-ghfir lī dhambī, wa wassiʿ lī fī dārī, wa bārik lī fīmā razaqtanī.",
+      "source_id": 80,
+      "benefits": "Saʿīd al-Jurayrī narrates that he heard ʿUbayd b. al-Qaʿqā’ (raḍiy Allāhu ‘anhu) speaking to man from Banu Hanzalah who said: “A man stared at the Prophet ﷺ while he was performing salāh. He ﷺ then started saying [the above] in his salāh.” (Ahmad 16599)",
+      "notes": "Forgiveness, Blessings & a Spacious Home"
+    },
+    {
+      "id": 24067,
+      "text_arabic": "اَللّٰهُمَّ زِدْنَا وَلَا تَنْقُصْنَا، وَأَكْرِمْنَا وَلَا تُهِنَّا، وَأَعْطِنَا وَلَا تَحْرِمْنَا، وَآثِرْنَا وَلَا تُؤْثِرْ عَلَيْنَا، وَأَرْضِنَا وَارْضَ عَنَّا",
+      "translation": "O Allah, grant us more and not less. Honour us and do not disgrace us. Grant us and do not deprive us. Favour us and do not favour others over us. Make us pleased with You and be pleased with us.",
+      "default_count": 1,
+      "transliteration": "Allāhumma zidnā wa lā tanquṣnā, wa akrimnā wa lā tuhinnā, wa aʿṭinā wa lā taḥrimnā, wa āthirnā wa lā tu’thir ʿalaynā, wa arḍinā wa-rḍā ʿannā.",
+      "source_id": 81,
+      "benefits": "‘Umar bin Al-Khattab (raḍiy Allāhu ‘anhu) narrated: “When revelation came to the Messenger of Allah ﷺ, one could hear what sounded like the buzzing of bees before his face. One day revelation was coming to him, he faced the Qiblah, raised his hands and said: [the above]. He ﷺ said: ‘Ten verses were revealed to me, whoever abides by them shall enter Paradise (and they are): ‘Successful indeed are the believers…’ until the completion of ten verses (23:1-10).’” (Tirmidhī 3173)",
+      "notes": "Honour & Pleasure of Allah"
+    },
+    {
+      "id": 24068,
+      "text_arabic": "اَللّٰهُمَّ أَحْسَنْتَ خَلْقِيْ فَأَحْسِنْ خُلُقِيْ",
+      "translation": "O Allah, beautify my character as You have beautified my appearance.",
+      "default_count": 1,
+      "transliteration": "Allāhumma aḥsanta khalqī fa-aḥsin khuluqī.",
+      "source_id": 82,
+      "benefits": "‘A’isha (raḍiy Allāhu ‘anhā) narrates that the Prophet ﷺ would supplicate with [the above]. (Ahmad 3823, 24392)",
+      "notes": "A Beautiful Character"
+    },
+    {
+      "id": 24069,
+      "text_arabic": "اَللّٰهُمَّ فَأَيُّمَا عَبْدٍ مُّؤْمِنٍ سَبَبْتُهُ فَاجْعَلْ ذٰلِكَ لَهُ قُرْبَةً إِلَيْكَ يَوْمَ الْقِيَامَةِ",
+      "translation": "O Allah, any believing servant whom I have cursed, make that a source of nearness to You on the Day of Judgement.",
+      "default_count": 1,
+      "transliteration": "Allāhumma fa-ayyumā ʿabdi-m-mu’minin sababtuhū fa-jʿal dhālika lahū qurbatan ilayka yawma-l-qiyāmah.",
+      "source_id": 83,
+      "benefits": "Abū Hurayrah (raḍiy Allāhu ‘anhu) narrates that he heard the Messenger of Allah ﷺ say [the above]. (Muslim 2601)\nIn another narration Abū Hurayrah (raḍiy Allāhu ‘anhu) narrates that the Messenger of Allah ﷺ said, “O Allah, I am only a human being. Whenever I scold, curse, or punish a Muslim man, then turn it into purification and mercy for him.” (Bukhārī 6000)",
+      "notes": "Atonement for Hurting Another Muslim"
+    },
+    {
+      "id": 24070,
+      "text_arabic": "اَللّٰهُمَّ أَلِّفْ بَيْنَ قُلُوْبِنَا، وَأَصْلِحْ ذَاتَ بَيْنِنَا، وَاهْدِنَا سُبُلَ السَّلَامِ، وَنَجِّنَا مِنَ الظُّلُمَاتِ إِلَى النُّوْرِ، وَجَنِّبْنَا الْفَوَاحِشَ مَا ظَهَرَ مِنْهَا وَمَا بَطَنَ، وَبَارِكْ لَنَا فِيْ أَسْمَاعِنَا، وَأَبْصَارِنَا، وَقُلُوْبِنَا، وَأَزْوَاجِنَا، وَذُرِّيَّاتِنَا، وَتُبْ عَلَيْنَا إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيْمُ، وَاجْعَلْنَا شَاكِرِيْنَ لِنِعَمِكَ مُثْنِيْنَ بِهَا عَلَيْكَ، قَابِلِيْنَ لَهَا، وَأَتِمِمْهَا عَلَيْنَا",
+      "translation": "O Allah, unite our hearts, set aright our relationships, and guide us to the paths of peace. Bring us out of darknesses into light and protect us from evident and hidden obscenities. Bless us in our hearing, our sight, our hearts, our spouses and our children. Accept our repentance. Indeed, You truly are the Acceptor of repentance, the Ever-Merciful. Make us of those who are grateful for Your blessings, who praise You for them and acknowledge them. Perfect (the blessings) and make them last forever for us.",
+      "default_count": 1,
+      "transliteration": "Allāhumma allif bayna qulūbinā, wa aṣliḥ dhāta bayninā, wa-hdinā subula-s-sālām, wa najjinā mina-ẓ-ẓulumāti ila-n-nūr, wa jannibna-l-fawāḥisha mā ẓahara minhā wa mā baṭan, wa bārik lanā fī asmāʿinā, wa abṣārinā, wa qulūbinā, wa azwājinā, wa dhurriyyātinā, wa tub ʿalaynā innaka Anta-t-Tawwābu-r-Raḥīm, wa-jʿalnā shākirīna li-niʿamik muthnīna bihā ʿalayk, qābilīna lahā, wa atmimhā ʿalaynā.",
+      "source_id": 84,
+      "benefits": "Ibn Mas’ūd (raḍiy Allāhu ‘anhu) narrates that the Messenger of Allah ﷺ said [the above]. (Hākim 977)",
+      "notes": "Unity, Guidance & Repentance"
+    },
+    {
+      "id": 24071,
+      "text_arabic": "اَللّٰهُمَّ إِنَّا نَسْأَلُكَ مِنْ خَيْرِ مَا سَأَلَكَ مِنْهُ نَبِيُّكَ مُحَمَّدٌ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ، وَنَعُوْذُ بِكَ مِنْ شَرِّ مَا اسْتَعَاذَ مِنْهُ نَبِيُّكَ مُحَمَّدٌ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ، وَأَنْتَ الْمُسْتَعَانُ، وَعَلَيْكَ الْبَلَاغُ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ",
+      "translation": "O Allah, we beg You for the good which Your Prophet Muhammad ﷺ asked from You. We seek Your protection from the evil which Your Prophet Muhammad ﷺ sought protection for from You. You are the One whose assistance is sought and You are the Only One who provides and suffices. There is no power (to avert evil) nor strength (to do good) except by Allah.",
+      "default_count": 1,
+      "transliteration": "Allāhumma innā nas’aluka min khayri mā sa’alaka minhu Nabiyyuka Muḥammadun ṣallā-llāhu ʿalayhi wa sallam, wa naʿūdhu bika min sharri ma-staʿādha minhu Nabiyyuka Muḥammadun ṣallā-llāhu ʿalayhi wa sallam, wa Anta-l-Mustaʿān, wa ʿalayka-l-balāgh, wa lā ḥawla wa lā quwwata illā bi-llāh.",
+      "source_id": 85,
+      "benefits": "Abū Umāmah (raḍiy Allāhu ‘anhu) addressed the Messenger of Allah ﷺ saying: ‘O Messenger of Allah, you have supplicated by means of many duās which we cannot remember.’ The Messenger of Allah ﷺ said: ‘Shall I not guide you to that which encompasses all of them?’ He then taught him [the above].’” (Tirmidhī 3521)",
+      "notes": "An All Encompassing Supplication"
+    }
+  ]
+}
