@@ -623,7 +623,7 @@ clamped rather than adding items that resolve to nothing. And two ways to a
 dhikr, because there are two ways of knowing which one you want.
 
 **The flat list searches; the other one browses.** "Dhikr" is every dhikr in the
-content build — 496 rows — with a search field over it. That list used to be
+content build — 825 rows — with a search field over it. That list used to be
 the thing this section argued against: without tagging it had nothing to sort or
 filter it by, and several hundred rows of Arabic in a row is unusable in a way
 no amount of styling fixes. The search field is the thing it was missing, and
@@ -789,9 +789,9 @@ list these. Two doors, two meanings — and somebody who wants theirs knows they
 are theirs. It is one provider's worth of change if that ever feels wrong in the
 hand.
 
-**No search on your own adhkar.** The flat picker has one because it is 496
-rows; this is the handful somebody wrote, and a search field over six rows is a
-control standing in front of the six.
+**No search on your own adhkar.** The flat picker has one because it is the
+whole content library; this is the handful somebody wrote, and a search field
+over six rows is a control standing in front of the six.
 
 **One new column, not a widened one.** `user_collection_items.item_id` is
 `INTEGER NOT NULL`; naming a UUID through it would mean rebuilding the table,

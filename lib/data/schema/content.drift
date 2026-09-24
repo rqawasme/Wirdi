@@ -125,7 +125,7 @@ dhikrById: SELECT * FROM adhkar WHERE id = :id;
 
 adhkarByIds: SELECT * FROM adhkar WHERE id IN :ids;
 
--- The whole adhkar table: 496 rows in the current build. The dhikr picker searches
+-- The whole adhkar table: 825 rows in the current build. The dhikr picker searches
 -- it in Dart, because `adhkar` has no `text_simple` the way `ayahs` does and SQLite's
 -- LIKE folds ASCII case and nothing else — so a WHERE clause here would do the English
 -- half of the search in SQL and the Arabic half somewhere else. See ArabicText.simplify.

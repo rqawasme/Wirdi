@@ -29,7 +29,7 @@ abstract class ContentRepository {
 
   Future<Dhikr> dhikr(int id);
 
-  /// Every dhikr in this content build, by id — 496 rows in the current one.
+  /// Every dhikr in this content build, by id — 825 rows in the current one.
   ///
   /// The whole table, deliberately. The dhikr picker matches Arabic
   /// diacritic-insensitively and `adhkar` carries no normalised column to match

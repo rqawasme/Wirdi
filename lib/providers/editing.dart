@@ -37,7 +37,7 @@ final FutureProvider<List<CollectionSummary>> builtinCollectionsProvider =
 /// Every dhikr in the content build, folded for search.
 ///
 /// Read when the dhikr picker opens and dropped when it closes; nothing keeps
-/// it alive, and nothing should — 496 rows of Arabic and English is well under
+/// it alive, and nothing should — 825 rows of Arabic and English is well under
 /// a megabyte to hold for as long as a picker is on screen, and the whole
 /// process lifetime to hold it for one.
 final FutureProvider<List<SearchableDhikr>> searchableAdhkarProvider =

@@ -17,9 +17,9 @@ import 'picker_scaffold.dart';
 /// The adhkar the user wrote, to add one to a collection — and the one picker
 /// that can also make what it offers.
 ///
-/// No search field. The other dhikr picker has one because it is four hundred
-/// and ninety-six rows; this is the handful somebody wrote themselves, and a
-/// search over six rows is a control in the way of the six.
+/// No search field. The other dhikr picker has one because it is the whole
+/// content library; this is the handful somebody wrote themselves, and a search
+/// over six rows is a control standing in the way of the six.
 ///
 /// Pops with a one-item `List<PickedItem>`.
 class UserDhikrPickerScreen extends ConsumerStatefulWidget {
