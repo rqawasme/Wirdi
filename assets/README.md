@@ -19,6 +19,17 @@ substitutes is not the same text.
 `pubspec.yaml` registers them under the family names in
 `lib/theme/typography.dart`. Changing one means changing both.
 
+## App icon
+
+`icon/wirdi_icon.svg` is the app icon: a tasbih of 33 beads, 22 counted, with
+the imam bead and tassel. It is generated, like every icon PNG under `ios/` and
+`android/`, by `tool/render_app_icons.py`, which holds the geometry and palette.
+Change the script and rerun it, rather than editing the SVG or the PNGs:
+
+```bash
+python3 tool/render_app_icons.py
+```
+
 ## content.db
 
 `content.db` belongs here, and is **not committed**. It is a build artifact:
