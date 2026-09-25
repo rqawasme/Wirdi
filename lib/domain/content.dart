@@ -1,3 +1,5 @@
+import 'item_ref.dart';
+
 /// Where a surah was revealed. Stored in `content.db` as the strings
 /// `'makkah'` and `'madinah'`.
 enum RevelationPlace { makkah, madinah }
@@ -74,35 +76,107 @@ final class Ayah {
   String toString() => 'Ayah($surahNumber:$ayahNumber)';
 }
 
-/// One dhikr.
+/// One dhikr: authored by the content pipeline, or written by the user.
+///
+/// One class for both, the way `CollectionSummary` is one class for a built-in
+/// collection and a user-made one. What differs between them is which database
+/// the row came out of — which is what [ref] says — and which of the fields
+/// below are filled: [sourceId] and [benefits] are the content build's, and
+/// [reference] is the user's.
+///
+/// Everything that draws a dhikr draws it through this, so a dhikr somebody
+/// wrote is recited, listed and read exactly like one that shipped with the
+/// app. That is the point.
 final class Dhikr {
   const Dhikr({
-    required this.id,
+    required this.ref,
     required this.textArabic,
-    required this.translation,
     required this.defaultCount,
+    this.translation,
     this.transliteration,
     this.sourceId,
+    this.reference,
     this.benefits,
     this.notes,
   });
 
-  final int id;
+  /// Which row this is, and so which database it lives in: a [ContentRef] for
+  /// an authored dhikr, a [UserDhikrRef] for one the user wrote.
+  ///
+  /// This replaced an `int id`, which could only ever name a row in
+  /// `content.db`.
+  final ItemRef ref;
+
   final String textArabic;
-  final String translation;
+
+  /// Null only for a dhikr the user wrote and left untranslated.
+  ///
+  /// `adhkar.translation` in `content.db` is NOT NULL, so an authored dhikr
+  /// always has one. Somebody writing down the dua they say after Fajr already
+  /// knows what it means, and refusing to save it until they have typed a
+  /// translation is asking them to do the content build's job — so the column
+  /// in `user_adhkar` is nullable, and every widget that draws this line
+  /// leaves it out rather than inventing one.
+  final String? translation;
+
   final String? transliteration;
 
   /// How many times this dhikr is said unless a collection item overrides it.
   final int defaultCount;
 
-  /// References `sources.id` in `content.db`.
+  /// References `sources.id` in `content.db`. Authored adhkar only.
   final int? sourceId;
+
+  /// Where the user says they found this one: free text, and theirs.
+  ///
+  /// Deliberately not a [Source]. A source row carries a grading, which is a
+  /// claim the content pipeline stands behind; this is a note somebody made
+  /// about their own copy, and the app must not dress the second as the first.
+  final String? reference;
 
   final String? benefits;
   final String? notes;
 
   @override
-  String toString() => 'Dhikr($id)';
+  String toString() => 'Dhikr(${ref.canonical})';
+}
+
+/// The fields of a dhikr the user is writing, without an id.
+///
+/// What the form hands to [UserDhikrRepository.create] and to its `update`,
+/// and the reason those two take the same argument: the same form asks the same
+/// questions whether the dhikr exists yet or not, and an update writes every
+/// field at once for the same reason `updateUserCollectionDetails` does — a
+/// half-applied answer is worse than a refused one.
+///
+/// Nullable fields are cleared by a null. Emptying a field is how a field is
+/// taken off, and the form hands back null for an empty one.
+final class DhikrDraft {
+  const DhikrDraft({
+    required this.textArabic,
+    this.translation,
+    this.transliteration,
+    this.defaultCount = 1,
+    this.reference,
+    this.notes,
+  });
+
+  /// The one field that is required. A dhikr with no words is not a dhikr; a
+  /// dhikr with no translation is one somebody knows the meaning of.
+  final String textArabic;
+
+  final String? translation;
+  final String? transliteration;
+
+  /// How many times it is said unless an item overrides it. 1 by default:
+  /// whatever number somebody had in mind, they are about to type it.
+  final int defaultCount;
+
+  final String? reference;
+  final String? notes;
+
+  @override
+  String toString() => 'DhikrDraft(${textArabic.length} chars x$defaultCount)';
 }
 
 /// A hadith or book reference that a dhikr cites.

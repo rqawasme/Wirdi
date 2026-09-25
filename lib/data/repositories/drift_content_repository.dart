@@ -1,5 +1,5 @@
 import '../../domain/content.dart';
-import '../../domain/content_ref.dart';
+import '../../domain/item_ref.dart';
 import '../../domain/errors.dart';
 import '../../domain/repositories.dart';
 import '../content_database.dart';

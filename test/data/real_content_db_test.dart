@@ -172,9 +172,14 @@ void _tests(File file) {
         final ResolvedCollection resolved = await repo.resolve(
           BuiltinCollectionId(id),
         );
+        // A built-in cannot name a dhikr out of somebody's user.db, so every
+        // ref here is a ContentRef and the pattern drops nothing.
         final Set<ContentType> kinds = <ContentType>{
           for (final CollectionEntry entry in resolved.entries)
-            if (entry is CollectionItemEntry) entry.ref.type,
+            if (entry case CollectionItemEntry(
+              ref: ContentRef(:final ContentType type),
+            ))
+              type,
         };
 
         // Al-Ikhlas, al-Falaq and al-Nas are surah items in both; the evening
@@ -196,7 +201,7 @@ void _tests(File file) {
       expect(
         <int>[
           for (final CollectionEntry entry in evening.entries)
-            if (entry is AyahItem) entry.ref.id,
+            if (entry is AyahItem) entry.ayah.id,
         ],
         <int>[2285, 2286],
       );
@@ -238,10 +243,12 @@ void _tests(File file) {
 
       // What the flat dhikr picker holds in memory while it is open.
       expect(adhkar.length, greaterThan(400));
-      expect(
-        adhkar.map((Dhikr d) => d.id).toList(),
-        orderedEquals(adhkar.map((Dhikr d) => d.id).toList()..sort()),
-      );
+      final List<int> ids = <int>[
+        for (final Dhikr d in adhkar)
+          if (d.ref case ContentRef(:final int id)) id,
+      ];
+      expect(ids, hasLength(adhkar.length));
+      expect(ids, orderedEquals(<int>[...ids]..sort()));
       for (final Dhikr dhikr in adhkar) {
         expect(dhikr.textArabic, isNotEmpty);
         expect(dhikr.translation, isNotEmpty);
@@ -263,7 +270,11 @@ void _tests(File file) {
 
     for (final Dhikr dhikr in vocalised) {
       final String folded = ArabicText.simplify(dhikr.textArabic);
-      expect(folded, isNotEmpty, reason: 'dhikr ${dhikr.id} folded away');
+      expect(
+        folded,
+        isNotEmpty,
+        reason: 'dhikr ${dhikr.ref.canonical} folded away',
+      );
       // Folding is idempotent, which is what lets the query be folded with
       // the same function as the text.
       expect(ArabicText.simplify(folded), folded);
@@ -287,7 +298,9 @@ void _tests(File file) {
         expect(
           entry.source,
           isNotNull,
-          reason: 'dhikr ${entry.dhikr.id} in collection $id has no source',
+          reason:
+              'dhikr ${entry.dhikr.ref.canonical} in collection $id '
+              'has no source',
         );
       }
     }

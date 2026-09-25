@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
@@ -234,6 +236,80 @@ void main() {
       );
       expect(stripe.segments, CollectionTile.maxSegments);
       expect(stripe.value, closeTo(41 / total, 0.001));
+    });
+
+    testWidgets('a committed collection edited behind the tab is re-counted', (
+      WidgetTester tester,
+    ) async {
+      // Home is never unmounted — it is a tab — so its view is never re-read on
+      // its own. Removing an item from a committed collection has to reach it,
+      // or the tile goes on counting a step that is gone.
+      final UserRepository user = dbs.userRepository(clock: () => now);
+      final UserCollectionId id = await data.collectionRepository.create(
+        'Mine',
+      );
+      await data.collectionRepository.addItem(id, const ContentRef.dhikr(1001));
+      await data.collectionRepository.addItem(id, const ContentRef.dhikr(1004));
+      await user.commit(id, DailySection.today);
+
+      await pumpApp(tester);
+      expect(find.text('0/8'), findsOneWidget);
+
+      final NavigatorState navigator = tester.state<NavigatorState>(
+        find.byType(Navigator).first,
+      );
+      unawaited(
+        navigator.pushNamed(
+          Routes.collectionEdit,
+          arguments: CollectionEditArguments(collectionId: id),
+        ),
+      );
+      await settle(tester);
+      // The seven-count one goes; the one said once stays.
+      await tester.tap(find.byTooltip('Remove').last);
+      await settle(tester);
+      navigator.pop();
+      await settle(tester);
+
+      expect(find.text('0/1'), findsOneWidget);
+    });
+
+    testWidgets('a count lowered under saved progress does not overshoot', (
+      WidgetTester tester,
+    ) async {
+      // Fifty done of a dhikr the user wrote at a hundred, and then its count
+      // edited down to three. The step still holds the same dhikr, so the
+      // progress is resumed — and the part of it past three must not count.
+      final UserRepository user = dbs.userRepository(clock: () => now);
+      final UserDhikrRef mine = await insertUserDhikr(
+        dbs.user,
+        id: testUuid(1),
+        defaultCount: 100,
+      );
+      final UserCollectionId id = await data.collectionRepository.create(
+        'Mine',
+      );
+      await data.collectionRepository.addItem(id, mine);
+      await user.commit(id, DailySection.today);
+      final ResolvedCollection resolved = await data.collectionRepository
+          .resolve(id);
+      await user.saveProgress(
+        WirdProgress.atStep(
+          collectionId: id,
+          step: resolved.steps.single,
+          currentCount: 50,
+          updatedAt: now,
+        ),
+      );
+
+      await data.userDhikrRepository.update(
+        mine,
+        const DhikrDraft(textArabic: 'PLACEHOLDER edited', defaultCount: 3),
+      );
+      await pumpApp(tester);
+
+      expect(find.text('3/3'), findsOneWidget);
+      expect(find.text('50/3'), findsNothing);
     });
 
     testWidgets('done today fills the stripe, and quiets everything else', (

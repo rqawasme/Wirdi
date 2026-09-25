@@ -2,7 +2,7 @@ import 'collection.dart';
 import 'collection_id.dart';
 import 'commitment.dart';
 import 'content.dart';
-import 'content_ref.dart';
+import 'item_ref.dart';
 import 'progress.dart';
 
 /// Read access to the bundled content database.
@@ -29,7 +29,7 @@ abstract class ContentRepository {
 
   Future<Dhikr> dhikr(int id);
 
-  /// Every dhikr in this content build, by id — 496 rows in the current one.
+  /// Every dhikr in this content build, by id — 825 rows in the current one.
   ///
   /// The whole table, deliberately. The dhikr picker matches Arabic
   /// diacritic-insensitively and `adhkar` carries no normalised column to match
@@ -73,9 +73,12 @@ abstract class CollectionRepository {
   /// [note] is a rubric shown with the item, mirroring what the content
   /// pipeline authors for built-ins. It is here so that copying a built-in
   /// wird into a user collection keeps its per-item notes.
+  ///
+  /// [ref] may name a dhikr the user wrote as readily as a row of
+  /// `content.db`; a collection makes no distinction between them.
   Future<void> addItem(
     UserCollectionId id,
-    ContentRef ref, {
+    ItemRef ref, {
     int? count,
     String? note,
   });
@@ -106,6 +109,61 @@ abstract class CollectionRepository {
   /// record, streaks run across all of them regardless of collection, and
   /// deleting them would retroactively break a streak the user earned.
   Future<void> delete(UserCollectionId id);
+}
+
+/// The adhkar the user wrote themselves.
+///
+/// A separate interface from [CollectionRepository] because these are content,
+/// not structure: what a collection *says*, rather than the order it says it
+/// in. [ContentRepository] is the same thing for the adhkar the app ships
+/// with, and the two are deliberately not merged — one is read-only and
+/// replaced wholesale on an app update, the other is written by the person
+/// using it and migrated forever.
+abstract class UserDhikrRepository {
+  /// Newest first. A dhikr somebody wrote has no arrangement, and the one they
+  /// are looking for is overwhelmingly the one they just made.
+  Future<List<Dhikr>> all();
+
+  Future<UserDhikrRef> create(DhikrDraft draft);
+
+  /// Writes every field of [draft] at once.
+  ///
+  /// The change is shared, because a collection item names a dhikr rather than
+  /// holding a copy of it: fixing a typo fixes it in every collection that
+  /// says this dhikr, and lowering [DhikrDraft.defaultCount] lowers it for
+  /// every item that carries no count override of its own. That is what makes
+  /// it worth writing a dhikr down once.
+  ///
+  /// Throws [DhikrNotFoundException] if it is gone or soft-deleted.
+  Future<void> update(UserDhikrRef ref, DhikrDraft draft);
+
+  /// How many collection items name each dhikr, in one read. Adhkar nothing
+  /// names are absent rather than present with a zero.
+  ///
+  /// Items and not collections: a collection that says the same dhikr twice
+  /// holds two items, which is what deleting it will remove.
+  Future<Map<UserDhikrRef, int>> usage();
+
+  /// The live collections that hold [ref], in list order. What the sentence in
+  /// front of a deletion is built from.
+  Future<List<CollectionSummary>> usedBy(UserDhikrRef ref);
+
+  /// Soft-deletes the dhikr and takes it out of every collection that held it,
+  /// in one transaction.
+  ///
+  /// The dhikr row stays, tombstoned, as a deleted collection's does. Its
+  /// items do not: an item is a position in a list, and a tombstoned one would
+  /// leave a hole that `setRepeatGroup`'s contiguity check trips over. Each
+  /// collection it was taken out of is renumbered to close the gap, exactly as
+  /// removing one item by hand does.
+  ///
+  /// Progress is left alone. A wird half done through a step that has just
+  /// been removed comes back through `ResolvedCollection.resumableFrom`, which
+  /// compares the ref it was written against and discards a row that no longer
+  /// matches — which is the correct answer here and needs no help.
+  ///
+  /// Throws [DhikrNotFoundException] if it is already gone.
+  Future<void> delete(UserDhikrRef ref);
 }
 
 /// Everything the user accumulates: progress, completions, reading position

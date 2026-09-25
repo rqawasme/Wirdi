@@ -8,7 +8,7 @@ import '../collections/picked_item.dart';
 import '../domain/collection.dart';
 import '../domain/collection_id.dart';
 import '../domain/content.dart';
-import '../domain/content_ref.dart';
+import '../domain/item_ref.dart';
 import '../domain/repositories.dart';
 import 'data_providers.dart';
 
@@ -37,11 +37,15 @@ final FutureProvider<List<CollectionSummary>> builtinCollectionsProvider =
 /// Every dhikr in the content build, folded for search.
 ///
 /// Read when the dhikr picker opens and dropped when it closes; nothing keeps
-/// it alive, and nothing should — 496 rows of Arabic and English is well under
-/// a megabyte to hold for as long as a picker is on screen, and the whole
-/// process lifetime to hold it for one.
+/// it alive, and nothing should — 825 rows of Arabic and English is well under
+/// a megabyte to hold for as long as a picker is on screen, and not worth
+/// holding for the whole process lifetime for the sake of one.
+///
+/// Auto-disposed so that is true. It was a plain `FutureProvider` for a while,
+/// which Riverpod keeps for the session once read, so the comment above
+/// described a behaviour the code did not have.
 final FutureProvider<List<SearchableDhikr>> searchableAdhkarProvider =
-    FutureProvider<List<SearchableDhikr>>((Ref ref) async {
+    FutureProvider.autoDispose<List<SearchableDhikr>>((Ref ref) async {
       final List<Dhikr> adhkar = await ref
           .watch(contentRepositoryProvider)
           .adhkar();
@@ -158,24 +162,36 @@ final class CollectionEditor {
   /// The renumbering is not tidiness. `setRepeatGroup` refuses a run that is
   /// not contiguous *by position*, so a collection carrying gaps has items
   /// that look adjacent in the list and cannot be grouped.
+  ///
+  /// The rows resolution dropped go into the new order too, at the end — see
+  /// [ResolvedCollection.droppedEntryIds]. Without them the order is short of
+  /// every row, `reorder` refuses it, and the removal has already landed: the
+  /// item is gone and the person is told the change could not be made.
   Future<void> removeItem(UserCollectionId id, String entryId) async {
     await _collections.removeItem(id, entryId);
     final ResolvedCollection after = await _collections.resolve(id);
-    final List<String> order = itemIdsInOrder(after.entries);
+    final List<String> order = <String>[
+      ...itemIdsInOrder(after.entries),
+      ...after.droppedEntryIds,
+    ];
     if (order.isNotEmpty) await _collections.reorder(id, order);
   }
 
   /// Moves the entry at [oldIndex] to [newIndex], blocks moving as units.
+  ///
+  /// Takes the whole [collection] rather than its entries, because a full
+  /// order needs the rows the entries leave out — and a signature that asked
+  /// for entries alone is how every caller came to forget them.
   Future<void> moveEntry(
     UserCollectionId id,
-    List<CollectionEntry> entries,
+    ResolvedCollection collection,
     int oldIndex,
     int newIndex,
   ) {
-    return _collections.reorder(
-      id,
-      reorderedItemIds(entries, oldIndex, newIndex),
-    );
+    return _collections.reorder(id, <String>[
+      ...reorderedItemIds(collection.entries, oldIndex, newIndex),
+      ...collection.droppedEntryIds,
+    ]);
   }
 
   /// Groups [selection] into a block recited [repetitions] times.

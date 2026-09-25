@@ -29,6 +29,15 @@ void main() {
 
   tearDown(() => dbs.close());
 
+  /// Every row's `position` as written, in order — the dropped rows included,
+  /// which `resolve` does not show.
+  Future<List<int>> rawPositions(UserCollectionId id) async {
+    final List<UserCollectionItemRow> rows = await dbs.user
+        .itemsForUserCollection(collection: id.uuid)
+        .get();
+    return <int>[for (final UserCollectionItemRow row in rows) row.position];
+  }
+
   /// The `count_override` column as written, which is not what `resolve`
   /// returns: resolution has already applied the fallbacks.
   Future<List<int?>> rawOverrides(UserCollectionId id) async {
@@ -40,11 +49,11 @@ void main() {
     ];
   }
 
-  Future<List<ContentRef>> refsOf(ResolvedCollection collection) async {
-    return <ContentRef>[
+  Future<List<ItemRef>> refsOf(ResolvedCollection collection) async {
+    return <ItemRef>[
       for (final CollectionEntry entry in collection.entries)
         ...switch (entry) {
-          CollectionItemEntry(:final ContentRef ref) => <ContentRef>[ref],
+          CollectionItemEntry(:final ItemRef ref) => <ItemRef>[ref],
           RepeatBlock(entries: final List<CollectionItemEntry> members) =>
             members.map((CollectionItemEntry e) => e.ref),
         },
@@ -209,6 +218,39 @@ void main() {
       ]);
     });
 
+    test('a copy carries the adhkar the user wrote, shared not cloned', () async {
+      final UserDhikrRef mine = await insertUserDhikr(
+        dbs.user,
+        id: testUuid(7),
+        defaultCount: 3,
+      );
+      final UserCollectionId source = await editor.create('Mine');
+      await editor.addItems(source, <PickedItem>[
+        PickedItem(ref: mine),
+        const PickedItem(ref: ContentRef.dhikr(1001)),
+      ]);
+
+      final UserCollectionId copy = await editor.duplicate(
+        source,
+        name: 'Copy',
+      );
+
+      final ResolvedCollection made = await collections.resolve(copy);
+      expect(made.unresolved, isEmpty);
+      expect(
+        made.entries
+            .whereType<CollectionItemEntry>()
+            .map((CollectionItemEntry e) => e.ref.canonical)
+            .toList(),
+        <String>[mine.canonical, 'dhikr:1001'],
+      );
+
+      // One dhikr, named twice: the copy points at the same row, so editing it
+      // once changes both collections. A copy of a collection is not a copy of
+      // what it says.
+      expect((await dbs.user.activeUserAdhkar().get()), hasLength(1));
+    });
+
     test('a copy is editable where the built-in was not', () async {
       final UserCollectionId copy = await editor.duplicate(
         mixed,
@@ -331,7 +373,7 @@ void main() {
         expect(order.first, all[3]);
         expect(order.sublist(1), <String>[all[0], all[1], all[2]]);
 
-        await editor.moveEntry(id, before.entries, 3, 0);
+        await editor.moveEntry(id, before, 3, 0);
         final ResolvedCollection after = await collections.resolve(id);
         expect(await refsOf(after), <ContentRef>[
           const ContentRef.dhikr(1004),
@@ -360,7 +402,7 @@ void main() {
       expect(grouped.entries[1], isA<RepeatBlock>());
 
       // Drag the block to the front. It is one entry, so this is one move.
-      await editor.moveEntry(id, grouped.entries, 1, 0);
+      await editor.moveEntry(id, grouped, 1, 0);
 
       final ResolvedCollection after = await collections.resolve(id);
       expect(after.entries.first, isA<RepeatBlock>());
@@ -523,6 +565,87 @@ void main() {
         expect(
           grouped.entries.whereType<RepeatBlock>().single.entries.length,
           2,
+        );
+      },
+    );
+  });
+
+  group('a collection holding a row that resolves to nothing', () {
+    // A dhikr a content update removed, or a row whose columns name nothing
+    // this app can read. Neither is drawn, but both are still rows — and
+    // `reorder` refuses an order that is not every row, so an edit built from
+    // the visible entries alone used to fail after it had half landed.
+    late UserCollectionId id;
+
+    setUp(() async {
+      id = await editor.create('Mine');
+      await editor.addItems(id, <PickedItem>[
+        const PickedItem(ref: ContentRef.dhikr(1001)),
+        // Content that is gone: a real ref, resolving to nothing.
+        const PickedItem(ref: ContentRef.dhikr(9999)),
+        const PickedItem(ref: ContentRef.dhikr(1002)),
+        const PickedItem(ref: ContentRef.dhikr(1003)),
+      ]);
+      // And a row with no readable ref at all — what a build that predates a
+      // new item type sees. It is not even reported as unresolved.
+      await insertUserItem(
+        dbs.user,
+        id: 'unreadable',
+        collectionId: id.uuid,
+        position: 5,
+        itemType: 'something_newer',
+        itemId: 1,
+      );
+    });
+
+    test('reports both rows as dropped, the unreadable one included', () async {
+      final ResolvedCollection resolved = await collections.resolve(id);
+      expect(resolved.entries, hasLength(3));
+      expect(resolved.unresolved, <ItemRef>[const ContentRef.dhikr(9999)]);
+      expect(resolved.droppedEntryIds, hasLength(2));
+      expect(resolved.droppedEntryIds.last, 'unreadable');
+    });
+
+    test('removing an item lands, and says nothing went wrong', () async {
+      final ResolvedCollection before = await collections.resolve(id);
+      await editor.removeItem(
+        id,
+        (before.entries.first as CollectionItemEntry).entryId,
+      );
+
+      final ResolvedCollection after = await collections.resolve(id);
+      expect(after.entries, hasLength(2));
+      // The dropped rows are kept, not pruned: a content update that removed
+      // something by mistake can put it back, and the item is still there.
+      expect(after.droppedEntryIds, hasLength(2));
+      // And every row, visible or not, is renumbered densely.
+      expect(await rawPositions(id), <int>[1, 2, 3, 4]);
+    });
+
+    test(
+      'moving an item lands, and carries the dropped rows to the end',
+      () async {
+        final ResolvedCollection before = await collections.resolve(id);
+        await editor.moveEntry(id, before, 2, 0);
+
+        final ResolvedCollection after = await collections.resolve(id);
+        expect(
+          after.entries.whereType<CollectionItemEntry>().map(
+            (CollectionItemEntry e) => e.ref.canonical,
+          ),
+          <String>['dhikr:1003', 'dhikr:1001', 'dhikr:1002'],
+        );
+        expect(await rawPositions(id), <int>[1, 2, 3, 4, 5]);
+        // Out from between 1001 and 1002, which now sit next to each other by
+        // position as well as on screen — so they can be grouped.
+        await editor.group(id, after.entries, <String>{
+          for (final CollectionItemEntry e
+              in after.entries.whereType<CollectionItemEntry>().skip(1))
+            e.entryId,
+        }, 2);
+        expect(
+          (await collections.resolve(id)).entries.whereType<RepeatBlock>(),
+          hasLength(1),
         );
       },
     );

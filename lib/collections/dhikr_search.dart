@@ -17,10 +17,13 @@ final class SearchableDhikr {
   });
 
   /// Folds [dhikr] into the form [searchAdhkar] matches against.
+  /// A dhikr the user wrote and left untranslated folds to an empty
+  /// translation, which no non-empty query matches — so it is findable by its
+  /// Arabic and not by words it does not have.
   factory SearchableDhikr.of(Dhikr dhikr) => SearchableDhikr(
     dhikr: dhikr,
     arabic: ArabicText.simplify(dhikr.textArabic),
-    translation: dhikr.translation.toLowerCase(),
+    translation: dhikr.translation?.toLowerCase() ?? '',
   );
 
   final Dhikr dhikr;
@@ -28,11 +31,11 @@ final class SearchableDhikr {
   /// [Dhikr.textArabic] through [ArabicText.simplify].
   final String arabic;
 
-  /// [Dhikr.translation], lower-cased.
+  /// [Dhikr.translation], lower-cased, or empty where there is none.
   final String translation;
 
   @override
-  String toString() => 'SearchableDhikr(${dhikr.id})';
+  String toString() => 'SearchableDhikr(${dhikr.ref.canonical})';
 }
 
 /// The adhkar of [all] that match [query], in the order [all] was given in.

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'
     show FilteringTextInputFormatter, TextInputFormatter;
 
+import '../collections/dhikr_editing.dart';
 import '../collections/picked_item.dart';
 import '../domain/commitment.dart';
 import '../domain/content.dart';
-import '../domain/content_ref.dart';
 import '../theme/theme.dart';
 
 /// What the name-and-description form came back with.
@@ -170,10 +170,12 @@ final class ItemOptions {
 /// touching either behaves exactly as the content intends it to, which is what
 /// most items want. The count field shows the natural count as its hint rather
 /// than as its value, so leaving it alone is not the same as pinning it.
+/// A null [subtitle] leaves the line out — a dhikr the user wrote and left
+/// untranslated has nothing to put there, and they have just written it.
 Future<ItemOptions?> showItemOptions(
   BuildContext context, {
   required String title,
-  required String subtitle,
+  required String? subtitle,
   required int naturalCount,
 }) {
   return showDialog<ItemOptions>(
@@ -203,11 +205,7 @@ Future<PickedItem?> askDhikrOptions(BuildContext context, Dhikr dhikr) async {
     naturalCount: dhikr.defaultCount,
   );
   if (options == null) return null;
-  return PickedItem(
-    ref: ContentRef.dhikr(dhikr.id),
-    count: options.count,
-    note: options.note,
-  );
+  return PickedItem(ref: dhikr.ref, count: options.count, note: options.note);
 }
 
 class _ItemOptionsDialog extends StatefulWidget {
@@ -218,7 +216,7 @@ class _ItemOptionsDialog extends StatefulWidget {
   });
 
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final int naturalCount;
 
   @override
@@ -261,19 +259,21 @@ class _ItemOptionsDialogState extends State<_ItemOptionsDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Text(
-            widget.subtitle,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+          if (widget.subtitle case final String subtitle) ...<Widget>[
+            Text(
+              subtitle,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
-          ),
-          const SizedBox(height: WirdiMetrics.space4),
+            const SizedBox(height: WirdiMetrics.space4),
+          ],
           TextField(
             controller: _count,
             keyboardType: TextInputType.number,
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly,
-            ],
+            // The same ceiling as the dhikr form: a twenty-digit paste here
+            // overflowed into null and was quietly read as "leave it alone".
+            inputFormatters: countInputFormatters,
             decoration: InputDecoration(
               labelText: 'Count',
               hintText: '${widget.naturalCount}',

@@ -3,9 +3,14 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
+import 'package:wirdi/data/content_database.dart';
+import 'package:wirdi/data/repositories/drift_collection_repository.dart';
+import 'package:wirdi/data/repositories/drift_user_dhikr_repository.dart';
 import 'package:wirdi/data/repositories/drift_user_repository.dart';
 import 'package:wirdi/data/user_database.dart';
 import 'package:wirdi/domain/domain.dart';
+
+import '../support/fixtures.dart';
 
 /// `user.db` is migrated, never replaced, so every version the app has shipped
 /// has to be able to reach the current one.
@@ -21,6 +26,11 @@ import 'package:wirdi/domain/domain.dart';
 /// than by keeping a copy of the old DDL, which would be one more thing to
 /// maintain and would go stale silently.
 void main() {
+  /// What [UserDatabase.schemaVersion] is, named once: every test here asserts
+  /// that a database wound back reaches the current version, and a bump should
+  /// be one edit rather than a dozen.
+  const int current = 6;
+
   late Directory dir;
   late File file;
 
@@ -69,7 +79,7 @@ void main() {
     windBackTo(1, <String>['DROP TABLE commitments']);
 
     expect(await migrateAndRead(), isEmpty);
-    expect(versionOf(file), 5);
+    expect(versionOf(file), current);
 
     // And the table it created has the days column, so committing works.
     final UserDatabase db = UserDatabase.openFile(file);
@@ -97,7 +107,7 @@ void main() {
     expect(migrated.section, DailySection.morning);
     // Every day is what a commitment meant when there was no other option.
     expect(migrated.days, Weekdays.everyDay);
-    expect(versionOf(file), 5);
+    expect(versionOf(file), current);
   });
 
   test('version 2 rewrites the section that was called daily', () async {
@@ -133,7 +143,7 @@ void main() {
     // whole item always is — and where a surah left mid-reading resumes from
     // when it was written before the column existed.
     expect(migrated.unitIndex, 0);
-    expect(versionOf(file), 5);
+    expect(versionOf(file), current);
   });
 
   test('a database already at the current version is left alone', () async {
@@ -163,14 +173,14 @@ void main() {
       windBackTo(1, <String>[]);
 
       expect(await migrateAndRead(), isEmpty);
-      expect(versionOf(file), 5);
+      expect(versionOf(file), current);
     });
 
     test('version 1 that created the table but not the index', () async {
       windBackTo(1, <String>['DROP INDEX idx_commitments_section']);
 
       expect(await migrateAndRead(), isEmpty);
-      expect(versionOf(file), 5);
+      expect(versionOf(file), current);
     });
 
     test('version 2 that already added the column', () async {
@@ -183,7 +193,7 @@ void main() {
       final Commitment migrated = (await migrateAndRead()).single;
       expect(migrated.section, DailySection.today);
       expect(migrated.days, Weekdays.everyDay);
-      expect(versionOf(file), 5);
+      expect(versionOf(file), current);
     });
 
     test('version 3 that already added the unit column', () async {
@@ -192,7 +202,7 @@ void main() {
       windBackTo(3, <String>[]);
 
       expect(await migrateAndRead(), isEmpty);
-      expect(versionOf(file), 5);
+      expect(versionOf(file), current);
     });
 
     test('the whole upgrade is safe to run twice', () async {
@@ -202,7 +212,7 @@ void main() {
       // Wound back again over the schema the first run produced.
       windBackTo(1, <String>[]);
       expect(await migrateAndRead(), isEmpty);
-      expect(versionOf(file), 5);
+      expect(versionOf(file), current);
     });
   });
 
@@ -256,7 +266,7 @@ void main() {
 
       expect(await migratedItemId(), 2011);
       expect(await migratedStepRef(), 'dhikr:2011');
-      expect(versionOf(file), 5);
+      expect(versionOf(file), current);
     });
 
     test('progress follows too, so a half-finished wird resumes', () async {
@@ -294,7 +304,106 @@ void main() {
       // already-merged database matches nothing rather than chaining on.
       windBackTo(4, <String>[]);
       expect(await migratedItemId(), 2011);
-      expect(versionOf(file), 5);
+      expect(versionOf(file), current);
     });
+  });
+  group('5 -> 6, the adhkar the user writes', () {
+    /// Takes the schema back to version 5: no `user_adhkar`, and no column on
+    /// `user_collection_items` to name a row of it by.
+    ///
+    /// Built by winding the current schema back rather than by keeping a copy
+    /// of the old DDL, like every other test here.
+    void windBackToFive(List<String> extra) {
+      windBackTo(5, <String>[
+        'DROP TABLE user_adhkar',
+        'DROP INDEX idx_user_collection_items_user_item',
+        'ALTER TABLE user_collection_items DROP COLUMN user_item_id',
+        ...extra,
+      ]);
+    }
+
+    /// Opens the database — which runs the migration — and reads one value
+    /// back off the file afterwards.
+    Future<Object?> migrated(String sql) async {
+      final UserDatabase db = UserDatabase.openFile(file);
+      await db.customSelect('SELECT 1').get();
+      await db.close();
+
+      final sqlite3.Database raw = sqlite3.sqlite3.open(file.path);
+      final Object? value = raw.select(sql).single.values.first;
+      raw.close();
+      return value;
+    }
+
+    test(
+      'a version 5 database comes forward with no adhkar of its own',
+      () async {
+        windBackToFive(const <String>[]);
+
+        expect(await migrated('SELECT COUNT(*) FROM user_adhkar'), 0);
+        expect(versionOf(file), current);
+      },
+    );
+
+    test('an item that pointed into content.db still does', () async {
+      // Nothing existing is touched: the new column is null on every row that
+      // was already there, which is what a content reference looks like.
+      windBackToFive(<String>[
+        'INSERT INTO user_collections (id, name, sort_order, created_at, '
+            "updated_at) VALUES ('u1', 'Mine', 1, 0, 0)",
+        'INSERT INTO user_collection_items (id, collection_id, item_type, '
+            "item_id, position, updated_at) VALUES ('i1', 'u1', 'dhikr', "
+            '1001, 1, 0)',
+      ]);
+
+      expect(await migrated('SELECT item_id FROM user_collection_items'), 1001);
+      expect(
+        await migrated('SELECT user_item_id FROM user_collection_items'),
+        isNull,
+      );
+    });
+
+    test('a run that failed part way through is safe to run twice', () async {
+      // The table created and the column added, but user_version still 5
+      // because something after them threw. createTable is CREATE TABLE IF NOT
+      // EXISTS, the column is checked for before it is added, and the index is
+      // IF NOT EXISTS — so the second pass finds all three and moves on.
+      windBackTo(5, const <String>[]);
+
+      expect(await migrated('SELECT COUNT(*) FROM user_adhkar'), 0);
+      expect(versionOf(file), current);
+    });
+
+    test(
+      'a dhikr the user wrote survives the trip and its item finds it',
+      () async {
+        windBackToFive(const <String>[]);
+
+        // Migrate first, then write through the app's own repositories: this is
+        // the shape the feature actually uses, and it proves the column the
+        // migration added is the one the queries write.
+        final UserDatabase db = UserDatabase.openFile(file);
+        final UserDhikrRef ref = await DriftUserDhikrRepository(
+          db,
+        ).create(const DhikrDraft(textArabic: 'PLACEHOLDER dhikr arabic'));
+        final ContentDatabase content = ContentDatabase.memory();
+        await seedContent(content);
+        final DriftCollectionRepository collections = DriftCollectionRepository(
+          content: content,
+          user: db,
+        );
+        final UserCollectionId id = await collections.create('Mine');
+        await collections.addItem(id, ref);
+
+        final ResolvedCollection resolved = await collections.resolve(id);
+        await db.close();
+        await content.close();
+
+        expect(resolved.unresolved, isEmpty);
+        final DhikrItem item = resolved.entries.single as DhikrItem;
+        expect(item.dhikr.ref, ref);
+        expect(item.dhikr.textArabic, 'PLACEHOLDER dhikr arabic');
+      },
+    );
   });
 }

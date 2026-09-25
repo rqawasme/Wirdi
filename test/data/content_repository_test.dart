@@ -74,8 +74,14 @@ void main() {
     // `adhkar` has no normalised column to match Arabic against.
     final List<Dhikr> all = await content.adhkar();
     expect(
-      <int>[for (final Dhikr d in all) d.id],
-      <int>[1001, 1002, 1003, 1004, 1005],
+      <String>[for (final Dhikr d in all) d.ref.canonical],
+      <String>[
+        'dhikr:1001',
+        'dhikr:1002',
+        'dhikr:1003',
+        'dhikr:1004',
+        'dhikr:1005',
+      ],
     );
     expect(all.first.defaultCount, 1);
   });

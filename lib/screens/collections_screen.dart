@@ -7,6 +7,7 @@ import '../domain/commitment.dart';
 import '../providers/collections.dart';
 import '../providers/editing.dart';
 import '../providers/home.dart';
+import '../providers/refresh.dart';
 import '../routes.dart';
 import '../theme/theme.dart';
 import '../widgets/collection_dialogs.dart';
@@ -99,6 +100,12 @@ class _CollectionList extends ConsumerWidget {
         if (mine.isEmpty) const _NoneOfYourOwn() else ..._rows(mine),
         const _GroupLabel('Built-in'),
         ..._rows(builtin),
+        // After the shelf, not above it: what somebody opens this tab for is a
+        // collection, and their own adhkar are the ingredients rather than the
+        // dish. A row in the list rather than a second icon in the app bar —
+        // the bar's one collections-only action is already "New collection",
+        // and this is not a thing anybody does twice in a morning.
+        const _YourAdhkarRow(),
       ],
     );
   }
@@ -316,6 +323,34 @@ class _CommitButton extends ConsumerWidget {
   }
 }
 
+/// The way through to the adhkar the user wrote.
+///
+/// Counts nothing. A number here would be read as a count of collections,
+/// which is what every other row in this list carries, and the screen behind
+/// it says how many there are the moment it opens.
+class _YourAdhkarRow extends StatelessWidget {
+  const _YourAdhkarRow();
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.only(top: WirdiMetrics.space5),
+      child: ListTile(
+        leading: const Icon(Icons.edit_note_outlined),
+        title: const Text('Your adhkar'),
+        subtitle: const Text('Adhkar you wrote, to put in your collections'),
+        trailing: Icon(
+          Icons.chevron_right,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+        onTap: () => Navigator.pushNamed(context, Routes.adhkar),
+      ),
+    );
+  }
+}
+
 /// What sits under the built-ins before the user has made anything.
 class _NoneOfYourOwn extends ConsumerWidget {
   const _NoneOfYourOwn();
@@ -494,10 +529,16 @@ Future<void> runCollectionEdit(
   WidgetRef ref,
   Future<void> Function() edit,
 ) async {
+  // Before the await: see [refreshAfterUserWrite] on why not `ref` after it.
+  final ProviderContainer container = ProviderScope.containerOf(
+    context,
+    listen: false,
+  );
   try {
     await edit();
-    ref.invalidate(collectionListingsProvider);
-    ref.invalidate(homeViewProvider);
+    // Creating, copying or deleting a collection. Deleting one also changes
+    // the count on every dhikr of the user's own it held.
+    refreshAfterUserWrite(container);
   } on CollectionEditingError catch (error) {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context)

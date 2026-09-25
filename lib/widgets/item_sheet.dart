@@ -149,7 +149,7 @@ class _Body extends ConsumerWidget {
         children: <Widget>[
           DhikrBlock(dhikr: dhikr),
           _Note(note: item.note),
-          _SourceLine(source: source),
+          _SourceLine(source: source, written: dhikr.reference),
         ],
       ),
       AyahItem(:final Ayah ayah) => _Scroll(
@@ -298,24 +298,42 @@ class _Note extends StatelessWidget {
 /// Where a dhikr comes from. Always shown when there is one: sourcing is a
 /// trust feature, and a reference you have to go looking for is a reference
 /// nobody reads.
+///
+/// Two kinds, and they are not interchangeable. [source] is a `sources` row of
+/// the content build, which carries a grading — a claim the pipeline stands
+/// behind. [written] is what somebody typed about their own copy, and it is
+/// marked as theirs so that a line in this position is never read as a grading
+/// nobody gave. A dhikr has one or the other, never both.
 class _SourceLine extends StatelessWidget {
-  const _SourceLine({required this.source});
+  const _SourceLine({required this.source, this.written});
 
   final Source? source;
+
+  /// [Dhikr.reference]: free text, and the user's own.
+  final String? written;
 
   @override
   Widget build(BuildContext context) {
     final Source? source = this.source;
-    if (source == null) return const SizedBox.shrink();
+    final String? written = this.written;
+    if (source == null && written == null) return const SizedBox.shrink();
 
     final ThemeData theme = Theme.of(context);
     final WirdiTypography type = theme.extension<WirdiTypography>()!;
-    final String grading = source.grading == null ? '' : ' · ${source.grading}';
+    final String line;
+    if (source != null) {
+      final String grading = source.grading == null
+          ? ''
+          : ' · ${source.grading}';
+      line = '${source.collection} ${source.reference}$grading';
+    } else {
+      line = 'Your note on where it is from: $written';
+    }
 
     return Padding(
       padding: const EdgeInsets.only(top: WirdiMetrics.space4),
       child: Text(
-        '${source.collection} ${source.reference}$grading',
+        line,
         style: type.dhikrCaption.copyWith(
           color: theme.colorScheme.onSurfaceVariant,
         ),

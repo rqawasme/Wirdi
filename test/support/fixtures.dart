@@ -4,6 +4,7 @@ import 'package:wirdi/data/repositories/drift_collection_repository.dart';
 import 'package:wirdi/data/repositories/drift_content_repository.dart';
 import 'package:wirdi/data/repositories/drift_user_repository.dart';
 import 'package:wirdi/data/user_database.dart';
+import 'package:wirdi/domain/item_ref.dart';
 
 /// In-memory databases seeded with structural placeholder content.
 ///
@@ -304,6 +305,11 @@ Future<String> insertUserCollection(
 }
 
 /// Inserts a user collection item row directly. Returns its id.
+///
+/// [userItemId] is the UUID of a dhikr in `user_adhkar`, for an item whose
+/// [itemType] is `'user_dhikr'`; such a row carries [itemId] 0. Reachable only
+/// from here: the repository writes both columns together, and a test that
+/// wants a row it would refuse to write has to write it itself.
 Future<String> insertUserItem(
   UserDatabase db, {
   required String id,
@@ -315,6 +321,7 @@ Future<String> insertUserItem(
   int? repeatGroup,
   int? repeatGroupCount,
   String? note,
+  String? userItemId,
 }) async {
   await db
       .into(db.userCollectionItems)
@@ -329,10 +336,39 @@ Future<String> insertUserItem(
           repeatGroup: Value<int?>(repeatGroup),
           repeatGroupCount: Value<int?>(repeatGroupCount),
           note: Value<String?>(note),
+          userItemId: Value<String?>(userItemId),
           updatedAt: DateTime(2026, 1, 1).millisecondsSinceEpoch,
         ),
       );
   return id;
+}
+
+/// Writes a dhikr of the user's own directly. Returns what names it.
+///
+/// For a test that needs one to exist without going through the repository —
+/// seeding a screen, mostly. The text is a placeholder describing which row it
+/// is, like everything else in here.
+Future<UserDhikrRef> insertUserDhikr(
+  UserDatabase db, {
+  required String id,
+  String? textArabic,
+  String? translation,
+  int defaultCount = 1,
+  DateTime? createdAt,
+}) async {
+  final int now = (createdAt ?? DateTime(2026, 1, 1)).millisecondsSinceEpoch;
+  await db.insertUserDhikr(
+    id: id,
+    textArabic: textArabic ?? 'PLACEHOLDER user dhikr $id arabic',
+    translation: translation,
+    transliteration: null,
+    defaultCount: defaultCount,
+    reference: null,
+    notes: null,
+    createdAt: now,
+    updatedAt: now,
+  );
+  return UserDhikrRef(id);
 }
 
 /// A stable, valid-looking UUID for fixtures that need a specific id.

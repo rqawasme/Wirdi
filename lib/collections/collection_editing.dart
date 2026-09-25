@@ -1,6 +1,6 @@
 import '../domain/collection.dart';
 import '../domain/collection_id.dart';
-import '../domain/content_ref.dart';
+import '../domain/item_ref.dart';
 import '../domain/repositories.dart';
 
 /// A refusal phrased for the person who caused it.
@@ -10,6 +10,10 @@ import '../domain/repositories.dart';
 /// front of somebody who has just dragged a row. Everything in this file that
 /// can refuse, refuses with one of these, and the editor screen shows
 /// [message] verbatim.
+///
+/// `dhikr_editing.dart` refuses with the same type rather than one of its own:
+/// the screens that write a dhikr are the screens that edit collections, and
+/// one error means each of them catches one thing.
 class CollectionEditingError implements Exception {
   const CollectionEditingError(this.message);
 
@@ -233,7 +237,7 @@ Future<UserCollectionId> duplicateCollection({
   }
 
   for (final CollectionItemEntry item in items) {
-    final ContentRef ref = item.ref;
+    final ItemRef ref = item.ref;
     await collections.addItem(
       id,
       ref,

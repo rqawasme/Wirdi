@@ -1,6 +1,6 @@
 import 'collection_id.dart';
 import 'content.dart';
-import 'content_ref.dart';
+import 'item_ref.dart';
 import 'playback_step.dart';
 import 'progress.dart';
 
@@ -88,8 +88,9 @@ sealed class CollectionItemEntry extends CollectionEntry {
   /// collections, which have no note column.
   final String? note;
 
-  /// What this entry points at in `content.db`.
-  ContentRef get ref;
+  /// What this entry points at: a row in `content.db`, or a dhikr the user
+  /// wrote, in `user.db`.
+  ItemRef get ref;
 }
 
 final class DhikrItem extends CollectionItemEntry {
@@ -108,11 +109,14 @@ final class DhikrItem extends CollectionItemEntry {
   /// Null when the dhikr cites none.
   final Source? source;
 
+  /// [Dhikr.ref] verbatim. A dhikr knows which row it is; this entry does not
+  /// get to decide, and a `ContentRef.dhikr(id)` built here is exactly how an
+  /// item pointing at a user's own dhikr would end up naming somebody else's.
   @override
-  ContentRef get ref => ContentRef.dhikr(dhikr.id);
+  ItemRef get ref => dhikr.ref;
 
   @override
-  String toString() => 'DhikrItem(${dhikr.id} x$count @$position)';
+  String toString() => 'DhikrItem(${dhikr.ref.canonical} x$count @$position)';
 }
 
 final class AyahItem extends CollectionItemEntry {
@@ -127,7 +131,7 @@ final class AyahItem extends CollectionItemEntry {
   final Ayah ayah;
 
   @override
-  ContentRef get ref => ContentRef.ayah(ayah.id);
+  ItemRef get ref => ContentRef.ayah(ayah.id);
 
   @override
   String toString() =>
@@ -151,7 +155,7 @@ final class SurahItem extends CollectionItemEntry {
   final Surah surah;
 
   @override
-  ContentRef get ref => ContentRef.surah(surah.number);
+  ItemRef get ref => ContentRef.surah(surah.number);
 
   @override
   String toString() => 'SurahItem(${surah.number} x$count @$position)';
@@ -191,7 +195,8 @@ final class ResolvedCollection {
   ResolvedCollection({
     required this.collection,
     required this.entries,
-    this.unresolved = const <ContentRef>[],
+    this.unresolved = const <ItemRef>[],
+    this.droppedEntryIds = const <String>[],
   }) : steps = _flatten(entries);
 
   final CollectionSummary collection;
@@ -202,13 +207,35 @@ final class ResolvedCollection {
   /// [entries] flattened for playback, repeat blocks expanded pass by pass.
   final List<PlaybackStep> steps;
 
-  /// Items whose content row was not found and were therefore dropped.
+  /// Items whose row was not found and were therefore dropped.
   ///
   /// Always empty for built-ins, whose references the content build verifies.
   /// A user collection can end up here when a content update removes a dhikr
   /// the user had added; one stale row should not make the whole collection
   /// unopenable.
-  final List<ContentRef> unresolved;
+  ///
+  /// A [UserDhikrRef] here should be unreachable — deleting a dhikr the user
+  /// wrote takes its items out of the collections that held it, in the same
+  /// transaction — and is the honest answer if it ever is not.
+  final List<ItemRef> unresolved;
+
+  /// The entry id of every row resolution dropped, in position order.
+  ///
+  /// A superset of [unresolved]: that lists the refs that could be named, and
+  /// this also holds a row whose columns name nothing this app can read — an
+  /// unknown `item_type`, or a `user_dhikr` row with no UUID. Nothing draws
+  /// these rows, but they are still rows, and `CollectionRepository.reorder`
+  /// wants every row of a collection or it refuses. So any edit that writes a
+  /// full order has to carry these along; built from [entries] alone, it would
+  /// be one row short, and the edit would fail after half of it had landed.
+  ///
+  /// Carried to the end of the collection, in the order they were in. They
+  /// are not recited, so where they sit changes nothing today — and the end is
+  /// the one place they cannot come between two items somebody can see and
+  /// make them look adjacent while `setRepeatGroup` refuses to group them.
+  ///
+  /// Always empty for built-ins, whose references the content build verifies.
+  final List<String> droppedEntryIds;
 
   CollectionId get id => collection.id;
 

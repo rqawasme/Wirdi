@@ -1,5 +1,5 @@
 import 'collection_id.dart';
-import 'content_ref.dart';
+import 'item_ref.dart';
 import 'playback_step.dart';
 
 /// Where the user is in a collection.
@@ -44,7 +44,7 @@ final class WirdProgress {
   /// Checked on resume: a mismatch means a content update or a reorder moved
   /// things underneath, and the progress is discarded rather than applied to
   /// whatever now sits at that index.
-  final ContentRef stepRef;
+  final ItemRef stepRef;
 
   /// Repetitions completed of the step at [stepIndex].
   final int currentCount;
@@ -62,7 +62,7 @@ final class WirdProgress {
 
   WirdProgress copyWith({
     int? stepIndex,
-    ContentRef? stepRef,
+    ItemRef? stepRef,
     int? currentCount,
     int? unitIndex,
     DateTime? updatedAt,

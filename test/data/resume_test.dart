@@ -3,6 +3,12 @@ import 'package:wirdi/domain/domain.dart';
 
 import '../support/fixtures.dart';
 
+/// The content id a step names.
+///
+/// Every step in these tests is an authored dhikr, ayah or surah, so every ref
+/// is a [ContentRef]; a cast says so once rather than at each expectation.
+int contentIdOf(ItemRef ref) => (ref as ContentRef).id;
+
 /// Saving and resuming across the two repositories, the way a player would:
 /// read the stored progress, then validate it against the collection as it is
 /// now.
@@ -39,7 +45,10 @@ void main() {
     // Steps 0..3 are the loose items, 4..12 the block pass by pass, 13 the
     // trailing dhikr. Step 8 is the second surah of the second round.
     expect(
-      resolved.steps.sublist(4, 13).map((PlaybackStep s) => s.ref.id).toList(),
+      resolved.steps
+          .sublist(4, 13)
+          .map((PlaybackStep s) => contentIdOf(s.ref))
+          .toList(),
       <int>[112, 113, 114, 112, 113, 114, 112, 113, 114],
     );
     final PlaybackStep step = resolved.steps[8];
@@ -162,9 +171,8 @@ void main() {
     expect((await resume(id))!.stepRef, const ContentRef.dhikr(1001));
 
     final List<String> surahIds = before.entries
-        .cast<CollectionItemEntry>()
-        .where((CollectionItemEntry e) => e.ref.type == ContentType.surah)
-        .map((CollectionItemEntry e) => e.entryId)
+        .whereType<SurahItem>()
+        .map((SurahItem e) => e.entryId)
         .toList();
     await collections.setRepeatGroup(id, surahIds, 3);
 

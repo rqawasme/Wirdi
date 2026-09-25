@@ -21,7 +21,7 @@ class UserDatabase extends _$UserDatabase {
   factory UserDatabase.memory() => UserDatabase(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -55,6 +55,15 @@ class UserDatabase extends _$UserDatabase {
     // user collection still pointing at one would resolve to nothing and the
     // item would quietly vanish from their collection. This repoints those
     // rows at the id that survived. See [_retiredAdhkar].
+    // 5 -> 6 adds `user_adhkar` — adhkar the user wrote themselves — and the
+    // column a collection item names one by. Nothing existing is touched: a
+    // database from version 5 comes forward with no adhkar of its own and
+    // every item still pointing into content.db, which is what it was.
+    //
+    // `user_item_id` is a new nullable column rather than a widened `item_id`
+    // deliberately. Widening means rebuilding the table, and a table rebuild
+    // cannot be made idempotent — which the second rule below requires of
+    // every step here.
     //
     // Two rules hold every step here, and both were learned the hard way.
     //
@@ -89,6 +98,18 @@ class UserDatabase extends _$UserDatabase {
       }
       if (from < 5) {
         await _mergeRetiredAdhkar();
+      }
+      if (from < 6) {
+        // createTable issues CREATE TABLE IF NOT EXISTS, so a second run over
+        // a half-migrated database finds the table and moves on.
+        await m.createTable(userAdhkar);
+        if (!await _hasColumn('user_collection_items', 'user_item_id')) {
+          await m.addColumn(
+            userCollectionItems,
+            userCollectionItems.userItemId,
+          );
+        }
+        await m.createIndex(idxUserCollectionItemsUserItem);
       }
     },
     beforeOpen: (OpeningDetails details) async {

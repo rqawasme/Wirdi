@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../collections/picked_item.dart';
 import '../../domain/content.dart';
-import '../../domain/content_ref.dart';
+import '../../domain/item_ref.dart';
 import '../../providers/reading.dart';
 import '../../widgets/banded_row.dart';
 import '../../widgets/collection_dialogs.dart';

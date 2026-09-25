@@ -8,8 +8,8 @@ import '../collections/picked_item.dart';
 import '../domain/collection.dart';
 import '../domain/collection_id.dart';
 import '../domain/content.dart';
-import '../providers/collections.dart';
 import '../providers/editing.dart';
+import '../providers/refresh.dart';
 import '../routes.dart';
 import '../theme/theme.dart';
 import '../widgets/collection_dialogs.dart';
@@ -49,13 +49,6 @@ class _CollectionEditScreenState extends ConsumerState<CollectionEditScreen> {
 
   UserCollectionId get _id => widget.collectionId;
 
-  void _refresh() {
-    ref.invalidate(resolvedCollectionProvider(_id));
-    // The list behind this screen counts items and reads progress, and both
-    // just changed.
-    ref.invalidate(collectionListingsProvider);
-  }
-
   /// Runs an edit, turning a refusal into a sentence on a snack bar.
   ///
   /// [CollectionEditingError] carries a message written for the person who
@@ -68,10 +61,18 @@ class _CollectionEditScreenState extends ConsumerState<CollectionEditScreen> {
   /// refusal that is easier to act on with the selection still made.
   Future<bool> _run(Future<void> Function() edit) async {
     if (_busy) return false;
+    // Before the await: see [refreshAfterUserWrite] on why not `ref` after it.
+    final ProviderContainer container = ProviderScope.containerOf(
+      context,
+      listen: false,
+    );
     setState(() => _busy = true);
     try {
       await edit();
-      _refresh();
+      // This collection, the list behind it and the home tile that follows
+      // the list, and the "in N places" count on any dhikr of the user's own
+      // that was added or removed.
+      refreshAfterUserWrite(container);
       return true;
     } on CollectionEditingError catch (error) {
       _say(error.message);
@@ -94,13 +95,14 @@ class _CollectionEditScreenState extends ConsumerState<CollectionEditScreen> {
   // Adding
   // ---------------------------------------------------------------------
 
-  /// The four pickers, as a sheet rather than a menu: they are four equal
+  /// The five pickers, as a sheet rather than a menu: they are five equal
   /// choices and one of them is the answer, which is a sheet's shape.
   ///
   /// Scrollable, and scroll-controlled, because of the fourth one. Three tiles
   /// with subtitles fit under any text scale; four do not at the large
   /// accessibility sizes, and a sheet that overflows is a sheet with a choice
-  /// hidden under the bottom edge.
+  /// hidden under the bottom edge. The fifth rides on that, and is the reason
+  /// the scroll is not a precaution any more.
   Future<void> _add() async {
     final String? route = await showModalBottomSheet<String>(
       context: context,
@@ -132,6 +134,17 @@ class _CollectionEditScreenState extends ConsumerState<CollectionEditScreen> {
                 subtitle: const Text('Every dhikr there is, searchable'),
                 onTap: () => Navigator.pop(context, Routes.pickDhikr),
               ),
+              // Last, and its own door: the adhkar in the three above are the
+              // ones the app shipped with, and these are the ones somebody
+              // wrote. Keeping them apart is what lets the searchable list go
+              // on meaning "the content library" — and this is also where a
+              // dhikr is written on the spot, for somebody who reached for the
+              // add button holding words that are not in the app at all.
+              ListTile(
+                title: const Text('Your adhkar'),
+                subtitle: const Text('The ones you wrote, or write one now'),
+                onTap: () => Navigator.pop(context, Routes.pickUserDhikr),
+              ),
             ],
           ),
         ),
@@ -150,14 +163,14 @@ class _CollectionEditScreenState extends ConsumerState<CollectionEditScreen> {
   // ---------------------------------------------------------------------
 
   Future<bool> _move(
-    List<CollectionEntry> entries,
+    ResolvedCollection collection,
     int oldIndex,
     int newIndex,
   ) {
     return _run(
       () => ref
           .read(collectionEditorProvider)
-          .moveEntry(_id, entries, oldIndex, newIndex),
+          .moveEntry(_id, collection, oldIndex, newIndex),
     );
   }
 
@@ -348,7 +361,7 @@ class _CollectionEditScreenState extends ConsumerState<CollectionEditScreen> {
               // back an index already adjusted for the row having been taken
               // out, which is the convention reorderedItemIds documents.
               onReorderItem: (int oldIndex, int newIndex) =>
-                  unawaited(_move(entries, oldIndex, newIndex)),
+                  unawaited(_move(collection, oldIndex, newIndex)),
               itemBuilder: (BuildContext context, int index) => _EntryRow(
                 key: ValueKey<String>(_keyOf(entries[index])),
                 entry: entries[index],
@@ -611,7 +624,9 @@ class EntryLine extends StatelessWidget {
     final Color quiet = theme.colorScheme.onSurfaceVariant;
     final String? note = item.note;
 
-    final (String title, String subtitle, bool arabic) = switch (item) {
+    // A null subtitle is a dhikr the user wrote and left untranslated: the
+    // line goes rather than standing empty.
+    final (String title, String? subtitle, bool arabic) = switch (item) {
       DhikrItem(:final Dhikr dhikr) => (
         dhikr.textArabic,
         dhikr.translation,
@@ -646,13 +661,15 @@ class EntryLine extends StatelessWidget {
           )
         else
           Text(title, style: theme.textTheme.titleMedium),
-        const SizedBox(height: WirdiMetrics.space1),
-        Text(
-          subtitle,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: theme.textTheme.bodySmall?.copyWith(color: quiet),
-        ),
+        if (subtitle != null) ...<Widget>[
+          const SizedBox(height: WirdiMetrics.space1),
+          Text(
+            subtitle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall?.copyWith(color: quiet),
+          ),
+        ],
         if (note != null && note.isNotEmpty) ...<Widget>[
           const SizedBox(height: WirdiMetrics.space1),
           Text(note, style: theme.textTheme.bodySmall?.copyWith(color: quiet)),

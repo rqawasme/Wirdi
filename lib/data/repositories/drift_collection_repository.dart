@@ -2,8 +2,9 @@ import 'package:uuid/uuid.dart';
 
 import '../../domain/collection.dart';
 import '../../domain/collection_id.dart';
-import '../../domain/content_ref.dart';
+import '../../domain/content.dart';
 import '../../domain/errors.dart';
+import '../../domain/item_ref.dart';
 import '../../domain/repositories.dart';
 import '../collection_resolver.dart';
 import '../content_database.dart';
@@ -18,6 +19,11 @@ import '../user_database.dart';
 /// `user.db`; and both resolve their content through the same
 /// [CollectionResolver] against `content.db`. There is no ATTACH and no
 /// cross-database SQL — the join happens in Dart, here.
+///
+/// A user collection can also name a dhikr the user wrote, which lives in
+/// `user.db` beside the collection itself. [CollectionResolver] holds
+/// `content.db` alone, so those rows are read here and handed to it — see
+/// [_userAdhkarFor].
 class DriftCollectionRepository implements CollectionRepository {
   DriftCollectionRepository({
     required ContentDatabase content,
@@ -88,10 +94,35 @@ class DriftCollectionRepository implements CollectionRepository {
     final List<UserCollectionItemRow> items = await _user
         .itemsForUserCollection(collection: id.uuid)
         .get();
+    final List<ResolvableItem> resolvable = items
+        .map(_userItem)
+        .toList(growable: false);
     return _resolver.resolve(
       userSummaryFromRow(row),
-      items.map(_userItem).toList(growable: false),
+      resolvable,
+      userAdhkar: await _userAdhkarFor(resolvable),
     );
+  }
+
+  /// The adhkar the user wrote that [items] name, by UUID.
+  ///
+  /// The fifth batched read of resolution, and the only one against `user.db`:
+  /// one `WHERE id IN (…)` for the whole collection, in the same shape as
+  /// `adhkarByIds` against `content.db`. Empty — and no statement at all —
+  /// for a collection that names none, which is most of them.
+  Future<Map<String, Dhikr>> _userAdhkarFor(List<ResolvableItem> items) async {
+    final Set<String> uuids = <String>{
+      for (final ResolvableItem item in items)
+        if (item.ref case UserDhikrRef(:final String uuid)) uuid,
+    };
+    if (uuids.isEmpty) return const <String, Dhikr>{};
+
+    final List<UserDhikrRow> rows = await _user
+        .userAdhkarByIds(ids: uuids.toList())
+        .get();
+    return <String, Dhikr>{
+      for (final UserDhikrRow row in rows) row.id: userDhikrFromRow(row),
+    };
   }
 
   @override
@@ -125,14 +156,24 @@ class DriftCollectionRepository implements CollectionRepository {
     if (changed == 0) throw CollectionNotFoundException(id);
   }
 
+  /// Appends an item naming [ref].
+  ///
+  /// A [UserDhikrRef] is not checked against `user_adhkar` first. One that
+  /// names nothing can only come of a dhikr deleted between a picker opening
+  /// and its answer being applied, and that item behaves exactly as an item
+  /// pointing at a dhikr a content update removed does: resolution drops it
+  /// and reports it in `ResolvedCollection.unresolved`, which is a state this
+  /// app already has an answer for.
   @override
   Future<void> addItem(
     UserCollectionId id,
-    ContentRef ref, {
+    ItemRef ref, {
     int? count,
     String? note,
   }) async {
     await _requireLiveCollection(id);
+    final ({String itemType, int itemId, String? userItemId}) columns =
+        itemColumnsFor(ref);
     await _user.transaction(() async {
       final int position = await _user
           .nextItemPosition(collection: id.uuid)
@@ -140,8 +181,9 @@ class DriftCollectionRepository implements CollectionRepository {
       await _user.insertUserCollectionItem(
         id: _uuid.v4(),
         collection: id.uuid,
-        itemType: ref.type.sqlName,
-        itemId: ref.id,
+        itemType: columns.itemType,
+        itemId: columns.itemId,
+        userItemId: columns.userItemId,
         position: position,
         countOverride: count,
         // Repeat groups are set afterwards, over a run of items, by
@@ -317,8 +359,9 @@ class DriftCollectionRepository implements CollectionRepository {
 
   static ResolvableItem _builtinItem(CollectionItemRow row) => ResolvableItem(
     entryId: row.id.toString(),
-    itemType: contentTypeFromSql(row.itemType),
-    itemId: row.itemId,
+    // `collection_items` has no user_item_id column and could not use one: a
+    // built-in cannot name a row of somebody's user.db.
+    ref: itemRefFromSql(row.itemType, row.itemId, null),
     position: row.position,
     countOverride: row.countOverride,
     repeatGroup: row.repeatGroup,
@@ -328,8 +371,7 @@ class DriftCollectionRepository implements CollectionRepository {
 
   static ResolvableItem _userItem(UserCollectionItemRow row) => ResolvableItem(
     entryId: row.id,
-    itemType: contentTypeFromSql(row.itemType),
-    itemId: row.itemId,
+    ref: itemRefFromSql(row.itemType, row.itemId, row.userItemId),
     position: row.position,
     countOverride: row.countOverride,
     repeatGroup: row.repeatGroup,

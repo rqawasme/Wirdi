@@ -155,7 +155,8 @@ class _DhikrSection extends StatelessWidget {
                   child: Text(adhkar[i].textArabic, style: type.dhikr),
                 ),
                 const SizedBox(height: WirdiMetrics.space2),
-                Text(adhkar[i].translation, style: type.translation),
+                if (adhkar[i].translation case final String translation)
+                  Text(translation, style: type.translation),
                 if (adhkar[i].transliteration case final String t) ...<Widget>[
                   const SizedBox(height: WirdiMetrics.space1),
                   Text(

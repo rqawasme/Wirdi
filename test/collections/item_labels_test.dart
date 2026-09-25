@@ -34,7 +34,7 @@ void main() {
   );
 
   const Dhikr dhikr = Dhikr(
-    id: 1001,
+    ref: ContentRef.dhikr(1001),
     textArabic: 'x',
     translation: 'x',
     defaultCount: 1,

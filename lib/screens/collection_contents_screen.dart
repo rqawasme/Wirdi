@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/collection.dart';
 import '../domain/collection_id.dart';
-import '../domain/content_ref.dart';
+import '../domain/item_ref.dart';
 import '../providers/editing.dart';
 import '../theme/theme.dart';
 import '../widgets/empty_state.dart';
@@ -289,26 +289,32 @@ class _BlockRow extends StatelessWidget {
   }
 }
 
-/// Items whose content row was not found, and were therefore dropped.
+/// Items whose row was not found, and were therefore dropped.
 ///
 /// A user collection can end up here when a content update removes a dhikr it
 /// had in it. This screen is the only place in the app that can say so — the
 /// player skips them silently, because a counter is no place to explain a
 /// content migration — so it says it plainly and quietly, as a fact about the
 /// library rather than as anybody's mistake.
+///
+/// Split by kind, because only one of the two sentences is true of each. An
+/// item naming a dhikr the user wrote is not something a content update did:
+/// deleting such a dhikr takes its items with it, in the same transaction, so
+/// this should be unreachable — and if a restored backup ever does produce one,
+/// blaming the content library for it would be the app misinforming somebody
+/// about their own data.
 class _Unresolved extends StatelessWidget {
   const _Unresolved({required this.refs});
 
-  final List<ContentRef> refs;
+  final List<ItemRef> refs;
 
   @override
   Widget build(BuildContext context) {
     if (refs.isEmpty) return const SizedBox.shrink();
 
     final ThemeData theme = Theme.of(context);
-    final String count = refs.length == 1
-        ? 'One item is'
-        : '${refs.length} items are';
+    final int content = refs.whereType<ContentRef>().length;
+    final int written = refs.length - content;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -318,8 +324,16 @@ class _Unresolved extends StatelessWidget {
         0,
       ),
       child: Text(
-        '$count no longer in the content library, and '
-        '${refs.length == 1 ? 'is' : 'are'} not recited.',
+        <String>[
+          if (content > 0)
+            '${content == 1 ? 'One item is' : '$content items are'} no longer '
+                'in the content library, and '
+                '${content == 1 ? 'is' : 'are'} not recited.',
+          if (written > 0)
+            '${written == 1 ? 'One dhikr' : '$written adhkar'} you wrote '
+                '${written == 1 ? 'is' : 'are'} no longer here, and '
+                '${written == 1 ? 'is' : 'are'} not recited.',
+        ].join(' '),
         style: theme.textTheme.bodySmall?.copyWith(
           color: theme.colorScheme.onSurfaceVariant,
         ),

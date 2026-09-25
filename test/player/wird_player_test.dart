@@ -5,6 +5,12 @@ import 'package:wirdi/player/wird_player.dart';
 
 import '../support/fixtures.dart';
 
+/// The content id a step names.
+///
+/// Every step in these tests is an authored dhikr, ayah or surah, so every ref
+/// is a [ContentRef]; a cast says so once rather than at each expectation.
+int contentIdOf(ItemRef ref) => (ref as ContentRef).id;
+
 /// The counter, without a widget in sight.
 ///
 /// Everything the player does to its position is here rather than in the
@@ -125,7 +131,7 @@ void main() {
       final List<String> visited = <String>[];
       for (int tap = 0; tap < 21; tap++) {
         visited.add(
-          '${player.step.ref.id} round ${player.step.repetition}'
+          '${contentIdOf(player.step.ref)} round ${player.step.repetition}'
           '/${player.step.repetitionsTotal}',
         );
         player.increment();
@@ -1060,7 +1066,7 @@ DhikrItem dhikrItem(
     count: count,
     note: note,
     dhikr: Dhikr(
-      id: id,
+      ref: ContentRef.dhikr(id),
       textArabic: 'PLACEHOLDER dhikr $id arabic',
       translation: 'PLACEHOLDER dhikr $id translation',
       defaultCount: count,

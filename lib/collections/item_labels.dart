@@ -1,5 +1,6 @@
 import '../domain/collection.dart';
 import '../domain/content.dart';
+import '../domain/item_ref.dart';
 
 /// What an item is called, and what kind of thing it is under that.
 ///
@@ -31,6 +32,10 @@ import '../domain/content.dart';
     '${surahName(ayah.surahNumber)} ${ayah.surahNumber}:${ayah.ayahNumber}',
     'Single ayah',
   ),
+  // "Yours" and not "Custom dhikr": the second names a category the app
+  // invented, and the first answers the question somebody looking at two
+  // similar adhkar is actually asking.
+  DhikrItem(dhikr: Dhikr(ref: UserDhikrRef())) => ('Dhikr', 'Yours'),
   DhikrItem() => ('Dhikr', null),
   null => ('Unavailable', null),
 };
