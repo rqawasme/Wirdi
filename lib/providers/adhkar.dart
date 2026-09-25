@@ -11,13 +11,13 @@ import 'data_providers.dart';
 
 /// The adhkar the user wrote, newest first.
 ///
-/// Read when a screen that lists them opens and dropped when it closes, like
-/// `searchableAdhkarProvider`. Every write goes through [UserDhikrEditor],
-/// which invalidates this — there is no stream behind it, and a list that
-/// refreshes itself on a write nobody made is a list that refreshes for no
-/// reason.
+/// Auto-disposed: read when a screen that lists them opens, and dropped when
+/// the last one closes. A plain `FutureProvider` is not — it is kept for the
+/// whole session once read, and a list kept that long goes stale the first time
+/// something changes it from a screen that did not think to say so. While a
+/// screen is open, `refreshAfterUserWrite` is what keeps it current.
 final FutureProvider<List<Dhikr>> userAdhkarProvider =
-    FutureProvider<List<Dhikr>>(
+    FutureProvider.autoDispose<List<Dhikr>>(
       (Ref ref) => ref.watch(userDhikrRepositoryProvider).all(),
       name: 'userAdhkar',
     );
@@ -25,9 +25,11 @@ final FutureProvider<List<Dhikr>> userAdhkarProvider =
 /// How many collection items name each dhikr the user wrote.
 ///
 /// One read for the whole list rather than one per row: the list shows this on
-/// every row, and asking per row is a statement per dhikr.
+/// every row, and asking per row is a statement per dhikr. Auto-disposed for
+/// the reason [userAdhkarProvider] is — and more so, since this one changes
+/// with every edit to a collection, not only with edits to the adhkar.
 final FutureProvider<Map<UserDhikrRef, int>> userDhikrUsageProvider =
-    FutureProvider<Map<UserDhikrRef, int>>(
+    FutureProvider.autoDispose<Map<UserDhikrRef, int>>(
       (Ref ref) => ref.watch(userDhikrRepositoryProvider).usage(),
       name: 'userDhikrUsage',
     );

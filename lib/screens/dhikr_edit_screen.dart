@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'
-    show FilteringTextInputFormatter, TextInputFormatter;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../collections/collection_editing.dart';
+import '../collections/dhikr_editing.dart';
 import '../domain/content.dart';
+import '../domain/errors.dart';
 import '../domain/item_ref.dart';
 import '../providers/adhkar.dart';
+import '../providers/refresh.dart';
 import '../theme/theme.dart';
 import '../widgets/voussoir_stripe.dart';
 
@@ -95,8 +96,9 @@ class _DhikrEditScreenState extends ConsumerState<DhikrEditScreen> {
     textArabic: _arabic.text,
     translation: _translation.text,
     transliteration: _transliteration.text,
-    // An empty field is once, which is what the hint says. Anything that is
-    // not a number cannot be typed — the field is digits only.
+    // An empty field is once, which is what the hint says. Anything else is
+    // at most six digits — see [countInputFormatters] — so it always parses;
+    // the fallback is for the empty field and nothing else.
     defaultCount: int.tryParse(_count.text.trim()) ?? 1,
     reference: _reference.text,
     notes: _notes.text,
@@ -104,6 +106,11 @@ class _DhikrEditScreenState extends ConsumerState<DhikrEditScreen> {
 
   Future<void> _save() async {
     if (_busy || !_written) return;
+    // Before the await: see [refreshAfterUserWrite] on why not `ref` after it.
+    final ProviderContainer container = ProviderScope.containerOf(
+      context,
+      listen: false,
+    );
     setState(() => _busy = true);
     try {
       final UserDhikrEditor editor = ref.read(userDhikrEditorProvider);
@@ -118,13 +125,18 @@ class _DhikrEditScreenState extends ConsumerState<DhikrEditScreen> {
 
       // Every list of these, and every collection that says one: the text and
       // the count a collection item resolves through have both just moved.
-      ref
-        ..invalidate(userAdhkarProvider)
-        ..invalidate(userDhikrUsageProvider);
+      refreshAfterUserWrite(container);
 
       if (mounted) Navigator.pop(context, saved);
     } on CollectionEditingError catch (error) {
       _say(error.message);
+    } on DhikrNotFoundException {
+      // Deleted while this form was open. There is nothing to save the edit
+      // over, so say so and leave, rather than staying on a form whose every
+      // Save will fail the same way.
+      refreshAfterUserWrite(container);
+      _say('That dhikr was deleted, so this edit was not saved.');
+      if (mounted) Navigator.pop(context);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -219,9 +231,7 @@ class _DhikrEditScreenState extends ConsumerState<DhikrEditScreen> {
           TextField(
             controller: _count,
             keyboardType: TextInputType.number,
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly,
-            ],
+            inputFormatters: countInputFormatters,
             decoration: const InputDecoration(
               labelText: 'Times said',
               hintText: '1',

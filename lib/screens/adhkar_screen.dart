@@ -5,10 +5,10 @@ import '../collections/collection_editing.dart';
 import '../collections/dhikr_editing.dart';
 import '../domain/collection.dart';
 import '../domain/content.dart';
+import '../domain/errors.dart';
 import '../domain/item_ref.dart';
 import '../providers/adhkar.dart';
-import '../providers/collections.dart';
-import '../providers/home.dart';
+import '../providers/refresh.dart';
 import '../routes.dart';
 import '../theme/theme.dart';
 import '../widgets/banded_row.dart';
@@ -40,24 +40,22 @@ class _AdhkarScreenState extends ConsumerState<AdhkarScreen> {
   /// A write is in flight.
   bool _busy = false;
 
-  Future<void> _write({Dhikr? dhikr}) async {
-    final Object? saved = await Navigator.pushNamed(
-      context,
-      Routes.dhikrEdit,
-      arguments: DhikrEditArguments(dhikr: dhikr),
-    );
-    // The editor invalidates the list itself; an edit that changed a count has
-    // also changed what every collection saying it resolves to.
-    if (saved is UserDhikrRef && mounted) {
-      ref
-        ..invalidate(collectionListingsProvider)
-        ..invalidate(homeViewProvider);
-    }
-  }
+  /// The form refreshes everything a save can touch on its own way out — see
+  /// [refreshAfterUserWrite] — so there is nothing left to do here after it.
+  Future<void> _write({Dhikr? dhikr}) => Navigator.pushNamed(
+    context,
+    Routes.dhikrEdit,
+    arguments: DhikrEditArguments(dhikr: dhikr),
+  );
 
   Future<void> _delete(Dhikr dhikr) async {
     if (_busy) return;
     if (dhikr.ref case final UserDhikrRef target) {
+      // Before the awaits: see [refreshAfterUserWrite] on why not `ref` after.
+      final ProviderContainer container = ProviderScope.containerOf(
+        context,
+        listen: false,
+      );
       setState(() => _busy = true);
       try {
         final List<CollectionSummary> holders = await ref
@@ -73,15 +71,15 @@ class _AdhkarScreenState extends ConsumerState<AdhkarScreen> {
         if (!confirmed || !mounted) return;
 
         await ref.read(userDhikrEditorProvider).delete(target);
-        ref
-          ..invalidate(userAdhkarProvider)
-          ..invalidate(userDhikrUsageProvider)
-          // Every collection it was taken out of is a row shorter, and one of
-          // them may be on the home screen.
-          ..invalidate(collectionListingsProvider)
-          ..invalidate(homeViewProvider);
+        // Every collection it was taken out of is a row shorter — including
+        // any already opened this session, which is the one that was missed.
+        refreshAfterUserWrite(container);
       } on CollectionEditingError catch (error) {
         _say(error.message);
+      } on DhikrNotFoundException {
+        // Already gone: what was asked for is done. Refreshing takes the row
+        // off, and there is nothing to apologise for.
+        refreshAfterUserWrite(container);
       } finally {
         if (mounted) setState(() => _busy = false);
       }

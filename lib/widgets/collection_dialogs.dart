@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'
     show FilteringTextInputFormatter, TextInputFormatter;
 
+import '../collections/dhikr_editing.dart';
 import '../collections/picked_item.dart';
 import '../domain/commitment.dart';
 import '../domain/content.dart';
@@ -270,9 +271,9 @@ class _ItemOptionsDialogState extends State<_ItemOptionsDialog> {
           TextField(
             controller: _count,
             keyboardType: TextInputType.number,
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly,
-            ],
+            // The same ceiling as the dhikr form: a twenty-digit paste here
+            // overflowed into null and was quietly read as "leave it alone".
+            inputFormatters: countInputFormatters,
             decoration: InputDecoration(
               labelText: 'Count',
               hintText: '${widget.naturalCount}',

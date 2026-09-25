@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
@@ -204,6 +206,28 @@ void main() {
       expect(tester.widget<TextButton>(save).onPressed, isNotNull);
     });
 
+    testWidgets('a pasted count cannot overflow into a count of one', (
+      WidgetTester tester,
+    ) async {
+      // Twenty digits used to reach int.tryParse whole, overflow it into
+      // null, and save the dhikr at a count of one without a word. The field
+      // now keeps six digits and no more, so what is typed is what is saved.
+      await pump(tester, const AdhkarScreen());
+      await tester.tap(find.widgetWithText(FilledButton, 'Write a dhikr'));
+      await settle(tester);
+
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Times said'),
+        '99999999999999999999',
+      );
+      await writeDhikr(tester, 'PLACEHOLDER counted arabic');
+
+      expect(
+        (await data.userDhikrRepository.all()).single.defaultCount,
+        999999,
+      );
+    });
+
     testWidgets('refuses a paste that went wrong, in a sentence', (
       WidgetTester tester,
     ) async {
@@ -334,6 +358,149 @@ void main() {
       // The ref a step stores is the one progress is checked against, so it
       // has to survive the round trip through its string form.
       expect(ItemRef.parse(resolved.steps.single.ref.canonical), ref);
+    });
+  });
+  group('staying current', () {
+    // Nothing here forgets on its own: a collection opened once stays resolved
+    // for the session. These walk the routes a person takes, so a screen that
+    // was opened, left, and opened again is the one being asked about.
+    final GlobalKey<NavigatorState> nav = GlobalKey<NavigatorState>();
+    late UserDhikrRef mine;
+    late UserCollectionId collection;
+    final String words = 'PLACEHOLDER user dhikr ${testUuid(1)} arabic';
+
+    setUp(() async {
+      mine = await insertUserDhikr(dbs.user, id: testUuid(1));
+      collection = await data.collectionRepository.create('Morning');
+      await data.collectionRepository.addItem(collection, mine);
+      await data.collectionRepository.addItem(
+        collection,
+        const ContentRef.dhikr(1001),
+      );
+    });
+
+    Future<void> pumpNavigable(WidgetTester tester) async {
+      tester.view.physicalSize = const Size(400, 1600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: <Override>[wirdiDataProvider.overrideWithValue(data)],
+          child: MaterialApp(
+            navigatorKey: nav,
+            theme: WirdiTheme.light(),
+            onGenerateRoute: WirdiRouter.onGenerateRoute,
+            home: const Scaffold(body: SizedBox()),
+          ),
+        ),
+      );
+      await settle(tester);
+    }
+
+    Future<void> push(WidgetTester tester, String route, [Object? args]) async {
+      unawaited(nav.currentState!.pushNamed(route, arguments: args));
+      await settle(tester);
+    }
+
+    Future<void> pop(WidgetTester tester) async {
+      nav.currentState!.pop();
+      await settle(tester);
+    }
+
+    Future<void> openCollection(WidgetTester tester) => push(
+      tester,
+      Routes.collectionEdit,
+      CollectionEditArguments(collectionId: collection),
+    );
+
+    testWidgets('a collection opened before a dhikr was deleted forgets it', (
+      WidgetTester tester,
+    ) async {
+      await pumpNavigable(tester);
+      await openCollection(tester);
+      expect(find.text(words), findsOneWidget);
+      await pop(tester);
+
+      await push(tester, Routes.adhkar);
+      await tester.tap(find.byTooltip('Delete'));
+      await settle(tester);
+      await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+      await settle(tester);
+      await pop(tester);
+
+      await openCollection(tester);
+      expect(find.text(words), findsNothing);
+    });
+
+    testWidgets('and one opened before a dhikr was edited shows the edit', (
+      WidgetTester tester,
+    ) async {
+      await pumpNavigable(tester);
+      await openCollection(tester);
+      await pop(tester);
+
+      await push(tester, Routes.adhkar);
+      await tester.tap(find.widgetWithText(TextButton, 'Edit'));
+      await settle(tester);
+      await writeDhikr(tester, 'PLACEHOLDER edited arabic');
+      await pop(tester);
+
+      await openCollection(tester);
+      expect(find.text(words), findsNothing);
+      expect(find.text('PLACEHOLDER edited arabic'), findsOneWidget);
+    });
+
+    testWidgets('the count on a dhikr follows an edit made over its screen', (
+      WidgetTester tester,
+    ) async {
+      // Your adhkar stays mounted underneath while a collection is edited on
+      // top of it, so it is watching the whole time and never re-reads on its
+      // own. Removing the dhikr from the collection has to reach it.
+      await pumpNavigable(tester);
+      await push(tester, Routes.adhkar);
+      expect(find.text('In one collection'), findsOneWidget);
+
+      await openCollection(tester);
+      await tester.tap(find.byTooltip('Remove').first);
+      await settle(tester);
+      await pop(tester);
+
+      expect(find.text('In none of your collections'), findsOneWidget);
+    });
+
+    testWidgets('saving a dhikr deleted under the form says so, and leaves', (
+      WidgetTester tester,
+    ) async {
+      await pumpNavigable(tester);
+      await push(tester, Routes.adhkar);
+      await tester.tap(find.widgetWithText(TextButton, 'Edit'));
+      await settle(tester);
+
+      // Gone while the form is open: the race the exception exists for.
+      await data.userDhikrRepository.delete(mine);
+      await writeDhikr(tester, 'PLACEHOLDER too late arabic');
+
+      expect(tester.takeException(), isNull);
+      expect(find.textContaining('was deleted'), findsOneWidget);
+      // Off the form, and nothing was written back into the deleted row.
+      expect(find.widgetWithText(TextButton, 'Save'), findsNothing);
+      expect(await data.userDhikrRepository.all(), isEmpty);
+    });
+
+    testWidgets('deleting one that is already gone is not an error', (
+      WidgetTester tester,
+    ) async {
+      await pumpNavigable(tester);
+      await push(tester, Routes.adhkar);
+      await tester.tap(find.byTooltip('Delete'));
+      await settle(tester);
+
+      await data.userDhikrRepository.delete(mine);
+      await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+      await settle(tester);
+
+      expect(tester.takeException(), isNull);
+      expect(find.byType(EmptyState), findsOneWidget);
     });
   });
 }

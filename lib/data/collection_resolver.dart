@@ -77,6 +77,7 @@ class CollectionResolver {
 
     final List<CollectionEntry> entries = <CollectionEntry>[];
     final List<ItemRef> unresolved = <ItemRef>[];
+    final List<String> dropped = <String>[];
 
     // A repeat block is a maximal run of adjacent items sharing a repeat_group.
     // The content build guarantees built-in groups are contiguous; user rows
@@ -105,6 +106,9 @@ class CollectionResolver {
       if (entry == null) {
         final ItemRef? ref = item.ref;
         if (ref != null) unresolved.add(ref);
+        // Every dropped row, named or not: see
+        // [ResolvedCollection.droppedEntryIds] for why an edit needs them.
+        dropped.add(item.entryId);
         continue;
       }
 
@@ -130,6 +134,7 @@ class CollectionResolver {
       collection: collection,
       entries: List<CollectionEntry>.unmodifiable(entries),
       unresolved: List<ItemRef>.unmodifiable(unresolved),
+      droppedEntryIds: List<String>.unmodifiable(dropped),
     );
   }
 

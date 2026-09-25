@@ -50,6 +50,23 @@ void main() {
       );
     });
 
+    test('a count past what six digits can hold', () {
+      expect(
+        dhikrRefusal(
+          const DhikrDraft(textArabic: words, defaultCount: maxDhikrCount + 1),
+        ),
+        isNotNull,
+      );
+      // And the ceiling itself is fine: tens of thousands are a real practice,
+      // and the limit sits well above them.
+      expect(
+        dhikrRefusal(
+          const DhikrDraft(textArabic: words, defaultCount: maxDhikrCount),
+        ),
+        isNull,
+      );
+    });
+
     test('the words alone are enough', () {
       // No translation, no transliteration, no reference: somebody writing down
       // the dua they say after Fajr already knows what it means.

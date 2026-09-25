@@ -8,8 +8,8 @@ import '../collections/picked_item.dart';
 import '../domain/collection.dart';
 import '../domain/collection_id.dart';
 import '../domain/content.dart';
-import '../providers/collections.dart';
 import '../providers/editing.dart';
+import '../providers/refresh.dart';
 import '../routes.dart';
 import '../theme/theme.dart';
 import '../widgets/collection_dialogs.dart';
@@ -49,13 +49,6 @@ class _CollectionEditScreenState extends ConsumerState<CollectionEditScreen> {
 
   UserCollectionId get _id => widget.collectionId;
 
-  void _refresh() {
-    ref.invalidate(resolvedCollectionProvider(_id));
-    // The list behind this screen counts items and reads progress, and both
-    // just changed.
-    ref.invalidate(collectionListingsProvider);
-  }
-
   /// Runs an edit, turning a refusal into a sentence on a snack bar.
   ///
   /// [CollectionEditingError] carries a message written for the person who
@@ -68,10 +61,18 @@ class _CollectionEditScreenState extends ConsumerState<CollectionEditScreen> {
   /// refusal that is easier to act on with the selection still made.
   Future<bool> _run(Future<void> Function() edit) async {
     if (_busy) return false;
+    // Before the await: see [refreshAfterUserWrite] on why not `ref` after it.
+    final ProviderContainer container = ProviderScope.containerOf(
+      context,
+      listen: false,
+    );
     setState(() => _busy = true);
     try {
       await edit();
-      _refresh();
+      // This collection, the list behind it and the home tile that follows
+      // the list, and the "in N places" count on any dhikr of the user's own
+      // that was added or removed.
+      refreshAfterUserWrite(container);
       return true;
     } on CollectionEditingError catch (error) {
       _say(error.message);
@@ -162,14 +163,14 @@ class _CollectionEditScreenState extends ConsumerState<CollectionEditScreen> {
   // ---------------------------------------------------------------------
 
   Future<bool> _move(
-    List<CollectionEntry> entries,
+    ResolvedCollection collection,
     int oldIndex,
     int newIndex,
   ) {
     return _run(
       () => ref
           .read(collectionEditorProvider)
-          .moveEntry(_id, entries, oldIndex, newIndex),
+          .moveEntry(_id, collection, oldIndex, newIndex),
     );
   }
 
@@ -360,7 +361,7 @@ class _CollectionEditScreenState extends ConsumerState<CollectionEditScreen> {
               // back an index already adjusted for the row having been taken
               // out, which is the convention reorderedItemIds documents.
               onReorderItem: (int oldIndex, int newIndex) =>
-                  unawaited(_move(entries, oldIndex, newIndex)),
+                  unawaited(_move(collection, oldIndex, newIndex)),
               itemBuilder: (BuildContext context, int index) => _EntryRow(
                 key: ValueKey<String>(_keyOf(entries[index])),
                 entry: entries[index],

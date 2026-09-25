@@ -7,6 +7,7 @@ import '../domain/commitment.dart';
 import '../providers/collections.dart';
 import '../providers/editing.dart';
 import '../providers/home.dart';
+import '../providers/refresh.dart';
 import '../routes.dart';
 import '../theme/theme.dart';
 import '../widgets/collection_dialogs.dart';
@@ -528,10 +529,16 @@ Future<void> runCollectionEdit(
   WidgetRef ref,
   Future<void> Function() edit,
 ) async {
+  // Before the await: see [refreshAfterUserWrite] on why not `ref` after it.
+  final ProviderContainer container = ProviderScope.containerOf(
+    context,
+    listen: false,
+  );
   try {
     await edit();
-    ref.invalidate(collectionListingsProvider);
-    ref.invalidate(homeViewProvider);
+    // Creating, copying or deleting a collection. Deleting one also changes
+    // the count on every dhikr of the user's own it held.
+    refreshAfterUserWrite(container);
   } on CollectionEditingError catch (error) {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context)

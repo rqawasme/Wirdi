@@ -196,6 +196,7 @@ final class ResolvedCollection {
     required this.collection,
     required this.entries,
     this.unresolved = const <ItemRef>[],
+    this.droppedEntryIds = const <String>[],
   }) : steps = _flatten(entries);
 
   final CollectionSummary collection;
@@ -217,6 +218,24 @@ final class ResolvedCollection {
   /// wrote takes its items out of the collections that held it, in the same
   /// transaction — and is the honest answer if it ever is not.
   final List<ItemRef> unresolved;
+
+  /// The entry id of every row resolution dropped, in position order.
+  ///
+  /// A superset of [unresolved]: that lists the refs that could be named, and
+  /// this also holds a row whose columns name nothing this app can read — an
+  /// unknown `item_type`, or a `user_dhikr` row with no UUID. Nothing draws
+  /// these rows, but they are still rows, and `CollectionRepository.reorder`
+  /// wants every row of a collection or it refuses. So any edit that writes a
+  /// full order has to carry these along; built from [entries] alone, it would
+  /// be one row short, and the edit would fail after half of it had landed.
+  ///
+  /// Carried to the end of the collection, in the order they were in. They
+  /// are not recited, so where they sit changes nothing today — and the end is
+  /// the one place they cannot come between two items somebody can see and
+  /// make them look adjacent while `setRepeatGroup` refuses to group them.
+  ///
+  /// Always empty for built-ins, whose references the content build verifies.
+  final List<String> droppedEntryIds;
 
   CollectionId get id => collection.id;
 

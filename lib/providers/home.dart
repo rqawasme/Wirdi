@@ -290,6 +290,13 @@ int _repetitions(List<PlaybackStep> steps) {
 
 /// Repetitions behind [progress]: every step before the current one in full,
 /// plus how far into the current one the user has counted.
+///
+/// The current step's share is clamped to what the step now asks for, exactly
+/// as `WirdPlayer` clamps it on resume. `resumableFrom` checks that the step
+/// still holds the same dhikr, not that it is still said as many times — and a
+/// dhikr the user wrote can have its count lowered under saved progress in two
+/// taps. Unclamped, fifty done of a step that now asks for three would read as
+/// forty-seven repetitions that do not exist, and a stripe past full.
 int _repetitionsDone(List<PlaybackStep> steps, WirdProgress? progress) {
   if (progress == null) return 0;
   int done = 0;
@@ -297,5 +304,6 @@ int _repetitionsDone(List<PlaybackStep> steps, WirdProgress? progress) {
     if (step.index >= progress.stepIndex) break;
     done += step.count;
   }
-  return done + progress.currentCount;
+  // In range: `resumableFrom` refuses an index past the end before this runs.
+  return done + progress.currentCount.clamp(0, steps[progress.stepIndex].count);
 }
