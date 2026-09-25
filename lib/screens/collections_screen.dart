@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../collections/collection_editing.dart';
 import '../domain/collection_id.dart';
 import '../domain/commitment.dart';
+import '../providers/adhkar.dart';
 import '../providers/collections.dart';
 import '../providers/editing.dart';
 import '../providers/home.dart';
@@ -84,18 +85,18 @@ class _CollectionList extends ConsumerWidget {
       children: <Widget>[
         // The user's own first. What somebody made is what they are looking
         // for; the built-ins are the shelf they took it off.
-        // "New collection" is the app bar's, not this label's: AppShell shows
-        // it whenever this tab is open, and a second + here was one too many.
+        // "New collection" is under the app bar's +, not beside this label:
+        // AppShell shows it whenever this tab is open, and a second + here was
+        // one too many.
         const _GroupLabel('Your Collections'),
         if (mine.isEmpty) const _NoneOfYourOwn() else ..._rows(mine),
+        // The user's own adhkar next, still above the fold and still with
+        // everything else of theirs. At the foot of the built-ins, where they
+        // started, nobody found them.
+        const _GroupLabel('Your Adhkar'),
+        const _YourAdhkarRow(),
         const _GroupLabel('Noble Collections'),
         ..._rows(builtin),
-        // After the shelf, not above it: what somebody opens this tab for is a
-        // collection, and their own adhkar are the ingredients rather than the
-        // dish. A row in the list rather than a second icon in the app bar —
-        // the bar's one collections-only action is already "New collection",
-        // and this is not a thing anybody does twice in a morning.
-        const _YourAdhkarRow(),
       ],
     );
   }
@@ -107,7 +108,10 @@ class _CollectionList extends ConsumerWidget {
   /// "Noble Collections" both start on the plain surface under their label.
   List<Widget> _rows(List<CollectionListing> group) => <Widget>[
     for (int i = 0; i < group.length; i++)
-      BandedRow(index: i, child: _Row(listing: group[i])),
+      BandedRow(
+        index: i,
+        child: _Row(listing: group[i]),
+      ),
   ];
 }
 
@@ -118,9 +122,8 @@ class _GroupLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final WirdiTypography type = Theme.of(
-      context,
-    ).extension<WirdiTypography>()!;
+    final ThemeData theme = Theme.of(context);
+    final WirdiTypography type = theme.extension<WirdiTypography>()!;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -129,9 +132,10 @@ class _GroupLabel extends StatelessWidget {
         WirdiMetrics.space4,
         WirdiMetrics.space2,
       ),
-      // The section header Home uses over its own groups, not a caption: in a
-      // list this long the two headings are what the eye finds its way by.
-      child: Text(label, style: type.sectionHeader),
+      child: Text(
+        label,
+        style: type.caption.copyWith(color: theme.colorScheme.onSurfaceVariant),
+      ),
     );
   }
 }
@@ -285,30 +289,32 @@ class _CommitButton extends ConsumerWidget {
   }
 }
 
-/// The way through to the adhkar the user wrote.
+/// The way through to the adhkar the user wrote, saying how many there are.
 ///
-/// Counts nothing. A number here would be read as a count of collections,
-/// which is what every other row in this list carries, and the screen behind
-/// it says how many there are the moment it opens.
-class _YourAdhkarRow extends StatelessWidget {
+/// A count is safe here where it was not at the foot of the list: under its
+/// own heading it cannot be read as a count of collections.
+class _YourAdhkarRow extends ConsumerWidget {
   const _YourAdhkarRow();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
+    final int? count = ref.watch(userAdhkarProvider).value?.length;
 
-    return Padding(
-      padding: const EdgeInsets.only(top: WirdiMetrics.space5),
-      child: ListTile(
-        leading: const Icon(Icons.edit_note_outlined),
-        title: const Text('Your adhkar'),
-        subtitle: const Text('Adhkar you wrote, to put in your collections'),
-        trailing: Icon(
-          Icons.chevron_right,
-          color: theme.colorScheme.onSurfaceVariant,
-        ),
-        onTap: () => Navigator.pushNamed(context, Routes.adhkar),
+    return ListTile(
+      leading: const Icon(Icons.edit_note_outlined),
+      title: Text(switch (count) {
+        null => 'Your adhkar',
+        0 => 'None written yet',
+        1 => '1 dhikr',
+        final int n => '$n adhkar',
+      }),
+      subtitle: const Text('Write your own, to put in your collections'),
+      trailing: Icon(
+        Icons.chevron_right,
+        color: theme.colorScheme.onSurfaceVariant,
       ),
+      onTap: () => Navigator.pushNamed(context, Routes.adhkar),
     );
   }
 }

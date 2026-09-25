@@ -650,7 +650,7 @@ void main() {
 
       expect(find.text('Wird'), findsOneWidget);
       // New collections are made on the Collections tab and nowhere else.
-      expect(find.byTooltip('New collection'), findsNothing);
+      expect(find.byTooltip('New'), findsNothing);
       expect(find.byTooltip('Quran'), findsOneWidget);
       expect(find.byTooltip('Settings'), findsOneWidget);
     });
@@ -682,11 +682,11 @@ void main() {
 
       // The title went with it, and so did the tab's own actions.
       expect(find.text('Wird'), findsNothing);
-      expect(find.byTooltip('New collection'), findsNothing);
+      expect(find.byTooltip('New'), findsNothing);
 
       await tester.tap(find.text('Collections'));
       await settle(tester);
-      expect(find.byTooltip('New collection'), findsOneWidget);
+      expect(find.byTooltip('New'), findsOneWidget);
     });
 
     testWidgets('the selected tab is marked by brick, and nothing else is', (

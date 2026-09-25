@@ -183,13 +183,49 @@ void main() {
     });
   });
 
+  group('your adhkar', () {
+    testWidgets('sit between your collections and the built-ins', (
+      WidgetTester tester,
+    ) async {
+      await pumpApp(tester);
+
+      // At the foot of the built-ins nobody found them.
+      final double yours = tester.getTopLeft(find.text('Your Adhkar')).dy;
+      expect(
+        tester.getTopLeft(find.text('Your Collections')).dy,
+        lessThan(yours),
+      );
+      expect(
+        yours,
+        lessThan(tester.getTopLeft(find.text('Noble Collections')).dy),
+      );
+      expect(find.text('None written yet'), findsOneWidget);
+    });
+
+    testWidgets('can be written from the +', (WidgetTester tester) async {
+      await pumpApp(tester);
+
+      await tester.tap(find.byTooltip('New'));
+      await settle(tester);
+      await tester.tap(find.text('Write a dhikr'));
+      await settle(tester);
+
+      // The form, titled as the menu entry was.
+      expect(find.text('Write a dhikr'), findsOneWidget);
+      expect(find.text('Save'), findsOneWidget);
+    });
+  });
+
   group('making a collection', () {
     testWidgets('from scratch, then landing in its editor', (
       WidgetTester tester,
     ) async {
       await pumpApp(tester);
 
-      await tester.tap(find.byTooltip('New collection'));
+      await tester.tap(find.byTooltip('New'));
+      await settle(tester);
+      // The menu's, and not the empty state's button of the same name.
+      await tester.tap(find.text('New collection').last);
       await settle(tester);
 
       await tester.enterText(

@@ -30,6 +30,9 @@ class AppShell extends ConsumerStatefulWidget {
   ConsumerState<AppShell> createState() => _AppShellState();
 }
 
+/// What the Collections tab's + can make.
+enum _NewThing { collection, dhikr }
+
 class _AppShellState extends ConsumerState<AppShell> {
   late WirdiTab _active = widget.initialTab;
 
@@ -63,11 +66,32 @@ class _AppShellState extends ConsumerState<AppShell> {
           // New collections are made on the Collections tab and nowhere else:
           // it is the tab about what the app contains, and Home is the tab
           // about what today contains.
+          //
+          // A menu rather than a button: the adhkar the user writes live on
+          // the same tab, and the + is where somebody looks to make one.
           if (_active == WirdiTab.collections)
-            IconButton(
+            PopupMenuButton<_NewThing>(
               icon: const Icon(Icons.add),
-              tooltip: 'New collection',
-              onPressed: () => newCollection(context, ref),
+              tooltip: 'New',
+              onSelected: (_NewThing thing) => switch (thing) {
+                _NewThing.collection => newCollection(context, ref),
+                // The form refreshes what a save touches on its own way out.
+                _NewThing.dhikr => Navigator.pushNamed(
+                  context,
+                  Routes.dhikrEdit,
+                ),
+              },
+              itemBuilder: (BuildContext context) =>
+                  const <PopupMenuEntry<_NewThing>>[
+                    PopupMenuItem<_NewThing>(
+                      value: _NewThing.collection,
+                      child: Text('New collection'),
+                    ),
+                    PopupMenuItem<_NewThing>(
+                      value: _NewThing.dhikr,
+                      child: Text('Write a dhikr'),
+                    ),
+                  ],
             ),
           IconButton(
             icon: const Icon(Icons.menu_book_outlined),
