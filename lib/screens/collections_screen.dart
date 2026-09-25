@@ -82,13 +82,13 @@ class _CollectionList extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.only(bottom: WirdiMetrics.space6),
       children: <Widget>[
-        // Yours first. What somebody made is what they are looking for; the
-        // built-ins are the shelf they took it off.
+        // The user's own first. What somebody made is what they are looking
+        // for; the built-ins are the shelf they took it off.
         // "New collection" is the app bar's, not this label's: AppShell shows
         // it whenever this tab is open, and a second + here was one too many.
-        const _GroupLabel('Yours'),
+        const _GroupLabel('Your Collections'),
         if (mine.isEmpty) const _NoneOfYourOwn() else ..._rows(mine),
-        const _GroupLabel('Built-in'),
+        const _GroupLabel('Noble Collections'),
         ..._rows(builtin),
         // After the shelf, not above it: what somebody opens this tab for is a
         // collection, and their own adhkar are the ingredients rather than the
@@ -103,8 +103,8 @@ class _CollectionList extends ConsumerWidget {
   /// Rows on alternating grounds, as the pickers draw theirs. A hairline
   /// between them was the first answer and the list still ran together: every
   /// row is a name, a line of detail and four icons, and one looks much like
-  /// the next. Banded from zero within each group, so "Yours" and "Built-in"
-  /// both start on the plain surface under their label.
+  /// the next. Banded from zero within each group, so "Your Collections" and
+  /// "Noble Collections" both start on the plain surface under their label.
   List<Widget> _rows(List<CollectionListing> group) => <Widget>[
     for (int i = 0; i < group.length; i++)
       BandedRow(index: i, child: _Row(listing: group[i])),
@@ -118,8 +118,9 @@ class _GroupLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final WirdiTypography type = theme.extension<WirdiTypography>()!;
+    final WirdiTypography type = Theme.of(
+      context,
+    ).extension<WirdiTypography>()!;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -128,10 +129,9 @@ class _GroupLabel extends StatelessWidget {
         WirdiMetrics.space4,
         WirdiMetrics.space2,
       ),
-      child: Text(
-        label,
-        style: type.caption.copyWith(color: theme.colorScheme.onSurfaceVariant),
-      ),
+      // The section header Home uses over its own groups, not a caption: in a
+      // list this long the two headings are what the eye finds its way by.
+      child: Text(label, style: type.sectionHeader),
     );
   }
 }
