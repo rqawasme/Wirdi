@@ -84,20 +84,9 @@ class _CollectionList extends ConsumerWidget {
       children: <Widget>[
         // Yours first. What somebody made is what they are looking for; the
         // built-ins are the shelf they took it off.
-        _GroupLabel(
-          'Yours',
-          // Only once there is a list to pin it above: the empty state below
-          // already offers the same action, front and centre, and a second
-          // one beside an empty label would be pointing at nothing.
-          action: mine.isEmpty
-              ? null
-              : IconButton(
-                  visualDensity: VisualDensity.compact,
-                  tooltip: 'New collection',
-                  icon: const Icon(Icons.add),
-                  onPressed: () => newCollection(context, ref),
-                ),
-        ),
+        // "New collection" is the app bar's, not this label's: AppShell shows
+        // it whenever this tab is open, and a second + here was one too many.
+        const _GroupLabel('Yours'),
         if (mine.isEmpty) const _NoneOfYourOwn() else ..._rows(mine),
         const _GroupLabel('Built-in'),
         ..._rows(builtin),
@@ -123,13 +112,9 @@ class _CollectionList extends ConsumerWidget {
 }
 
 class _GroupLabel extends StatelessWidget {
-  const _GroupLabel(this.label, {this.action});
+  const _GroupLabel(this.label);
 
   final String label;
-
-  /// Sits at the label's trailing edge — "New collection" on "Yours", and
-  /// nothing on "Built-in" or on an empty "Yours".
-  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -137,24 +122,15 @@ class _GroupLabel extends StatelessWidget {
     final WirdiTypography type = theme.extension<WirdiTypography>()!;
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(
+      padding: const EdgeInsets.fromLTRB(
         WirdiMetrics.space4,
         WirdiMetrics.space5,
-        action == null ? WirdiMetrics.space4 : WirdiMetrics.space2,
+        WirdiMetrics.space4,
         WirdiMetrics.space2,
       ),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: Text(
-              label,
-              style: type.caption.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-          ?action,
-        ],
+      child: Text(
+        label,
+        style: type.caption.copyWith(color: theme.colorScheme.onSurfaceVariant),
       ),
     );
   }
