@@ -4,12 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../collections/collection_editing.dart';
 import '../domain/collection_id.dart';
 import '../domain/commitment.dart';
+import '../providers/adhkar.dart';
 import '../providers/collections.dart';
 import '../providers/editing.dart';
 import '../providers/home.dart';
 import '../providers/refresh.dart';
 import '../routes.dart';
 import '../theme/theme.dart';
+import '../widgets/banded_row.dart';
 import '../widgets/collection_dialogs.dart';
 import '../widgets/collection_row.dart';
 import '../widgets/empty_state.dart';
@@ -81,56 +83,42 @@ class _CollectionList extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.only(bottom: WirdiMetrics.space6),
       children: <Widget>[
-        // Yours first. What somebody made is what they are looking for; the
-        // built-ins are the shelf they took it off.
-        _GroupLabel(
-          'Yours',
-          // Only once there is a list to pin it above: the empty state below
-          // already offers the same action, front and centre, and a second
-          // one beside an empty label would be pointing at nothing.
-          action: mine.isEmpty
-              ? null
-              : IconButton(
-                  visualDensity: VisualDensity.compact,
-                  tooltip: 'New collection',
-                  icon: const Icon(Icons.add),
-                  onPressed: () => newCollection(context, ref),
-                ),
-        ),
+        // The user's own first. What somebody made is what they are looking
+        // for; the built-ins are the shelf they took it off.
+        // "New collection" is under the app bar's +, not beside this label:
+        // AppShell shows it whenever this tab is open, and a second + here was
+        // one too many.
+        const _GroupLabel('Your Collections'),
         if (mine.isEmpty) const _NoneOfYourOwn() else ..._rows(mine),
-        const _GroupLabel('Built-in'),
-        ..._rows(builtin),
-        // After the shelf, not above it: what somebody opens this tab for is a
-        // collection, and their own adhkar are the ingredients rather than the
-        // dish. A row in the list rather than a second icon in the app bar —
-        // the bar's one collections-only action is already "New collection",
-        // and this is not a thing anybody does twice in a morning.
+        // The user's own adhkar next, still above the fold and still with
+        // everything else of theirs. At the foot of the built-ins, where they
+        // started, nobody found them.
+        const _GroupLabel('Your Adhkar'),
         const _YourAdhkarRow(),
+        const _GroupLabel('Noble Collections'),
+        ..._rows(builtin),
       ],
     );
   }
 
-  /// Rows with a hairline between them — a division, not a bar, and none
-  /// before the first or after the last: the group label is the boundary
-  /// there.
-  List<Widget> _rows(List<CollectionListing> group) {
-    final List<Widget> rows = <Widget>[];
-    for (final CollectionListing listing in group) {
-      if (rows.isNotEmpty) rows.add(const _Hairline());
-      rows.add(_Row(listing: listing));
-    }
-    return rows;
-  }
+  /// Rows on alternating grounds, as the pickers draw theirs. A hairline
+  /// between them was the first answer and the list still ran together: every
+  /// row is a name, a line of detail and four icons, and one looks much like
+  /// the next. Banded from zero within each group, so "Your Collections" and
+  /// "Noble Collections" both start on the plain surface under their label.
+  List<Widget> _rows(List<CollectionListing> group) => <Widget>[
+    for (int i = 0; i < group.length; i++)
+      BandedRow(
+        index: i,
+        child: _Row(listing: group[i]),
+      ),
+  ];
 }
 
 class _GroupLabel extends StatelessWidget {
-  const _GroupLabel(this.label, {this.action});
+  const _GroupLabel(this.label);
 
   final String label;
-
-  /// Sits at the label's trailing edge — "New collection" on "Yours", and
-  /// nothing on "Built-in" or on an empty "Yours".
-  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -138,38 +126,16 @@ class _GroupLabel extends StatelessWidget {
     final WirdiTypography type = theme.extension<WirdiTypography>()!;
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(
+      padding: const EdgeInsets.fromLTRB(
         WirdiMetrics.space4,
         WirdiMetrics.space5,
-        action == null ? WirdiMetrics.space4 : WirdiMetrics.space2,
+        WirdiMetrics.space4,
         WirdiMetrics.space2,
       ),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: Text(
-              label,
-              style: type.caption.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-          ?action,
-        ],
+      child: Text(
+        label,
+        style: type.caption.copyWith(color: theme.colorScheme.onSurfaceVariant),
       ),
-    );
-  }
-}
-
-class _Hairline extends StatelessWidget {
-  const _Hairline();
-
-  @override
-  Widget build(BuildContext context) {
-    return Divider(
-      height: WirdiMetrics.hairline,
-      thickness: WirdiMetrics.hairline,
-      color: Theme.of(context).colorScheme.outlineVariant,
     );
   }
 }
@@ -323,30 +289,32 @@ class _CommitButton extends ConsumerWidget {
   }
 }
 
-/// The way through to the adhkar the user wrote.
+/// The way through to the adhkar the user wrote, saying how many there are.
 ///
-/// Counts nothing. A number here would be read as a count of collections,
-/// which is what every other row in this list carries, and the screen behind
-/// it says how many there are the moment it opens.
-class _YourAdhkarRow extends StatelessWidget {
+/// A count is safe here where it was not at the foot of the list: under its
+/// own heading it cannot be read as a count of collections.
+class _YourAdhkarRow extends ConsumerWidget {
   const _YourAdhkarRow();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
+    final int? count = ref.watch(userAdhkarProvider).value?.length;
 
-    return Padding(
-      padding: const EdgeInsets.only(top: WirdiMetrics.space5),
-      child: ListTile(
-        leading: const Icon(Icons.edit_note_outlined),
-        title: const Text('Your adhkar'),
-        subtitle: const Text('Adhkar you wrote, to put in your collections'),
-        trailing: Icon(
-          Icons.chevron_right,
-          color: theme.colorScheme.onSurfaceVariant,
-        ),
-        onTap: () => Navigator.pushNamed(context, Routes.adhkar),
+    return ListTile(
+      leading: const Icon(Icons.edit_note_outlined),
+      title: Text(switch (count) {
+        null => 'Your adhkar',
+        0 => 'None written yet',
+        1 => '1 dhikr',
+        final int n => '$n adhkar',
+      }),
+      subtitle: const Text('Write your own, to put in your collections'),
+      trailing: Icon(
+        Icons.chevron_right,
+        color: theme.colorScheme.onSurfaceVariant,
       ),
+      onTap: () => Navigator.pushNamed(context, Routes.adhkar),
     );
   }
 }

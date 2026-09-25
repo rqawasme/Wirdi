@@ -222,6 +222,13 @@ void main() {
       // enough.
       await pumpList(tester, textScaler: const TextScaler.linear(2));
       expect(tester.takeException(), isNull);
+      // At 2x the sections above the built-ins fill the first screen, and a
+      // row the list has not scrolled to is a row it has not built.
+      await tester.scrollUntilVisible(
+        find.text('PLACEHOLDER collection 1 english'),
+        200,
+      );
+      await settle(tester);
 
       final Finder row = find.ancestor(
         of: find.text('PLACEHOLDER collection 1 english'),

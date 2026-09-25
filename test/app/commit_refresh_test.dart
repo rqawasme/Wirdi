@@ -157,7 +157,10 @@ void main() {
     await pumpApp(tester);
     await openTab(tester, 'Collections');
 
-    await tester.tap(find.byTooltip('New collection'));
+    await tester.tap(find.byTooltip('New'));
+    await settle(tester);
+    // The menu's, and not the empty state's button of the same name.
+    await tester.tap(find.text('New collection').last);
     await settle(tester);
     await tester.enterText(find.byType(TextField).first, 'Surah al-Kahf');
     await settle(tester);
@@ -177,7 +180,10 @@ void main() {
   group('editing a committed collection', () {
     /// Commits [name], made fresh, and returns to the collections list.
     Future<void> makeAndCommit(WidgetTester tester, String name) async {
-      await tester.tap(find.byTooltip('New collection'));
+      await tester.tap(find.byTooltip('New'));
+      await settle(tester);
+      // The menu's, and not the empty state's button of the same name.
+      await tester.tap(find.text('New collection').last);
       await settle(tester);
       await tester.enterText(find.byType(TextField).first, name);
       await settle(tester);
