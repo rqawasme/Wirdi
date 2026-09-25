@@ -10,6 +10,7 @@ import '../providers/home.dart';
 import '../providers/refresh.dart';
 import '../routes.dart';
 import '../theme/theme.dart';
+import '../widgets/banded_row.dart';
 import '../widgets/collection_dialogs.dart';
 import '../widgets/collection_row.dart';
 import '../widgets/empty_state.dart';
@@ -110,17 +111,15 @@ class _CollectionList extends ConsumerWidget {
     );
   }
 
-  /// Rows with a hairline between them — a division, not a bar, and none
-  /// before the first or after the last: the group label is the boundary
-  /// there.
-  List<Widget> _rows(List<CollectionListing> group) {
-    final List<Widget> rows = <Widget>[];
-    for (final CollectionListing listing in group) {
-      if (rows.isNotEmpty) rows.add(const _Hairline());
-      rows.add(_Row(listing: listing));
-    }
-    return rows;
-  }
+  /// Rows on alternating grounds, as the pickers draw theirs. A hairline
+  /// between them was the first answer and the list still ran together: every
+  /// row is a name, a line of detail and four icons, and one looks much like
+  /// the next. Banded from zero within each group, so "Yours" and "Built-in"
+  /// both start on the plain surface under their label.
+  List<Widget> _rows(List<CollectionListing> group) => <Widget>[
+    for (int i = 0; i < group.length; i++)
+      BandedRow(index: i, child: _Row(listing: group[i])),
+  ];
 }
 
 class _GroupLabel extends StatelessWidget {
@@ -157,19 +156,6 @@ class _GroupLabel extends StatelessWidget {
           ?action,
         ],
       ),
-    );
-  }
-}
-
-class _Hairline extends StatelessWidget {
-  const _Hairline();
-
-  @override
-  Widget build(BuildContext context) {
-    return Divider(
-      height: WirdiMetrics.hairline,
-      thickness: WirdiMetrics.hairline,
-      color: Theme.of(context).colorScheme.outlineVariant,
     );
   }
 }

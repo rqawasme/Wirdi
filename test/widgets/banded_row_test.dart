@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wirdi/data/wirdi_data.dart';
 import 'package:wirdi/providers/data_providers.dart';
+import 'package:wirdi/screens/collections_screen.dart';
 import 'package:wirdi/screens/pickers/surah_picker_screen.dart';
 import 'package:wirdi/screens/surah_list_screen.dart';
 import 'package:wirdi/theme/theme.dart';
@@ -176,6 +177,12 @@ void main() {
 
     testWidgets('the surah picker bands', (WidgetTester tester) async {
       await pump(tester, const SurahPickerScreen());
+      expect(find.byType(BandedRow), findsWidgets);
+    });
+
+    testWidgets('the collections list bands', (WidgetTester tester) async {
+      // A body without a Scaffold of its own; AppShell supplies one in the app.
+      await pump(tester, const Scaffold(body: CollectionsScreen()));
       expect(find.byType(BandedRow), findsWidgets);
     });
 
