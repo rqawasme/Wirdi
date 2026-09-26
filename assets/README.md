@@ -24,7 +24,10 @@ substitutes is not the same text.
 `icon/wirdi_icon.svg` is the app icon: a tasbih of 33 beads, 22 counted, with
 the imam bead and tassel. It is generated, like every icon PNG under `ios/` and
 `android/`, by `tool/render_app_icons.py`, which holds the geometry and palette.
-Change the script and rerun it, rather than editing the SVG or the PNGs:
+So are the two Google Play listing images beside it, `icon/play_store_icon.png`
+and `icon/play_feature_graphic.png`. They are uploaded to Play Console by hand
+and are not bundled with the app. Change the script and rerun it, rather than
+editing the SVG or the PNGs:
 
 ```bash
 python3 tool/render_app_icons.py

@@ -13,6 +13,8 @@ that description:
                                                   monochrome layers
     assets/icon/play_store_icon.png               the 512px icon for the Google
                                                   Play listing
+    assets/icon/play_feature_graphic.png          the listing's 1024x500 feature
+                                                  graphic
 
 Run it after changing the geometry or the palette:
 
@@ -46,6 +48,9 @@ CREAM = "#FBF6EC"
 BRICK = "#9E4630"
 UNCOUNTED = "#D9BFA7"
 GOLD = "#8A6A2E"
+# surfaceContainerHigh: the unlit wedge of the voussoir stripe
+# (lib/widgets/voussoir_stripe.dart), which only the feature graphic draws.
+STONE = "#F0E6D4"
 
 # The loop.
 BEADS = 33
@@ -153,25 +158,45 @@ def rgb(hex_colour: str) -> tuple[float, float, float]:
 
 
 class Canvas:
-    """Straight-alpha RGBA, one float per channel, composited source-over."""
+    """Straight-alpha RGBA, one float per channel, composited source-over.
 
-    def __init__(self, size: int, background: str | None) -> None:
-        self.size = size
-        n = size * size
+    Square by default, with the design filling it. The Play feature graphic
+    passes its own height, scale and origin: a wide canvas with the design
+    placed somewhere inside it.
+    """
+
+    def __init__(
+        self,
+        width: int,
+        background: str | None,
+        height: int | None = None,
+        scale: float | None = None,
+        origin: tuple[float, float] = (0.0, 0.0),
+    ) -> None:
+        self.width = width
+        self.height = height or width
+        # Pixels per design unit, and where the design's (0, 0) lands in pixels.
+        self.k = scale or width / UNITS
+        self.dx, self.dy = origin
+        n = self.width * self.height
         r, g, b = rgb(background) if background else (0.0, 0.0, 0.0)
         a = 1.0 if background else 0.0
         self.r, self.g, self.b = array("d", [r]) * n, array("d", [g]) * n, array("d", [b]) * n
         self.a = array("d", [a]) * n
 
+    def to_units(self, px: float, py: float) -> tuple[float, float]:
+        """A position in pixels, in design units."""
+        return (px - self.dx) / self.k, (py - self.dy) / self.k
+
     def draw(self, shape: Shape, colour: str | None = None, alpha: float = 1.0) -> None:
-        k = self.size / UNITS  # pixels per design unit
+        k, dx, dy = self.k, self.dx, self.dy
         cr, cg, cb = rgb(colour or shape.colour)
         x0, y0, x1, y1 = _bounds(shape)
-        for py in range(max(0, int(y0 * k) - 1), min(self.size, int(y1 * k) + 2)):
-            v = (py + 0.5) / k
-            row = py * self.size
-            for px in range(max(0, int(x0 * k) - 1), min(self.size, int(x1 * k) + 2)):
-                u = (px + 0.5) / k
+        for py in range(max(0, int(y0 * k + dy) - 1), min(self.height, int(y1 * k + dy) + 2)):
+            v = (py + 0.5 - dy) / k
+            row = py * self.width
+            for px in range(max(0, int(x0 * k + dx) - 1), min(self.width, int(x1 * k + dx) + 2)):
+                u = (px + 0.5 - dx) / k
                 cover = min(1.0, max(0.0, 0.5 - _distance(shape, u, v) * k)) * alpha
                 if cover <= 0:
                     continue
@@ -185,7 +210,8 @@ class Canvas:
 
     def mask_rounded(self, radius_fraction: float) -> None:
         """Cut the corners to a rounded square, for Android's legacy icon."""
-        n = self.size
+        assert self.width == self.height, "only a square canvas has a rounded-square mask"
+        n = self.width
         rad = radius_fraction * n
         for py in range(n):
             for px in range(n):
@@ -196,11 +222,11 @@ class Canvas:
                 self.a[py * n + px] *= cover
 
     def png(self, alpha: bool) -> bytes:
-        n = self.size
+        w, h = self.width, self.height
         raw = bytearray()
-        for y in range(n):
+        for y in range(h):
             raw.append(0)
-            for i in range(y * n, (y + 1) * n):
+            for i in range(y * w, (y + 1) * w):
                 raw += bytes(round(c * 255) for c in (self.r[i], self.g[i], self.b[i]))
                 if alpha:
                     raw.append(round(self.a[i] * 255))
@@ -208,7 +234,7 @@ class Canvas:
         def chunk(tag: bytes, data: bytes) -> bytes:
             return struct.pack(">I", len(data)) + tag + data + struct.pack(">I", zlib.crc32(tag + data))
 
-        header = struct.pack(">IIBBBBB", n, n, 8, 6 if alpha else 2, 0, 0, 0)
+        header = struct.pack(">IIBBBBB", w, h, 8, 6 if alpha else 2, 0, 0, 0)
         return b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", header) + chunk(b"IDAT", zlib.compress(bytes(raw), 9)) + chunk(b"IEND", b"")
 
 
@@ -238,6 +264,41 @@ def _distance(shape: Shape, u: float, v: float) -> float:
         # Outward normal of a clockwise edge, with y pointing down.
         d = max(d, ((u - ax) * ey - (v - ay) * ex) / length)
     return d
+
+
+# --- the Play feature graphic ------------------------------------------------
+
+# Play's required size. The tasbih is centred, because Play crops this image to
+# other shapes on some surfaces and the middle is what always survives. No text:
+# the app's name sits right beside it on every surface that shows it.
+FEATURE_W, FEATURE_H = 1024, 500
+FEATURE_TASBIH_PX = 400
+# The voussoir rule along the foot, in the app's proportions — a 4dp band cut
+# into 12dp wedges there — at a width that divides 1024 exactly, so the rhythm
+# is whole from edge to edge.
+FEATURE_WEDGE_W, FEATURE_WEDGE_H = 32, 10
+
+
+def feature_graphic(shapes: list[Shape]) -> Canvas:
+    top, bottom = vertical_bounds(shapes)
+    k = FEATURE_TASBIH_PX / (bottom - top)
+    field = FEATURE_H - FEATURE_WEDGE_H
+    canvas = Canvas(
+        FEATURE_W,
+        CREAM,
+        height=FEATURE_H,
+        scale=k,
+        origin=(FEATURE_W / 2 - UNITS / 2 * k, field / 2 - (top + bottom) / 2 * k),
+    )
+    for sh in shapes:
+        canvas.draw(sh)
+
+    y0, y1 = FEATURE_H - FEATURE_WEDGE_H, FEATURE_H
+    for i in range(FEATURE_W // FEATURE_WEDGE_W):
+        x0, x1 = i * FEATURE_WEDGE_W, (i + 1) * FEATURE_WEDGE_W
+        corners = (canvas.to_units(x0, y0), canvas.to_units(x1, y0), canvas.to_units(x1, y1), canvas.to_units(x0, y1))
+        canvas.draw(Polygon(corners, BRICK if i % 2 == 0 else STONE))
+    return canvas
 
 
 # --- outputs -----------------------------------------------------------------
@@ -319,6 +380,8 @@ def main() -> None:
     # in the upload. Not bundled with the app — it is uploaded to Play Console
     # by hand, from here.
     write(ROOT / "assets/icon/play_store_icon.png", render(shapes, 512, CREAM).png(alpha=True))
+    # And its feature graphic. Opaque, which Play requires of this one.
+    write(ROOT / "assets/icon/play_feature_graphic.png", feature_graphic(shapes).png(alpha=False))
 
 
 if __name__ == "__main__":

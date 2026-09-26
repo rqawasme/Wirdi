@@ -77,7 +77,7 @@ listing. A website is optional; the repository will do.
 | Asset | Size | Where it comes from |
 | --- | --- | --- |
 | App icon | 512 × 512 PNG | `assets/icon/play_store_icon.png`, written by `tool/render_app_icons.py` |
-| Feature graphic | 1024 × 500 PNG or JPEG | To make. The tasbih on the limestone cream, `#FBF6EC`, reads well; no text needed |
+| Feature graphic | 1024 × 500 PNG, no alpha | `assets/icon/play_feature_graphic.png`, written by the same script: the tasbih on the limestone cream over the voussoir rule. No text, since the app's name is beside it wherever Play shows it |
 | Phone screenshots | 2 to 8, 16:9 or 9:16, 320–3840 px a side | From a phone: Home with a commitment, the wird player mid-count, a surah, the tracker, the collections list |
 
 Screenshots from a release build on a real phone look like what people will
