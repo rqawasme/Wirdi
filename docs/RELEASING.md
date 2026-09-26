@@ -209,9 +209,12 @@ The app is `app.wirdi` in Play Console. That package name is permanent: Play
 never lets it be reused or changed, and a different one would be a different
 app.
 
-### Before the first release
+### Before the closed test
 
-Once, in Play Console, before any bundle goes up:
+Once, in Play Console. Only the first step is needed before the first upload:
+internal testing goes out on an app that is not fully set up, so the rest can be
+done alongside it. Closed testing and production cannot go out until all of it
+is done.
 
 1. **Create the app.** Name *Wirdi*, default language English (United States),
    type *App*, *Free*.

@@ -85,8 +85,9 @@ get: no debug banner, and the real fonts.
 
 ## App content
 
-*Policy and programs → App content.* Every form has to be done before the first
-release can go out, even to internal testing.
+*Policy and programs → App content.* Internal testing can go out before these
+are done, but closed testing and production cannot, so finish every form before
+starting the closed test.
 
 | Form | Answer |
 | --- | --- |
