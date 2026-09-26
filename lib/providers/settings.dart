@@ -21,7 +21,6 @@ abstract final class SettingKeys {
   // user had chosen back to the default. The Dart name may move; the key does
   // not.
   static const String showTracker = 'streak.visible';
-  static const String checkForUpdates = 'updates.check';
 
   // `tasbih.count` is written into the same table and is deliberately not
   // here: it is not part of [WirdiSettings], because putting it there would
@@ -47,7 +46,6 @@ final class WirdiSettings {
     this.showTranslation = true,
     this.haptics = true,
     this.showTracker = true,
-    this.checkForUpdates = false,
     this.quranInGold = false,
     this.arabicFace = ArabicFace.notoNaskh,
     this.dimBrackets = true,
@@ -89,18 +87,6 @@ final class WirdiSettings {
   /// "Show tracker" so that what it takes away is not a surprise.
   final bool showTracker;
 
-  /// Whether the app asks GitHub, once a launch, whether a newer version has
-  /// been released.
-  ///
-  /// Off, and it is the only thing in this app that would ever open a socket.
-  /// Left alone, Wirdi makes no network calls at all — no check, no ping,
-  /// nothing about the user going anywhere — which is a property worth keeping
-  /// true by default and worth making somebody ask for an exception to.
-  ///
-  /// Android only. iOS cannot install an app over itself, so the switch is not
-  /// on that screen at all rather than being one that does nothing.
-  final bool checkForUpdates;
-
   /// Dev screen: Quran text in `tertiary` gold, or in `onSurface` cedar ink.
   ///
   /// Cedar ink by decision, after looking at both on a device. Which leaves
@@ -127,7 +113,6 @@ final class WirdiSettings {
     bool? showTranslation,
     bool? haptics,
     bool? showTracker,
-    bool? checkForUpdates,
     bool? quranInGold,
     ArabicFace? arabicFace,
     bool? dimBrackets,
@@ -139,7 +124,6 @@ final class WirdiSettings {
       showTranslation: showTranslation ?? this.showTranslation,
       haptics: haptics ?? this.haptics,
       showTracker: showTracker ?? this.showTracker,
-      checkForUpdates: checkForUpdates ?? this.checkForUpdates,
       quranInGold: quranInGold ?? this.quranInGold,
       arabicFace: arabicFace ?? this.arabicFace,
       dimBrackets: dimBrackets ?? this.dimBrackets,
@@ -181,9 +165,6 @@ class SettingsController extends AsyncNotifier<WirdiSettings> {
       showTracker:
           _bool(await repository.setting(SettingKeys.showTracker)) ??
           defaults.showTracker,
-      checkForUpdates:
-          _bool(await repository.setting(SettingKeys.checkForUpdates)) ??
-          defaults.checkForUpdates,
       quranInGold:
           _bool(await repository.setting(SettingKeys.devQuranInGold)) ??
           defaults.quranInGold,
@@ -243,14 +224,6 @@ class SettingsController extends AsyncNotifier<WirdiSettings> {
       SettingKeys.showTracker,
       value.toString(),
       (WirdiSettings s) => s.copyWith(showTracker: value),
-    );
-  }
-
-  Future<void> setCheckForUpdates(bool value) {
-    return _set(
-      SettingKeys.checkForUpdates,
-      value.toString(),
-      (WirdiSettings s) => s.copyWith(checkForUpdates: value),
     );
   }
 

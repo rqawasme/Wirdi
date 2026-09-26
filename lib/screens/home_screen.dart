@@ -9,7 +9,6 @@ import '../theme/theme.dart';
 import '../widgets/collection_tile.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/failure_screen.dart';
-import '../widgets/update_banner.dart';
 import '../widgets/weekday_name.dart';
 
 /// What the user committed to today, how far through each commitment they are,
@@ -49,11 +48,6 @@ class _Home extends ConsumerWidget {
       padding: const EdgeInsets.only(bottom: WirdiMetrics.space6),
       children: <Widget>[
         _Greeting(view: view),
-        // Its own widget and its own watch, so that a check returning nothing
-        // — which is every launch on a current build, and every launch at all
-        // unless the setting was turned on — costs the greeting and the tiles
-        // no rebuild. It renders a zero-height box in that case.
-        const UpdateBanner(),
         if (view.isEmpty)
           const Padding(
             padding: EdgeInsets.only(top: WirdiMetrics.space6),

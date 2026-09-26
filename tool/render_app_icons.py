@@ -11,6 +11,8 @@ that description:
     android/app/src/main/res/mipmap-*dpi/         legacy icon, and the adaptive
                                                   icon's foreground and
                                                   monochrome layers
+    assets/icon/play_store_icon.png               the 512px icon for the Google
+                                                  Play listing
 
 Run it after changing the geometry or the palette:
 
@@ -310,6 +312,13 @@ def main() -> None:
         layer = round(108 * density)
         write(res / f"mipmap-{name}/ic_launcher_foreground.png", render(adaptive, layer, None).png(alpha=True))
         write(res / f"mipmap-{name}/ic_launcher_monochrome.png", render(adaptive, layer, None, mono=True).png(alpha=True))
+
+    # Google Play's listing icon: 512px, full-bleed and square, like iOS's,
+    # but as the 32-bit PNG Play asks for — opaque all the same.
+    # Play draws the rounded corners and the shadow itself, and asks for neither
+    # in the upload. Not bundled with the app — it is uploaded to Play Console
+    # by hand, from here.
+    write(ROOT / "assets/icon/play_store_icon.png", render(shapes, 512, CREAM).png(alpha=True))
 
 
 if __name__ == "__main__":

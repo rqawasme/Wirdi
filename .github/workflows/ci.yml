@@ -182,8 +182,8 @@ jobs:
 
       # A debug APK rather than `gradlew compileDebugKotlin`, because this also
       # runs manifest merging and resource linking: it catches a malformed
-      # AndroidManifest.xml, a FileProvider pointing at an @xml resource that
-      # is not there, and a bad authority — not only Kotlin that will not
-      # compile. One ABI, which is the cheap way to get that coverage.
+      # AndroidManifest.xml and a resource reference that goes nowhere — not
+      # only Kotlin that will not compile. One ABI, which is the cheap way to
+      # get that coverage.
       - name: Build the Android app
         run: flutter build apk --debug --target-platform android-arm64

@@ -101,13 +101,13 @@ jobs:
     if: needs.detect.outputs.release == 'true'
     uses: ./.github/workflows/ci.yml
     with:
-      # This workflow builds a real, signed release APK a few jobs down. Letting
-      # the gate build a debug one first would be the same compiler run twice,
-      # for about five minutes.
+      # This workflow builds a real, signed release bundle a few jobs down.
+      # Letting the gate build a debug APK first would be the same compiler run
+      # twice, for about five minutes.
       skip-android-build: true
 
   android:
-    name: build the Android APK
+    name: build the Android App Bundle
     needs: [detect, test]
     runs-on: ubuntu-latest
     outputs:
@@ -121,9 +121,13 @@ jobs:
 
       # android/app/build.gradle.kts picks the release signing config up from
       # android/key.properties, and falls back to the debug keys when that file
-      # is absent. Absent is the honest state for a repository that has not been
-      # given a keystore yet: the build still produces an installable APK, and
-      # the release notes say plainly that it is not distributable.
+      # is absent. Absent is the honest state for a fork, which has no access to
+      # the keystore: the build still succeeds, the release notes say plainly
+      # that the bundle is not distributable, and the Play job does not run.
+      #
+      # The keystore is Play's *upload* key, not the key installs are signed
+      # with. Play App Signing holds that one: Play verifies the upload key on
+      # every bundle, strips it, and re-signs what it delivers with its own.
       - name: Configure release signing
         id: signing
         env:
@@ -136,11 +140,11 @@ jobs:
 
           if [ -z "${KEYSTORE_BASE64:-}" ]; then
             echo "signed=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::ANDROID_KEYSTORE_BASE64 is not set. Building with the debug keys — the APK will not be distributable. See docs/RELEASING.md."
+            echo "::warning::ANDROID_KEYSTORE_BASE64 is not set. Building with the debug keys — Play will reject the bundle. See docs/RELEASING.md."
             exit 0
           fi
 
-          # Half-configured is worse than unconfigured: it produces an APK
+          # Half-configured is worse than unconfigured: it produces a bundle
           # signed with a key nobody meant to use, or a confusing Gradle error.
           missing=""
           [ -n "${STORE_PASSWORD:-}" ] || missing="$missing ANDROID_KEYSTORE_PASSWORD"
@@ -165,26 +169,31 @@ jobs:
           echo "signed=true" >> "$GITHUB_OUTPUT"
           echo "Release keystore configured."
 
+      # An App Bundle, not an APK: Play accepts nothing else for a new app, and
+      # builds the per-device APKs from it itself.
+      #
       # --build-number is the run number rather than anything in pubspec.yaml:
       # Play rejects an upload whose versionCode it has seen before, and a
       # number that only ever goes up is one less thing to remember at bump
       # time. The user-visible version name still comes from pubspec.yaml.
-      - name: Build the APK
-        run: flutter build apk --release --build-number=${{ github.run_number }}
+      # github.run_number is counted per workflow file, so renaming this file
+      # would restart it at 1 and every upload after that would be refused.
+      - name: Build the App Bundle
+        run: flutter build appbundle --release --build-number=${{ github.run_number }}
 
-      - name: Name the APK after its version
+      - name: Name the bundle after its version
         env:
           VERSION: ${{ needs.detect.outputs.version }}
         run: |
           set -euo pipefail
           mkdir -p dist
-          mv build/app/outputs/flutter-apk/app-release.apk "dist/wirdi-$VERSION.apk"
+          mv build/app/outputs/bundle/release/app-release.aab "dist/wirdi-$VERSION.aab"
           ls -l dist
 
       - uses: actions/upload-artifact@v4
         with:
-          name: android-apk
-          path: dist/*.apk
+          name: android-aab
+          path: dist/*.aab
           if-no-files-found: error
           retention-days: 7
 
@@ -248,9 +257,9 @@ jobs:
           ls -l dist
 
           if [ "$ANDROID_SIGNED" = "true" ]; then
-            apk_note="Signed with the upload keystore."
+            aab_note="Signed with the Play upload key, and uploaded to Play's internal testing track by this workflow's \`play\` job when Play credentials are configured."
           else
-            apk_note="**Signed with the Android debug keys**, because no release keystore is configured. Installable for testing; not distributable through Play, and anyone can re-sign it. See \`docs/RELEASING.md\`."
+            aab_note="**Signed with the Android debug keys**, because no upload keystore is configured. Play will reject it. See \`docs/RELEASING.md\`."
           fi
 
           notes="$(cat <<EOF
@@ -260,7 +269,7 @@ jobs:
 
           ### Artifacts
 
-          - \`wirdi-$VERSION.apk\` — Android. $apk_note
+          - \`wirdi-$VERSION.aab\` — the Android App Bundle for Google Play. Not installable directly: install Wirdi from Play. $aab_note
           - \`wirdi-$VERSION-unsigned.ipa\` — iOS, **unsigned**. Built with \`--no-codesign\`: it needs re-signing with your own certificate before a device will install it.
           EOF
           )"
@@ -272,3 +281,57 @@ jobs:
             --notes "$notes" \
             --target "$GITHUB_SHA" \
             dist/*
+
+  # Delivery to Google Play, after the release is tagged rather than before it.
+  # The GitHub release is the record of what was built and tested; this is one
+  # place it goes. Running last means a failed upload — Play down, a
+  # permission missing on the service account — is retried with "Re-run failed
+  # jobs" on this same run, same bundle and same versionCode, without anything
+  # upstream being built or tagged twice.
+  #
+  # Only a bundle signed with the upload key is ever sent: Play would reject a
+  # debug-signed one anyway, and a fork has neither key nor credentials.
+  play:
+    name: upload to Google Play
+    needs: [detect, android, release]
+    if: needs.android.outputs.signed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      # Unset is an expected state, not an error. The very first bundle has to
+      # be uploaded by hand in Play Console — the API cannot create a release
+      # for an app that has never been rolled out anywhere — so the first
+      # release is made before these credentials exist. See docs/RELEASING.md.
+      - name: Check for Play credentials
+        id: credentials
+        env:
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -z "${PLAY_SERVICE_ACCOUNT_JSON:-}" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::PLAY_SERVICE_ACCOUNT_JSON is not set, so nothing was uploaded to Play. The bundle is attached to the GitHub release; upload it in Play Console by hand. See docs/RELEASING.md."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/download-artifact@v4
+        if: steps.credentials.outputs.configured == 'true'
+        with:
+          name: android-aab
+          path: dist
+
+      # To the internal testing track, and no further. Promoting a build to
+      # closed testing or production is a decision made in Play Console, by a
+      # person, after the build has been on a phone.
+      #
+      # Pinned to a commit rather than a tag: this action is handed a key that
+      # can publish to Play, and a tag can be moved to point at anything.
+      - name: Upload to the internal testing track
+        if: steps.credentials.outputs.configured == 'true'
+        uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1.1.5
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: app.wirdi
+          releaseFiles: dist/wirdi-${{ needs.detect.outputs.version }}.aab
+          releaseName: ${{ needs.detect.outputs.version }}
+          track: internal
+          status: completed
