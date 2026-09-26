@@ -338,9 +338,7 @@ length of brick across its top edge instead — the one place brick acts as a
 plain bar rather than as the voussoir rhythm — plus `onSurface` ink and Inter
 Medium. Icons stay chrome, never brick and never gold, and nothing swaps between
 filled and outline to signal selection. No tab carries a badge, dot or count,
-because the app has no notifications. That rule holds with the update notice
-too: it is a card in the Home list, never a mark on a tab, and it exists only
-for somebody who turned the update check on — see Updating.
+because the app has no notifications.
 
 **Each tab keeps its own scroll position.** The four bodies live in an
 `IndexedStack`, and each gets its own `ScrollController` — a vertical `ListView`
@@ -1038,7 +1036,9 @@ that will move.
 
 ### The dev screen
 
-`lib/dev/` is a rendering harness and is deleted before release. It puts the
+`lib/dev/` is a rendering harness, and exists only in a debug build: its route
+is registered `when kDebugMode` in `lib/routes.dart` and its one entry point is
+behind the same constant, so a release build compiles it out. It puts the
 known-hard Uthmani cases — elongation, imala, ishmam, the saad-seen variants,
 waqf marks in sequence, the sajdah mark — on screen at any size, in either
 Arabic face, in gold or in cedar ink, read out of the real database rather than
@@ -1066,59 +1066,57 @@ the copy ever drifts from the pubspec.
 Bump both together:
 
 ```bash
-tool/bump_version.sh 0.2.0
+tool/bump_version.sh 1.0.1
 ```
 
 Pushing that to `main` is what cuts a release. `.github/workflows/release.yml`
 notices the version changed, runs the test suite — by calling `ci.yml`, the same
 workflow that runs on every pull request, rather than a copy of its steps that
-would drift from it — and only then builds the Android APK and the iOS app,
-publishes a release and tags it `v0.2.0`. The tag is created at the end, at the
-tested commit, which is what stops a tag ever naming a commit whose tests did
-not pass. A push that does not change the version builds nothing.
+would drift from it — and only then builds the Android App Bundle and the iOS
+app, publishes a GitHub release and tags it `v1.0.1`. The tag is created at the
+end, at the tested commit, which is what stops a tag ever naming a commit whose
+tests did not pass. A push that does not change the version builds nothing.
+
+Android ships through **Google Play**. The last job uploads the bundle to Play's
+internal testing track; promoting it to closed testing or production is done by
+hand in Play Console, once the build has been on a phone. The bundle is signed
+with Play's upload key, and Play re-signs what it delivers with the app signing
+key it holds. Nothing installable is attached to the GitHub release — the `.aab`
+there is the archive of what went to Play, not a way around it.
 
 The build numbers behind those versions — the Android `versionCode`, the iOS
 `CFBundleVersion` — come from the CI run number rather than from `pubspec.yaml`.
-Stores reject a build number they have seen before, and a number that only ever
-goes up is one less thing to remember at bump time.
+Play rejects a build number it has seen before, and a number that only ever goes
+up is one less thing to remember at bump time.
 
-The APK is signed with the Android debug keys until a release keystore is
-configured through repository secrets, and the iOS build is unsigned, because
-signing it needs an Apple Developer certificate this repository does not hold.
-Both facts are stated on the release itself rather than left to be discovered.
-[`docs/RELEASING.md`](docs/RELEASING.md) has the details and the setup.
-
-## Updating
-
-The app can notice that a newer version has been released and install it.
-Turned on, it asks GitHub once a launch what the latest release is; if that is
-newer than the running build, a notice appears at the top of Home, and tapping
-it downloads that release's APK and hands it to Android's installer. It exists
-so a phone can be updated from the phone rather than from a cable.
-
-**Off by default, and the only thing in the app that opens a socket.** Left
-alone Wirdi makes no network calls at all — the fonts and the content are
-bundled, and nothing is fetched. The switch is in Settings, the About sheet says
-what it does, and `test/app/update_banner_test.dart` asserts that with it off
-the update client is never called even once. A claim printed under a switch is
-worth a test.
-
-**Android only.** iOS does not let an app install itself, so the notice and the
-switch are not there rather than being there and inert.
-
-Two things are worth knowing before the first use. Android refuses to upgrade an
-app whose signing key changed, so a phone holding a debug-signed build — which
-is what `flutter run` installs — needs one manual uninstall and reinstall before
-self-updating works, and uninstalling takes `user.db` with it. And the
-`REQUEST_INSTALL_PACKAGES` permission this needs must come out before the app is
-submitted to Play.
+The iOS build is unsigned, because signing it needs an Apple Developer
+certificate this repository does not hold. That is stated on the release itself
+rather than left to be discovered. [`docs/RELEASING.md`](docs/RELEASING.md) has
+the details: the keystore, the Play credentials, the first upload that has to be
+made by hand, and the testing Play requires before production.
 
 CI compiles the Android app on every pull request — `flutter build apk --debug`
 in a job beside the tests. `analysis_options.yaml` excludes `android/**` and
-`dart format` covers only `lib test tool`, so without that job the Kotlin, the
-manifest and the `FileProvider` would have nothing checking them until a release
-was being cut. The release workflow skips it, having a real APK to build.
+`dart format` covers only `lib test tool`, so without that job the Kotlin and
+the manifest would have nothing checking them until a release was being cut.
+The release workflow skips it, having a real bundle to build.
 
-[`docs/SELF_UPDATE.md`](docs/SELF_UPDATE.md) covers both, how the pieces fit,
-the on-device checks that no test can make, and the checklist for removing the
-feature.
+## Updating
+
+Through Google Play, and nothing else. Play keeps the app up to date on its own;
+there is no in-app check, no notice and no prompt.
+
+**Wirdi has no network access at all.** The release manifest declares no
+permissions — not `INTERNET`, not anything — and the fonts and the content are
+bundled, so nothing is fetched and nothing about anybody goes anywhere. That is
+what the Play Data safety declaration and [`docs/PRIVACY.md`](docs/PRIVACY.md)
+say, and `test/app/android_manifest_test.dart` fails if a permission is added,
+so the claim cannot quietly stop being true.
+
+Builds up to 0.8.2 were published as APKs on GitHub releases and carried an
+opt-in self-updater that downloaded and installed the next one. It came out
+before the move to Play, which rejects `REQUEST_INSTALL_PACKAGES` in an app
+whose purpose is not installing packages. A phone still holding one of those
+builds has it signed with a different key from the one Play delivers with, so
+Android will not upgrade it in place: uninstall it once — which deletes
+`user.db` with it — and install from Play.
