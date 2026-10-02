@@ -40,15 +40,20 @@ MAX_DETAIL_LINES = 10
 
 # Look-alikes from other alphabets that QUL writes in place of the dot-below
 # letters of Arabic transliteration — ĥ for ḥ, ş for ṣ, ţ for ṭ, đ for ḍ.
-# import_quran.py's SURAH_NAME_LETTERS maps them on import; this is what keeps
-# them out of every transliteration the app shows, wherever the text came from.
+# import_quran.py's surah_name() maps them on import; this is what keeps them
+# out of every transliteration the app shows, wherever the text came from.
 LOOKALIKE_LETTERS = frozenset("ĤĥŞşŢţĐđ")
 
-# Every column of transliterated text in content.db.
+# QUL's other surah-name spellings, which surah_name() also replaces: a
+# backtick for ʿayn, an apostrophe for hamza, á for alif maqṣūrah. Checked in
+# surah names only — elsewhere an apostrophe can be an apostrophe.
+QUL_SURAH_NAME_MARKS = frozenset("`'á")
+
+# Every column of transliterated text in content.db, and what may not be in it.
 TRANSLITERATED_COLUMNS = (
-    ("surahs", "number", "name_transliterated"),
-    ("ayahs", "id", "transliteration"),
-    ("adhkar", "id", "transliteration"),
+    ("surahs", "number", "name_transliterated", LOOKALIKE_LETTERS | QUL_SURAH_NAME_MARKS),
+    ("ayahs", "id", "transliteration", LOOKALIKE_LETTERS),
+    ("adhkar", "id", "transliteration", LOOKALIKE_LETTERS),
 )
 
 # The sentinel content/examples/ uses in place of religious text, which no real
@@ -281,10 +286,10 @@ class Verifier:
                 )
 
     def transliteration_letters(self) -> None:
-        check = self.check("transliterations use dot-below letters, not look-alikes")
-        for table, key, column in TRANSLITERATED_COLUMNS:
+        check = self.check("transliterations use ḥ ṣ ṭ ḍ ʿ ʾ ā, not QUL's stand-ins")
+        for table, key, column, forbidden in TRANSLITERATED_COLUMNS:
             for row in self.q(f"SELECT {key} AS k, {column} AS text FROM {table} WHERE {column} IS NOT NULL"):
-                found = sorted(set(row["text"]) & LOOKALIKE_LETTERS)
+                found = sorted(set(row["text"]) & forbidden)
                 if found:
                     check.fail(f"{table} {row['k']}: {' '.join(found)} in {row['text'][:60]!r}")
 

@@ -131,12 +131,22 @@ surahs. The importer refuses a partial list.
 
 ## Transliterated surah names
 
-QUL's `name` column writes the dot-below letters of Arabic transliteration with
-look-alikes from other alphabets: `ĥ` for `ḥ` (ح), `ş` for `ṣ` (ص), `ţ` for `ṭ`
-(ط) and `đ` for `ḍ` (ض) — "Al-Fātiĥah" for Al-Fātiḥah. The importer maps them
-back (`SURAH_NAME_LETTERS` in `import_quran.py`), which puts the surah names on
-the same convention as every other transliteration in the app, and
-`verify_content.py` fails the build if one ever reaches `content.db`.
+QUL's `name` column transliterates on a convention of its own, and the importer
+(`surah_name()` in `import_quran.py`) puts it on the one the adhkar use:
+
+| QUL | App | For | Example |
+| --- | --- | --- | --- |
+| `ĥ` `ş` `ţ` `đ` | `ḥ` `ṣ` `ṭ` `ḍ` | ح ص ط ض | Al-Fātiĥah → Al-Fātiḥah |
+| `` ` `` | `ʿ` (U+02BF) | ع | `` `Abasa `` → ʿAbasa |
+| `'` | `ʾ` (U+02BE), or nothing at the start of a word | ء | Al-Mu'minūn → Al-Muʾminūn, Al-'Aḥzāb → Al-Aḥzāb |
+| `á`, `aá` | `ā` | ى | Aḍ-Ḍuḥaá → Aḍ-Ḍuḥā |
+
+Three names are misspelled in QUL whatever the letters, and are replaced whole
+(`SURAH_NAME_CORRECTIONS`): 21 al-Anbiyā, written without its *i*; 58
+al-Mujādilah, the one *tāʾ marbūṭah* not written *-ah*; and 61 aṣ-Ṣaff, the one
+*shadda* not doubled.
+
+`verify_content.py` fails the build if any of QUL's forms reaches `content.db`.
 
 ## A note on `has_bismillah`
 

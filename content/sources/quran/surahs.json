@@ -40,7 +40,7 @@
     {
       "number": 3,
       "name_arabic": "آل عمران",
-      "name_transliterated": "Āli `Imrān",
+      "name_transliterated": "Āli ʿImrān",
       "name_english": "Ali 'Imran",
       "revelation_place": "madinah",
       "ayah_count": 200,
@@ -60,7 +60,7 @@
     {
       "number": 5,
       "name_arabic": "المائدة",
-      "name_transliterated": "Al-Mā'idah",
+      "name_transliterated": "Al-Māʾidah",
       "name_english": "Al-Ma'idah",
       "revelation_place": "madinah",
       "ayah_count": 120,
@@ -70,7 +70,7 @@
     {
       "number": 6,
       "name_arabic": "الأنعام",
-      "name_transliterated": "Al-'An`ām",
+      "name_transliterated": "Al-Anʿām",
       "name_english": "Al-An'am",
       "revelation_place": "makkah",
       "ayah_count": 165,
@@ -80,7 +80,7 @@
     {
       "number": 7,
       "name_arabic": "الأعراف",
-      "name_transliterated": "Al-'A`rāf",
+      "name_transliterated": "Al-Aʿrāf",
       "name_english": "Al-A'raf",
       "revelation_place": "makkah",
       "ayah_count": 206,
@@ -90,7 +90,7 @@
     {
       "number": 8,
       "name_arabic": "الأنفال",
-      "name_transliterated": "Al-'Anfāl",
+      "name_transliterated": "Al-Anfāl",
       "name_english": "Al-Anfal",
       "revelation_place": "madinah",
       "ayah_count": 75,
@@ -140,7 +140,7 @@
     {
       "number": 13,
       "name_arabic": "الرعد",
-      "name_transliterated": "Ar-Ra`d",
+      "name_transliterated": "Ar-Raʿd",
       "name_english": "Ar-Ra'd",
       "revelation_place": "madinah",
       "ayah_count": 43,
@@ -180,7 +180,7 @@
     {
       "number": 17,
       "name_arabic": "الإسراء",
-      "name_transliterated": "Al-'Isrā",
+      "name_transliterated": "Al-Isrā",
       "name_english": "Al-Isra",
       "revelation_place": "makkah",
       "ayah_count": 111,
@@ -220,7 +220,7 @@
     {
       "number": 21,
       "name_arabic": "الأنبياء",
-      "name_transliterated": "Al-'Anbyā",
+      "name_transliterated": "Al-Anbiyā",
       "name_english": "Al-Anbya",
       "revelation_place": "makkah",
       "ayah_count": 112,
@@ -240,7 +240,7 @@
     {
       "number": 23,
       "name_arabic": "المؤمنون",
-      "name_transliterated": "Al-Mu'minūn",
+      "name_transliterated": "Al-Muʾminūn",
       "name_english": "Al-Mu'minun",
       "revelation_place": "makkah",
       "ayah_count": 118,
@@ -270,7 +270,7 @@
     {
       "number": 26,
       "name_arabic": "الشعراء",
-      "name_transliterated": "Ash-Shu`arā",
+      "name_transliterated": "Ash-Shuʿarā",
       "name_english": "Ash-Shu'ara",
       "revelation_place": "makkah",
       "ayah_count": 227,
@@ -300,7 +300,7 @@
     {
       "number": 29,
       "name_arabic": "العنكبوت",
-      "name_transliterated": "Al-`Ankabūt",
+      "name_transliterated": "Al-ʿAnkabūt",
       "name_english": "Al-'Ankabut",
       "revelation_place": "makkah",
       "ayah_count": 69,
@@ -340,7 +340,7 @@
     {
       "number": 33,
       "name_arabic": "الأحزاب",
-      "name_transliterated": "Al-'Aḥzāb",
+      "name_transliterated": "Al-Aḥzāb",
       "name_english": "Al-Ahzab",
       "revelation_place": "madinah",
       "ayah_count": 73,
@@ -430,7 +430,7 @@
     {
       "number": 42,
       "name_arabic": "الشورى",
-      "name_transliterated": "Ash-Shūraá",
+      "name_transliterated": "Ash-Shūrā",
       "name_english": "Ash-Shuraa",
       "revelation_place": "makkah",
       "ayah_count": 53,
@@ -470,7 +470,7 @@
     {
       "number": 46,
       "name_arabic": "الأحقاف",
-      "name_transliterated": "Al-'Aḥqāf",
+      "name_transliterated": "Al-Aḥqāf",
       "name_english": "Al-Ahqaf",
       "revelation_place": "makkah",
       "ayah_count": 35,
@@ -570,7 +570,7 @@
     {
       "number": 56,
       "name_arabic": "الواقعة",
-      "name_transliterated": "Al-Wāqi`ah",
+      "name_transliterated": "Al-Wāqiʿah",
       "name_english": "Al-Waqi'ah",
       "revelation_place": "makkah",
       "ayah_count": 96,
@@ -590,7 +590,7 @@
     {
       "number": 58,
       "name_arabic": "المجادلة",
-      "name_transliterated": "Al-Mujādila",
+      "name_transliterated": "Al-Mujādilah",
       "name_english": "Al-Mujadila",
       "revelation_place": "madinah",
       "ayah_count": 22,
@@ -620,7 +620,7 @@
     {
       "number": 61,
       "name_arabic": "الصف",
-      "name_transliterated": "Aṣ-Ṣaf",
+      "name_transliterated": "Aṣ-Ṣaff",
       "name_english": "As-Saf",
       "revelation_place": "madinah",
       "ayah_count": 14,
@@ -630,7 +630,7 @@
     {
       "number": 62,
       "name_arabic": "الجمعة",
-      "name_transliterated": "Al-Jumu`ah",
+      "name_transliterated": "Al-Jumuʿah",
       "name_english": "Al-Jumu'ah",
       "revelation_place": "madinah",
       "ayah_count": 11,
@@ -710,7 +710,7 @@
     {
       "number": 70,
       "name_arabic": "المعارج",
-      "name_transliterated": "Al-Ma`ārij",
+      "name_transliterated": "Al-Maʿārij",
       "name_english": "Al-Ma'arij",
       "revelation_place": "makkah",
       "ayah_count": 44,
@@ -770,7 +770,7 @@
     {
       "number": 76,
       "name_arabic": "الانسان",
-      "name_transliterated": "Al-'Insān",
+      "name_transliterated": "Al-Insān",
       "name_english": "Al-Insan",
       "revelation_place": "madinah",
       "ayah_count": 31,
@@ -800,7 +800,7 @@
     {
       "number": 79,
       "name_arabic": "النازعات",
-      "name_transliterated": "An-Nāzi`āt",
+      "name_transliterated": "An-Nāziʿāt",
       "name_english": "An-Nazi'at",
       "revelation_place": "makkah",
       "ayah_count": 46,
@@ -810,7 +810,7 @@
     {
       "number": 80,
       "name_arabic": "عبس",
-      "name_transliterated": "`Abasa",
+      "name_transliterated": "ʿAbasa",
       "name_english": "'Abasa",
       "revelation_place": "makkah",
       "ayah_count": 42,
@@ -830,7 +830,7 @@
     {
       "number": 82,
       "name_arabic": "الإنفطار",
-      "name_transliterated": "Al-'Infiṭār",
+      "name_transliterated": "Al-Infiṭār",
       "name_english": "Al-Infitar",
       "revelation_place": "makkah",
       "ayah_count": 19,
@@ -850,7 +850,7 @@
     {
       "number": 84,
       "name_arabic": "الإنشقاق",
-      "name_transliterated": "Al-'Inshiqāq",
+      "name_transliterated": "Al-Inshiqāq",
       "name_english": "Al-Inshiqaq",
       "revelation_place": "makkah",
       "ayah_count": 25,
@@ -880,7 +880,7 @@
     {
       "number": 87,
       "name_arabic": "الأعلى",
-      "name_transliterated": "Al-'A`lá",
+      "name_transliterated": "Al-Aʿlā",
       "name_english": "Al-A'la",
       "revelation_place": "makkah",
       "ayah_count": 19,
@@ -940,7 +940,7 @@
     {
       "number": 93,
       "name_arabic": "الضحى",
-      "name_transliterated": "Aḍ-Ḍuḥaá",
+      "name_transliterated": "Aḍ-Ḍuḥā",
       "name_english": "Ad-Duhaa",
       "revelation_place": "makkah",
       "ayah_count": 11,
@@ -970,7 +970,7 @@
     {
       "number": 96,
       "name_arabic": "العلق",
-      "name_transliterated": "Al-`Alaq",
+      "name_transliterated": "Al-ʿAlaq",
       "name_english": "Al-'Alaq",
       "revelation_place": "makkah",
       "ayah_count": 19,
@@ -1010,7 +1010,7 @@
     {
       "number": 100,
       "name_arabic": "العاديات",
-      "name_transliterated": "Al-`Ādiyāt",
+      "name_transliterated": "Al-ʿĀdiyāt",
       "name_english": "Al-'Adiyat",
       "revelation_place": "makkah",
       "ayah_count": 11,
@@ -1020,7 +1020,7 @@
     {
       "number": 101,
       "name_arabic": "القارعة",
-      "name_transliterated": "Al-Qāri`ah",
+      "name_transliterated": "Al-Qāriʿah",
       "name_english": "Al-Qari'ah",
       "revelation_place": "makkah",
       "ayah_count": 11,
@@ -1040,7 +1040,7 @@
     {
       "number": 103,
       "name_arabic": "العصر",
-      "name_transliterated": "Al-`Aṣr",
+      "name_transliterated": "Al-ʿAṣr",
       "name_english": "Al-'Asr",
       "revelation_place": "makkah",
       "ayah_count": 3,
@@ -1080,7 +1080,7 @@
     {
       "number": 107,
       "name_arabic": "الماعون",
-      "name_transliterated": "Al-Mā`ūn",
+      "name_transliterated": "Al-Māʿūn",
       "name_english": "Al-Ma'un",
       "revelation_place": "makkah",
       "ayah_count": 7,
@@ -1130,7 +1130,7 @@
     {
       "number": 112,
       "name_arabic": "الإخلاص",
-      "name_transliterated": "Al-'Ikhlāṣ",
+      "name_transliterated": "Al-Ikhlāṣ",
       "name_english": "Al-Ikhlas",
       "revelation_place": "makkah",
       "ayah_count": 4,
