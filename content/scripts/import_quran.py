@@ -384,6 +384,20 @@ def pick(
 # --------------------------------------------------------------------------
 
 
+# QUL's transliterated surah names write the dot-below letters of Arabic
+# transliteration with look-alikes borrowed from other alphabets: ĥ for ḥ (ح),
+# ş for ṣ (ص), ţ for ṭ (ط) and đ for ḍ (ض) — so "Al-Fātiĥah" for Al-Fātiḥah.
+# To a reader who knows the convention they read as typos, and every other
+# transliteration in the app, the adhkar included, uses the dot-below letters.
+# verify_content.py fails the build if a look-alike reaches content.db.
+SURAH_NAME_LETTERS = str.maketrans({
+    "Ĥ": "Ḥ", "ĥ": "ḥ",
+    "Ş": "Ṣ", "ş": "ṣ",
+    "Ţ": "Ṭ", "ţ": "ṭ",
+    "Đ": "Ḍ", "đ": "ḍ",
+})
+
+
 def load_surahs(path: Path) -> dict[int, dict[str, Any]]:
     """Load QUL surah (chapter) metadata from SQLite or JSON."""
     if path.suffix.lower() == ".json":
@@ -403,7 +417,7 @@ def load_surahs(path: Path) -> dict[int, dict[str, Any]]:
         surahs[number] = {
             "number": number,
             "name_arabic": (row.get("name_arabic") or "").strip(),
-            "name_transliterated": name_complex or name_simple,
+            "name_transliterated": (name_complex or name_simple).translate(SURAH_NAME_LETTERS),
             "name_english": name_simple or name_complex,
             "revelation_place": (row.get("revelation_place") or "").strip().lower(),
             "ayah_count": int(row.get("verses_count") or 0),

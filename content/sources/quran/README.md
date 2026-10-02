@@ -129,6 +129,15 @@ python3 content/scripts/import_quran.py --english-names my-names.json
 where `my-names.json` is `{"1": "The Opening", "2": "The Cow", …}` covering all 114
 surahs. The importer refuses a partial list.
 
+## Transliterated surah names
+
+QUL's `name` column writes the dot-below letters of Arabic transliteration with
+look-alikes from other alphabets: `ĥ` for `ḥ` (ح), `ş` for `ṣ` (ص), `ţ` for `ṭ`
+(ط) and `đ` for `ḍ` (ض) — "Al-Fātiĥah" for Al-Fātiḥah. The importer maps them
+back (`SURAH_NAME_LETTERS` in `import_quran.py`), which puts the surah names on
+the same convention as every other transliteration in the app, and
+`verify_content.py` fails the build if one ever reaches `content.db`.
+
 ## A note on `has_bismillah`
 
 `surahs.has_bismillah` is derived as "1 for every surah except 9", **not** from QUL's
