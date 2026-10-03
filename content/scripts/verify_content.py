@@ -38,6 +38,24 @@ ITEM_TARGETS = {
 
 MAX_DETAIL_LINES = 10
 
+# Look-alikes from other alphabets that QUL writes in place of the dot-below
+# letters of Arabic transliteration — ĥ for ḥ, ş for ṣ, ţ for ṭ, đ for ḍ.
+# import_quran.py's surah_name() maps them on import; this is what keeps them
+# out of every transliteration the app shows, wherever the text came from.
+LOOKALIKE_LETTERS = frozenset("ĤĥŞşŢţĐđ")
+
+# QUL's other surah-name spellings, which surah_name() also replaces: a
+# backtick for ʿayn, an apostrophe for hamza, á for alif maqṣūrah. Checked in
+# surah names only — elsewhere an apostrophe can be an apostrophe.
+QUL_SURAH_NAME_MARKS = frozenset("`'á")
+
+# Every column of transliterated text in content.db, and what may not be in it.
+TRANSLITERATED_COLUMNS = (
+    ("surahs", "number", "name_transliterated", LOOKALIKE_LETTERS | QUL_SURAH_NAME_MARKS),
+    ("ayahs", "id", "transliteration", LOOKALIKE_LETTERS),
+    ("adhkar", "id", "transliteration", LOOKALIKE_LETTERS),
+)
+
 # The sentinel content/examples/ uses in place of religious text, which no real
 # dhikr may be written from memory to stand in for. Every example dhikr carries
 # it, so it is the one string that is legitimately repeated across ids — see
@@ -267,6 +285,14 @@ class Verifier:
                     f"{', '.join(str(i) for i in drop)} at it instead"
                 )
 
+    def transliteration_letters(self) -> None:
+        check = self.check("transliterations use ḥ ṣ ṭ ḍ ʿ ʾ ā, not QUL's stand-ins")
+        for table, key, column, forbidden in TRANSLITERATED_COLUMNS:
+            for row in self.q(f"SELECT {key} AS k, {column} AS text FROM {table} WHERE {column} IS NOT NULL"):
+                found = sorted(set(row["text"]) & forbidden)
+                if found:
+                    check.fail(f"{table} {row['k']}: {' '.join(found)} in {row['text'][:60]!r}")
+
     def legal_enums(self) -> None:
         check = self.check("every item_type and collection type is legal")
         placeholders = ", ".join("?" for _ in ITEM_TYPES)
@@ -329,6 +355,7 @@ class Verifier:
         self.repeat_groups()
         self.adhkar_sources()
         self.no_duplicate_adhkar()
+        self.transliteration_letters()
         self.legal_enums()
         self.meta_keys()
         self.no_autoincrement()

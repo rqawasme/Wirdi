@@ -384,6 +384,50 @@ def pick(
 # --------------------------------------------------------------------------
 
 
+# QUL's transliterated surah names write the dot-below letters of Arabic
+# transliteration with look-alikes borrowed from other alphabets: ĥ for ḥ (ح),
+# ş for ṣ (ص), ţ for ṭ (ط) and đ for ḍ (ض) — so "Al-Fātiĥah" for Al-Fātiḥah.
+# To a reader who knows the convention they read as typos.
+SURAH_NAME_LETTERS = str.maketrans({
+    "Ĥ": "Ḥ", "ĥ": "ḥ",
+    "Ş": "Ṣ", "ş": "ṣ",
+    "Ţ": "Ṭ", "ţ": "ṭ",
+    "Đ": "Ḍ", "đ": "ḍ",
+})
+
+# Three names QUL misspells outright, whatever the letters: al-Anbiyāʾ written
+# without its i, the one tāʾ marbūṭah not written -ah, and the one shadda not
+# doubled. Whole names, already on the convention surah_name() produces.
+SURAH_NAME_CORRECTIONS: dict[int, str] = {
+    21: "Al-Anbiyā",
+    58: "Al-Mujādilah",
+    61: "Aṣ-Ṣaff",
+}
+
+
+def surah_name(number: int, qul_name: str) -> str:
+    """QUL's transliterated surah name, on the convention the adhkar use.
+
+    1. The look-alike letters above become the dot-below letters.
+    2. QUL's á for alif maqṣūrah, written "aá" after a fatḥah, becomes ā:
+       "Ash-Shūraá" -> "Ash-Shūrā", "Al-A`lá" -> "Al-Aʿlā".
+    3. QUL's backtick for ʿayn becomes ʿ (U+02BF): "`Abasa" -> "ʿAbasa".
+    4. QUL's apostrophe for hamza is dropped at the start of a word, which is
+       how the adhkar write it ("aʿūdhu", never "ʾaʿūdhu"), and becomes ʾ
+       (U+02BE) inside one: "Al-'Aḥzāb" -> "Al-Aḥzāb", "Al-Mu'minūn" ->
+       "Al-Muʾminūn".
+
+    verify_content.py fails the build if any of QUL's forms reaches content.db.
+    """
+    if number in SURAH_NAME_CORRECTIONS:
+        return SURAH_NAME_CORRECTIONS[number]
+    name = qul_name.translate(SURAH_NAME_LETTERS)
+    name = name.replace("aá", "ā").replace("á", "ā")
+    name = name.replace("`", "ʿ")
+    name = re.sub(r"(^|[- ])'", r"\1", name)
+    return name.replace("'", "ʾ")
+
+
 def load_surahs(path: Path) -> dict[int, dict[str, Any]]:
     """Load QUL surah (chapter) metadata from SQLite or JSON."""
     if path.suffix.lower() == ".json":
@@ -403,7 +447,7 @@ def load_surahs(path: Path) -> dict[int, dict[str, Any]]:
         surahs[number] = {
             "number": number,
             "name_arabic": (row.get("name_arabic") or "").strip(),
-            "name_transliterated": name_complex or name_simple,
+            "name_transliterated": surah_name(number, name_complex or name_simple),
             "name_english": name_simple or name_complex,
             "revelation_place": (row.get("revelation_place") or "").strip().lower(),
             "ayah_count": int(row.get("verses_count") or 0),

@@ -129,6 +129,25 @@ python3 content/scripts/import_quran.py --english-names my-names.json
 where `my-names.json` is `{"1": "The Opening", "2": "The Cow", …}` covering all 114
 surahs. The importer refuses a partial list.
 
+## Transliterated surah names
+
+QUL's `name` column transliterates on a convention of its own, and the importer
+(`surah_name()` in `import_quran.py`) puts it on the one the adhkar use:
+
+| QUL | App | For | Example |
+| --- | --- | --- | --- |
+| `ĥ` `ş` `ţ` `đ` | `ḥ` `ṣ` `ṭ` `ḍ` | ح ص ط ض | Al-Fātiĥah → Al-Fātiḥah |
+| `` ` `` | `ʿ` (U+02BF) | ع | `` `Abasa `` → ʿAbasa |
+| `'` | `ʾ` (U+02BE), or nothing at the start of a word | ء | Al-Mu'minūn → Al-Muʾminūn, Al-'Aḥzāb → Al-Aḥzāb |
+| `á`, `aá` | `ā` | ى | Aḍ-Ḍuḥaá → Aḍ-Ḍuḥā |
+
+Three names are misspelled in QUL whatever the letters, and are replaced whole
+(`SURAH_NAME_CORRECTIONS`): 21 al-Anbiyā, written without its *i*; 58
+al-Mujādilah, the one *tāʾ marbūṭah* not written *-ah*; and 61 aṣ-Ṣaff, the one
+*shadda* not doubled.
+
+`verify_content.py` fails the build if any of QUL's forms reaches `content.db`.
+
 ## A note on `has_bismillah`
 
 `surahs.has_bismillah` is derived as "1 for every surah except 9", **not** from QUL's
