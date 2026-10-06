@@ -368,8 +368,8 @@ rate-limited to one every half second while counting — the player's rule, for
 the player's reason — and a reset is written immediately, because it is the
 change that would be worst to lose.
 
-**The goal is the marker bead, not the end of the string.** Set one — 33, 99,
-100, 1000 or any count up to the six digits every count field takes — and a
+**The goal is the marker bead, not the end of the string.** Set one — 33, 100,
+1000 or any count up to the six digits every count field takes — and a
 counted `VoussoirStripe` under the number fills toward it. The tap that lands
 on the goal knocks twice instead of clicking, and so does the tap on every
 multiple of it after, the way the marker bead comes round under the thumb on

@@ -555,10 +555,11 @@ class _GoalSheet extends StatefulWidget {
 
   final int? current;
 
-  /// Thirty-three for the tasbih after prayer, ninety-nine for its three
-  /// rounds together and for the names, a hundred for the adhkar the hadith
-  /// count in hundreds, and a thousand for a long sitting.
-  static const List<int> presets = <int>[33, 99, 100, 1000];
+  /// Thirty-three for the tasbih after prayer, a hundred for the adhkar the
+  /// hadith count in hundreds, and a thousand for a long sitting. Anything
+  /// else is the field's to hold — a goal saved before a preset was dropped
+  /// opens there, so it is kept rather than lost.
+  static const List<int> presets = <int>[33, 100, 1000];
 
   @override
   State<_GoalSheet> createState() => _GoalSheetState();
