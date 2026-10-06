@@ -39,8 +39,12 @@ Abu Bakr al-Sakran al-Saqqaf; **Hizb al-Nasr**, the Litany of Victory — two
 different litanies of that name, one by Imam al-Haddad and one by Imam
 al-Shadhili, which is why those two carry their author in the name; **Dua
 al-Nasiri**, the Prayer of the Oppressed, of Imam Muhammad ibn Nasir al-Dar'i;
-and the two daily **Ratibs**, of Imam al-Haddad and of Habib Umar al-Attas.
-That list is deliberately not counted here: another one is two more files in
+the two daily **Ratibs**, of Imam al-Haddad and of Habib Umar al-Attas; and
+the supplications for **waking up from sleep** from Imam al-Ghazali's Bidayat
+al-Hidaya, which draws on the dhikr library rather than adding a file of its
+own: three of its five duas are from the library's Bidayat al-Hidaya
+supplications and two are the morning adhkar's. That list is deliberately not
+counted here: another one is two more files in
 `content/sources/` — one of adhkar, one of collection items — so
 `sources/collections/` is the listing that stays true.
 Each morning/evening pair shares one file of dhikr text — most of what is said

@@ -139,6 +139,7 @@ void _tests(File file) {
         'b:20',
         'b:21',
         'b:22',
+        'b:23',
       ]),
     );
     expect(
@@ -157,6 +158,7 @@ void _tests(File file) {
         'Dua al-Nasiri',
         'Ratib al-Haddad',
         'Ratib al-Attas',
+        'Waking up from sleep',
       ]),
     );
   });
