@@ -29,6 +29,13 @@ import 'player_haptics.dart';
 /// takes the count to zero and leaves the goal where it is, ready for the next
 /// round.
 ///
+/// The count stays one number, and the rounds are read off it rather than
+/// kept beside it: [goalsReached] is how many rounds are done and [roundTaps]
+/// is how far into the next one. So a hundred, ten times, and a thousand once
+/// are the same thousand taps, shown the way each was asked for — and undo,
+/// reset and a restart cannot leave a round count disagreeing with the count
+/// it came from.
+///
 /// Only a tap lands on the goal. Undoing back onto a multiple is not reaching
 /// it, and setting a goal at or below the count that is already there is not
 /// reaching it either — both are the number being moved, not counted.
@@ -135,15 +142,16 @@ class TasbihCounter extends ChangeNotifier {
   /// tab always was.
   int? get goal => _goal;
 
-  /// How many times the count has gone past the goal: 0 short of it, 1 from
-  /// the goal up to just short of twice it, and so on.
+  /// How many rounds are done: 0 short of the goal, 1 from the goal up to
+  /// just short of twice it, and so on. The screen's rounds plate.
   int get goalsReached {
     final int? goal = _goal;
     return goal == null ? 0 : _count ~/ goal;
   }
 
-  /// How far into the current round the count is, from 0 to [goal], for the
-  /// stripe. Zero with no goal.
+  /// How far into the current round the count is, from 0 to [goal]: the
+  /// number the screen shows with a goal, and how full the stripe is. Zero
+  /// with no goal.
   ///
   /// Exactly on a multiple it is the whole round, not none of it: the tap that
   /// lands on 33 fills the stripe, and the tap after it starts the next one.

@@ -61,6 +61,17 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  /// Whether [text] is there to be read: on the screen, and not in a line
+  /// that is held open but left unpainted.
+  bool readable(String text) {
+    final Finder found = find.text(text);
+    if (found.evaluate().isEmpty) return false;
+    return find
+        .ancestor(of: found, matching: find.byType(Visibility))
+        .evaluate()
+        .every((Element element) => (element.widget as Visibility).visible);
+  }
+
   /// The goal's stripe. The only one on this screen: the rule under the app
   /// bar belongs to the shell, which is not pumped here.
   VoussoirStripe stripe(WidgetTester tester) =>
@@ -145,6 +156,8 @@ void main() {
       await chooseGoal(tester, '33');
       expect(find.text('Goal 33'), findsOneWidget);
       expect(find.text('of 33'), findsOneWidget);
+      // The rounds plate is there from the start, at nothing.
+      expect(find.text('×0'), findsOneWidget);
       expect(stripe(tester).lit, 0);
       expect(stripe(tester).segments, 33);
 
@@ -154,37 +167,68 @@ void main() {
       expect(find.text('of 33'), findsOneWidget);
     });
 
-    testWidgets('is said when it is reached, and counting carries on past it', (
+    testWidgets('fills a round, counts it, and starts the next at one', (
       WidgetTester tester,
     ) async {
       await data.userRepository.setSetting(TasbihCounter.goalKey, '3');
       await pumpTasbih(tester);
-      expect(find.text('of 3'), findsOneWidget);
+      expect(find.text('0'), findsOneWidget);
+      expect(find.text('×0'), findsOneWidget);
 
       for (int tap = 0; tap < 3; tap++) {
         await count(tester);
       }
       await tester.pumpAndSettle();
+      // Full on the goal itself, and the round counted on that same tap.
       expect(find.text('3'), findsOneWidget);
-      expect(find.text('Goal reached'), findsOneWidget);
-      expect(stripe(tester).lit, 3, reason: 'full on the goal itself');
+      expect(stripe(tester).lit, 3);
+      expect(find.text('×1'), findsOneWidget);
+      // The number above is still the total, so the total is not said twice.
+      expect(readable('3 in all'), isFalse);
 
-      // Past it: still counting, the stripe starting the next round, and the
-      // line still saying what was reached.
+      // The next tap starts the next round, and the total comes in under it.
       await count(tester);
       await tester.pumpAndSettle();
-      expect(find.text('4'), findsOneWidget);
-      expect(find.text('Goal reached'), findsOneWidget);
+      expect(find.text('1'), findsOneWidget);
       expect(stripe(tester).lit, 1);
+      expect(find.text('×1'), findsOneWidget);
+      expect(readable('4 in all'), isTrue);
 
       await count(tester);
       await count(tester);
       await tester.pumpAndSettle();
-      expect(find.text('6'), findsOneWidget);
-      expect(find.text('Goal reached ×2'), findsOneWidget);
+      expect(find.text('3'), findsOneWidget);
+      expect(find.text('×2'), findsOneWidget);
+      expect(readable('6 in all'), isTrue);
     });
 
-    testWidgets('is announced with the count', (WidgetTester tester) async {
+    testWidgets(
+      'ten rounds of a hundred are a thousand, and go on from there',
+      (WidgetTester tester) async {
+        await data.userRepository.setSetting(TasbihCounter.settingKey, '999');
+        await data.userRepository.setSetting(TasbihCounter.goalKey, '100');
+        await pumpTasbih(tester);
+        expect(find.text('99'), findsOneWidget);
+        expect(find.text('×9'), findsOneWidget);
+        expect(readable('999 in all'), isTrue);
+
+        await count(tester);
+        await tester.pumpAndSettle();
+        expect(find.text('100'), findsOneWidget);
+        expect(find.text('×10'), findsOneWidget);
+        expect(readable('1000 in all'), isTrue);
+
+        await count(tester);
+        await tester.pumpAndSettle();
+        expect(find.text('1'), findsOneWidget);
+        expect(find.text('×10'), findsOneWidget);
+        expect(readable('1001 in all'), isTrue);
+      },
+    );
+
+    testWidgets('is announced with the round, the rounds and the total', (
+      WidgetTester tester,
+    ) async {
       final SemanticsHandle semantics = tester.ensureSemantics();
       await data.userRepository.setSetting(TasbihCounter.goalKey, '2');
       await pumpTasbih(tester);
@@ -196,11 +240,14 @@ void main() {
       await count(tester);
       await count(tester);
       await tester.pumpAndSettle();
-      expect(announced(), '2, goal of 2 reached');
+      expect(announced(), '2 of 2, goal reached once');
       await count(tester);
       await count(tester);
       await tester.pumpAndSettle();
-      expect(announced(), '4, goal of 2 reached 2 times');
+      expect(announced(), '2 of 2, goal reached 2 times, 4 in all');
+      await count(tester);
+      await tester.pumpAndSettle();
+      expect(announced(), '1 of 2, goal reached 2 times, 5 in all');
 
       semantics.dispose();
     });
@@ -241,9 +288,10 @@ void main() {
 
       await count(tester);
 
-      // Reached and said, on the frame of the tap, with nothing in motion.
+      // Reached and counted, on the frame of the tap, with nothing in motion.
       expect(tester.hasRunningAnimations, isFalse);
-      expect(find.text('Goal reached'), findsOneWidget);
+      expect(find.text('×1'), findsOneWidget);
+      expect(find.text('×0'), findsNothing);
       // The second knock is still on its way.
       await tester.pump(const Duration(seconds: 1));
     });
@@ -252,7 +300,8 @@ void main() {
       await data.userRepository.setSetting(TasbihCounter.settingKey, '5');
       await data.userRepository.setSetting(TasbihCounter.goalKey, '3');
       await pumpTasbih(tester);
-      expect(find.text('Goal reached'), findsOneWidget);
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('×1'), findsOneWidget);
 
       await tester.tap(button('Reset'));
       await tester.pumpAndSettle();
@@ -261,17 +310,27 @@ void main() {
 
       expect(find.text('0'), findsOneWidget);
       expect(find.text('of 3'), findsOneWidget);
+      expect(find.text('×0'), findsOneWidget);
+      expect(readable('5 in all'), isFalse);
       expect(find.text('Goal 3'), findsOneWidget);
     });
 
-    testWidgets('can be taken away again', (WidgetTester tester) async {
+    testWidgets('can be taken away again, and the number is the count', (
+      WidgetTester tester,
+    ) async {
+      await data.userRepository.setSetting(TasbihCounter.settingKey, '40');
       await data.userRepository.setSetting(TasbihCounter.goalKey, '33');
       await pumpTasbih(tester);
+      expect(find.text('7'), findsOneWidget);
       expect(find.text('of 33'), findsOneWidget);
 
       await chooseGoal(tester, 'No goal');
 
+      // Nothing was lost: the rounds were only ever a way of reading it.
+      expect(find.text('40'), findsOneWidget);
       expect(find.text('of 33'), findsNothing);
+      expect(find.text('×1'), findsNothing);
+      expect(find.textContaining('in all'), findsNothing);
       expect(find.byType(VoussoirStripe), findsNothing);
       expect(find.text('Goal'), findsOneWidget);
     });

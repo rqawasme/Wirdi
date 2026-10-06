@@ -356,9 +356,9 @@ from disagreeing about where the day begins.
 ### The tasbih tab
 
 A free counter, with a goal if somebody wants one. One enormous tap target, the
-running count in 72dp numerals over it, and undo, the goal and reset in a bar
-underneath — no dhikr behind the number, and no history kept of what it
-reached.
+running count — or, with a goal, the round — in 72dp numerals over it, and undo,
+the goal and reset in a bar underneath. No dhikr behind the number, and no
+history kept of what it reached.
 
 **It counts until somebody resets it.** Not until the end of a step, not until
 midnight, not until the goal, and not until the app is closed: `TasbihCounter`
@@ -370,16 +370,22 @@ change that would be worst to lose.
 
 **The goal is the marker bead, not the end of the string.** Set one — 33, 100,
 1000 or any count up to the six digits every count field takes — and a
-counted `VoussoirStripe` under the number fills toward it. The tap that lands
-on the goal knocks twice instead of clicking, and so does the tap on every
-multiple of it after, the way the marker bead comes round under the thumb on
-each pass. Nothing stops there: the count carries on, the stripe starts the
-next round on the next tap, and the caption under it goes from `of 33` to
-`Goal reached`, then `Goal reached ×2`. The line is the same at the hundredth
-multiple as at the first bar the number on it; nothing escalates. It is
-persisted under `tasbih.goal`, written immediately, and a reset leaves it where
-it is. Only a tap reaches it: undoing back onto a multiple, or setting a goal
-the count is already past, shows it as reached and does not knock.
+counted `VoussoirStripe` under the number fills toward it while the number
+counts the round. The tap that lands on the goal knocks twice instead of
+clicking, and so does the tap on every multiple of it after, the way the marker
+bead comes round under the thumb on each pass. Nothing stops there: the next
+tap starts the next round at one, with the stripe empty again, a plate under the
+stripe counts the rounds — `×0`, `×1`, `×2` — and a line under that keeps the
+running total once it is no longer the number above (`140 in all`). So a
+thousand can be one goal of a thousand or ten rounds of a hundred, whichever way
+somebody keeps it, and they are the same thousand taps: the count is one number
+and the rounds are read off it, never kept beside it, so undo, reset and a
+restart cannot leave the two disagreeing. The plate is there from the moment a
+goal is, at `×0`, and the same at the hundredth round as at the first; nothing
+escalates. The goal is persisted under `tasbih.goal`, written immediately, and a
+reset leaves it where it is. Only a tap reaches it: undoing back onto a
+multiple, or setting a goal the count is already past, shows it as reached and
+does not knock.
 
 **It is deliberately not the wird player.** The player counts *something*, a
 step at a time, and finishes; this counts taps, and does not. What it borrows is
@@ -390,7 +396,7 @@ haptic, through the same `PlayerHaptics` and the same settings switch.
 
 **Reaching the goal is the one thing that moves.** The number and the stripe
 swell once and settle back over one `WirdiMotion.completion` beat, and the
-caption fades to its new line. Scale and opacity only, painted rather than laid
+rounds plate fades to its new count. Scale and opacity only, painted rather than laid
 out, and on the new number — the swell never holds a count back, and the next
 tap lands while it is settling. With animations turned off in the OS the goal
 is reached on the frame of the tap with nothing in motion.

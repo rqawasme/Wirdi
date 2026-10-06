@@ -10,6 +10,7 @@ import '../providers/data_providers.dart';
 import '../providers/settings.dart';
 import '../theme/theme.dart';
 import '../widgets/failure_screen.dart';
+import '../widgets/plate.dart';
 import '../widgets/voussoir_stripe.dart';
 
 /// The tasbih: one number, one tap target, and a way back to zero — with a
@@ -21,10 +22,13 @@ import '../widgets/voussoir_stripe.dart';
 /// switch and across a restart of the app. That is what a hand-held tasbih
 /// does.
 ///
-/// The goal is the marker bead on the string. Set one and a stripe under the
-/// number fills toward it, the tap that reaches it knocks twice, and so does
-/// every multiple of it after — and the count carries on through all of them.
-/// Leave it unset and the screen is the bare counter it always was.
+/// The goal is the marker bead on the string. Set one and the number counts
+/// the round: it climbs to the goal as a stripe under it fills, the tap that
+/// reaches it knocks twice, and the next tap starts the next round at one. A
+/// plate under the stripe counts the rounds and a line under that keeps the
+/// total, so a thousand can be one goal of a thousand or ten rounds of a
+/// hundred, whichever way somebody keeps it. Leave the goal unset and the
+/// screen is the bare counter it always was.
 ///
 /// It is the counting screen the wird player is not: the player counts
 /// *something*, a step at a time, and stops when the wird is done. When the
@@ -273,6 +277,10 @@ class _TapToCountState extends State<_TapToCount>
     final ColorScheme colors = theme.colorScheme;
     final TasbihCounter counter = widget.counter;
     final int? goal = counter.goal;
+    // With a goal the number is the round, like the beads between two marker
+    // beads: it climbs to the goal with the stripe and starts again with it.
+    // Without one it is the count, as it always was.
+    final int shown = goal == null ? counter.count : counter.roundTaps;
 
     return Semantics(
       button: true,
@@ -309,7 +317,7 @@ class _TapToCountState extends State<_TapToCount>
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
-                        '${counter.count}',
+                        '$shown',
                         style: type.tasbihCount.copyWith(color: colors.primary),
                       ),
                     ),
@@ -331,8 +339,15 @@ class _TapToCountState extends State<_TapToCount>
                       child: _stripe(counter, goal),
                     ),
                   ),
-                  const SizedBox(height: WirdiMetrics.space3),
-                  _GoalCaption(counter: counter),
+                  const SizedBox(height: WirdiMetrics.space2),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: _TapToCount.stripeWidth,
+                    ),
+                    child: _RoundLine(counter: counter, goal: goal),
+                  ),
+                  const SizedBox(height: WirdiMetrics.space2),
+                  _Total(counter: counter, goal: goal),
                 ],
                 const SizedBox(height: WirdiMetrics.space4),
                 Text(
@@ -366,70 +381,109 @@ class _TapToCountState extends State<_TapToCount>
     );
   }
 
+  /// The round, the rounds and the total, in that order, which is the order
+  /// they are read on the screen: what is being counted now first.
   static String _semanticValue(TasbihCounter counter) {
     final int? goal = counter.goal;
     if (goal == null) return '${counter.count}';
-    return switch (counter.goalsReached) {
-      0 => '${counter.count} of $goal',
-      1 => '${counter.count}, goal of $goal reached',
-      final int times => '${counter.count}, goal of $goal reached $times times',
-    };
+    final int rounds = counter.goalsReached;
+    return <String>[
+      '${counter.roundTaps} of $goal',
+      if (rounds == 1) 'goal reached once',
+      if (rounds > 1) 'goal reached $rounds times',
+      if (counter.count > goal) '${counter.count} in all',
+    ].join(', ');
   }
 }
 
-/// What the stripe means, in words: how far there is to go, and then how many
-/// times the goal has come round.
+/// Under the stripe: what the round is counting to, and how many rounds there
+/// have been.
 ///
-/// "Goal reached" and not a congratulation, and the same line at the
-/// hundredth multiple as at the first bar the count on it: nothing escalates,
+/// The rounds are a [Plate], `×3` the way a dhikr said three times is `×3`
+/// everywhere else in the app — the goal, so many times over. It is there from
+/// the moment there is a goal, at `×0`, for the reason the player's step
+/// header always carries its plate: a plate that comes and goes is worse than
+/// a quiet one, and this one sitting at nothing is what says where the first
+/// round will be counted.
+///
+/// The same plate at the hundredth round as at the first. Nothing escalates,
 /// which is the rule the home tiles and the finished wird keep too.
-class _GoalCaption extends StatelessWidget {
-  const _GoalCaption({required this.counter});
+class _RoundLine extends StatelessWidget {
+  const _RoundLine({required this.counter, required this.goal});
 
   final TasbihCounter counter;
+  final int goal;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final ColorScheme colors = theme.colorScheme;
-    final TextStyle? style = theme.textTheme.bodyMedium;
-    final int reached = counter.goalsReached;
+    final int rounds = counter.goalsReached;
 
-    final Widget caption = reached == 0
-        ? Text(
-            'of ${counter.goal}',
-            key: ValueKey<String>('of ${counter.goal}'),
-            style: style?.copyWith(color: colors.onSurfaceVariant),
-          )
-        : Row(
-            key: ValueKey<String>('reached $reached'),
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              // Brick, as the player's finished band marks its check: the one
-              // mark on the screen that says something has been reached.
-              Icon(
-                Icons.check,
-                size: WirdiMetrics.space5,
-                color: colors.primary,
-              ),
-              const SizedBox(width: WirdiMetrics.space1),
-              Text(
-                reached == 1 ? 'Goal reached' : 'Goal reached ×$reached',
-                style: style?.copyWith(color: colors.onSurface),
-              ),
-            ],
-          );
-
-    // A short fade between one line and the next. The caption changes on the
-    // goal's tap and not between, so it is never a fade on the counting path.
+    // A short fade from one count of rounds to the next. The plate changes on
+    // the goal's tap and not between, so it is never a fade on the counting
+    // path.
     final Duration fade = MediaQuery.disableAnimationsOf(context)
         ? Duration.zero
         : theme.extension<WirdiMotion>()!.standard;
-    return AnimatedSwitcher(
-      duration: fade,
-      switchInCurve: WirdiMotion.easingDecelerate,
-      switchOutCurve: WirdiMotion.easingAccelerate,
-      child: caption,
+
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Text(
+            'of $goal',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        const SizedBox(width: WirdiMetrics.space2),
+        // Right-aligned, so a round count that gains a digit grows away from
+        // the goal rather than pushing it.
+        AnimatedSwitcher(
+          duration: fade,
+          switchInCurve: WirdiMotion.easingDecelerate,
+          switchOutCurve: WirdiMotion.easingAccelerate,
+          layoutBuilder: (Widget? current, List<Widget> previous) => Stack(
+            alignment: Alignment.centerRight,
+            children: <Widget>[...previous, ?current],
+          ),
+          child: Plate(key: ValueKey<int>(rounds), label: '×$rounds'),
+        ),
+      ],
+    );
+  }
+}
+
+/// The running total, once it is no longer the number above.
+///
+/// Until the first round is done the number on the screen *is* the total, so
+/// saying it again under the stripe would be the same number twice. Its line
+/// is held open all the same — kept in the layout and not painted — so the
+/// column does not jump up on the tap after the goal, which is the tap the eye
+/// is most likely to be on.
+class _Total extends StatelessWidget {
+  const _Total({required this.counter, required this.goal});
+
+  final TasbihCounter counter;
+  final int goal;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return Visibility(
+      visible: counter.count > goal,
+      maintainSize: true,
+      maintainAnimation: true,
+      maintainState: true,
+      child: Text(
+        '${counter.count} in all',
+        textAlign: TextAlign.center,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+      ),
     );
   }
 }
