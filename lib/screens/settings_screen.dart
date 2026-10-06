@@ -92,8 +92,8 @@ class SettingsScreen extends ConsumerWidget {
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Haptics'),
                   subtitle: const Text(
-                    'The counter answers each tap, and knocks at the end of a '
-                    'step',
+                    'A click on each tap, a knock at the end of a step, and '
+                    'two at a tasbih goal',
                   ),
                   value: settings.haptics,
                   onChanged: controller.setHaptics,

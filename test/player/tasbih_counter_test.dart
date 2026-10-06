@@ -37,12 +37,14 @@ void main() {
 
   TasbihCounter counterOn({
     int initialCount = 0,
+    int? initialGoal,
     Duration saveDebounce = TasbihCounter.defaultSaveDebounce,
   }) {
     final TasbihCounter counter = TasbihCounter(
       user: user,
       haptics: haptics.haptics,
       initialCount: initialCount,
+      initialGoal: initialGoal,
       saveDebounce: saveDebounce,
     );
     opened.add(counter);
@@ -50,6 +52,17 @@ void main() {
   }
 
   Future<String?> stored() => user.setting(TasbihCounter.settingKey);
+
+  Future<String?> storedGoal() => user.setting(TasbihCounter.goalKey);
+
+  Future<TasbihCounter> reopened() async {
+    final TasbihCounter counter = await TasbihCounter.open(
+      user: user,
+      haptics: haptics.haptics,
+    );
+    opened.add(counter);
+    return counter;
+  }
 
   test('counts a tap at a time, with no ceiling to reach', () async {
     final TasbihCounter counter = counterOn();
@@ -60,10 +73,14 @@ void main() {
       counter.increment();
     }
 
-    // Past thirty-three and past a hundred: nothing here completes, and the
-    // count is not a wird's.
+    // Past thirty-three and past a hundred: with no goal nothing here
+    // completes, nothing knocks, and the count is not a wird's.
     expect(counter.count, 100);
     expect(counter.isEmpty, isFalse);
+    expect(counter.goal, isNull);
+    expect(counter.goalsReached, 0);
+    expect(counter.roundTaps, 0);
+    expect(haptics.knocks, 0);
   });
 
   test('undo takes one tap back, and stops at zero', () async {
@@ -156,37 +173,189 @@ void main() {
     counter.increment();
     counter.increment();
     counter.decrement();
-    expect(haptics.selections, 3);
-    expect(haptics.impacts, 0);
+    expect(haptics.clicks, 3);
+    expect(haptics.knocks, 0);
 
-    // The heavier effect, and only it: reset is the one thing on this screen
-    // that has to be distinguishable from a tap without looking.
+    // The heavier effect, and only it: reset has to be distinguishable from a
+    // tap without looking.
     counter.reset();
-    expect(haptics.selections, 3);
-    expect(haptics.impacts, 1);
+    expect(haptics.clicks, 3);
+    expect(haptics.knocks, 1);
 
     // Nothing to reset, nothing to feel.
     counter.reset();
     counter.decrement();
-    expect(haptics.impacts, 1);
-    expect(haptics.selections, 3);
+    expect(haptics.knocks, 1);
+    expect(haptics.clicks, 3);
+  });
+
+  group('the goal', () {
+    test('the tap on the goal knocks twice instead of clicking, and so does '
+        'every multiple of it', () {
+      final TasbihCounter counter = counterOn(initialGoal: 3);
+
+      final List<int> rounds = <int>[];
+      for (int tap = 0; tap < 9; tap++) {
+        counter.increment();
+        rounds.add(counter.roundTaps);
+      }
+
+      // On 3, 6 and 9: two knocks each, and no click on those three taps.
+      expect(haptics.knocks, 6);
+      expect(haptics.clicks, 6);
+      expect(counter.goalArrivals, 3);
+      expect(counter.goalsReached, 3);
+      // The stripe fills on the goal's tap and starts again on the next one.
+      expect(rounds, <int>[1, 2, 3, 1, 2, 3, 1, 2, 3]);
+    });
+
+    test('the count carries on past the goal', () {
+      final TasbihCounter counter = counterOn(initialGoal: 33);
+
+      for (int tap = 0; tap < 40; tap++) {
+        counter.increment();
+      }
+
+      expect(counter.count, 40);
+      expect(counter.goalsReached, 1);
+      expect(counter.roundTaps, 7);
+    });
+
+    test(
+      'undo is a click, and coming back up onto the goal reaches it again',
+      () {
+        final TasbihCounter counter = counterOn(initialGoal: 3);
+        for (int tap = 0; tap < 3; tap++) {
+          counter.increment();
+        }
+        expect(counter.goalArrivals, 1);
+        expect(haptics.knocks, 2);
+
+        counter.decrement();
+        expect(counter.goalsReached, 0);
+        expect(haptics.knocks, 2, reason: 'undo is never a knock');
+        expect(haptics.clicks, 3);
+
+        counter.increment();
+        expect(counter.goalArrivals, 2);
+        expect(haptics.knocks, 4);
+      },
+    );
+
+    test('undoing back onto a multiple is not reaching it', () {
+      final TasbihCounter counter = counterOn(initialCount: 4, initialGoal: 3);
+
+      counter.decrement();
+
+      expect(counter.count, 3);
+      expect(counter.goalsReached, 1);
+      expect(counter.roundTaps, 3, reason: 'the stripe is full on the goal');
+      expect(counter.goalArrivals, 0);
+      expect(haptics.knocks, 0);
+    });
+
+    test('a goal set at or below the count is reached, without a knock', () {
+      final TasbihCounter counter = counterOn(initialCount: 40);
+
+      counter.setGoal(33);
+
+      expect(counter.goalsReached, 1);
+      expect(counter.roundTaps, 7);
+      expect(counter.goalArrivals, 0);
+      expect(haptics.knocks, 0, reason: 'nothing was counted onto it');
+    });
+
+    test('reset takes the count to zero and leaves the goal', () {
+      final TasbihCounter counter = counterOn(
+        initialCount: 10,
+        initialGoal: 33,
+      );
+
+      counter.reset();
+
+      expect(counter.count, 0);
+      expect(counter.goal, 33);
+      expect(counter.roundTaps, 0);
+      expect(counter.goalsReached, 0);
+    });
+
+    test('is written straight away, and survives being opened again', () async {
+      final TasbihCounter counter = counterOn();
+
+      counter.setGoal(33);
+      // Not behind the rate limiter: a goal is chosen once, not in bursts.
+      expect(counter.hasPendingSave, isFalse);
+      await counter.writes;
+      expect(await storedGoal(), '33');
+      expect((await reopened()).goal, 33);
+
+      counter.setGoal(null);
+      await counter.writes;
+      expect(await storedGoal(), '');
+      expect((await reopened()).goal, isNull);
+    });
+
+    test('lands in order with the count it was set among', () async {
+      final TasbihCounter counter = counterOn();
+
+      counter.increment();
+      counter.increment();
+      counter.setGoal(5);
+      counter.reset();
+      counter.setGoal(7);
+      await counter.flush();
+
+      final TasbihCounter again = await reopened();
+      expect(again.count, 0);
+      expect(again.goal, 7);
+    });
+
+    test('a stored goal no sheet could set is no goal', () async {
+      for (final String raw in <String>[
+        '',
+        'none',
+        '0',
+        '-3',
+        '9.5',
+        '${TasbihCounter.maxGoal + 1}',
+      ]) {
+        await user.setSetting(TasbihCounter.goalKey, raw);
+        expect((await reopened()).goal, isNull, reason: 'stored "$raw"');
+      }
+    });
+
+    test('a goal outside the range is refused, not stored', () async {
+      final TasbihCounter counter = counterOn(initialGoal: 33);
+
+      expect(() => counter.setGoal(0), throwsArgumentError);
+      expect(
+        () => counter.setGoal(TasbihCounter.maxGoal + 1),
+        throwsArgumentError,
+      );
+      expect(counter.goal, 33);
+
+      counter.setGoal(TasbihCounter.maxGoal);
+      expect(counter.goal, TasbihCounter.maxGoal);
+    });
   });
 }
 
-/// [PlayerHaptics] with the two effects counted instead of sent, and a clock
-/// that steps a second on each read — so the throttle never swallows an effect
-/// a test meant to count.
+/// [PlayerHaptics] with the two effects counted instead of sent, a clock that
+/// steps a second on each read — so the throttle never swallows an effect a
+/// test meant to count — and the goal's second knock run at once rather than
+/// after its gap, so a goal is always both of its knocks.
 class RecordedTasbihHaptics {
   RecordedTasbihHaptics() {
     haptics = PlayerHaptics(
-      selection: () => selections++,
-      impact: () => impacts++,
+      click: () => clicks++,
+      knock: () => knocks++,
       clock: () => DateTime(2026).add(Duration(seconds: _reads++)),
+      schedule: (Duration delay, HapticEffect effect) => effect(),
     );
   }
 
   late final PlayerHaptics haptics;
-  int selections = 0;
-  int impacts = 0;
+  int clicks = 0;
+  int knocks = 0;
   int _reads = 0;
 }
