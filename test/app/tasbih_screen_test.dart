@@ -184,7 +184,7 @@ void main() {
       expect(stripe(tester).lit, 3);
       expect(find.text('×1'), findsOneWidget);
       // The number above is still the total, so the total is not said twice.
-      expect(readable('3 in all'), isFalse);
+      expect(readable('Total 3'), isFalse);
 
       // The next tap starts the next round, and the total comes in under it.
       await count(tester);
@@ -192,14 +192,14 @@ void main() {
       expect(find.text('1'), findsOneWidget);
       expect(stripe(tester).lit, 1);
       expect(find.text('×1'), findsOneWidget);
-      expect(readable('4 in all'), isTrue);
+      expect(readable('Total 4'), isTrue);
 
       await count(tester);
       await count(tester);
       await tester.pumpAndSettle();
       expect(find.text('3'), findsOneWidget);
       expect(find.text('×2'), findsOneWidget);
-      expect(readable('6 in all'), isTrue);
+      expect(readable('Total 6'), isTrue);
     });
 
     testWidgets(
@@ -210,19 +210,19 @@ void main() {
         await pumpTasbih(tester);
         expect(find.text('99'), findsOneWidget);
         expect(find.text('×9'), findsOneWidget);
-        expect(readable('999 in all'), isTrue);
+        expect(readable('Total 999'), isTrue);
 
         await count(tester);
         await tester.pumpAndSettle();
         expect(find.text('100'), findsOneWidget);
         expect(find.text('×10'), findsOneWidget);
-        expect(readable('1000 in all'), isTrue);
+        expect(readable('Total 1000'), isTrue);
 
         await count(tester);
         await tester.pumpAndSettle();
         expect(find.text('1'), findsOneWidget);
         expect(find.text('×10'), findsOneWidget);
-        expect(readable('1001 in all'), isTrue);
+        expect(readable('Total 1001'), isTrue);
       },
     );
 
@@ -244,10 +244,10 @@ void main() {
       await count(tester);
       await count(tester);
       await tester.pumpAndSettle();
-      expect(announced(), '2 of 2, goal reached 2 times, 4 in all');
+      expect(announced(), '2 of 2, goal reached 2 times, total 4');
       await count(tester);
       await tester.pumpAndSettle();
-      expect(announced(), '1 of 2, goal reached 2 times, 5 in all');
+      expect(announced(), '1 of 2, goal reached 2 times, total 5');
 
       semantics.dispose();
     });
@@ -311,7 +311,7 @@ void main() {
       expect(find.text('0'), findsOneWidget);
       expect(find.text('of 3'), findsOneWidget);
       expect(find.text('×0'), findsOneWidget);
-      expect(readable('5 in all'), isFalse);
+      expect(readable('Total 5'), isFalse);
       expect(find.text('Goal 3'), findsOneWidget);
     });
 
@@ -330,7 +330,7 @@ void main() {
       expect(find.text('40'), findsOneWidget);
       expect(find.text('of 33'), findsNothing);
       expect(find.text('×1'), findsNothing);
-      expect(find.textContaining('in all'), findsNothing);
+      expect(find.textContaining('Total'), findsNothing);
       expect(find.byType(VoussoirStripe), findsNothing);
       expect(find.text('Goal'), findsOneWidget);
     });

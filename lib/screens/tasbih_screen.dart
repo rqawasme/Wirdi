@@ -391,7 +391,7 @@ class _TapToCountState extends State<_TapToCount>
       '${counter.roundTaps} of $goal',
       if (rounds == 1) 'goal reached once',
       if (rounds > 1) 'goal reached $rounds times',
-      if (counter.count > goal) '${counter.count} in all',
+      if (counter.count > goal) 'total ${counter.count}',
     ].join(', ');
   }
 }
@@ -458,6 +458,9 @@ class _RoundLine extends StatelessWidget {
 
 /// The running total, once it is no longer the number above.
 ///
+/// Label first, the way a scoreboard is read: `Total 140` is a figure with a
+/// name on it, where a trailing phrase made it read as half a sentence.
+///
 /// Until the first round is done the number on the screen *is* the total, so
 /// saying it again under the stripe would be the same number twice. Its line
 /// is held open all the same — kept in the layout and not painted — so the
@@ -478,7 +481,7 @@ class _Total extends StatelessWidget {
       maintainAnimation: true,
       maintainState: true,
       child: Text(
-        '${counter.count} in all',
+        'Total ${counter.count}',
         textAlign: TextAlign.center,
         style: theme.textTheme.bodyMedium?.copyWith(
           color: theme.colorScheme.onSurfaceVariant,

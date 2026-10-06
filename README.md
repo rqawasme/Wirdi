@@ -376,7 +376,7 @@ clicking, and so does the tap on every multiple of it after, the way the marker
 bead comes round under the thumb on each pass. Nothing stops there: the next
 tap starts the next round at one, with the stripe empty again, a plate under the
 stripe counts the rounds — `×0`, `×1`, `×2` — and a line under that keeps the
-running total once it is no longer the number above (`140 in all`). So a
+running total once it is no longer the number above (`Total 140`). So a
 thousand can be one goal of a thousand or ten rounds of a hundred, whichever way
 somebody keeps it, and they are the same thousand taps: the count is one number
 and the rounds are read off it, never kept beside it, so undo, reset and a
