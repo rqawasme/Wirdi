@@ -20,7 +20,9 @@ import '../theme/theme.dart';
 /// not change appearance as it grows. A completed day is one mark, and it is
 /// the same mark on day 2 as on day 200. Nothing warns, nothing counts down
 /// the hours left in the day, and a zero says zero rather than saying anything
-/// about the person reading it. There are no notifications in the app at all.
+/// about the person reading it. Nothing here is ever a notification: the only
+/// ones the app sends are the reminders somebody sets for a wird, and those
+/// say its name and nothing about a streak.
 ///
 /// The tracker around this panel does encourage, in a line of its own — the
 /// position argued at length in the README is against *gamification*, not

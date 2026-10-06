@@ -6,6 +6,7 @@ import '../collections/dhikr_editing.dart';
 import '../collections/picked_item.dart';
 import '../domain/commitment.dart';
 import '../domain/content.dart';
+import '../reminders/reminder_scheduler.dart';
 import '../theme/theme.dart';
 
 /// What the name-and-description form came back with.
@@ -397,13 +398,21 @@ String? _emptyToNull(String value) => value.isEmpty ? null : value;
 /// What the commit sheet came back with.
 @immutable
 final class CommitmentChoice {
-  const CommitmentChoice({required this.section, required this.days});
+  const CommitmentChoice({
+    required this.section,
+    required this.days,
+    this.reminder,
+  });
 
   final DailySection section;
   final Weekdays days;
+
+  /// Null for no reminder.
+  final ReminderTime? reminder;
 }
 
-/// When a collection is to be done: which part of the day, and which days.
+/// When a collection is to be done: which part of the day, which days, and
+/// whether to be reminded.
 ///
 /// A sheet rather than a menu, and for the same reason the item pickers are
 /// one: the choices are the answer. It holds its selection rather than closing
@@ -415,24 +424,44 @@ final class CommitmentChoice {
 /// is the default and the great majority of cases, so the day row starts full
 /// and most people will never touch it — it is there for al-Kahf on Friday and
 /// for the collections authored around a particular day.
+///
+/// The reminder is the third answer, and the only one that starts off. It
+/// sounds on the days above at one clock time, and turning it on is what asks
+/// the phone for permission to post notifications — here, next to the switch
+/// that needs it, rather than at launch for a feature nobody has touched.
+/// [reminders] is how the sheet asks; [remindersEnabled] is the switch in
+/// Settings, which the sheet mentions when it is off and leaves alone.
 Future<CommitmentChoice?> showCommitmentSheet(
   BuildContext context, {
   required String name,
+  required ReminderScheduler reminders,
+  required bool remindersEnabled,
   CommitmentChoice? current,
 }) {
   return showModalBottomSheet<CommitmentChoice>(
     context: context,
     isScrollControlled: true,
-    builder: (BuildContext context) =>
-        _CommitmentSheet(name: name, current: current),
+    builder: (BuildContext context) => _CommitmentSheet(
+      name: name,
+      current: current,
+      reminders: reminders,
+      remindersEnabled: remindersEnabled,
+    ),
   );
 }
 
 class _CommitmentSheet extends StatefulWidget {
-  const _CommitmentSheet({required this.name, this.current});
+  const _CommitmentSheet({
+    required this.name,
+    required this.reminders,
+    required this.remindersEnabled,
+    this.current,
+  });
 
   final String name;
   final CommitmentChoice? current;
+  final ReminderScheduler reminders;
+  final bool remindersEnabled;
 
   @override
   State<_CommitmentSheet> createState() => _CommitmentSheetState();
@@ -441,6 +470,50 @@ class _CommitmentSheet extends StatefulWidget {
 class _CommitmentSheetState extends State<_CommitmentSheet> {
   late DailySection _section = widget.current?.section ?? DailySection.today;
   late Weekdays _days = widget.current?.days ?? Weekdays.everyDay;
+  late ReminderTime? _reminder = widget.current?.reminder;
+
+  /// The phone said no to notifications when the reminder was turned on.
+  bool _refused = false;
+
+  /// A permission prompt or a time picker is open. A second tap on the switch
+  /// while either is up would open another on top of it.
+  bool _asking = false;
+
+  Future<void> _setReminder(bool on) async {
+    if (!on) {
+      setState(() {
+        _reminder = null;
+        _refused = false;
+      });
+      return;
+    }
+    if (_asking) return;
+    _asking = true;
+    try {
+      final bool allowed = await widget.reminders.requestPermission();
+      if (!mounted) return;
+      setState(() => _refused = !allowed);
+      // Left off rather than set anyway. A reminder the phone will not show
+      // is a switch that says something is going to happen when it is not.
+      if (allowed) await _pickTime();
+    } finally {
+      _asking = false;
+    }
+  }
+
+  /// Turning the reminder on asks for the time straight away, starting from a
+  /// sensible hour for the part of the day; cancelling leaves it off. Once it
+  /// is on, the time row asks again from the time already set.
+  Future<void> _pickTime() async {
+    final ReminderTime from = _reminder ?? _suggestedReminder(_section);
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: from.hour, minute: from.minute),
+      helpText: 'Remind me at',
+    );
+    if (picked == null || !mounted) return;
+    setState(() => _reminder = ReminderTime(picked.hour, picked.minute));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -488,6 +561,14 @@ class _CommitmentSheetState extends State<_CommitmentSheet> {
                 onChanged: (Weekdays days) => setState(() => _days = days),
               ),
             ),
+            _ReminderPicker(
+              reminder: _reminder,
+              refused: _refused,
+              remindersEnabled: widget.remindersEnabled,
+              onToggled: _setReminder,
+              onPickTime: _pickTime,
+              onOpenSettings: widget.reminders.openSystemSettings,
+            ),
             Padding(
               padding: const EdgeInsets.all(WirdiMetrics.space4),
               child: FilledButton(
@@ -498,7 +579,11 @@ class _CommitmentSheetState extends State<_CommitmentSheet> {
                     ? null
                     : () => Navigator.pop(
                         context,
-                        CommitmentChoice(section: _section, days: _days),
+                        CommitmentChoice(
+                          section: _section,
+                          days: _days,
+                          reminder: _reminder,
+                        ),
                       ),
                 child: Text(widget.current == null ? 'Commit' : 'Save'),
               ),
@@ -574,6 +659,120 @@ class _DayPicker extends StatelessWidget {
     );
   }
 }
+
+/// The reminder: a switch, the time once there is one, and a line when the
+/// phone or the Settings switch is going to keep it quiet.
+///
+/// Says nothing about what a reminder is for or what missing one means. It is
+/// a time, on the days already chosen above, and that is all the row claims.
+class _ReminderPicker extends StatelessWidget {
+  const _ReminderPicker({
+    required this.reminder,
+    required this.refused,
+    required this.remindersEnabled,
+    required this.onToggled,
+    required this.onPickTime,
+    required this.onOpenSettings,
+  });
+
+  final ReminderTime? reminder;
+  final bool refused;
+  final bool remindersEnabled;
+  final ValueChanged<bool> onToggled;
+  final VoidCallback onPickTime;
+  final VoidCallback onOpenSettings;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final TextStyle? note = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            WirdiMetrics.space4,
+            WirdiMetrics.space5,
+            WirdiMetrics.space4,
+            0,
+          ),
+          child: Text('Reminder', style: theme.textTheme.labelLarge),
+        ),
+        SwitchListTile(
+          title: const Text('Remind me'),
+          subtitle: Text(
+            reminder == null ? 'No reminder' : 'On the days above',
+          ),
+          value: reminder != null,
+          onChanged: onToggled,
+        ),
+        if (reminder case final ReminderTime time)
+          ListTile(
+            title: const Text('Time'),
+            trailing: Text(
+              formatReminderTime(context, time),
+              style: theme.textTheme.bodyLarge,
+            ),
+            onTap: onPickTime,
+          ),
+        if (refused)
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: WirdiMetrics.space4,
+            ),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    'Notifications are off for Wirdi in your phone\'s '
+                    'settings.',
+                    style: note,
+                  ),
+                ),
+                TextButton(
+                  onPressed: onOpenSettings,
+                  child: const Text('Open settings'),
+                ),
+              ],
+            ),
+          )
+        else if (reminder != null && !remindersEnabled)
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: WirdiMetrics.space4,
+            ),
+            child: Text(
+              'Reminders are off in Settings, so this one will not sound '
+              'until they are on again.',
+              style: note,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// [time] the way the phone writes times: 6:30 AM, or 06:30.
+String formatReminderTime(BuildContext context, ReminderTime time) =>
+    MaterialLocalizations.of(context).formatTimeOfDay(
+      TimeOfDay(hour: time.hour, minute: time.minute),
+      alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+    );
+
+/// Where the time picker starts when a reminder is first turned on.
+///
+/// Only a starting point for the dial — the picker is on screen with it, and
+/// whatever is chosen there is what is kept. Clock times rather than prayer
+/// times, which move with the seasons and the place: these are just a
+/// plausible hour inside each part of the day.
+ReminderTime _suggestedReminder(DailySection section) => switch (section) {
+  DailySection.today => const ReminderTime(9, 0),
+  DailySection.morning => const ReminderTime(6, 0),
+  DailySection.evening => const ReminderTime(17, 0),
+};
 
 /// What a set of days reads as in a sentence.
 ///

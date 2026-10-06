@@ -51,6 +51,8 @@ search for.
 > COUNT AND KEEP YOUR PLACE
 > • Commit to a collection, on every day or on the days you choose, and it is
 >   waiting on the home screen when it is due
+> • A reminder at the time you choose, if you want one — and not on a day
+>   you have already done it
 > • Step through a wird one dhikr at a time, tapping to count, with a gentle
 >   vibration as you go
 > • A tasbih counter for everything else
@@ -108,10 +110,14 @@ starting the closed test.
 - Is all of the user data collected by your app encrypted in transit? Not asked
   once the answer above is No.
 
-That answer is true because the release manifest declares no permissions, not
-even `INTERNET`, so the app cannot send anything anywhere.
-`test/app/android_manifest_test.dart` fails if a permission is added. Anybody
-adding one — for reminders, sync, anything — changes this form and
+That answer is true because the release manifest declares no `INTERNET`
+permission, so the app cannot send anything anywhere. It declares two others,
+both for reminders: `POST_NOTIFICATIONS`, to show them, and
+`RECEIVE_BOOT_COMPLETED`, to keep them scheduled across a restart. Neither
+collects or shares anything — a reminder is a local notification the phone
+shows at a time the app gave it — so neither changes an answer on this form.
+`test/app/android_manifest_test.dart` fails if any other permission is added.
+Anybody adding one — for sync, anything — changes this form and
 [`PRIVACY.md`](PRIVACY.md) in the same release.
 
 ### Content rating

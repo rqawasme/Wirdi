@@ -139,6 +139,7 @@ Commitment? commitmentFromRow(CommitmentRow row) {
     collectionId: id,
     section: section,
     days: Weekdays.fromMask(row.days),
+    reminder: ReminderTime.tryFromMinutes(row.reminderMinutes),
     sortOrder: row.sortOrder,
     createdAt: fromEpochMs(row.createdAt),
     updatedAt: fromEpochMs(row.updatedAt),

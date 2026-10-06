@@ -9,6 +9,8 @@ import '../providers/collections.dart';
 import '../providers/editing.dart';
 import '../providers/home.dart';
 import '../providers/refresh.dart';
+import '../providers/reminders.dart';
+import '../providers/settings.dart';
 import '../routes.dart';
 import '../theme/theme.dart';
 import '../widgets/banded_row.dart';
@@ -278,14 +280,28 @@ class _CommitButton extends ConsumerWidget {
     final CommitmentChoice? choice = await showCommitmentSheet(
       context,
       name: listing.name,
+      reminders: ref.read(reminderSchedulerProvider),
+      remindersEnabled:
+          ref.read(settingsProvider).value?.remindersEnabled ?? true,
       current: current == null
           ? null
-          : CommitmentChoice(section: current.section, days: current.days),
+          : CommitmentChoice(
+              section: current.section,
+              days: current.days,
+              reminder: current.reminder,
+            ),
     );
     if (choice == null || !context.mounted) return;
+    // The reminders follow on their own: the sync watches the commitments
+    // this invalidates.
     await ref
         .read(homeCommitmentsProvider)
-        .commit(listing.id, choice.section, days: choice.days);
+        .commit(
+          listing.id,
+          choice.section,
+          days: choice.days,
+          reminder: choice.reminder,
+        );
   }
 }
 

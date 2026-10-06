@@ -266,6 +266,35 @@ part of the day or to none. Committing it somewhere else is a move, and it keeps
 its place in the grid: tiles sit in the order they were committed and nothing
 reorders itself as the day goes on.
 
+**A commitment can carry a reminder, and none does until it is asked for.** The
+commit sheet's third question, after the part of the day and the days: a switch
+and a clock time, sounding on each of the days above. A clock time rather than a
+prayer time, because a prayer time means knowing where the phone is, and this
+app asks for nothing that would tell it. Turning the switch on is the only thing
+that asks the phone for permission to post notifications — never at launch, for
+a feature nobody has touched — and a refusal leaves the switch off and says
+where in the phone's settings to change it, rather than keeping a reminder the
+phone will not show. A reminder says `Time for` and the collection's name, with
+its Arabic name under it where it has one, and nothing else: no count, no
+streak, nothing about what happens if it is missed. Tapping one opens Home.
+Settings has one switch to silence them all without forgetting any of the
+times.
+
+**Reminders are laid out a day at a time, not as a repeating alarm.** A
+repeating notification cannot skip one day, so a wird finished this morning
+would still be reminded of this evening. Instead `lib/reminders/reminder_plan.dart`
+works out each reminder for the next four weeks as a single notification,
+leaving out today's for anything already finished today, and
+`reminderSyncProvider` hands the whole plan to the phone whenever anything it
+is made from changes: a commitment, a collection's name or existence, a
+completion, the Settings switch, and the app coming back to the front — which is
+what picks up a new day and a new time zone. iOS keeps at most 64 pending
+notifications, so the plan stops at 64, soonest first; the cost is that somebody
+who stops opening the app stops being reminded after a few weeks. The reminders
+are scheduled inexact on Android: the exact-alarm permission is one Google Play
+keeps for alarm clocks and calendars, and a few minutes' drift does not matter
+to a wird.
+
 **A tile counts repetitions, not entries.** A collection of one dhikr said a
 hundred times reads `40/100` and its stripe advances as it is said; counted as
 entries it would be `0/1` and the stripe would go from empty to full in a single
@@ -337,8 +366,9 @@ this app drops the stadium everywhere. The selected tab is marked by a 4dp
 length of brick across its top edge instead — the one place brick acts as a
 plain bar rather than as the voussoir rhythm — plus `onSurface` ink and Inter
 Medium. Icons stay chrome, never brick and never gold, and nothing swaps between
-filled and outline to signal selection. No tab carries a badge, dot or count,
-because the app has no notifications.
+filled and outline to signal selection. No tab carries a badge, dot or count:
+the only notifications the app has are the reminders somebody sets, and those
+carry no badge either.
 
 **Each tab keeps its own scroll position.** The four bodies live in an
 `IndexedStack`, and each gets its own `ScrollController` — a vertical `ListView`
@@ -852,7 +882,9 @@ escalate, rank, warn, or mark a failure. Concretely, and pinned by
 - no loss vocabulary, no countdown, nothing "at risk"
 - nothing red, and no icon anywhere on the tab — the month arrows are chevrons
   set in type, because an icon here is one step from a flame here
-- still no notifications, of any kind, anywhere in the app
+- no notifications about the tracker, of any kind: the only notification in
+  the app is a reminder somebody set themselves, and it names the wird and
+  nothing else
 
 **A missed due day gets no mark.** There are two marks on the calendar and only
 two: a filled square for a day completed, and a hairline outline for today. A
@@ -1106,12 +1138,15 @@ The release workflow skips it, having a real bundle to build.
 Through Google Play, and nothing else. Play keeps the app up to date on its own;
 there is no in-app check, no notice and no prompt.
 
-**Wirdi has no network access at all.** The release manifest declares no
-permissions — not `INTERNET`, not anything — and the fonts and the content are
-bundled, so nothing is fetched and nothing about anybody goes anywhere. That is
-what the Play Data safety declaration and [`docs/PRIVACY.md`](docs/PRIVACY.md)
-say, and `test/app/android_manifest_test.dart` fails if a permission is added,
-so the claim cannot quietly stop being true.
+**Wirdi has no network access at all.** The release manifest declares two
+permissions, both for reminders — `POST_NOTIFICATIONS` and
+`RECEIVE_BOOT_COMPLETED` — and not `INTERNET`, and the fonts and the content are
+bundled, so nothing is fetched and nothing about anybody goes anywhere. A
+reminder is a local notification: the app hands the phone a time and a line of
+text, and the phone shows it. That is what the Play Data safety declaration and
+[`docs/PRIVACY.md`](docs/PRIVACY.md) say, and `test/app/android_manifest_test.dart`
+fails if any other permission is added, so the claim cannot quietly stop being
+true.
 
 Builds up to 0.8.2 were published as APKs on GitHub releases and carried an
 opt-in self-updater that downloaded and installed the next one. It came out

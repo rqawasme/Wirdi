@@ -21,6 +21,7 @@ abstract final class SettingKeys {
   // user had chosen back to the default. The Dart name may move; the key does
   // not.
   static const String showTracker = 'streak.visible';
+  static const String remindersEnabled = 'reminders.enabled';
 
   // `tasbih.count` is written into the same table and is deliberately not
   // here: it is not part of [WirdiSettings], because putting it there would
@@ -46,6 +47,7 @@ final class WirdiSettings {
     this.showTranslation = true,
     this.haptics = true,
     this.showTracker = true,
+    this.remindersEnabled = true,
     this.quranInGold = false,
     this.arabicFace = ArabicFace.notoNaskh,
     this.dimBrackets = true,
@@ -87,6 +89,14 @@ final class WirdiSettings {
   /// "Show tracker" so that what it takes away is not a surprise.
   final bool showTracker;
 
+  /// Whether any reminder sounds.
+  ///
+  /// On by default, which on its own does nothing: a reminder is set on a
+  /// commitment, and no commitment starts with one. Off silences every one of
+  /// them and forgets none of their times, so turning it back on is a single
+  /// switch rather than a trip through every collection.
+  final bool remindersEnabled;
+
   /// Dev screen: Quran text in `tertiary` gold, or in `onSurface` cedar ink.
   ///
   /// Cedar ink by decision, after looking at both on a device. Which leaves
@@ -113,6 +123,7 @@ final class WirdiSettings {
     bool? showTranslation,
     bool? haptics,
     bool? showTracker,
+    bool? remindersEnabled,
     bool? quranInGold,
     ArabicFace? arabicFace,
     bool? dimBrackets,
@@ -124,6 +135,7 @@ final class WirdiSettings {
       showTranslation: showTranslation ?? this.showTranslation,
       haptics: haptics ?? this.haptics,
       showTracker: showTracker ?? this.showTracker,
+      remindersEnabled: remindersEnabled ?? this.remindersEnabled,
       quranInGold: quranInGold ?? this.quranInGold,
       arabicFace: arabicFace ?? this.arabicFace,
       dimBrackets: dimBrackets ?? this.dimBrackets,
@@ -165,6 +177,9 @@ class SettingsController extends AsyncNotifier<WirdiSettings> {
       showTracker:
           _bool(await repository.setting(SettingKeys.showTracker)) ??
           defaults.showTracker,
+      remindersEnabled:
+          _bool(await repository.setting(SettingKeys.remindersEnabled)) ??
+          defaults.remindersEnabled,
       quranInGold:
           _bool(await repository.setting(SettingKeys.devQuranInGold)) ??
           defaults.quranInGold,
@@ -224,6 +239,14 @@ class SettingsController extends AsyncNotifier<WirdiSettings> {
       SettingKeys.showTracker,
       value.toString(),
       (WirdiSettings s) => s.copyWith(showTracker: value),
+    );
+  }
+
+  Future<void> setRemindersEnabled(bool value) {
+    return _set(
+      SettingKeys.remindersEnabled,
+      value.toString(),
+      (WirdiSettings s) => s.copyWith(remindersEnabled: value),
     );
   }
 

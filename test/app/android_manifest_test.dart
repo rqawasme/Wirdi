@@ -4,10 +4,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// What the release manifest claims, held to it.
 ///
-/// Wirdi declares no permissions, and its Google Play Data safety answers —
-/// no data collected, none shared, no network access — rest on that. A
-/// permission added here would make those answers false without anything else
-/// in the build noticing, so this is the check that does.
+/// Wirdi declares two permissions, both for reminders, and its Google Play
+/// Data safety answers — no data collected, none shared, no network access —
+/// rest on that being all. A permission added here would make those answers
+/// false without anything else in the build noticing, so this is the check
+/// that does.
 ///
 /// `analysis_options.yaml` excludes `android/**` and `dart format` covers only
 /// `lib test tool`, so nothing on the Dart side reads this file otherwise. CI's
@@ -24,16 +25,82 @@ void main() {
     manifest = file.readAsStringSync();
   });
 
-  test('the release manifest declares no permissions', () {
-    // Matches `<uses-permission-sdk-23` too. Read with the comments stripped,
-    // because the manifest explains in a comment why there are none.
+  test('the release manifest declares what reminders need and no more', () {
+    // Read with the comments stripped, because the manifest explains in a
+    // comment what each one is for.
+    final String declared = XmlWellFormedness.withoutComments(manifest);
     expect(
-      XmlWellFormedness.withoutComments(manifest),
-      isNot(contains('<uses-permission')),
+      declaredPermissions(declared),
+      <String>{
+        'android.permission.POST_NOTIFICATIONS',
+        'android.permission.RECEIVE_BOOT_COMPLETED',
+      },
       reason:
-          'Wirdi is a zero-permission app, and its Play Data safety '
-          'declaration says so. Adding a permission means revisiting that '
-          'declaration and docs/PRIVACY.md first.',
+          'Wirdi asks for the two permissions reminders need and nothing '
+          'else, and its Play Data safety declaration says so. Adding one '
+          'means revisiting that declaration and docs/PRIVACY.md first.',
+    );
+    // Every tag accounted for: a `<uses-permission` the pattern could not
+    // read a name out of would otherwise slip past the set above.
+    expect(
+      '<uses-permission'.allMatches(declared).length,
+      declaredPermissions(declared).length,
+    );
+  });
+
+  test('the release manifest still cannot reach the network', () {
+    expect(
+      declaredPermissions(XmlWellFormedness.withoutComments(manifest)),
+      isNot(contains('android.permission.INTERNET')),
+      reason:
+          'Reminders are local notifications. Nothing in Wirdi needs the '
+          'network, and docs/PRIVACY.md promises it has none.',
+    );
+  });
+
+  test('the receivers that deliver reminders are declared', () {
+    // flutter_local_notifications declares neither itself. Without the first
+    // a reminder's time comes and nothing shows; without the second every
+    // reminder is lost when the phone restarts.
+    final String declared = XmlWellFormedness.withoutComments(manifest);
+    expect(declared, contains('ScheduledNotificationReceiver"'));
+    expect(declared, contains('ScheduledNotificationBootReceiver"'));
+    expect(declared, contains('android.intent.action.BOOT_COMPLETED'));
+  });
+
+  test('the reminder icon exists and the shrinker is told to keep it', () {
+    // Named only from Dart, so the release resource shrinker cannot see it is
+    // used, and a stripped icon is a reminder that fails to show.
+    const String res = 'android/app/src/main/res';
+    for (final String density in <String>[
+      'mdpi',
+      'hdpi',
+      'xhdpi',
+      'xxhdpi',
+      'xxxhdpi',
+    ]) {
+      expect(
+        File('$res/drawable-$density/ic_notification.png').existsSync(),
+        isTrue,
+        reason: 'run tool/render_app_icons.py',
+      );
+    }
+    expect(
+      File('$res/raw/keep.xml').readAsStringSync(),
+      contains('@drawable/ic_notification'),
+    );
+  });
+
+  test('permissions are read out of the tags that declare them', () {
+    expect(
+      declaredPermissions(
+        '<manifest>'
+        '<uses-permission android:name="a.B"/>'
+        '<uses-permission-sdk-23 android:name="c.D" />'
+        '<uses-permission\n    android:name="e.F"></uses-permission>'
+        '</manifest>',
+      ),
+      <String>{'a.B', 'c.D', 'e.F'},
     );
   });
 
@@ -84,6 +151,15 @@ void main() {
     );
   });
 }
+
+/// The `android:name` of every `<uses-permission>` and
+/// `<uses-permission-sdk-23>` in [manifest].
+Set<String> declaredPermissions(String manifest) => <String>{
+  for (final RegExpMatch match in RegExp(
+    r'<uses-permission(?:-sdk-23)?\s[^>]*?android:name="([^"]+)"',
+  ).allMatches(manifest))
+    match.group(1)!,
+};
 
 /// Enough of an XML check to catch the mistakes a hand-edited manifest makes.
 ///

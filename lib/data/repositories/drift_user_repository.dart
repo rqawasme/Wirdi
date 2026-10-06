@@ -175,6 +175,7 @@ class DriftUserRepository implements UserRepository {
     CollectionId id,
     DailySection section, {
     Weekdays days = Weekdays.everyDay,
+    ReminderTime? reminder,
   }) async {
     final int now = toEpochMs(_now());
     // Only read for an insert; the upsert leaves sort_order alone on a move,
@@ -187,6 +188,7 @@ class DriftUserRepository implements UserRepository {
       sortOrder: sortOrder,
       createdAt: now,
       updatedAt: now,
+      reminderMinutes: reminder?.minutes,
     );
   }
 

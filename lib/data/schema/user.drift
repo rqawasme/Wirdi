@@ -442,13 +442,20 @@ upsertSetting:
 -- alone. A mask rather than a child table because a commitment is one row and
 -- a set of at most seven flags is not a relation worth joining; 127 is the
 -- default because that is what almost every commitment is.
+--
+-- reminder_minutes is the local time of day a reminder sounds, as minutes
+-- after midnight — 390 is 06:30 — on each of the days above. NULL is no
+-- reminder, which is what every commitment starts as. Local wall-clock time
+-- rather than an instant, for the same reason date_key is: the reminder is for
+-- half past six wherever the phone is, not for one moment in UTC.
 CREATE TABLE commitments (
-    collection_ref TEXT    NOT NULL PRIMARY KEY,
-    section        TEXT    NOT NULL,
-    days           INTEGER NOT NULL DEFAULT 127,
-    sort_order     INTEGER NOT NULL,
-    created_at     INTEGER NOT NULL,
-    updated_at     INTEGER NOT NULL
+    collection_ref   TEXT    NOT NULL PRIMARY KEY,
+    section          TEXT    NOT NULL,
+    days             INTEGER NOT NULL DEFAULT 127,
+    sort_order       INTEGER NOT NULL,
+    created_at       INTEGER NOT NULL,
+    updated_at       INTEGER NOT NULL,
+    reminder_minutes INTEGER
 ) AS CommitmentRow;
 
 CREATE INDEX IF NOT EXISTS idx_commitments_section ON commitments (section, sort_order);
@@ -464,13 +471,20 @@ nextCommitmentSortOrder:
 -- Moving a collection to another section keeps its sort_order and its
 -- created_at: it is the same commitment, in a different part of the day, and
 -- it should not jump to the end of the grid for having been moved.
+--
+-- The reminder is written with the rest rather than on its own: the sheet asks
+-- when in the day, which days and what time together, and answers all three at
+-- once. NULL clears it.
 upsertCommitment:
     INSERT INTO commitments
-        (collection_ref, section, days, sort_order, created_at, updated_at)
-    VALUES (:ref, :section, :days, :sortOrder, :createdAt, :updatedAt)
+        (collection_ref, section, days, sort_order, created_at, updated_at,
+         reminder_minutes)
+    VALUES (:ref, :section, :days, :sortOrder, :createdAt, :updatedAt,
+            :reminderMinutes)
     ON CONFLICT (collection_ref) DO UPDATE SET
         section = excluded.section,
         days = excluded.days,
+        reminder_minutes = excluded.reminder_minutes,
         updated_at = excluded.updated_at;
 
 deleteCommitment: DELETE FROM commitments WHERE collection_ref = :ref;

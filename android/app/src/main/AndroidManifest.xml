@@ -1,10 +1,23 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- No <uses-permission>, deliberately. Wirdi is a zero-permission app:
-         everything it shows is bundled and everything it records stays on the
-         device, and its Play Data safety declaration says exactly that.
-         test/app/android_manifest_test.dart fails if a permission is added
-         here. The debug and profile manifests add INTERNET for hot reload;
-         neither is merged into a release build. -->
+    <!-- Two permissions, both for reminders, and nothing else. Everything
+         Wirdi shows is bundled and everything it records stays on the device;
+         a reminder is a local notification the phone shows at a time the app
+         handed it, so neither of these sends anything anywhere, and there is
+         still no INTERNET.
+
+         POST_NOTIFICATIONS is asked for at runtime on Android 13 and later,
+         and only when somebody turns a reminder on. RECEIVE_BOOT_COMPLETED is
+         what lets the scheduled reminders survive a restart. The notification
+         plugin's own manifest merges in VIBRATE as well, which needs no
+         prompt.
+
+         test/app/android_manifest_test.dart fails if anything else is added
+         here, and docs/PRIVACY.md and the Play Data safety declaration
+         (docs/PLAY_LISTING.md) say exactly this. The debug and profile
+         manifests add INTERNET for hot reload; neither is merged into a
+         release build. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <application
         android:label="Wirdi"
         android:name="${applicationName}"
@@ -31,6 +44,23 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- What shows a scheduled reminder when its time comes, and what
+             puts the reminders back after the phone restarts or the app is
+             updated. Both belong to flutter_local_notifications; neither is
+             exported. -->
+        <receiver
+            android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+        <receiver
+            android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

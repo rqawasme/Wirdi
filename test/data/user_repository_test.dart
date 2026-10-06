@@ -506,4 +506,67 @@ void main() {
       expect(committed.last.collectionId, builtin);
     });
   });
+
+  group('commitment reminders', () {
+    test('a commitment starts with no reminder', () async {
+      await user.commit(mine, DailySection.morning);
+
+      expect((await user.commitments()).single.reminder, isNull);
+    });
+
+    test('a reminder is stored and read back', () async {
+      await user.commit(
+        mine,
+        DailySection.morning,
+        reminder: const ReminderTime(6, 30),
+      );
+
+      expect(
+        (await user.commitments()).single.reminder,
+        const ReminderTime(6, 30),
+      );
+    });
+
+    test('committing again without one takes it away', () async {
+      // Every commit states the whole commitment, as the sheet does: a
+      // reminder switched off there arrives here as no reminder at all.
+      await user.commit(
+        mine,
+        DailySection.morning,
+        reminder: const ReminderTime(6, 30),
+      );
+      await user.commit(mine, DailySection.morning);
+
+      expect((await user.commitments()).single.reminder, isNull);
+    });
+
+    test('changing the time keeps the commitment in its place', () async {
+      await user.commit(mine, DailySection.evening);
+      await user.commit(builtin, DailySection.evening);
+
+      await user.commit(
+        mine,
+        DailySection.evening,
+        reminder: const ReminderTime(17, 45),
+      );
+
+      final List<Commitment> committed = await user.commitments();
+      expect(committed.first.collectionId, mine);
+      expect(committed.first.reminder, const ReminderTime(17, 45));
+      expect(committed.last.collectionId, builtin);
+      expect(committed.last.reminder, isNull);
+    });
+
+    test('a stored time that is not a time of day is no reminder', () async {
+      await user.commit(mine, DailySection.today);
+      await dbs.user.customStatement(
+        'UPDATE commitments SET reminder_minutes = 1440',
+      );
+
+      // Kept, without the reminder, rather than dropped for having a bad one.
+      final Commitment committed = (await user.commitments()).single;
+      expect(committed.collectionId, mine);
+      expect(committed.reminder, isNull);
+    });
+  });
 }
