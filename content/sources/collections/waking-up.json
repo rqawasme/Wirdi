@@ -1,0 +1,26 @@
+{
+  "id": 23,
+  "name_arabic": "آدَابُ الاسْتِيقَاظِ مِنَ النَّوْمِ",
+  "name_english": "Waking up from sleep",
+  "description": "The supplications Imam al-Ghazali gives in Bidayat al-Hidaya (The Beginning of Guidance) for waking up: praise for being brought back to life after sleep, entering the morning upon the fitra and by Allah, and asking to be sent to the good of the day and kept from its evil.",
+  "author": "Imam al-Ghazali",
+  "type": "wird",
+  "sort_order": 12,
+  "items": [
+    {
+      "dhikr": 26002
+    },
+    {
+      "dhikr": 3012
+    },
+    {
+      "dhikr": 3010
+    },
+    {
+      "dhikr": 26003
+    },
+    {
+      "dhikr": 26004
+    }
+  ]
+}

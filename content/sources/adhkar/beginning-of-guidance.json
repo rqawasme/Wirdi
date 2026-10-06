@@ -1,0 +1,527 @@
+{
+  "group": "beginning-of-guidance",
+  "description": "The supplications of Bidāyat al-Hidāya (The Beginning of Guidance) of Imam al-Ghazālī, as compiled in the booklet “The Beginning of Guidance: Duas and Important Notes”, studied under Shaykh Dawood B. Trevelyan, with that booklet's translation, and the four supplications of its appendix on memorisation, taken from ʿIlāj al-Nisyān of Ḥabīb Muḥammad ibn ʿAlawī al-ʿAydarūs. Not a wird: no built-in collection points here. Every duʿāʾ in the booklet is in the library: the ones here, plus four it shares with what was already authored, which are not copied - the morning duʿāʾ on the fiṭra (3012) and bika aṣbaḥnā (3010), the ḥawqala said in answer to the adhān (2036) and the tenth of the ten prayers of glorification, bismi Llāhi lladhī lā yaḍurru (2011). Its two whole verses, 2:164 before sleep and 87:6 after every prayer, and the surahs it names, are ayah and surah items. Each dhikr's notes say when it is said.",
+  "adhkar": [
+    {
+      "id": 26001,
+      "text_arabic": "اللّٰهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ عِلْمٍ لَا يَنْفَعُ وَقَلْبٍ لَا يَخْشَعُ وَعَمَلٍ لَا يُرْفَعُ وَدُعَاءٍ لَا يُسْمَعُ",
+      "translation": "O Allah, I seek refuge in You from knowledge that does not benefit, a heart that does not fear, a deed that does not ascend, and an invocation that is not heard.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "The first duʿāʾ mentioned in the book."
+    },
+    {
+      "id": 26002,
+      "text_arabic": "الْحَمْدُ لِلّٰهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ، أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلّٰهِ، وَالْعَظَمَةُ وَالسُّلْطَانُ لِلّٰهِ، وَالْعِزَّةُ وَالْقُدْرَةُ لِلّٰهِ",
+      "translation": "Praise be to Allah, who has brought us back to life after causing us to die, and to Whom shall be the resurrection. We have entered the morning, as has the dominion, belonging to Allah. Grandeur and might belong to Allah. Magnificence and power belong to Allah.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "Upon waking up."
+    },
+    {
+      "id": 26003,
+      "text_arabic": "اللّٰهُمَّ إِنَّا نَسْأَلُكَ أَنْ تَبْعَثَنَا فِي هٰذَا الْيَوْمِ إِلَىٰ كُلِّ خَيْرٍ، وَنَعُوذُ بِكَ أَنْ نَجْتَرِحَ فِيهِ سُوءًا أَوْ نَجُرَّهُ إِلَىٰ مُسْلِمٍ أَوْ يَجُرَّهُ أَحَدٌ إِلَيْنَا",
+      "translation": "O Allah, we ask You to send us to every good thing on this day; and we seek Your protection from doing evil this day, from bringing it upon a Muslim, or from anyone bringing it upon us.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "Upon waking up."
+    },
+    {
+      "id": 26004,
+      "text_arabic": "نَسْأَلُكَ خَيْرَ هٰذَا الْيَوْمِ، وَخَيْرَ مَا فِيهِ، وَنَعُوذُ بِكَ مِنْ شَرِّهِ، وَشَرِّ مَا فِيهِ",
+      "translation": "We ask You for the good of this day, and the best of what it holds, and we seek refuge with You from the evil of this day, and the evil of what it holds.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "Upon waking up."
+    },
+    {
+      "id": 26005,
+      "text_arabic": "بِاسْمِ اللّٰهِ، أَعُوذُ بِاللّٰهِ مِنَ الرِّجْسِ النَّجِسِ، الْخَبِيثِ الْمُخْبِثِ الشَّيْطَانِ الرَّجِيمِ",
+      "translation": "In the name of Allah, I seek refuge in Allah from filth and impurity, and from the defiled one who defiles, Satan the accursed.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "Before entering the lavatory, entering with the left foot first."
+    },
+    {
+      "id": 26006,
+      "text_arabic": "غُفْرَانَكَ، الْحَمْدُ لِلّٰهِ الَّذِي أَذْهَبَ عَنِّي مَا يُؤْذِينِي، وَأَبْقَىٰ عَلَيَّ مَا يَنْفَعُنِي",
+      "translation": "Your forgiveness. All praise to the One who takes from me what harms me and leaves me what benefits me.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "Upon leaving the lavatory, leaving with the right foot first."
+    },
+    {
+      "id": 26007,
+      "text_arabic": "اللّٰهُمَّ طَهِّرْ قَلْبِي مِنَ النِّفَاقِ، وَحَصِّنْ فَرْجِي مِنَ الْفَوَاحِشِ",
+      "translation": "O Allah, purify my heart from hypocrisy, and keep my private parts from wrong action.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "Upon finishing cleaning oneself after the lavatory."
+    },
+    {
+      "id": 26008,
+      "text_arabic": "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيمِ، رَبِّ أَعُوذُ بِكَ مِنْ هَمَزَاتِ الشَّيَاطِينِ، وَأَعُوذُ بِكَ رَبِّ أَنْ يَحْضُرُونِ",
+      "translation": "In the Name of Allah, the Merciful, the Compassionate. O my Lord, I take refuge in You from the incitements of devils, and I seek Your protection, O my Lord, from their being present with me.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "Before starting wuḍūʾ. After the basmala it is Qurʾān 23:97-98."
+    },
+    {
+      "id": 26009,
+      "text_arabic": "اللّٰهُمَّ إِنِّي أَسْأَلُكَ الْيُمْنَ وَالْبَرَكَةَ، وَأَعُوذُ بِكَ مِنَ الشُّؤْمِ وَالْهَلَكَةِ",
+      "translation": "O Allah, truly I beg of You good portents and blessing, and I seek refuge in You from bad portents and loss.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "During wuḍūʾ, when washing the hands."
+    },
+    {
+      "id": 26010,
+      "text_arabic": "اللّٰهُمَّ أَعِنِّي عَلَىٰ تِلَاوَةِ كِتَابِكَ وَكَثْرَةِ الذِّكْرِ لَكَ، وَثَبِّتْنِي بِالْقَوْلِ الثَّابِتِ فِي الْحَيَاةِ الدُّنْيَا وَفِي الْآخِرَةِ",
+      "translation": "O Allah, help me with the reading of Your Book, and much remembrance of You, and establish me “in strength with the word that stands firm, in the life of this world and in the Hereafter”.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "During wuḍūʾ, after rinsing the mouth. Its close is drawn from Qurʾān 14:27."
+    },
+    {
+      "id": 26011,
+      "text_arabic": "اللّٰهُمَّ أَرِحْنِي رَائِحَةَ الْجَنَّةِ وَأَنْتَ عَنِّي رَاضٍ",
+      "translation": "O Allah, let me smell the fragrance of Paradise whilst you are pleased with me!",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "During wuḍūʾ, when drawing water into the nose."
+    },
+    {
+      "id": 26012,
+      "text_arabic": "اللّٰهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ رَوَائِحِ النَّارِ وَمِنْ سُوءِ الدَّارِ",
+      "translation": "O Allah, I seek refuge in You from the foul odors of the Fire and from the evil of that abode!",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "During wuḍūʾ, when blowing the water out of the nose."
+    },
+    {
+      "id": 26013,
+      "text_arabic": "اللّٰهُمَّ بَيِّضْ وَجْهِي بِنُورِكَ يَوْمَ تَبْيَضُّ وُجُوهُ أَوْلِيَائِكَ، وَلَا تُسَوِّدْ وَجْهِي بِظُلُمَاتِكَ يَوْمَ تَسْوَدُّ وُجُوهُ أَعْدَائِكَ",
+      "translation": "O Allah! Make radiant my face with Your light on the Day You make radiant the faces of Your friends. And do not shroud my face with darkness on the Day you shroud the faces of Your enemies with darkness.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "During wuḍūʾ, when washing the face."
+    },
+    {
+      "id": 26014,
+      "text_arabic": "اللّٰهُمَّ أَعْطِنِي كِتَابِي بِيَمِينِي وَحَاسِبْنِي حِسَابًا يَسِيرًا",
+      "translation": "O Allah, give me my book of deeds in my right hand and judge me with leniency!",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "During wuḍūʾ, when washing the right arm."
+    },
+    {
+      "id": 26015,
+      "text_arabic": "اللّٰهُمَّ إِنِّي أَعُوذُ بِكَ أَنْ تُعْطِيَنِي كِتَابِي بِشِمَالِي أَوْ مِنْ وَرَاءِ ظَهْرِي",
+      "translation": "O Allah, verily I seek refuge with You from Your giving me my book of deeds in my left hand or from behind my back!",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "During wuḍūʾ, when washing the left arm."
+    },
+    {
+      "id": 26016,
+      "text_arabic": "اللّٰهُمَّ غَشِّنِي بِرَحْمَتِكَ، وَأَنْزِلْ عَلَيَّ مِنْ بَرَكَاتِكَ، وَأَظِلَّنِي تَحْتَ ظِلِّ عَرْشِكَ، يَوْمَ لَا ظِلَّ إِلَّا ظِلُّكَ، اللّٰهُمَّ حَرِّمْ شَعْرِي وَبَشَرِي عَلَىٰ النَّارِ",
+      "translation": "O Allah, shower over me Your mercy, and rain down on me Your blessing, and shade me in the shade of Your Throne on the Day when there will be no shade but Your shade. O Allah, make my hair and the skin forbidden to the Fire.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "During wuḍūʾ, when wiping the head."
+    },
+    {
+      "id": 26017,
+      "text_arabic": "اللّٰهُمَّ اجْعَلْنِي مِنَ الَّذِينَ يَسْتَمِعُونَ الْقَوْلَ فَيَتَّبِعُونَ أَحْسَنَهُ، اللّٰهُمَّ أَسْمِعْنِي مُنَادِيَ الْجَنَّةِ مَعَ الْأَبْرَارِ",
+      "translation": "O Allah! Make me of those who listen to the Word (of Allah) and follow it in the best way. O Allah! Let me, with the obedient ones, hear the Caller to Heaven.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "During wuḍūʾ, when wiping the ears."
+    },
+    {
+      "id": 26018,
+      "text_arabic": "اللّٰهُمَّ فُكَّ رَقَبَتِي مِنَ النَّارِ، وَأَعُوذُ بِكَ مِنَ السَّلَاسِلِ وَالْأَغْلَالِ",
+      "translation": "O Allah, free my neck from the Fire, and save me from the chains and shackles [of punishment].",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "During wuḍūʾ, when wiping the neck."
+    },
+    {
+      "id": 26019,
+      "text_arabic": "اللّٰهُمَّ ثَبِّتْ قَدَمَيَّ عَلَىٰ الصِّرَاطِ يَوْمَ تَزِلُّ الْأَقْدَامُ فِي النَّارِ",
+      "translation": "O Allah, make my feet firm on the causeway (sirat) on the Day that feet slip and fall into the Fire.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "During wuḍūʾ, when washing the right foot."
+    },
+    {
+      "id": 26020,
+      "text_arabic": "اللّٰهُمَّ إِنِّي أَعُوذُ بِكَ أَنْ تَزِلَّ قَدَمِي عَلَىٰ الصِّرَاطِ يَوْمَ تَزِلُّ أَقْدَامُ الْمُنَافِقِينَ",
+      "translation": "O Allah, I seek refuge in You from my foot slipping on the causeway on the Day that slip the feet of the hypocrites.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "During wuḍūʾ, when washing the left foot."
+    },
+    {
+      "id": 26021,
+      "text_arabic": "أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللّٰهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ، سُبْحَانَكَ اللّٰهُمَّ وَبِحَمْدِكَ، أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا أَنْتَ، عَمِلْتُ سُوءًا وَظَلَمْتُ نَفْسِي، أَسْتَغْفِرُكَ وَأَتُوبُ إِلَيْكَ، فَاغْفِرْ لِي وَتُبْ عَلَيَّ، إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيمُ",
+      "translation": "I bear witness that there is no god save Allah alone, Who has no partner, and I bear witness that Muhammad is His servant and His Messenger. Transcendence and praise be to You, O Allah; I bear witness that there is no god save You. I have done evil and I have wronged my soul; I seek Your forgiveness and I turn to You in repentance; forgive me and accept my repentance, for You are the one who accepts repentance, the Merciful.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "Upon completing wuḍūʾ."
+    },
+    {
+      "id": 26022,
+      "text_arabic": "اللّٰهُمَّ اجْعَلْنِي مِنَ التَّوَّابِينَ، وَاجْعَلْنِي مِنَ الْمُتَطَهِّرِينَ، وَاجْعَلْنِي مِنْ عِبَادِكَ الصَّالِحِينَ، وَاجْعَلْنِي صَبُورًا شَكُورًا، وَاجْعَلْنِي أَذْكُرُكَ ذِكْرًا كَثِيرًا وَأُسَبِّحُكَ بُكْرَةً وَأَصِيلًا",
+      "translation": "O Allah, make me of those who frequently repent, and make me of those who purify themselves. Make me one of Your pious servants; make me always patient and grateful; make me remember You frequently, and praise You at each day's beginning and at its end.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "Upon completing wuḍūʾ."
+    },
+    {
+      "id": 26023,
+      "text_arabic": "اللّٰهُمَّ إِنِّي أَسْأَلُكَ بِحَقِّ السَّائِلِينَ عَلَيْكَ، وَبِحَقِّ الرَّاغِبِينَ إِلَيْكَ، وَبِحَقِّ مَمْشَايَ هٰذَا إِلَيْكَ، فَإِنِّي لَمْ أَخْرُجْ أَشَرًا وَلَا بَطَرًا وَلَا رِيَاءً وَلَا سُمْعَةً، بَلْ خَرَجْتُ اتِّقَاءَ سَخَطِكَ، وَابْتِغَاءَ مَرْضَاتِكَ، فَأَسْأَلُكَ أَنْ تُنْقِذَنِي مِنَ النَّارِ وَأَنْ تُدْخِلَنِي الْجَنَّةَ، وَأَنْ تَغْفِرَ لِي ذُنُوبِي، فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ",
+      "translation": "O Allah, I beseech You by the right of those who beseech You, and the right of those who long for You, and the right of this walk of mine toward You. I have not left my home intending insolence, nor in arrogance, nor seeking to make a show of my actions, nor seeking prestige; rather, I have come forth from my home in fear of Your wrath and in search of Your satisfaction. I ask You to save me from the Fire, to let me enter Paradise, and I ask that You forgive my sins, for truly there is none who forgives sins but You.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "When walking to the mosque."
+    },
+    {
+      "id": 26024,
+      "text_arabic": "اللّٰهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ وَعَلَىٰ آلِ مُحَمَّدٍ وَسَلِّمْ، اللّٰهُمَّ اغْفِرْ لِي ذُنُوبِي، وَافْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",
+      "translation": "O Allah, bestow Your extolling mercy upon Muhammad and the family of Muhammad and give them peace. O Allah, forgive me my sins, and open to me the doors of Your mercy.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "When entering the mosque."
+    },
+    {
+      "id": 26025,
+      "text_arabic": "لَا أَرْبَحَ اللّٰهُ تِجَارَتَكَ",
+      "translation": "May Allah make your transaction unprofitable.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "Said on seeing someone selling in the mosque."
+    },
+    {
+      "id": 26026,
+      "text_arabic": "لَا رَدَّ اللّٰهُ عَلَيْكَ ضَالَّتَكَ",
+      "translation": "May Allah not restore to you what you have lost.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "Said on hearing someone call out in the mosque for something they have lost."
+    },
+    {
+      "id": 26027,
+      "text_arabic": "اللّٰهُمَّ إِنِّي أَسْأَلُكَ رَحْمَةً مِنْ عِنْدِكَ تَهْدِي بِهَا قَلْبِي، وَتَجْمَعُ بِهَا شَمْلِي، وَتَلُمُّ بِهَا شَعَثِي، وَتَرُدُّ بِهَا أُلْفَتِي، وَتُصْلِحُ بِهَا دِينِي، وَتَحْفَظُ بِهَا غَائِبِي، وَتَرْفَعُ بِهَا شَاهِدِي، وَتُزَكِّي بِهَا عَمَلِي، وَتُبَيِّضُ بِهَا وَجْهِي، وَتُلَقِّينِي بِهَا رُشْدِي، وَتَعْصِمُنِي بِهَا مِنْ كُلِّ سُوءٍ",
+      "translation": "O Allah, I ask You for mercy through which You guide my heart, by which You compose my state of disarray, by which You order my disorder, by which You return me to my state of harmony, through which You reform me in my religion, by which You preserve my inner state and elevate my outer state, through which You purify my deeds, illuminate my face, instill in me my guidance, and protect me from all evil.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "After the two sunnah rakʿas of Fajr, staying in the mosque until sunrise."
+    },
+    {
+      "id": 26028,
+      "text_arabic": "اللّٰهُمَّ إِنِّي أَسْأَلُكَ إِيمَانًا دَائِمًا يُبَاشِرُ قَلْبِي، وَأَسْأَلُكَ يَقِينًا صَادِقًا حَتَّىٰ أَعْلَمَ أَنَّهُ لَنْ يُصِيبَنِي إِلَّا مَا كَتَبْتَهُ عَلَيَّ، وَرَضِّنِي بِمَا قَسَمْتَهُ لِي",
+      "translation": "O Allah, I ask You for everlasting faith felt intimately in my heart; I ask You for true certainty, so that I may know that nothing will befall me except what You have written for me; and make me pleased with what You have allotted me.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "After the two sunnah rakʿas of Fajr, staying in the mosque until sunrise."
+    },
+    {
+      "id": 26029,
+      "text_arabic": "اللّٰهُمَّ أَعْطِنِي إِيمَانًا صَادِقًا، وَيَقِينًا لَيْسَ بَعْدَهُ كُفْرٌ، وَرَحْمَةً أَنَالُ بِهَا شَرَفَ كَرَامَتِكَ فِي الدُّنْيَا وَالْآخِرَةِ",
+      "translation": "O Allah, bless me with sincere faith and certainty after which there is no unbelief, and mercy whereby I may receive the honor of Your favor in this world and the next.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "After the two sunnah rakʿas of Fajr, staying in the mosque until sunrise."
+    },
+    {
+      "id": 26030,
+      "text_arabic": "اللّٰهُمَّ إِنِّي أَسْأَلُكَ الصَّبْرَ عِنْدَ الْقَضَاءِ، وَالْفَوْزَ عِنْدَ اللِّقَاءِ، وَمَنَازِلَ الشُّهَدَاءِ، وَعَيْشَ السُّعَدَاءِ، وَالنَّصْرَ عَلَىٰ الْأَعْدَاءِ، وَمُرَافَقَةَ الْأَنْبِيَاءِ",
+      "translation": "O Allah, I beseech You for patience with the Decree, for success in the encounter [on the Day of Judgment], for the stations of the martyrs and for the life of the fortunate, for assistance against enemies, and for the companionship of the prophets.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "After the two sunnah rakʿas of Fajr, staying in the mosque until sunrise."
+    },
+    {
+      "id": 26031,
+      "text_arabic": "اللّٰهُمَّ إِنِّي أُنْزِلُ بِكَ حَاجَتِي، وَإِنْ ضَعُفَ رَأْيِي، وَقَصُرَ عَمَلِي، وَافْتَقَرْتُ إِلَىٰ رَحْمَتِكَ، فَأَسْأَلُكَ يَا قَاضِيَ الْأُمُورِ وَيَا شَافِيَ الصُّدُورِ، كَمَا تُجِيرُ بَيْنَ الْبُحُورِ، أَنْ تُجِيرَنِي مِنْ عَذَابِ السَّعِيرِ، وَمِنْ دَعْوَةِ الثُّبُورِ، وَمِنْ فِتْنَةِ الْقُبُورِ",
+      "translation": "O Allah, I lay before You my need, even though my perception be weak, my actions insufficient, and I am in dire need of Your mercy. I beg of You, O Accomplisher of all things, O Healer of hearts, as You rescue from the midst of the seas, rescue me from the punishment of the Fire, the call for destruction, and the torment of the grave.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "After the two sunnah rakʿas of Fajr, staying in the mosque until sunrise."
+    },
+    {
+      "id": 26032,
+      "text_arabic": "اللّٰهُمَّ وَمَا قَصُرَ عَنْهُ رَأْيِي، وَضَعُفَ عَنْهُ عَمَلِي، وَلَمْ تَبْلُغْهُ نِيَّتِي أَوْ أُمْنِيَّتِي مِنْ خَيْرٍ وَعَدْتَهُ أَحَدًا مِنْ عِبَادِكَ، أَوْ خَيْرٍ أَنْتَ مُعْطِيهِ أَحَدًا مِنْ خَلْقِكَ، فَإِنِّي أَرْغَبُ إِلَيْكَ فِيهِ، وَأَسْأَلُكَهُ يَا رَبَّ الْعَالَمِينَ",
+      "translation": "O Allah, I ask You for any good of which my perception has fallen short and my actions have been too weak to achieve, and which my intentions and hopes have failed to reach - any good You have promised to any of Your servants or have given to any of Your creatures; for truly I desire this good from You and beg You for it, O Lord of all the Worlds!",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "After the two sunnah rakʿas of Fajr, staying in the mosque until sunrise."
+    },
+    {
+      "id": 26033,
+      "text_arabic": "اللّٰهُمَّ اجْعَلْنَا هَادِينَ مُهْتَدِينَ، غَيْرَ ضَالِّينَ وَلَا مُضِلِّينَ، حَرْبًا لِأَعْدَائِكَ، وَسِلْمًا لِأَوْلِيَائِكَ، نُحِبُّ بِحُبِّكَ النَّاسَ، وَنُعَادِي بِعَدَاوَتِكَ مَنْ خَالَفَكَ مِنْ خَلْقِكَ",
+      "translation": "O Allah, make us guide and be guided, and do not make us lead astray or be led astray - showing enmity toward Your enemies and at peace with Your Friends, that we love people with Your love, and are hostile with Your hostility toward any of Your creatures who have opposed You.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "After the two sunnah rakʿas of Fajr, staying in the mosque until sunrise."
+    },
+    {
+      "id": 26034,
+      "text_arabic": "اللّٰهُمَّ هٰذَا الدُّعَاءُ وَعَلَيْكَ الْإِجَابَةُ، وَهٰذَا الْجُهْدُ وَعَلَيْكَ التُّكْلَانُ، وَإِنَّا لِلّٰهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللّٰهِ الْعَلِيِّ الْعَظِيمِ",
+      "translation": "O Allah, this is my supplication, and its answer is Yours to give; this is my effort and upon You is all reliance. And we belong to Allah and to Him are we returning, and there is no ability [to ward off evil] or strength [to do good] except through Allah, the High, the Mighty.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "After the two sunnah rakʿas of Fajr, staying in the mosque until sunrise."
+    },
+    {
+      "id": 26035,
+      "text_arabic": "اللّٰهُمَّ يَا ذَا الْحَبْلِ الشَّدِيدِ وَالْأَمْرِ الرَّشِيدِ، أَسْأَلُكَ الْأَمْنَ يَوْمَ الْوَعِيدِ، وَالْجَنَّةَ يَوْمَ الْخُلُودِ، مَعَ الْمُقَرَّبِينَ الشُّهُودِ، وَالرُّكَّعِ السُّجُودِ، الْمُوفِينَ بِالْعُهُودِ، إِنَّكَ رَحِيمٌ وَدُودٌ، وَأَنْتَ تَفْعَلُ مَا تُرِيدُ، سُبْحَانَ الَّذِي تَعَطَّفَ بِالْعِزِّ وَقَالَ بِهِ، سُبْحَانَ الَّذِي لَبِسَ الْمَجْدَ وَتَكَرَّمَ بِهِ، سُبْحَانَ الَّذِي لَا يَنْبَغِي التَّسْبِيحُ إِلَّا لَهُ، سُبْحَانَ ذِي الْفَضْلِ وَالنِّعَمِ، سُبْحَانَ ذِي الْقُدْرَةِ وَالْكَرَمِ، سُبْحَانَ الَّذِي أَحْصَىٰ كُلَّ شَيْءٍ بِعِلْمِهِ",
+      "translation": "O Allah, O Owner of the firm handhold and the guiding command, I ask You for safety on the Day of Punishment, and Paradise on the Day of Eternity, with those who are close to You, who have beheld the Truth, who bow and prostrate themselves before You, and who fulfill their covenants. Truly You are Merciful and Loving and You do what You will. Transcendent is the one who is characterized by might, and who has declared it. Transcendent is the one who is clothed in glory, and who has shown generosity in it. Transcendent is the one who alone is worthy of glorification. Transcendent is the owner of favor and blessing. Transcendent is the owner of power and generosity. Transcendent is the one whose knowledge encompasses all things.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "After the two sunnah rakʿas of Fajr, staying in the mosque until sunrise."
+    },
+    {
+      "id": 26036,
+      "text_arabic": "اللّٰهُمَّ اجْعَلْ لِي نُورًا فِي قَلْبِي، وَنُورًا فِي قَبْرِي، وَنُورًا فِي سَمْعِي، وَنُورًا فِي بَصَرِي، وَنُورًا فِي شَعْرِي، وَنُورًا فِي بَشَرِي، وَنُورًا فِي لَحْمِي، وَنُورًا فِي دَمِي، وَنُورًا فِي عِظَامِي، وَنُورًا مِنْ بَيْنِ يَدَيَّ، وَنُورًا مِنْ خَلْفِي، وَنُورًا عَنْ يَمِينِي، وَنُورًا عَنْ شِمَالِي، وَنُورًا مِنْ فَوْقِي، وَنُورًا مِنْ تَحْتِي، اللّٰهُمَّ زِدْنِي نُورًا، وَأَعْطِنِي نُورًا، وَاجْعَلْ لِي نُورًا",
+      "translation": "O Allah, grant me light in my heart and light in my grave, light in my hearing and light in my seeing, light in my hair and light in my skin, light in my flesh, light in my blood and light in my bones; light before me, light behind me, light to my right side, light to my left side, light above me, light below me. O Allah, increase me in light and give me light and make me light.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "After the two sunnah rakʿas of Fajr, staying in the mosque until sunrise."
+    },
+    {
+      "id": 26037,
+      "text_arabic": "أَقَامَهَا اللّٰهُ وَأَدَامَهَا مَا دَامَتِ السَّمَاوَاتُ وَالْأَرْضُ",
+      "translation": "May Allah establish it and continue it as long as the heavens and the Earth continue to exist.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "During the iqāma, in answer to qad qāmati ṣ-ṣalāh."
+    },
+    {
+      "id": 26038,
+      "text_arabic": "اللّٰهُمَّ إِنِّي أَسْأَلُكَ عِنْدَ حُضُورِ صَلَاتِكَ، وَأَصْوَاتِ دُعَاتِكَ، وَإِدْبَارِ لَيْلِكَ، وَإِقْبَالِ نَهَارِكَ، أَنْ تُؤْتِيَ سَيِّدَنَا مُحَمَّدًا صَلَّى اللّٰهُ عَلَيْهِ وَسَلَّمَ الْوَسِيلَةَ وَالْفَضِيلَةَ وَالدَّرَجَةَ الرَّفِيعَةَ، وَابْعَثْهُ الْمَقَامَ الْمَحْمُودَ الَّذِي وَعَدْتَهُ، إِنَّكَ لَا تُخْلِفُ الْمِيعَادَ، بِرَحْمَتِكَ يَا أَرْحَمَ الرَّاحِمِينَ",
+      "translation": "O Allah, I ask You at the advent of Your prayer, and the voices engaged in calling on You, by the retreat of Your night, and the advance of Your day, to grant our Master Muhammad ﷺ a place near to You, an excellent rank, and the exalted degree, and to raise him to the praised station which You have promised him. Truly You do not break Your promise. By Your mercy, O Most Merciful of the merciful!",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "After answering the muʾadhdhin; said specifically after the adhān of Fajr."
+    },
+    {
+      "id": 26039,
+      "text_arabic": "اللّٰهُمَّ صَلِّ عَلَىٰ سَيِّدِنَا مُحَمَّدٍ وَعَلَىٰ آلِ سَيِّدِنَا مُحَمَّدٍ، اللّٰهُمَّ أَنْتَ السَّلَامُ، وَمِنْكَ السَّلَامُ، وَإِلَيْكَ يَعُودُ السَّلَامُ، فَحَيِّنَا رَبَّنَا بِالسَّلَامِ، وَأَدْخِلْنَا دَارَ السَّلَامِ، تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ، سُبْحَانَ رَبِّيَ الْعَلِيِّ الْأَعْلَى الْوَهَّابِ، لَا إِلٰهَ إِلَّا اللّٰهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، يُحْيِي وَيُمِيتُ، وَهُوَ حَيٌّ لَا يَمُوتُ، بِيَدِهِ الْخَيْرُ، وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ، لَا إِلٰهَ إِلَّا اللّٰهُ أَهْلُ النِّعْمَةِ وَالْمِنَّةِ وَالْفَضْلِ وَالثَّنَاءِ الْحَسَنِ، لَا إِلٰهَ إِلَّا اللّٰهُ، وَلَا نَعْبُدُ إِلَّا إِيَّاهُ، مُخْلِصِينَ لَهُ الدِّينَ وَلَوْ كَرِهَ الْكَافِرُونَ",
+      "translation": "O Allah, bestow Your extolling mercy upon our Master Muhammad ﷺ and the family of our Master Muhammad ﷺ. O Allah, You are Peace, and from You comes peace and to You peace returns, so greet us, O our Lord, with peace, and let us enter the Abode of Peace. Blessed and Exalted are You, O Possessor of Majesty and Bounty. Glory be to my Lord, the High, Most Exalted, the Bestower. There is no god but Allah alone, Who has no partner. His is the dominion and to Him is all praise, He gives life and He gives death, and He is the Living who never dies, in His Hand is all goodness, and He has power over all things. There is no god but Allah, the Possessor of [every] bounty, gift, favor and excellent praise. There is no god but Allah, and we worship none but Him, making our religion sincerely His, in spite of the aversion of those who disbelieve.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "After completing the prayer."
+    },
+    {
+      "id": 26040,
+      "text_arabic": "اللّٰهُمَّ إِنِّي أَسْأَلُكَ مِنَ الْخَيْرِ كُلِّهِ، عَاجِلِهِ وَآجِلِهِ، مَا عَلِمْتُ مِنْهُ وَمَا لَمْ أَعْلَمْ، وَأَعُوذُ بِكَ مِنَ الشَّرِّ كُلِّهِ، عَاجِلِهِ وَآجِلِهِ، مَا عَلِمْتُ مِنْهُ وَمَا لَمْ أَعْلَمْ، وَأَسْأَلُكَ الْجَنَّةَ وَمَا قَرَّبَ إِلَيْهَا مِنْ قَوْلٍ أَوْ عَمَلٍ أَوِ اعْتِقَادٍ، وَأَعُوذُ بِكَ مِنَ النَّارِ وَمَا قَرَّبَ إِلَيْهَا مِنْ قَوْلٍ أَوْ عَمَلٍ أَوِ اعْتِقَادٍ، وَأَسْأَلُكَ مِنْ خَيْرِ مَا سَأَلَكَ مِنْهُ عَبْدُكَ وَنَبِيُّكَ سَيِّدُنَا مُحَمَّدٌ صَلَّى اللّٰهُ عَلَيْهِ وَسَلَّمَ، وَأَسْتَعِيذُكَ مِمَّا اسْتَعَاذَكَ مِنْهُ عَبْدُكَ وَنَبِيُّكَ سَيِّدُنَا مُحَمَّدٌ صَلَّى اللّٰهُ عَلَيْهِ وَسَلَّمَ، اللّٰهُمَّ وَمَا قَضَيْتَ لِي مِنْ أَمْرٍ فَاجْعَلْ عَاقِبَتَهُ رَشَدًا",
+      "translation": "O Allah, I ask of You for all good, whether it comes sooner or later, that which I know and that which I know not. I seek refuge with You from all evil, whether it comes sooner or later, that which I know and that which I know not. I ask You for Paradise, and for those words and actions and beliefs that will bring me closer to it; and I take refuge with You from the Fire and from those words and actions and beliefs that will bring me closer to it. I ask of You the good which Your slave and prophet, our Master Muhammad ﷺ, asked of You; and I seek refuge in You from everything from which Your slave and prophet, our Master Muhammad ﷺ, sought refuge in You. O Allah, whatever matter You have decreed for me, make its end one of guidance.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "The comprehensive supplication taught to Sayyidatunā ʿĀʾisha, may Allah be pleased with her."
+    },
+    {
+      "id": 26041,
+      "text_arabic": "يَا حَيُّ، يَا قَيُّومُ، بِرَحْمَتِكَ أَسْتَغِيثُ، لَا تَكِلْنِي إِلَىٰ نَفْسِي وَلَا إِلَىٰ أَحَدٍ مِنْ خَلْقِكَ طَرْفَةَ عَيْنٍ، وَأَصْلِحْ لِي شَأْنِي كُلَّهُ",
+      "translation": "O Ever-Living, O Self-Subsistent, by Your mercy I beseech Your help. Leave me not to myself nor to any of Your creation even for the blink of an eye. Set right for me all my affairs.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "The supplication advised to Sayyidatunā Fāṭima, may Allah be pleased with her."
+    },
+    {
+      "id": 26042,
+      "text_arabic": "اللّٰهُمَّ إِنِّي أَصْبَحْتُ لَا أَسْتَطِيعُ دَفْعَ مَا أَكْرَهُ، وَلَا أَمْلِكُ نَفْعَ مَا أَرْجُو، وَأَصْبَحَ الْأَمْرُ كُلُّهُ بِيَدِ غَيْرِي، وَأَصْبَحْتُ مُرْتَهَنًا بِعَمَلِي، فَلَا فَقِيرَ أَفْقَرُ مِنِّي، اللّٰهُمَّ لَا تُشْمِتْ بِي عَدُوِّي، وَلَا تَسُؤْ بِي صَدِيقِي، وَلَا تَجْعَلْ مُصِيبَتِي فِي دِينِي، وَلَا تَجْعَلِ الدُّنْيَا أَكْبَرَ هَمِّي، وَلَا مَبْلَغَ عِلْمِي، وَلَا تُسَلِّطْ عَلَيَّ مَنْ لَا يَرْحَمُنِي",
+      "translation": "O Allah, I enter this morning unable to repel what I dislike and powerless to attain the benefit of what I seek. All matters this morning are in hands other than mine. I enter the morning a hostage to my own deeds. There is no pauper poorer than I. O Allah, do not give my enemy cause to gloat over me, nor my friend cause to lament over me. Do not cause calamity to occur in my religious affairs; let not this world be the greatest of my concerns nor the extent of my knowledge, nor place in power over me one who will show me no mercy.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "The supplication of Sayyidunā ʿĪsā, upon him be peace."
+    },
+    {
+      "id": 26043,
+      "text_arabic": "لَا إِلٰهَ إِلَّا اللّٰهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، يُحْيِي وَيُمِيتُ وَهُوَ حَيٌّ لَا يَمُوتُ بِيَدِهِ الْخَيْرُ، وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ",
+      "translation": "There is no god but Allah alone, who has no partner. His is the dominion and to Him belongs all praise. He gives life and gives death, and He is the Ever-living who never dies. In His hand is all good, and He has power over all things.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "The first of the ten prayers of glorification and remembrance."
+    },
+    {
+      "id": 26044,
+      "text_arabic": "لَا إِلٰهَ إِلَّا اللّٰهُ الْمَلِكُ الْحَقُّ الْمُبِينُ",
+      "translation": "There is no god but Allah, the Sovereign, the True, the Clarifier.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "The second of the ten prayers of glorification and remembrance."
+    },
+    {
+      "id": 26045,
+      "text_arabic": "لَا إِلٰهَ إِلَّا اللّٰهُ الْوَاحِدُ الْقَهَّارُ، رَبُّ السَّمَاوَاتِ وَالْأَرْضِ وَمَا بَيْنَهُمَا الْعَزِيزُ الْغَفَّارُ",
+      "translation": "There is no god but Allah, the One, the Conqueror, Lord of the heavens and the earth and all that is in between, the Magnificent, the Forgiving.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "The third of the ten prayers of glorification and remembrance."
+    },
+    {
+      "id": 26046,
+      "text_arabic": "سُبْحَانَ اللّٰهِ، وَالْحَمْدُ لِلّٰهِ، وَلَا إِلٰهَ إِلَّا اللّٰهُ، وَاللّٰهُ أَكْبَرُ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللّٰهِ الْعَلِيِّ الْعَظِيمِ",
+      "translation": "Transcendent is Allah, all praise is to Allah, and there is no god but Allah, and Allah is Great; there is no power nor might except by Allah, the High, the Mighty.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "The fourth of the ten prayers of glorification and remembrance."
+    },
+    {
+      "id": 26047,
+      "text_arabic": "سُبُّوحٌ قُدُّوسٌ رَبُّ الْمَلَائِكَةِ وَالرُّوحِ",
+      "translation": "All-Transcendent, All-Holy, Lord of the angels and of the Spirits.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "The fifth of the ten prayers of glorification and remembrance. Commentators say al-Rūḥ refers to Sayyidunā Jibrīl."
+    },
+    {
+      "id": 26048,
+      "text_arabic": "سُبْحَانَ اللّٰهِ الْعَظِيمِ وَبِحَمْدِهِ",
+      "translation": "Transcendent is Allah, the Mighty, and by His praise.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "The sixth of the ten prayers of glorification and remembrance."
+    },
+    {
+      "id": 26049,
+      "text_arabic": "أَسْتَغْفِرُ اللّٰهَ الْعَظِيمَ الَّذِي لَا إِلٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ، وَأَسْأَلُهُ التَّوْبَةَ وَالْمَغْفِرَةَ",
+      "translation": "I seek the forgiveness of Allah, the Mighty, apart from whom there is no god, the Ever-living, the Self-subsistent, and I ask Him to accept my repentance and grant me forgiveness.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "The seventh of the ten prayers of glorification and remembrance."
+    },
+    {
+      "id": 26050,
+      "text_arabic": "اللّٰهُمَّ لَا مَانِعَ لِمَا أَعْطَيْتَ، وَلَا مُعْطِيَ لِمَا مَنَعْتَ، وَلَا رَادَّ لِمَا قَضَيْتَ، وَلَا يَنْفَعُ ذَا الْجَدِّ مِنْكَ الْجَدُّ",
+      "translation": "O Allah, none can withhold what You bestow, and none can bestow what You withhold, and there is none to repel what You ordain, and the fortune of any who possess fortune will in no way avail them against You.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "The eighth of the ten prayers of glorification and remembrance."
+    },
+    {
+      "id": 26051,
+      "text_arabic": "اللّٰهُمَّ صَلِّ عَلَىٰ سَيِّدِنَا مُحَمَّدٍ وَعَلَىٰ آلِ سَيِّدِنَا مُحَمَّدٍ",
+      "translation": "O Allah, bestow Your extolling mercy upon our Master Muhammad and the family of our Master Muhammad.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "The ninth of the ten prayers of glorification and remembrance."
+    },
+    {
+      "id": 26052,
+      "text_arabic": "بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِاسْمِكَ أَرْفَعُهُ، فَاغْفِرْ لِي ذَنْبِي، اللّٰهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ، اللّٰهُمَّ بِاسْمِكَ أَحْيَا وَأَمُوتُ، أَعُوذُ بِكَ مِنْ شَرِّ كُلِّ ذِي شَرٍّ، وَمِنْ شَرِّ كُلِّ دَابَّةٍ أَنْتَ آخِذٌ بِنَاصِيَتِهَا، إِنَّ رَبِّي عَلَىٰ صِرَاطٍ مُسْتَقِيمٍ",
+      "translation": "In Your Name, my Lord, I lay myself down, and in Your Name I rise up; forgive me my sins. O Allah, save me from Your punishment the Day You resurrect Your slaves. O Allah, in Your Name I live and I die, and I seek Your refuge from the evil of everything that possesses evil, and from the evil of every creature whose forelock You hold - truly my Lord is on the Right Way.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "When going to sleep."
+    },
+    {
+      "id": 26053,
+      "text_arabic": "أَنْتَ الْأَوَّلُ فَلَيْسَ قَبْلَكَ شَيْءٌ، وَأَنْتَ الْآخِرُ فَلَيْسَ بَعْدَكَ شَيْءٌ، وَأَنْتَ الظَّاهِرُ فَلَيْسَ فَوْقَكَ شَيْءٌ، وَأَنْتَ الْبَاطِنُ فَلَيْسَ دُونَكَ شَيْءٌ، اقْضِ عَنِّي الدَّيْنَ وَأَغْنِنِي مِنَ الْفَقْرِ",
+      "translation": "You are the First, there was nothing before You; You are the Last, there is nothing after You; You are the Apparent, there is nothing above You; You are the Hidden, there is nothing below You - resolve for me my debts and enrich me beyond poverty.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "When going to sleep."
+    },
+    {
+      "id": 26054,
+      "text_arabic": "اللّٰهُمَّ أَنْتَ خَلَقْتَ نَفْسِي، وَأَنْتَ تَتَوَفَّاهَا، لَكَ مَمَاتُهَا وَمَحْيَاهَا، إِنْ أَمَتَّهَا فَاغْفِرْ لَهَا، وَإِنْ أَحْيَيْتَهَا فَاحْفَظْهَا بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ",
+      "translation": "O Allah, You created my soul, and You will cause it to die - to You belong its perishing and its living. If You cause it to die, forgive it, and if You give it life, protect it by that which You protect Your pious slaves.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "When going to sleep."
+    },
+    {
+      "id": 26055,
+      "text_arabic": "اللّٰهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ",
+      "translation": "O Allah, truly I ask of You pardon and well-being.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "When going to sleep."
+    },
+    {
+      "id": 26056,
+      "text_arabic": "اللّٰهُمَّ أَيْقِظْنِي فِي أَحَبِّ السَّاعَاتِ إِلَيْكَ، وَاسْتَعْمِلْنِي بِأَحَبِّ الْأَعْمَالِ إِلَيْكَ؛ لِتُقَرِّبَنِي إِلَيْكَ زُلْفَىٰ، وَتُبْعِدَنِي مِنْ سَخَطِكَ بُعْدًا، أَسْأَلُكَ فَتُعْطِيَنِي، وَأَسْتَغْفِرُكَ فَتَغْفِرَ لِي، وَأَدْعُوكَ فَتَسْتَجِيبَ لِي",
+      "translation": "O Allah, waken me in the hour most beloved to You, and use me in the work most beloved to You, so that You draw me ever closer to You, and keep me always far from Your wrath - so that when I ask of You, You give me, when I repent to You, You forgive me, and when I call unto You, You answer me!",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "When going to sleep. Then recite Āyat al-Kursī, the last two verses of al-Baqara, al-Ikhlāṣ, al-Falaq, al-Nās and al-Mulk."
+    },
+    {
+      "id": 26057,
+      "text_arabic": "اللّٰهُ أَكْبَرُ كَبِيرًا، وَالْحَمْدُ لِلّٰهِ كَثِيرًا، وَسُبْحَانَ اللّٰهِ بُكْرَةً وَأَصِيلًا",
+      "translation": "Allah is Most Great! Praise be to Allah in abundance, and glory be to Allah morning and evening.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "After the opening takbīr of the prayer. In the Ḥanafī school it is not said in obligatory prayers, only in voluntary (nafl) ones."
+    },
+    {
+      "id": 26058,
+      "text_arabic": "وَجَّهْتُ وَجْهِي لِلَّذِي فَطَرَ السَّمَاوَاتِ وَالْأَرْضَ حَنِيفًا مُسْلِمًا وَمَا أَنَا مِنَ الْمُشْرِكِينَ، إِنَّ صَلَاتِي وَنُسُكِي وَمَحْيَايَ وَمَمَاتِي لِلّٰهِ رَبِّ الْعَالَمِينَ لَا شَرِيكَ لَهُ، وَبِذٰلِكَ أُمِرْتُ وَأَنَا مِنَ الْمُسْلِمِينَ",
+      "translation": "I have turned my face to the One who created the heavens and earth, in submission as a pure monotheist, and I am not of those who associate others with Him. Indeed, my prayer, my worship, my life, and my death are for Allah Most High, Lord of the Worlds, Who has no partner. Thus have I been commanded, and I am of those who submit.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "After the opening takbīr of the prayer. In the Ḥanafī school it is not said in obligatory prayers, only in voluntary (nafl) ones."
+    },
+    {
+      "id": 26059,
+      "text_arabic": "رَبَّنَا لَكَ الْحَمْدُ مِلْءَ السَّمَاوَاتِ وَمِلْءَ الْأَرْضِ وَمِلْءَ مَا شِئْتَ مِنْ شَيْءٍ بَعْدُ",
+      "translation": "O Our Lord, to You is praise filling the heavens and the earth and filling whatever You will thereafter.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "When standing upright after bowing. In the Ḥanafī school it is not said in obligatory prayers, only in voluntary (nafl) ones."
+    },
+    {
+      "id": 26060,
+      "text_arabic": "رَبِّ اغْفِرْ لِي، وَارْحَمْنِي، وَارْزُقْنِي، وَاهْدِنِي، وَاجْبُرْنِي، وَعَافِنِي، وَاعْفُ عَنِّي",
+      "translation": "O Lord, forgive me and have mercy on me, provide for me and guide me, heal me, grant me well-being, and pardon me.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "When sitting between the two prostrations. Unlike the other prayer duʿāʾ, in the Ḥanafī school this one may be said in obligatory prayers too."
+    },
+    {
+      "id": 26061,
+      "text_arabic": "اللّٰهُمَّ يَا غَنِيُّ يَا حَمِيدُ، يَا مُبْدِئُ يَا مُعِيدُ، يَا رَحِيمُ يَا وَدُودُ، أَغْنِنِي بِحَلَالِكَ عَنْ حَرَامِكَ، وَبِطَاعَتِكَ عَنْ مَعْصِيَتِكَ، وَبِفَضْلِكَ عَمَّنْ سِوَاكَ",
+      "translation": "O Allah, O You Free from want, O Praised One, O Originator, O Restorer, O Most Merciful, O Loving - enrich me with what You have made lawful, so that I have no need of what You have made unlawful; [enrich me] with obedience to You, so that I have no need to disobey You; and [enrich me] with Your grace, so that I have no need of any other than You.",
+      "default_count": 1,
+      "source_id": 120,
+      "notes": "After completing the Friday prayer. When you have finished and made the salutation, then before speaking, recite al-Fātiḥa, al-Ikhlāṣ, al-Falaq and al-Nās seven times each, which protects you from one Friday to the next and guards against Satan; then say this."
+    },
+    {
+      "id": 26062,
+      "text_arabic": "اللّٰهُمَّ صَلِّ وَسَلِّمْ وَبَارِكْ عَلَىٰ سَيِّدِنَا وَمَوْلَانَا مُحَمَّدٍ النُّورِ الْمُذْهِبِ لِلنِّسْيَانِ بِنُورِهِ فِي كُلِّ لَمْحَةٍ وَنَفَسٍ عَدَدَ مَا وَسِعَهُ عِلْمُ اللّٰهِ",
+      "translation": "O Allah, send benedictions, peace, and blessings upon our Leader and Master Muhammad, the light through which every form of forgetfulness is dispelled in every moment and with every breath, as many times as are encompassed by the knowledge of Allah.",
+      "default_count": 1,
+      "source_id": 121,
+      "notes": "A prayer upon the Prophet ﷺ to recite frequently: a tried and tested cure for forgetfulness."
+    },
+    {
+      "id": 26063,
+      "text_arabic": "اللّٰهُمَّ إِنِّي أَسْتَوْدِعُكَ مَا عَلَّمْتَنِيهِ فَارْدُدْهُ إِلَيَّ عِنْدَ حَاجَتِي إِلَيْهِ وَلَا تُنْسِنِيهِ يَا رَبَّ الْعَالَمِينَ، اللّٰهُمَّ أَخْرِجْنَا مِنْ ظُلُمَاتِ الْوَهْمِ وَأَكْرِمْنَا بِنُورِ الْفَهْمِ وَافْتَحْ عَلَيْنَا بِمَعْرِفَةِ الْعِلْمِ وَحَسِّنْ أَخْلَاقَنَا بِالْحِلْمِ وَسَهِّلْ لَنَا أَبْوَابَ فَضْلِكَ وَانْشُرْ عَلَيْنَا مِنْ خَزَائِنِ رَحْمَتِكَ يَا أَرْحَمَ الرَّاحِمِينَ",
+      "translation": "O Allah, I entrust to You whatever You teach me, so return it to me at the time that I need it. And do not cause me to forget it, O Lord of all the worlds. O Allah, take us out of the darkness of illusion and honour us with the light of understanding. Open upon us, through gnosis, knowledge. Beautify our conduct with forbearance, and facilitate for us the doors to Your grace. And spread upon us mercy from the treasures of Your mercy, O Most Merciful of those who show mercy.",
+      "default_count": 1,
+      "source_id": 121,
+      "notes": "Before a lesson."
+    },
+    {
+      "id": 26064,
+      "text_arabic": "اللّٰهُمَّ افْتَحْ عَلَيَّ فُتُوحَ الْعَارِفِينَ بِحِكْمَتِكَ وَانْشُرْ عَلَيَّ رَحْمَتَكَ وَذَكِّرْنِي مَا نَسِيتُ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ",
+      "translation": "O Allah, grant me the opening of the gnostics through Your wisdom, spread over me Your mercy, and remind me when I forget, O Owner of majesty and honour.",
+      "default_count": 1,
+      "source_id": 121,
+      "notes": "To repeat often, against forgetting what one has memorised."
+    },
+    {
+      "id": 26065,
+      "text_arabic": "اللّٰهُمَّ نَوِّرْ بِالْكِتَابِ بَصَرِي وَاشْرَحْ بِهِ صَدْرِي وَاسْتَعْمِلْ بِهِ بَدَنِي وَأَطْلِقْ بِهِ لِسَانِي وَقَوِّ بِهِ جَنَانِي وَاشْرَحْ بِهِ فَهْمِي وَقَوِّ بِهِ عَزْمِي بِحَوْلِكَ وَقُوَّتِكَ فَإِنَّهُ لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِكَ يَا أَرْحَمَ الرَّاحِمِينَ",
+      "translation": "O Allah, illuminate with Your Book my sight, expand through it my breast, employ with it my body, cause it to be pronounced by my tongue, strengthen with it my heart, expand with it my understanding and strengthen with it my resolve, that is, through Your might and power. For indeed there is no might nor power except with You. O Most Merciful of those who show mercy.",
+      "default_count": 1,
+      "source_id": 121,
+      "benefits": "Ibn Masʿūd related that the Prophet ﷺ said: “If someone fears that he will forget the Qurʾān after having memorised it, or knowledge after learning it, he should say [the above].”",
+      "notes": "To repeat often, against forgetting the Qurʾān or knowledge. The booklet glosses janānī (my inner self) as qalbī, my heart."
+    }
+  ]
+}
