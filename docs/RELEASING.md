@@ -226,8 +226,8 @@ is done.
    - **Privacy policy** — required even for an app that collects nothing. Use
      `https://github.com/rqawasme/Wirdi/blob/main/docs/PRIVACY.md`.
    - **Data safety** — no data collected, none shared. This is true because the
-     release manifest declares no permissions, and
-     `test/app/android_manifest_test.dart` keeps it true.
+     release manifest declares no network access — only the two permissions
+     reminders need — and `test/app/android_manifest_test.dart` keeps it true.
    - **Target audience** — choosing only 13 and over keeps the app out of the
      Families policy's extra review. Nothing in the app would fail it — no ads,
      no data — but it is more review for no gain.
@@ -304,10 +304,12 @@ bundle's details, shows what Play made of it. Worth a look on the first one:
 
 - **Target SDK** 36. Play has required API 36 for new apps and updates since
   31 August 2026; Flutter 3.47.2 sets it through `flutter.targetSdkVersion`.
-- **Permissions**: nothing that reaches the network or any data. The one entry
-  to expect is `app.wirdi.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`, which
-  AndroidX merges in: a signature permission the app declares for itself, to
-  keep its own broadcast receivers private. It grants access to nothing. Any
+- **Permissions**: nothing that reaches the network or any data. Expect four.
+  `POST_NOTIFICATIONS` and `RECEIVE_BOOT_COMPLETED` are the app's own, for
+  reminders. `VIBRATE` comes in with flutter_local_notifications, which declares
+  it for notification vibration. And `app.wirdi.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`,
+  which AndroidX merges in: a signature permission the app declares for itself,
+  to keep its own broadcast receivers private. It grants access to nothing. Any
   other entry means a dependency has added one, and the Data safety answers
   need looking at before that bundle goes further.
 - **Memory page size**: no 16 KB warning. The one native library that is not

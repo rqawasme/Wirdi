@@ -110,6 +110,18 @@ class SettingsScreen extends ConsumerWidget {
                   value: settings.showTracker,
                   onChanged: controller.setShowTracker,
                 ),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Reminders'),
+                  // The times themselves are set where a collection is
+                  // committed, one at a time. This is the switch for all of
+                  // them, and it forgets none.
+                  subtitle: const Text(
+                    'Off silences them all and keeps the times you set',
+                  ),
+                  value: settings.remindersEnabled,
+                  onChanged: controller.setRemindersEnabled,
+                ),
                 const SizedBox(height: WirdiMetrics.space4),
                 SettingChoice<ThemeMode>(
                   label: 'Theme',

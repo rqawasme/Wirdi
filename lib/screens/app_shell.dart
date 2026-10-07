@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../providers/reminders.dart';
+import '../reminders/reminder_plan.dart';
 import '../routes.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/voussoir_stripe.dart';
@@ -19,6 +23,11 @@ import 'tracker_screen.dart';
 /// each switch, which is what gives each tab its own scroll position: coming
 /// back to Collections half way down the list should land half way down the
 /// list.
+///
+/// It is also what keeps the reminders laid out, since it is the one widget
+/// alive for as long as the app is: it holds [reminderSyncProvider] open, asks
+/// it again whenever the app comes back to the front — a new day, or a new
+/// time zone — and answers a tapped reminder by going Home.
 class AppShell extends ConsumerStatefulWidget {
   const AppShell({super.key, this.initialTab = WirdiTab.home});
 
@@ -49,16 +58,58 @@ class _AppShellState extends ConsumerState<AppShell> {
     for (final WirdiTab _ in WirdiTab.values) ScrollController(),
   ];
 
+  late final AppLifecycleListener _lifecycle;
+
+  late final StreamSubscription<void> _reminderTaps;
+
+  @override
+  void initState() {
+    super.initState();
+    _lifecycle = AppLifecycleListener(
+      onResume: () => ref.invalidate(reminderSyncProvider),
+    );
+    _reminderTaps = ref
+        .read(reminderSchedulerProvider)
+        .taps
+        .listen((_) => _openHome());
+  }
+
   @override
   void dispose() {
+    _reminderTaps.cancel();
+    _lifecycle.dispose();
     for (final ScrollController controller in _controllers) {
       controller.dispose();
     }
     super.dispose();
   }
 
+  /// Where a tapped reminder leads: Home, with whatever was open on top of
+  /// the shell closed. Home is where the wird it was about is waiting, and a
+  /// wird left part-way through saved its place on the way out.
+  void _openHome() {
+    if (!mounted) return;
+    Navigator.of(context).popUntil((Route<dynamic> route) => route.isFirst);
+    if (_active != WirdiTab.home) setState(() => _active = WirdiTab.home);
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Listened to only to keep it running. A plan that fails is logged and
+    // otherwise left: there is nothing on screen for it to explain itself on,
+    // and the next change tries again.
+    ref.listen<AsyncValue<List<PlannedReminder>>>(reminderSyncProvider, (
+      _,
+      AsyncValue<List<PlannedReminder>> next,
+    ) {
+      if (next case AsyncError(
+        :final Object error,
+        :final StackTrace stackTrace,
+      )) {
+        debugPrint('Wirdi could not plan reminders: $error\n$stackTrace');
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_title),

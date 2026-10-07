@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The release build's resource shrinker removes anything it cannot see
+     referenced, and the reminder icon is referenced only by name, from Dart
+     (lib/reminders/local_notification_scheduler.dart). Without this it would
+     be stripped, and a reminder would fail to show rather than show without
+     an icon. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_notification" />

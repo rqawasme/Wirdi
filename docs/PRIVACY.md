@@ -1,6 +1,6 @@
 # Wirdi privacy policy
 
-*Effective 26 September 2026*
+*Effective 6 October 2026*
 
 Wirdi is an app for daily Islamic practice, developed by Safi Solutions. This
 policy covers the Wirdi app for Android and iOS.
@@ -17,16 +17,30 @@ Everything you do in Wirdi is kept in a database on your own phone:
 
 - the collections you commit to, create or edit, and the adhkar you write;
 - your progress through them, the days you completed them, and your streak;
-- your settings, such as text size, theme and whether the translation is shown.
+- your settings, such as text size, theme and whether the translation is shown;
+- the reminder times you set, if you set any.
 
 None of it is sent anywhere. Uninstalling Wirdi deletes all of it.
 
 ## Network access
 
-None. On Android the app asks for no permissions at all — not even permission
-to use the internet — so it cannot connect to anything. The Quran text, the
-translation, the adhkar and the fonts are all part of the app when you install
-it, and nothing is downloaded while you use it.
+None. Wirdi does not ask for permission to use the internet, so it cannot
+connect to anything. The Quran text, the translation, the adhkar and the fonts
+are all part of the app when you install it, and nothing is downloaded while you
+use it.
+
+## Reminders
+
+If you turn on a reminder for a collection, Wirdi asks your phone for
+permission to show notifications — then, and not before. Reminders are local
+notifications: Wirdi gives your phone the time and the name of the collection,
+and your phone shows it when the time comes. Nothing is sent anywhere to make
+that happen. On Android the app also asks to be told when the phone restarts,
+which is what lets a reminder survive the restart; that permission grants no
+access to anything else. These are the only permissions Wirdi asks for.
+
+You can turn reminders off in Wirdi's settings, or turn off notifications for
+Wirdi in your phone's settings, at any time.
 
 ## Things your phone and app store do on their own
 

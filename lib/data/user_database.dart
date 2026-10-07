@@ -21,7 +21,7 @@ class UserDatabase extends _$UserDatabase {
   factory UserDatabase.memory() => UserDatabase(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -64,6 +64,10 @@ class UserDatabase extends _$UserDatabase {
     // deliberately. Widening means rebuilding the table, and a table rebuild
     // cannot be made idempotent — which the second rule below requires of
     // every step here.
+    // 6 -> 7 gives a commitment an optional reminder: a time of day to be
+    // notified on each of its days. Existing rows come forward with none,
+    // which is the only honest reading of a commitment made before there was
+    // anything to ask — a reminder is something somebody asks for.
     //
     // Two rules hold every step here, and both were learned the hard way.
     //
@@ -110,6 +114,12 @@ class UserDatabase extends _$UserDatabase {
           );
         }
         await m.createIndex(idxUserCollectionItemsUserItem);
+      }
+      // Checked rather than gated on `from == 6` alone: a database from before
+      // version 2 had its `commitments` created above from the current schema,
+      // reminder column and all.
+      if (from < 7 && !await _hasColumn('commitments', 'reminder_minutes')) {
+        await m.addColumn(commitments, commitments.reminderMinutes);
       }
     },
     beforeOpen: (OpeningDetails details) async {

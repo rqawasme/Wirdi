@@ -50,8 +50,9 @@ enum WirdiTab {
 /// disappears at a glance. The weight of the label carries the rest.
 ///
 /// Flat, and it stays flat: no elevation, no tint and no shadow when content
-/// scrolls under it. There are no badges, dots or counts, because the app has
-/// no notifications, and nothing floats above it, because there is no FAB.
+/// scrolls under it. There are no badges, dots or counts — the only
+/// notifications are the reminders somebody sets, and nothing in the app is
+/// unread — and nothing floats above it, because there is no FAB.
 class BottomNav extends StatelessWidget {
   const BottomNav({super.key, required this.active, required this.onSelect});
 

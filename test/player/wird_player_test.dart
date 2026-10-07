@@ -1184,7 +1184,8 @@ class CountingUserRepository implements UserRepository {
     CollectionId id,
     DailySection section, {
     Weekdays days = Weekdays.everyDay,
-  }) => _inner.commit(id, section, days: days);
+    ReminderTime? reminder,
+  }) => _inner.commit(id, section, days: days, reminder: reminder);
 
   @override
   Future<void> uncommit(CollectionId id) => _inner.uncommit(id);

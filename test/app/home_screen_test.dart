@@ -736,8 +736,8 @@ void main() {
     ) async {
       await pumpApp(tester);
 
-      // The app has no notifications at all, so there is nothing for one to
-      // be about.
+      // The only notifications are the reminders somebody sets, and nothing in
+      // the app is ever unread, so there is nothing for one to be about.
       expect(find.byType(Badge), findsNothing);
     });
 

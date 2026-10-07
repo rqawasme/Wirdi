@@ -3117,6 +3117,17 @@ class Commitments extends Table with TableInfo<Commitments, CommitmentRow> {
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL',
   );
+  static const VerificationMeta _reminderMinutesMeta = const VerificationMeta(
+    'reminderMinutes',
+  );
+  late final GeneratedColumn<int> reminderMinutes = GeneratedColumn<int>(
+    'reminder_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
   @override
   List<GeneratedColumn> get $columns => [
     collectionRef,
@@ -3125,6 +3136,7 @@ class Commitments extends Table with TableInfo<Commitments, CommitmentRow> {
     sortOrder,
     createdAt,
     updatedAt,
+    reminderMinutes,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3187,6 +3199,15 @@ class Commitments extends Table with TableInfo<Commitments, CommitmentRow> {
     } else if (isInserting) {
       context.missing(_updatedAtMeta);
     }
+    if (data.containsKey('reminder_minutes')) {
+      context.handle(
+        _reminderMinutesMeta,
+        reminderMinutes.isAcceptableOrUnknown(
+          data['reminder_minutes']!,
+          _reminderMinutesMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -3220,6 +3241,10 @@ class Commitments extends Table with TableInfo<Commitments, CommitmentRow> {
         DriftSqlType.int,
         data['${effectivePrefix}updated_at'],
       )!,
+      reminderMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reminder_minutes'],
+      ),
     );
   }
 
@@ -3239,6 +3264,7 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
   final int sortOrder;
   final int createdAt;
   final int updatedAt;
+  final int? reminderMinutes;
   const CommitmentRow({
     required this.collectionRef,
     required this.section,
@@ -3246,6 +3272,7 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
     required this.sortOrder,
     required this.createdAt,
     required this.updatedAt,
+    this.reminderMinutes,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3256,6 +3283,9 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
     map['sort_order'] = Variable<int>(sortOrder);
     map['created_at'] = Variable<int>(createdAt);
     map['updated_at'] = Variable<int>(updatedAt);
+    if (!nullToAbsent || reminderMinutes != null) {
+      map['reminder_minutes'] = Variable<int>(reminderMinutes);
+    }
     return map;
   }
 
@@ -3271,6 +3301,7 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
       sortOrder: serializer.fromJson<int>(json['sort_order']),
       createdAt: serializer.fromJson<int>(json['created_at']),
       updatedAt: serializer.fromJson<int>(json['updated_at']),
+      reminderMinutes: serializer.fromJson<int?>(json['reminder_minutes']),
     );
   }
   @override
@@ -3283,6 +3314,7 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
       'sort_order': serializer.toJson<int>(sortOrder),
       'created_at': serializer.toJson<int>(createdAt),
       'updated_at': serializer.toJson<int>(updatedAt),
+      'reminder_minutes': serializer.toJson<int?>(reminderMinutes),
     };
   }
 
@@ -3293,6 +3325,7 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
     int? sortOrder,
     int? createdAt,
     int? updatedAt,
+    Value<int?> reminderMinutes = const Value.absent(),
   }) => CommitmentRow(
     collectionRef: collectionRef ?? this.collectionRef,
     section: section ?? this.section,
@@ -3300,6 +3333,9 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
     sortOrder: sortOrder ?? this.sortOrder,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    reminderMinutes: reminderMinutes.present
+        ? reminderMinutes.value
+        : this.reminderMinutes,
   );
   CommitmentRow copyWithCompanion(CommitmentsCompanion data) {
     return CommitmentRow(
@@ -3311,6 +3347,9 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
       sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      reminderMinutes: data.reminderMinutes.present
+          ? data.reminderMinutes.value
+          : this.reminderMinutes,
     );
   }
 
@@ -3322,7 +3361,8 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
           ..write('days: $days, ')
           ..write('sortOrder: $sortOrder, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('reminderMinutes: $reminderMinutes')
           ..write(')'))
         .toString();
   }
@@ -3335,6 +3375,7 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
     sortOrder,
     createdAt,
     updatedAt,
+    reminderMinutes,
   );
   @override
   bool operator ==(Object other) =>
@@ -3345,7 +3386,8 @@ class CommitmentRow extends DataClass implements Insertable<CommitmentRow> {
           other.days == this.days &&
           other.sortOrder == this.sortOrder &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.reminderMinutes == this.reminderMinutes);
 }
 
 class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
@@ -3355,6 +3397,7 @@ class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
   final Value<int> sortOrder;
   final Value<int> createdAt;
   final Value<int> updatedAt;
+  final Value<int?> reminderMinutes;
   final Value<int> rowid;
   const CommitmentsCompanion({
     this.collectionRef = const Value.absent(),
@@ -3363,6 +3406,7 @@ class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
     this.sortOrder = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.reminderMinutes = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   CommitmentsCompanion.insert({
@@ -3372,6 +3416,7 @@ class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
     required int sortOrder,
     required int createdAt,
     required int updatedAt,
+    this.reminderMinutes = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : collectionRef = Value(collectionRef),
        section = Value(section),
@@ -3385,6 +3430,7 @@ class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
     Expression<int>? sortOrder,
     Expression<int>? createdAt,
     Expression<int>? updatedAt,
+    Expression<int>? reminderMinutes,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -3394,6 +3440,7 @@ class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
       if (sortOrder != null) 'sort_order': sortOrder,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (reminderMinutes != null) 'reminder_minutes': reminderMinutes,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -3405,6 +3452,7 @@ class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
     Value<int>? sortOrder,
     Value<int>? createdAt,
     Value<int>? updatedAt,
+    Value<int?>? reminderMinutes,
     Value<int>? rowid,
   }) {
     return CommitmentsCompanion(
@@ -3414,6 +3462,7 @@ class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
       sortOrder: sortOrder ?? this.sortOrder,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      reminderMinutes: reminderMinutes ?? this.reminderMinutes,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -3439,6 +3488,9 @@ class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<int>(updatedAt.value);
     }
+    if (reminderMinutes.present) {
+      map['reminder_minutes'] = Variable<int>(reminderMinutes.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -3454,6 +3506,7 @@ class CommitmentsCompanion extends UpdateCompanion<CommitmentRow> {
           ..write('sortOrder: $sortOrder, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
+          ..write('reminderMinutes: $reminderMinutes, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -4007,9 +4060,10 @@ abstract class _$UserDatabase extends GeneratedDatabase {
     required int sortOrder,
     required int createdAt,
     required int updatedAt,
+    int? reminderMinutes,
   }) {
     return customInsert(
-      'INSERT INTO commitments (collection_ref, section, days, sort_order, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6) ON CONFLICT (collection_ref) DO UPDATE SET section = excluded.section, days = excluded.days, updated_at = excluded.updated_at',
+      'INSERT INTO commitments (collection_ref, section, days, sort_order, created_at, updated_at, reminder_minutes) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7) ON CONFLICT (collection_ref) DO UPDATE SET section = excluded.section, days = excluded.days, reminder_minutes = excluded.reminder_minutes, updated_at = excluded.updated_at',
       variables: [
         Variable<String>(ref),
         Variable<String>(section),
@@ -4017,6 +4071,7 @@ abstract class _$UserDatabase extends GeneratedDatabase {
         Variable<int>(sortOrder),
         Variable<int>(createdAt),
         Variable<int>(updatedAt),
+        Variable<int>(reminderMinutes),
       ],
       updates: {commitments},
     );
@@ -5886,6 +5941,7 @@ typedef $CommitmentsCreateCompanionBuilder =
       required int sortOrder,
       required int createdAt,
       required int updatedAt,
+      Value<int?> reminderMinutes,
       Value<int> rowid,
     });
 typedef $CommitmentsUpdateCompanionBuilder =
@@ -5896,6 +5952,7 @@ typedef $CommitmentsUpdateCompanionBuilder =
       Value<int> sortOrder,
       Value<int> createdAt,
       Value<int> updatedAt,
+      Value<int?> reminderMinutes,
       Value<int> rowid,
     });
 
@@ -5934,6 +5991,11 @@ class $CommitmentsFilterComposer extends Composer<_$UserDatabase, Commitments> {
 
   ColumnFilters<int> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get reminderMinutes => $composableBuilder(
+    column: $table.reminderMinutes,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -5976,6 +6038,11 @@ class $CommitmentsOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get reminderMinutes => $composableBuilder(
+    column: $table.reminderMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $CommitmentsAnnotationComposer
@@ -6006,6 +6073,11 @@ class $CommitmentsAnnotationComposer
 
   GeneratedColumn<int> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get reminderMinutes => $composableBuilder(
+    column: $table.reminderMinutes,
+    builder: (column) => column,
+  );
 }
 
 class $CommitmentsTableManager
@@ -6045,6 +6117,7 @@ class $CommitmentsTableManager
                 Value<int> sortOrder = const Value.absent(),
                 Value<int> createdAt = const Value.absent(),
                 Value<int> updatedAt = const Value.absent(),
+                Value<int?> reminderMinutes = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CommitmentsCompanion(
                 collectionRef: collectionRef,
@@ -6053,6 +6126,7 @@ class $CommitmentsTableManager
                 sortOrder: sortOrder,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                reminderMinutes: reminderMinutes,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -6063,6 +6137,7 @@ class $CommitmentsTableManager
                 required int sortOrder,
                 required int createdAt,
                 required int updatedAt,
+                Value<int?> reminderMinutes = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CommitmentsCompanion.insert(
                 collectionRef: collectionRef,
@@ -6071,6 +6146,7 @@ class $CommitmentsTableManager
                 sortOrder: sortOrder,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                reminderMinutes: reminderMinutes,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

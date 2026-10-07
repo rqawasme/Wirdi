@@ -11,6 +11,8 @@ that description:
     android/app/src/main/res/mipmap-*dpi/         legacy icon, and the adaptive
                                                   icon's foreground and
                                                   monochrome layers
+    android/app/src/main/res/drawable-*dpi/       the reminder notification's
+                                                  small icon
     assets/icon/play_store_icon.png               the 512px icon for the Google
                                                   Play listing
     assets/icon/play_feature_graphic.png          the listing's 1024x500 feature
@@ -68,6 +70,10 @@ ADAPTIVE_SCALE = 0.68
 # Uncounted beads in the monochrome layer, which the launcher tints: alpha is
 # the only way left to tell them apart from the counted ones.
 MONO_UNCOUNTED_ALPHA = 0.4
+# Android's notification small icon: 24dp, drawn by the system as a silhouette
+# from its alpha alone, in a 22dp live area. The design is enlarged to fill
+# that, since at this size every pixel of margin is a pixel of tasbih lost.
+NOTIFICATION_SCALE = 1.4
 
 
 @dataclass(frozen=True)
@@ -373,6 +379,13 @@ def main() -> None:
         layer = round(108 * density)
         write(res / f"mipmap-{name}/ic_launcher_foreground.png", render(adaptive, layer, None).png(alpha=True))
         write(res / f"mipmap-{name}/ic_launcher_monochrome.png", render(adaptive, layer, None, mono=True).png(alpha=True))
+
+    # The reminder's small icon: white on transparent, like the monochrome
+    # layer, because the system tints it and reads nothing but its alpha.
+    notification = scaled(shapes, NOTIFICATION_SCALE)
+    for name, density in ANDROID_DENSITIES.items():
+        icon = render(notification, round(24 * density), None, mono=True)
+        write(res / f"drawable-{name}/ic_notification.png", icon.png(alpha=True))
 
     # Google Play's listing icon: 512px, full-bleed and square, like iOS's,
     # but as the 32-bit PNG Play asks for — opaque all the same.

@@ -29,7 +29,7 @@ void main() {
   /// What [UserDatabase.schemaVersion] is, named once: every test here asserts
   /// that a database wound back reaches the current version, and a bump should
   /// be one edit rather than a dozen.
-  const int current = 6;
+  const int current = 7;
 
   late Directory dir;
   late File file;
@@ -405,5 +405,59 @@ void main() {
         expect(item.dhikr.textArabic, 'PLACEHOLDER dhikr arabic');
       },
     );
+  });
+
+  group('6 -> 7, the reminder', () {
+    /// Takes `commitments` back to version 6: no reminder column.
+    void windBackToSix(List<String> extra) {
+      windBackTo(6, <String>[
+        'ALTER TABLE commitments DROP COLUMN reminder_minutes',
+        ...extra,
+      ]);
+    }
+
+    test('a commitment comes forward with no reminder', () async {
+      windBackToSix(<String>[
+        "INSERT INTO commitments (collection_ref, section, days, sort_order, "
+            "created_at, updated_at) VALUES ('b:1', 'evening', 16, 1, 0, 0)",
+      ]);
+
+      final Commitment migrated = (await migrateAndRead()).single;
+      // A reminder is something somebody asks for, and nobody had.
+      expect(migrated.reminder, isNull);
+      // And nothing else about it moved.
+      expect(migrated.section, DailySection.evening);
+      expect(migrated.days.weekdays, <int>[DateTime.friday]);
+      expect(versionOf(file), current);
+    });
+
+    test('and can be given one once it has', () async {
+      windBackToSix(<String>[
+        "INSERT INTO commitments (collection_ref, section, days, sort_order, "
+            "created_at, updated_at) VALUES ('b:1', 'morning', 127, 1, 0, 0)",
+      ]);
+      await migrateAndRead();
+
+      final UserDatabase db = UserDatabase.openFile(file);
+      final DriftUserRepository user = DriftUserRepository(db);
+      await user.commit(
+        const BuiltinCollectionId(1),
+        DailySection.morning,
+        reminder: const ReminderTime(6, 30),
+      );
+      expect(
+        (await user.commitments()).single.reminder,
+        const ReminderTime(6, 30),
+      );
+      await db.close();
+    });
+
+    test('a run that failed part way through is safe to run twice', () async {
+      // The column already added and user_version still 6.
+      windBackTo(6, const <String>[]);
+
+      expect(await migrateAndRead(), isEmpty);
+      expect(versionOf(file), current);
+    });
   });
 }

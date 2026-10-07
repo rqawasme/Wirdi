@@ -251,8 +251,11 @@ final class HomeCommitments {
     CollectionId id,
     DailySection section, {
     Weekdays days = Weekdays.everyDay,
+    ReminderTime? reminder,
   }) async {
-    await _ref.read(userRepositoryProvider).commit(id, section, days: days);
+    await _ref
+        .read(userRepositoryProvider)
+        .commit(id, section, days: days, reminder: reminder);
     _invalidate();
   }
 
