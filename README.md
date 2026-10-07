@@ -389,24 +389,51 @@ from disagreeing about where the day begins.
 
 ### The tasbih tab
 
-A free counter, and nothing else. One enormous tap target, the running count in
-72dp numerals over it, and undo and reset in a bar underneath — no dhikr behind
-the number, no target in front of it, and no history kept of what it reached.
+A free counter, with a goal if somebody wants one. One enormous tap target, the
+running count — or, with a goal, the round — in 72dp numerals over it, and undo,
+the goal and reset in a bar underneath. No dhikr behind the number, and no
+history kept of what it reached.
 
 **It counts until somebody resets it.** Not until the end of a step, not until
-midnight, and not until the app is closed: `TasbihCounter` persists the number
-under `tasbih.count` in `user.db`'s settings table, so a tab switch and a cold
-start both come back to the count that was left. Writes are rate-limited to one
-every half second while counting — the player's rule, for the player's reason —
-and a reset is written immediately, because it is the change that would be worst
-to lose.
+midnight, not until the goal, and not until the app is closed: `TasbihCounter`
+persists the number under `tasbih.count` in `user.db`'s settings table, so a tab
+switch and a cold start both come back to the count that was left. Writes are
+rate-limited to one every half second while counting — the player's rule, for
+the player's reason — and a reset is written immediately, because it is the
+change that would be worst to lose.
+
+**The goal is the marker bead, not the end of the string.** Set one — 33, 100,
+1000 or any count up to the six digits every count field takes — and a
+counted `VoussoirStripe` under the number fills toward it while the number
+counts the round. The tap that lands on the goal knocks twice instead of
+clicking, and so does the tap on every multiple of it after, the way the marker
+bead comes round under the thumb on each pass. Nothing stops there: the next
+tap starts the next round at one, with the stripe empty again, a plate under the
+stripe counts the rounds — `×0`, `×1`, `×2` — and a line under that keeps the
+running total once it is no longer the number above (`Total 140`). So a
+thousand can be one goal of a thousand or ten rounds of a hundred, whichever way
+somebody keeps it, and they are the same thousand taps: the count is one number
+and the rounds are read off it, never kept beside it, so undo, reset and a
+restart cannot leave the two disagreeing. The plate is there from the moment a
+goal is, at `×0`, and the same at the hundredth round as at the first; nothing
+escalates. The goal is persisted under `tasbih.goal`, written immediately, and a
+reset leaves it where it is. Only a tap reaches it: undoing back onto a
+multiple, or setting a goal the count is already past, shows it as reached and
+does not knock.
 
 **It is deliberately not the wird player.** The player counts *something*, a
 step at a time, and finishes; this counts taps, and does not. What it borrows is
 the shape — `lib/player/tasbih_counter.dart` is a `ChangeNotifier` with no
 widget in it, and the screen is a `ListenableBuilder` over it — and the two
-rules the counting path lives by: nothing animates, and feedback is the haptic,
-through the same `PlayerHaptics` and the same settings switch.
+rules the counting path lives by: the number never animates, and feedback is the
+haptic, through the same `PlayerHaptics` and the same settings switch.
+
+**Reaching the goal is the one thing that moves.** The number and the stripe
+swell once and settle back over one `WirdiMotion.completion` beat, and the
+rounds plate fades to its new count. Scale and opacity only, painted rather than laid
+out, and on the new number — the swell never holds a count back, and the next
+tap lands while it is settling. With animations turned off in the OS the goal
+is reached on the frame of the tap with nothing in motion.
 
 **Reset asks first.** It sits a thumb's width from a target being tapped at
 speed, and what it throws away is however long somebody has been counting. Undo
@@ -444,11 +471,23 @@ the band. At
 thirty-three repetitions a counter that eases into position is a counter running behind the
 thumb, and the lag is the whole experience. The end of a wird is the one thing
 here that is not on that path — see **finishing** below. Feedback is haptic instead: a
-`selectionClick` on each tap, throttled to one per 60ms and **dropped** rather
+`lightImpact` on each tap, throttled to one per 60ms and **dropped** rather
 than queued, because some Android devices buffer rapid vibration calls and play
 them back late — which is the same lag arriving through the other sense. The
-end of a step is a heavier impact, which always fires, and the tap that
-finishes a step advances on its own rather than asking for another one.
+end of a step is a knock, the heaviest effect the platform's haptic API has,
+which always fires, and the tap that finishes a step advances on its own rather
+than asking for another one.
+
+Flutter names the effects after iOS's, and Android does not rank them the same
+way, which `PlayerHaptics` chooses around. `selectionClick` is Android's clock
+tick, the faintest effect it plays and the one taps used to send, which many
+phones barely render; `heavyImpact` is its context click, lighter than a key
+press. So a tap is `lightImpact` on both, and a knock is `vibrate` on Android
+(a long press's heavy click) and `heavyImpact` on iOS (where `vibrate` is a long
+system buzz). All of it is the view's haptic feedback rather than the vibrator,
+so it needs no permission — and so it also follows the phone's own touch
+feedback setting, which an app without the `VIBRATE` permission cannot
+override.
 
 **The stripe is the wird.** `VoussoirStripe.progress` is cut into
 `min(stepCount, 33)` segments — one per step where a collection is short

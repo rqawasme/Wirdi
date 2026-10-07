@@ -106,14 +106,14 @@ void main() {
 
       player.increment();
       player.increment();
-      expect(haptics.impacts, 0);
-      expect(haptics.selections, 2);
+      expect(haptics.knocks, 0);
+      expect(haptics.clicks, 2);
 
       player.increment();
-      expect(haptics.impacts, 1);
+      expect(haptics.knocks, 1);
       // The completing tap fires one effect, not two: two haptics on one tap
       // read as one muddy buzz rather than as an ending.
-      expect(haptics.selections, 2);
+      expect(haptics.clicks, 2);
     });
 
     test('a block of 3 repeated 7 times counts out 21 steps in order', () {
@@ -244,12 +244,12 @@ void main() {
       }
       // Seven taps in: four ayahs, a round boundary and three more. Nothing
       // has ended yet, so nothing has knocked — a round is not a step.
-      expect(haptics.selections, 7);
-      expect(haptics.impacts, 0);
+      expect(haptics.clicks, 7);
+      expect(haptics.knocks, 0);
 
       player.increment();
-      expect(haptics.impacts, 1);
-      expect(haptics.selections, 7, reason: 'one effect on the ending tap');
+      expect(haptics.knocks, 1);
+      expect(haptics.clicks, 7, reason: 'one effect on the ending tap');
     });
 
     test('undo at unit 0 lands on the previous round\'s last unit', () {
@@ -1103,8 +1103,8 @@ SurahItem surahItem(
 class RecordedHaptics {
   RecordedHaptics() {
     haptics = PlayerHaptics(
-      selection: () => selections++,
-      impact: () => impacts++,
+      click: () => clicks++,
+      knock: () => knocks++,
       // Every effect at the same instant would be thrown away by the throttle,
       // so the clock steps a second on each read.
       clock: () => DateTime(2026).add(Duration(seconds: _reads++)),
@@ -1112,8 +1112,8 @@ class RecordedHaptics {
   }
 
   late final PlayerHaptics haptics;
-  int selections = 0;
-  int impacts = 0;
+  int clicks = 0;
+  int knocks = 0;
   int _reads = 0;
 }
 
