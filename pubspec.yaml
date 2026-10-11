@@ -1,7 +1,7 @@
 name: wirdi
 description: Daily Islamic practice — wird collections, dhikr and Quran, with counters and progress.
 publish_to: none
-version: 1.0.1
+version: 1.1.0
 
 environment:
   sdk: ^3.10.0
