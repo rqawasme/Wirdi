@@ -11,6 +11,7 @@ import 'package:wirdi/providers/settings.dart';
 import 'package:wirdi/routes.dart';
 import 'package:wirdi/screens/collection_contents_screen.dart';
 import 'package:wirdi/theme/theme.dart';
+import 'package:wirdi/widgets/dhikr_block.dart';
 
 import '../support/fixtures.dart';
 
@@ -181,6 +182,24 @@ void main() {
       inSheet(find.text('PLACEHOLDER dhikr 1001 translation')),
       findsOneWidget,
     );
+  });
+
+  testWidgets('and the transliteration with transliterations off', (
+    WidgetTester tester,
+  ) async {
+    // The same asymmetry, for the same reason. Held on the block's flag: the
+    // fixture adhkar carry no transliteration to look for.
+    await data.userRepository.setSetting(
+      SettingKeys.showTransliteration,
+      'false',
+    );
+    await pumpContents(tester, mixed);
+
+    await tester.tap(find.text('PLACEHOLDER dhikr 1001 arabic').first);
+    await settle(tester);
+
+    final DhikrBlock block = tester.widget(inSheet(find.byType(DhikrBlock)));
+    expect(block.showTransliteration, isTrue);
   });
 
   testWidgets('an empty collection of the user\'s own says so', (

@@ -132,11 +132,11 @@ class _Heading extends StatelessWidget {
 
 /// The item's text, in the shape its kind wants.
 ///
-/// **The translation is always shown here**, whatever the show-translation
-/// setting says. That setting is about the surface you recite from — somebody
-/// reciting from memory wants the page uninterrupted — and this sheet exists to
-/// work out *which item this is*. Hiding half the answer would defeat the
-/// screen.
+/// **The translation and transliteration are always shown here**, whatever the
+/// show-translation and show-transliteration settings say. Those settings are
+/// about the surface you recite from — somebody reciting from memory wants the
+/// page uninterrupted — and this sheet exists to work out *which item this is*.
+/// Hiding half the answer would defeat the screen.
 class _Body extends ConsumerWidget {
   const _Body({required this.item});
 

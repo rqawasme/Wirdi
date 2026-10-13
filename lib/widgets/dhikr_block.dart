@@ -18,11 +18,14 @@ class DhikrBlock extends StatelessWidget {
     super.key,
     required this.dhikr,
     this.showTranslation = true,
+    this.showTransliteration = true,
   });
 
   final Dhikr dhikr;
 
   final bool showTranslation;
+
+  final bool showTransliteration;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +47,9 @@ class DhikrBlock extends StatelessWidget {
             locale: AyahBlock.arabic,
           ),
         ),
-        if (transliteration != null && transliteration.isNotEmpty) ...<Widget>[
+        if (showTransliteration &&
+            transliteration != null &&
+            transliteration.isNotEmpty) ...<Widget>[
           const SizedBox(height: WirdiMetrics.space3),
           Text(
             transliteration,

@@ -15,6 +15,7 @@ abstract final class SettingKeys {
   static const String translationScale = 'text.translation_scale';
   static const String themeMode = 'theme.mode';
   static const String showTranslation = 'text.show_translation';
+  static const String showTransliteration = 'text.show_transliteration';
   static const String haptics = 'haptics.enabled';
   // Still `streak.visible` although the setting is now called "Show tracker":
   // these strings are persisted, and renaming one silently resets whatever the
@@ -46,6 +47,7 @@ final class WirdiSettings {
     this.translationScale = 1,
     this.themeMode = ThemeMode.light,
     this.showTranslation = true,
+    this.showTransliteration = true,
     this.haptics = true,
     this.showTracker = true,
     this.remindersEnabled = true,
@@ -68,6 +70,13 @@ final class WirdiSettings {
   /// Off is a real reading mode, not a way to save space: somebody reciting
   /// from memory or reading for the Arabic wants the page uninterrupted.
   final bool showTranslation;
+
+  /// Whether the transliteration is shown under each dhikr.
+  ///
+  /// Separate from [showTranslation] because the two are wanted by different
+  /// people: somebody who reads the Arabic script has no use for the Latin
+  /// spelling of it, and may still want the meaning underneath.
+  final bool showTransliteration;
 
   /// Whether the counter answers a tap with a haptic.
   ///
@@ -122,6 +131,7 @@ final class WirdiSettings {
     double? translationScale,
     ThemeMode? themeMode,
     bool? showTranslation,
+    bool? showTransliteration,
     bool? haptics,
     bool? showTracker,
     bool? remindersEnabled,
@@ -134,6 +144,7 @@ final class WirdiSettings {
       translationScale: translationScale ?? this.translationScale,
       themeMode: themeMode ?? this.themeMode,
       showTranslation: showTranslation ?? this.showTranslation,
+      showTransliteration: showTransliteration ?? this.showTransliteration,
       haptics: haptics ?? this.haptics,
       showTracker: showTracker ?? this.showTracker,
       remindersEnabled: remindersEnabled ?? this.remindersEnabled,
@@ -172,6 +183,9 @@ class SettingsController extends AsyncNotifier<WirdiSettings> {
       showTranslation:
           _bool(await repository.setting(SettingKeys.showTranslation)) ??
           defaults.showTranslation,
+      showTransliteration:
+          _bool(await repository.setting(SettingKeys.showTransliteration)) ??
+          defaults.showTransliteration,
       haptics:
           _bool(await repository.setting(SettingKeys.haptics)) ??
           defaults.haptics,
@@ -224,6 +238,14 @@ class SettingsController extends AsyncNotifier<WirdiSettings> {
       SettingKeys.showTranslation,
       value.toString(),
       (WirdiSettings s) => s.copyWith(showTranslation: value),
+    );
+  }
+
+  Future<void> setShowTransliteration(bool value) {
+    return _set(
+      SettingKeys.showTransliteration,
+      value.toString(),
+      (WirdiSettings s) => s.copyWith(showTransliteration: value),
     );
   }
 

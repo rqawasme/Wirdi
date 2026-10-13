@@ -10,7 +10,7 @@ import '../widgets/ayah_block.dart';
 import '../widgets/text_size_slider.dart';
 import '../widgets/voussoir_stripe.dart';
 
-/// Reading size, translation, theme.
+/// Reading size, translation, transliteration, theme.
 ///
 /// The preview sits above the sliders so that a size change is visible without
 /// leaving the screen, and it is the real [AyahBlock] the reading view uses
@@ -87,6 +87,15 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   value: settings.showTranslation,
                   onChanged: controller.setShowTranslation,
+                ),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Show transliteration'),
+                  subtitle: const Text(
+                    'The Arabic of each dhikr spelled out in Latin letters',
+                  ),
+                  value: settings.showTransliteration,
+                  onChanged: controller.setShowTransliteration,
                 ),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,

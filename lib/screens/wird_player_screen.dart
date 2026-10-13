@@ -1281,8 +1281,8 @@ class _TapToCount extends StatelessWidget {
   }
 }
 
-/// A dhikr step: the Arabic, the translation, and what the collection says
-/// about it.
+/// A dhikr step: the Arabic, the transliteration and translation, and what
+/// the collection says about it.
 class _DhikrStep extends ConsumerWidget {
   const _DhikrStep({required this.item});
 
@@ -1290,13 +1290,17 @@ class _DhikrStep extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool showTranslation =
-        ref.watch(settingsProvider).value?.showTranslation ?? true;
+    final WirdiSettings settings =
+        ref.watch(settingsProvider).value ?? const WirdiSettings();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DhikrBlock(dhikr: item.dhikr, showTranslation: showTranslation),
+        DhikrBlock(
+          dhikr: item.dhikr,
+          showTranslation: settings.showTranslation,
+          showTransliteration: settings.showTransliteration,
+        ),
         _Note(note: item.note),
         _SourceLine(source: item.source),
         _Benefits(benefits: item.dhikr.benefits),
