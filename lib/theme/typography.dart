@@ -303,8 +303,8 @@ final class WirdiTypography extends ThemeExtension<WirdiTypography> {
     lineHeight: translationLineHeight,
   );
 
-  /// Transliteration and the source line under a dhikr. Scaled with the
-  /// translation, at [dhikrCaptionRatio] of it.
+  /// The transliteration under a dhikr or a verse, and the source line under
+  /// a dhikr. Scaled with the translation, at [dhikrCaptionRatio] of it.
   TextStyle get dhikrCaption => _latin(
     size: translationSize * _clamp(translationScale) * dhikrCaptionRatio,
     lineHeight: dhikrCaptionLineHeight,

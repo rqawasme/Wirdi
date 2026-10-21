@@ -265,6 +265,20 @@ void main() {
       // A count of one, so the tap finishes the step and moves on by itself.
       expect(find.text('4 of 14'), findsOneWidget);
     });
+
+    testWidgets('follows the show-transliteration setting', (
+      WidgetTester tester,
+    ) async {
+      await data.userRepository.setSetting(
+        SettingKeys.showTransliteration,
+        'false',
+      );
+      await openAt(tester, 2);
+
+      final AyahBlock block = tester.widget(find.byType(AyahBlock));
+      expect(block.showTransliteration, isFalse);
+      expect(block.showTranslation, isTrue);
+    });
   });
 
   group('a surah step', () {
@@ -402,6 +416,20 @@ void main() {
       await openAt(tester, 7);
 
       expect(find.text('Ayah 1 of 4 · round 2 of 3'), findsOneWidget);
+    });
+
+    testWidgets('follows the show-transliteration setting', (
+      WidgetTester tester,
+    ) async {
+      await data.userRepository.setSetting(
+        SettingKeys.showTransliteration,
+        'false',
+      );
+      await openAt(tester, 4);
+
+      final AyahBlock block = tester.widget(find.byType(AyahBlock));
+      expect(block.showTransliteration, isFalse);
+      expect(block.showTranslation, isTrue);
     });
   });
 

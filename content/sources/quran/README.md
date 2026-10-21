@@ -148,6 +148,21 @@ al-Mujādilah, the one *tāʾ marbūṭah* not written *-ah*; and 61 aṣ-Ṣaff
 
 `verify_content.py` fails the build if any of QUL's forms reaches `content.db`.
 
+## The verse transliteration is on a convention of its own
+
+`ayahs.transliteration` comes from #7, QUL's syllables transliteration, and is
+used as it comes: plain ASCII, broken into syllables, spelled by sound —
+`bis-mil la-hhir rah-man-nir raheem` for 1:1. That is not the convention the
+adhkar and the surah names use (`Bismi Llāhi r-Raḥmāni r-Raḥīm`), so a Quranic
+dua in the dhikr library and the same words in the reading view are spelled
+two ways.
+
+It is not converted, unlike the surah names. Those are 114 strings that could
+be checked by eye; this is 6,236 verses, and the syllables spelling has already
+thrown away what the other convention writes down — its `z` is ز, ذ and ظ
+alike — so a conversion would have to guess, in Quran text. Replacing it means
+importing a different QUL transliteration, not rewriting this one.
+
 ## A note on `has_bismillah`
 
 `surahs.has_bismillah` is derived as "1 for every surah except 9", **not** from QUL's

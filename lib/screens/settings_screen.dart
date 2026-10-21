@@ -92,7 +92,7 @@ class SettingsScreen extends ConsumerWidget {
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Show transliteration'),
                   subtitle: const Text(
-                    'The Arabic of each dhikr spelled out in Latin letters',
+                    'The Arabic in Latin letters, under each verse and dhikr',
                   ),
                   value: settings.showTransliteration,
                   onChanged: controller.setShowTransliteration,
@@ -173,8 +173,8 @@ class _Preview extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<Ayah> ayah = ref.watch(previewAyahProvider);
-    final bool showTranslation =
-        ref.watch(settingsProvider).value?.showTranslation ?? true;
+    final WirdiSettings settings =
+        ref.watch(settingsProvider).value ?? const WirdiSettings();
 
     return Container(
       width: double.infinity,
@@ -187,7 +187,8 @@ class _Preview extends ConsumerWidget {
         AsyncData(:final Ayah value) => AyahBlock(
           ayah: value,
           surahName: 'Al-Fatihah',
-          showTranslation: showTranslation,
+          showTranslation: settings.showTranslation,
+          showTransliteration: settings.showTransliteration,
         ),
         // Never an error worth a screen: a missing preview verse means the
         // content database is broken, which startup already refused to get

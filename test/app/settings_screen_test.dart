@@ -8,6 +8,7 @@ import 'package:wirdi/providers/settings.dart';
 import 'package:wirdi/routes.dart';
 import 'package:wirdi/screens/settings_screen.dart';
 import 'package:wirdi/theme/theme.dart';
+import 'package:wirdi/widgets/ayah_block.dart';
 
 import '../support/fixtures.dart';
 
@@ -77,6 +78,9 @@ void main() {
       expect(SettingKeys.showTransliteration, 'text.show_transliteration');
       // Its own switch, not a second label on the translation's.
       expect(tile(tester, 'Show translation').value, isTrue);
+      // And the verse at the top shows what it did.
+      final AyahBlock preview = tester.widget(find.byType(AyahBlock));
+      expect(preview.showTransliteration, isFalse);
     });
 
     testWidgets('comes back off on the next launch', (

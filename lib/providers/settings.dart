@@ -71,7 +71,7 @@ final class WirdiSettings {
   /// from memory or reading for the Arabic wants the page uninterrupted.
   final bool showTranslation;
 
-  /// Whether the transliteration is shown under each dhikr.
+  /// Whether the transliteration is shown under each verse and each dhikr.
   ///
   /// Separate from [showTranslation] because the two are wanted by different
   /// people: somebody who reads the Arabic script has no use for the Latin
