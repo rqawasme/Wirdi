@@ -5,7 +5,8 @@ import '../quran/uthmani_text.dart';
 import '../theme/theme.dart';
 import 'translation_text.dart';
 
-/// One verse: Arabic, its number, and the translation beneath.
+/// One verse: Arabic, its number, its transliteration and the translation
+/// beneath.
 ///
 /// The same widget the reading view scrolls and the settings screen previews,
 /// so a size change is judged against what it will actually look like.
@@ -14,12 +15,18 @@ import 'translation_text.dart';
 /// `tertiary` gold — decided in phase 3 by looking at both on a device. It is
 /// left to the ambient text colour rather than set explicitly, which is what
 /// makes the absence of gold here deliberate and visible.
+///
+/// The transliteration is QUL's, syllable by syllable in plain Latin letters,
+/// which is not the convention the adhkar are transliterated on — see the
+/// content README. It is set in the dhikr's caption style all the same, so the
+/// line under the Arabic reads as the same kind of thing wherever it is.
 class AyahBlock extends StatelessWidget {
   const AyahBlock({
     super.key,
     required this.ayah,
     required this.surahName,
     this.showTranslation = true,
+    this.showTransliteration = true,
   });
 
   final Ayah ayah;
@@ -29,6 +36,8 @@ class AyahBlock extends StatelessWidget {
   final String surahName;
 
   final bool showTranslation;
+
+  final bool showTransliteration;
 
   /// Arabic content is marked with this so the engine picks Arabic shaping and
   /// digit conventions, and so a screen reader switches voice rather than
@@ -41,6 +50,7 @@ class AyahBlock extends StatelessWidget {
     final WirdiTypography type = theme.extension<WirdiTypography>()!;
 
     final String verse = UthmaniText.withoutAyahNumber(ayah.textUthmani);
+    final String? transliteration = ayah.transliteration;
 
     return Semantics(
       container: true,
@@ -69,6 +79,19 @@ class AyahBlock extends StatelessWidget {
             if (ayah.sajdah) ...<Widget>[
               const SizedBox(height: WirdiMetrics.space2),
               const _SajdahMarker(),
+            ],
+            // Every verse in the current content build has one, but the column
+            // is nullable and a build without the QUL file leaves it empty.
+            if (showTransliteration &&
+                transliteration != null &&
+                transliteration.isNotEmpty) ...<Widget>[
+              const SizedBox(height: WirdiMetrics.space3),
+              Text(
+                transliteration,
+                style: type.dhikrCaption.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
             ],
             if (showTranslation) ...<Widget>[
               const SizedBox(height: WirdiMetrics.space3),

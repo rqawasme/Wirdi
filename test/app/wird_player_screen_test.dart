@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:wirdi/data/wirdi_data.dart';
 import 'package:wirdi/domain/domain.dart';
 import 'package:wirdi/providers/data_providers.dart';
+import 'package:wirdi/providers/settings.dart';
 import 'package:wirdi/routes.dart';
 import 'package:wirdi/screens/wird_player_screen.dart';
 import 'package:wirdi/theme/theme.dart';
@@ -213,6 +214,24 @@ void main() {
       expect(find.text('1 of 14'), findsOneWidget);
       expect(find.text('0'), findsOneWidget);
     });
+
+    testWidgets('follows the show-transliteration setting', (
+      WidgetTester tester,
+    ) async {
+      // Asserted on the block's flag rather than on a line of text: the
+      // fixture adhkar carry no transliteration to see go. What the flag does
+      // to the block is test/widgets/dhikr_block_test.dart's to hold.
+      await data.userRepository.setSetting(
+        SettingKeys.showTransliteration,
+        'false',
+      );
+      await openAt(tester, 0);
+
+      final DhikrBlock block = tester.widget(find.byType(DhikrBlock));
+      expect(block.showTransliteration, isFalse);
+      // Its own switch: turning one off leaves the other alone.
+      expect(block.showTranslation, isTrue);
+    });
   });
 
   group('an ayah step', () {
@@ -245,6 +264,20 @@ void main() {
 
       // A count of one, so the tap finishes the step and moves on by itself.
       expect(find.text('4 of 14'), findsOneWidget);
+    });
+
+    testWidgets('follows the show-transliteration setting', (
+      WidgetTester tester,
+    ) async {
+      await data.userRepository.setSetting(
+        SettingKeys.showTransliteration,
+        'false',
+      );
+      await openAt(tester, 2);
+
+      final AyahBlock block = tester.widget(find.byType(AyahBlock));
+      expect(block.showTransliteration, isFalse);
+      expect(block.showTranslation, isTrue);
     });
   });
 
@@ -383,6 +416,20 @@ void main() {
       await openAt(tester, 7);
 
       expect(find.text('Ayah 1 of 4 · round 2 of 3'), findsOneWidget);
+    });
+
+    testWidgets('follows the show-transliteration setting', (
+      WidgetTester tester,
+    ) async {
+      await data.userRepository.setSetting(
+        SettingKeys.showTransliteration,
+        'false',
+      );
+      await openAt(tester, 4);
+
+      final AyahBlock block = tester.widget(find.byType(AyahBlock));
+      expect(block.showTransliteration, isFalse);
+      expect(block.showTranslation, isTrue);
     });
   });
 

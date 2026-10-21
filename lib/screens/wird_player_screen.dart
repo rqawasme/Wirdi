@@ -1281,8 +1281,8 @@ class _TapToCount extends StatelessWidget {
   }
 }
 
-/// A dhikr step: the Arabic, the translation, and what the collection says
-/// about it.
+/// A dhikr step: the Arabic, the transliteration and translation, and what
+/// the collection says about it.
 class _DhikrStep extends ConsumerWidget {
   const _DhikrStep({required this.item});
 
@@ -1290,13 +1290,17 @@ class _DhikrStep extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool showTranslation =
-        ref.watch(settingsProvider).value?.showTranslation ?? true;
+    final WirdiSettings settings =
+        ref.watch(settingsProvider).value ?? const WirdiSettings();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        DhikrBlock(dhikr: item.dhikr, showTranslation: showTranslation),
+        DhikrBlock(
+          dhikr: item.dhikr,
+          showTranslation: settings.showTranslation,
+          showTransliteration: settings.showTransliteration,
+        ),
         _Note(note: item.note),
         _SourceLine(source: item.source),
         _Benefits(benefits: item.dhikr.benefits),
@@ -1314,8 +1318,8 @@ class _AyahStep extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool showTranslation =
-        ref.watch(settingsProvider).value?.showTranslation ?? true;
+    final WirdiSettings settings =
+        ref.watch(settingsProvider).value ?? const WirdiSettings();
     final Ayah ayah = item.ayah;
     // Already loaded for the surah list, and only wanted for the name.
     final Surah? surah = ref
@@ -1334,7 +1338,8 @@ class _AyahStep extends ConsumerWidget {
         AyahBlock(
           ayah: ayah,
           surahName: name,
-          showTranslation: showTranslation,
+          showTranslation: settings.showTranslation,
+          showTransliteration: settings.showTransliteration,
         ),
         _Note(note: item.note),
       ],
@@ -1358,8 +1363,8 @@ class _SurahStep extends ConsumerWidget {
     final AsyncValue<SurahReading> reading = ref.watch(
       surahReadingProvider(item.surah.number),
     );
-    final bool showTranslation =
-        ref.watch(settingsProvider).value?.showTranslation ?? true;
+    final WirdiSettings settings =
+        ref.watch(settingsProvider).value ?? const WirdiSettings();
 
     return switch (reading) {
       // Said in the content area rather than as a [FailureScreen], which is a
@@ -1371,7 +1376,8 @@ class _SurahStep extends ConsumerWidget {
         reading: value,
         unitIndex: player.unitIndex,
         note: item.note,
-        showTranslation: showTranslation,
+        showTranslation: settings.showTranslation,
+        showTransliteration: settings.showTransliteration,
       ),
       _ => const Center(child: CircularProgressIndicator()),
     };
@@ -1386,12 +1392,14 @@ class _SurahVerse extends StatelessWidget {
     required this.unitIndex,
     required this.note,
     required this.showTranslation,
+    required this.showTransliteration,
   });
 
   final SurahReading reading;
   final int unitIndex;
   final String? note;
   final bool showTranslation;
+  final bool showTransliteration;
 
   @override
   Widget build(BuildContext context) {
@@ -1413,6 +1421,7 @@ class _SurahVerse extends StatelessWidget {
           ayah: ayahs[index],
           surahName: reading.surah.nameTransliterated,
           showTranslation: showTranslation,
+          showTransliteration: showTransliteration,
         ),
         _Note(note: note),
       ],

@@ -12,6 +12,7 @@ import 'package:wirdi/data/wirdi_data.dart';
 import 'package:wirdi/domain/progress.dart';
 import 'package:wirdi/providers/data_providers.dart';
 import 'package:wirdi/providers/reading.dart';
+import 'package:wirdi/providers/settings.dart';
 import 'package:wirdi/screens/reading_screen.dart';
 import 'package:wirdi/theme/theme.dart';
 import 'package:wirdi/widgets/ayah_block.dart';
@@ -172,6 +173,37 @@ void _tests(File contentFile) {
         hasLength(2),
         reason: 'one basmala string, plus null for Al-Fatiha and At-Tawbah',
       );
+    });
+  });
+
+  group('transliteration', () {
+    // Read off each block's own verse rather than written out here: this file
+    // runs against the real Quran, and asserts on it without quoting it.
+    Iterable<String?> shown(WidgetTester tester) => tester
+        .widgetList<AyahBlock>(find.byType(AyahBlock))
+        .map((AyahBlock block) => block.ayah.transliteration);
+
+    testWidgets('every verse shows its own', (WidgetTester tester) async {
+      await pumpSurah(tester, 112);
+
+      expect(shown(tester), hasLength(4));
+      for (final String? transliteration in shown(tester)) {
+        expect(transliteration, isNotNull);
+        expect(find.text(transliteration!), findsOneWidget);
+      }
+    });
+
+    testWidgets('none of it with the setting off', (WidgetTester tester) async {
+      await data.userRepository.setSetting(
+        SettingKeys.showTransliteration,
+        'false',
+      );
+      await pumpSurah(tester, 112);
+
+      expect(shown(tester), hasLength(4));
+      for (final String? transliteration in shown(tester)) {
+        expect(find.text(transliteration!), findsNothing);
+      }
     });
   });
 

@@ -302,8 +302,8 @@ class _SurahBodyState extends ConsumerState<_SurahBody> {
 
   @override
   Widget build(BuildContext context) {
-    final bool showTranslation =
-        ref.watch(settingsProvider).value?.showTranslation ?? true;
+    final WirdiSettings settings =
+        ref.watch(settingsProvider).value ?? const WirdiSettings();
     final SurahReading reading = widget.reading;
     final String surahName = reading.surah.nameTransliterated;
 
@@ -334,7 +334,8 @@ class _SurahBodyState extends ConsumerState<_SurahBody> {
             child = AyahBlock(
               ayah: reading.ayahs[index - _leading],
               surahName: surahName,
-              showTranslation: showTranslation,
+              showTranslation: settings.showTranslation,
+              showTransliteration: settings.showTransliteration,
             );
           }
           return Padding(padding: WirdiMetrics.readingColumn, child: child);

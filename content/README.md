@@ -268,7 +268,7 @@ knowledge (does this dhikr exist? is this ayah in range?) is `build_content.py`'
 | `sources` | one per reference |
 | `collections` | one per authored collection |
 | `collection_items` | one per item, after ayah ranges expand |
-| `meta` | `schema_version`, `content_version`, `built_at`, `quran_source`, `translation_edition`, `content_checksum` |
+| `meta` | `schema_version`, `content_version`, `built_at`, `quran_source`, `translation_edition`, `content_checksum`, and `transliteration_edition` when the import had one |
 
 `ayahs.text_simple` is `text_uthmani` with diacritics stripped and alef variants
 normalised, for search matching later. Search is not a v1 feature; the column costs

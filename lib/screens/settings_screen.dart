@@ -10,7 +10,7 @@ import '../widgets/ayah_block.dart';
 import '../widgets/text_size_slider.dart';
 import '../widgets/voussoir_stripe.dart';
 
-/// Reading size, translation, theme.
+/// Reading size, translation, transliteration, theme.
 ///
 /// The preview sits above the sliders so that a size change is visible without
 /// leaving the screen, and it is the real [AyahBlock] the reading view uses
@@ -90,6 +90,15 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
+                  title: const Text('Show transliteration'),
+                  subtitle: const Text(
+                    'The Arabic in Latin letters, under each verse and dhikr',
+                  ),
+                  value: settings.showTransliteration,
+                  onChanged: controller.setShowTransliteration,
+                ),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
                   title: const Text('Haptics'),
                   subtitle: const Text(
                     'A click on each tap, a knock at the end of a step, and '
@@ -164,8 +173,8 @@ class _Preview extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<Ayah> ayah = ref.watch(previewAyahProvider);
-    final bool showTranslation =
-        ref.watch(settingsProvider).value?.showTranslation ?? true;
+    final WirdiSettings settings =
+        ref.watch(settingsProvider).value ?? const WirdiSettings();
 
     return Container(
       width: double.infinity,
@@ -178,7 +187,8 @@ class _Preview extends ConsumerWidget {
         AsyncData(:final Ayah value) => AyahBlock(
           ayah: value,
           surahName: 'Al-Fatihah',
-          showTranslation: showTranslation,
+          showTranslation: settings.showTranslation,
+          showTransliteration: settings.showTransliteration,
         ),
         // Never an error worth a screen: a missing preview verse means the
         // content database is broken, which startup already refused to get

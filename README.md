@@ -654,10 +654,19 @@ inside a bounded height, which are two halves of one requirement: a column of
 286 `AyahBlock`s would lay every one of them out before the sheet appeared, and
 an unbounded list inside a sheet has no height to build against at all.
 
-The translation is always shown in that sheet, whatever the show-translation
-setting says. That setting is about the surface you recite from — somebody
-reciting from memory wants the page uninterrupted — and this sheet exists to
-work out *which item this is*. Hiding half the answer would defeat the screen.
+The translation and transliteration are always shown in that sheet, whatever
+the show-translation and show-transliteration settings say. Those settings are
+about the surface you recite from — somebody reciting from memory wants the
+page uninterrupted — and this sheet exists to work out *which item this is*.
+Hiding half the answer would defeat the screen.
+
+The two are separate switches because they are wanted by different people:
+somebody who reads the Arabic script has no use for the Latin spelling of it,
+and may still want the meaning underneath. Both default on, and both reach
+verses and adhkar alike; the transliteration's is stored as
+`text.show_transliteration`. The verses' transliteration is QUL's, on a
+different convention from the adhkar's — see
+[`content/sources/quran/README.md`](content/sources/quran/README.md).
 
 **Two ways to make one.** From scratch — a name, an optional description, and an
 empty collection to fill. Or by copying an existing one, which is the path this

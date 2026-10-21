@@ -30,8 +30,8 @@ Future<void> showAboutSheet(BuildContext context) {
 /// Sources, credits and licences.
 ///
 /// Required before release and easier to write now than to remember later. The
-/// Quran source and translation edition are read out of `content.db`'s `meta`
-/// table rather than written here, so a credit cannot drift from the database it
+/// Quran source, translation edition and transliteration file are read out of
+/// `content.db`'s `meta` table rather than written here, so a credit cannot drift from the database it
 /// is crediting. The font licences are the actual bundled OFL files — the
 /// licence requires that they travel with the fonts, so they are assets and
 /// this shows them verbatim rather than paraphrasing.
@@ -106,6 +106,19 @@ class AboutContent extends ConsumerWidget {
         // "Saheeh"; printing it again here in the other spelling would just
         // look like an error.
         const _Body('Published by Abul-Qasim Publishing House.'),
+
+        // Only for a build that has one: without the QUL file the verses carry
+        // no transliteration, and there is nothing here to credit.
+        if (metadata.value?.transliterationEdition
+            case final String edition) ...<Widget>[
+          const SizedBox(height: WirdiMetrics.space6),
+          const _Section(title: 'Transliteration'),
+          _Entry(label: 'Source', value: edition),
+          const _Body(
+            'The transliteration under each verse is imported from the Quranic '
+            'Universal Library (qul.tarteel.ai) and shown as published there.',
+          ),
+        ],
 
         const SizedBox(height: WirdiMetrics.space6),
         const _Section(title: 'Fonts'),

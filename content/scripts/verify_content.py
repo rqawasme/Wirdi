@@ -334,6 +334,24 @@ class Verifier:
             elif not str(present[key]).strip():
                 check.fail(f"meta[{key!r}] is empty")
 
+    def transliteration_credited(self) -> None:
+        check = self.check("a verse transliteration has its source in meta")
+        shown = self.scalar(
+            "SELECT COUNT(*) FROM ayahs WHERE transliteration IS NOT NULL"
+        )
+        if not shown:
+            return
+        edition = self.scalar(
+            "SELECT COALESCE(MAX(value), '') FROM meta "
+            "WHERE key = 'transliteration_edition'"
+        )
+        if not str(edition).strip():
+            check.fail(
+                f"{shown} ayahs carry a transliteration and meta does not say "
+                "where it came from (transliteration_edition) — the About "
+                "screen would show it uncredited"
+            )
+
     def no_autoincrement(self) -> None:
         check = self.check("no AUTOINCREMENT primary keys")
         rows = self.q(
@@ -358,6 +376,7 @@ class Verifier:
         self.transliteration_letters()
         self.legal_enums()
         self.meta_keys()
+        self.transliteration_credited()
         self.no_autoincrement()
 
 
