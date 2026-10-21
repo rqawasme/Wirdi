@@ -390,9 +390,18 @@ from disagreeing about where the day begins.
 ### The tasbih tab
 
 A free counter, with a goal if somebody wants one. One enormous tap target, the
-running count — or, with a goal, the round — in 72dp numerals over it, and undo,
-the goal and reset in a bar underneath. No dhikr behind the number, and no
-history kept of what it reached.
+running count — or, with a goal, the round — in 72dp numerals inside a ring of
+prayer beads, and undo, the goal and reset in a bar underneath. No dhikr behind
+the number, and no history kept of what it reached.
+
+**The ring is a misbaha.** `BeadRing` draws a string of beads round the number,
+running clockwise from a long marker bead at the bottom with a tassel hanging
+from it — the order a thumb pulls them in. With no goal it is a loose string of
+thirty-three with one bead lit, the one under the thumb, moving on a bead a tap
+and coming back round; nothing on it says where a round ends, because there is
+no round. It is drawn at one size and scaled down whole on a smaller screen, and
+it is flat like everything else: a bead is a disc of brick or of stone, not a
+lit sphere.
 
 **It counts until somebody resets it.** Not until the end of a step, not until
 midnight, not until the goal, and not until the app is closed: `TasbihCounter`
@@ -403,13 +412,18 @@ the player's reason — and a reset is written immediately, because it is the
 change that would be worst to lose.
 
 **The goal is the marker bead, not the end of the string.** Set one — 33, 100,
-1000 or any count up to the six digits every count field takes — and a
-counted `VoussoirStripe` under the number fills toward it while the number
-counts the round. The tap that lands on the goal knocks twice instead of
+1000 or any count up to the six digits every count field takes — and the
+ring's beads fill toward it in brick while the number counts the round, with
+`of 33` under it. Up to a hundred it is one bead a tap, so the goals people
+count to most are one-for-one; past a hundred the ring keeps its hundred beads
+and each stands for a share of the round, quantised down so a goal of a
+thousand lights a bead every tenth tap and the last one on the goal itself. The
+marker bead is pale gold while the goal is ahead and fills solid gold on the tap
+that reaches it. The tap that lands on the goal knocks twice instead of
 clicking, and so does the tap on every multiple of it after, the way the marker
 bead comes round under the thumb on each pass. Nothing stops there: the next
-tap starts the next round at one, with the stripe empty again, a plate under the
-stripe counts the rounds — `×0`, `×1`, `×2` — and a line under that keeps the
+tap starts the next round at one, with the beads empty again, a plate under the
+ring counts the rounds — `×0`, `×1`, `×2` — and a line under that keeps the
 running total once it is no longer the number above (`Total 140`). So a
 thousand can be one goal of a thousand or ten rounds of a hundred, whichever way
 somebody keeps it, and they are the same thousand taps: the count is one number
@@ -428,8 +442,8 @@ widget in it, and the screen is a `ListenableBuilder` over it — and the two
 rules the counting path lives by: the number never animates, and feedback is the
 haptic, through the same `PlayerHaptics` and the same settings switch.
 
-**Reaching the goal is the one thing that moves.** The number and the stripe
-swell once and settle back over one `WirdiMotion.completion` beat, and the
+**Reaching the goal is the one thing that moves.** The ring and the number in
+it swell once and settle back over one `WirdiMotion.completion` beat, and the
 rounds plate fades to its new count. Scale and opacity only, painted rather than laid
 out, and on the new number — the swell never holds a count back, and the next
 tap lands while it is settling. With animations turned off in the OS the goal
@@ -1051,12 +1065,13 @@ transparent in both themes, so nothing casts a shadow even if something later
 takes an elevation. Buttons are squared at 8dp, overriding Material's stadium
 default.
 
-`tertiary` is gold, and is currently claimed by nothing. It was reserved for
-Quran text, which is now set in `onSurface` cedar ink. Nothing in
+`tertiary` is gold, and has one claim: the tasbih's marker bead and its
+tassel, painted by name in `BeadRing`, where gold is the goal. It was reserved
+for Quran text, which is now set in `onSurface` cedar ink. Nothing in
 `lib/theme/wirdi_theme.dart` maps it onto a component, so gold appearing
-anywhere in the UI still means a widget reached for the wrong role — that is the
-signal, and it is deliberate that Material components rarely pick `tertiary` on
-their own.
+anywhere else in the UI still means a widget reached for the wrong role — that
+is the signal, and it is deliberate that Material components rarely pick
+`tertiary` on their own.
 
 ### Type
 

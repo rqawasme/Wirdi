@@ -7,7 +7,7 @@ import 'package:wirdi/player/tasbih_counter.dart';
 import 'package:wirdi/providers/data_providers.dart';
 import 'package:wirdi/screens/tasbih_screen.dart';
 import 'package:wirdi/theme/theme.dart';
-import 'package:wirdi/widgets/voussoir_stripe.dart';
+import 'package:wirdi/widgets/bead_ring.dart';
 
 import '../support/fixtures.dart';
 
@@ -72,10 +72,9 @@ void main() {
         .every((Element element) => (element.widget as Visibility).visible);
   }
 
-  /// The goal's stripe. The only one on this screen: the rule under the app
-  /// bar belongs to the shell, which is not pumped here.
-  VoussoirStripe stripe(WidgetTester tester) =>
-      tester.widget<VoussoirStripe>(find.byType(VoussoirStripe));
+  /// The ring of beads round the number.
+  BeadRing ring(WidgetTester tester) =>
+      tester.widget<BeadRing>(find.byType(BeadRing));
 
   testWidgets('a tap anywhere counts, and the count keeps going', (
     WidgetTester tester,
@@ -89,6 +88,33 @@ void main() {
 
     // Past thirty-three without stopping: there is no target on this screen.
     expect(find.text('40'), findsOneWidget);
+  });
+
+  testWidgets('with no goal, one bead marks where the thumb is', (
+    WidgetTester tester,
+  ) async {
+    await pumpTasbih(tester);
+    // A loose string: nothing counted toward, so nothing filling.
+    expect(ring(tester).lit, isNull);
+    expect(ring(tester).beads, BeadRing.looseBeads);
+    expect(ring(tester).thumb, isNull);
+
+    await count(tester);
+    expect(ring(tester).thumb, 0);
+    await count(tester);
+    expect(ring(tester).thumb, 1);
+  });
+
+  testWidgets('with no goal, the thumb comes back round the string', (
+    WidgetTester tester,
+  ) async {
+    await data.userRepository.setSetting(TasbihCounter.settingKey, '33');
+    await pumpTasbih(tester);
+    expect(ring(tester).thumb, 32);
+
+    await count(tester);
+    expect(find.text('34'), findsOneWidget);
+    expect(ring(tester).thumb, 0);
   });
 
   testWidgets('undo takes one back, and both controls are dead at zero', (
@@ -145,12 +171,13 @@ void main() {
   });
 
   group('the goal', () {
-    testWidgets('is chosen from the sheet, and the stripe counts toward it', (
+    testWidgets('is chosen from the sheet, and the ring counts toward it', (
       WidgetTester tester,
     ) async {
       await pumpTasbih(tester);
-      // No goal is the bare counter: no stripe and no caption.
-      expect(find.byType(VoussoirStripe), findsNothing);
+      // No goal is the bare counter: a loose string and no caption.
+      expect(ring(tester).lit, isNull);
+      expect(find.textContaining('of '), findsNothing);
       expect(find.text('Goal'), findsOneWidget);
 
       await chooseGoal(tester, '33');
@@ -158,12 +185,12 @@ void main() {
       expect(find.text('of 33'), findsOneWidget);
       // The rounds plate is there from the start, at nothing.
       expect(find.text('×0'), findsOneWidget);
-      expect(stripe(tester).lit, 0);
-      expect(stripe(tester).segments, 33);
+      expect(ring(tester).lit, 0);
+      expect(ring(tester).beads, 33);
 
       await count(tester);
       await count(tester);
-      expect(stripe(tester).lit, 2);
+      expect(ring(tester).lit, 2);
       expect(find.text('of 33'), findsOneWidget);
     });
 
@@ -181,7 +208,7 @@ void main() {
       await tester.pumpAndSettle();
       // Full on the goal itself, and the round counted on that same tap.
       expect(find.text('3'), findsOneWidget);
-      expect(stripe(tester).lit, 3);
+      expect(ring(tester).lit, 3);
       expect(find.text('×1'), findsOneWidget);
       // The number above is still the total, so the total is not said twice.
       expect(readable('Total 3'), isFalse);
@@ -190,7 +217,7 @@ void main() {
       await count(tester);
       await tester.pumpAndSettle();
       expect(find.text('1'), findsOneWidget);
-      expect(stripe(tester).lit, 1);
+      expect(ring(tester).lit, 1);
       expect(find.text('×1'), findsOneWidget);
       expect(readable('Total 4'), isTrue);
 
@@ -200,6 +227,68 @@ void main() {
       expect(find.text('3'), findsOneWidget);
       expect(find.text('×2'), findsOneWidget);
       expect(readable('Total 6'), isTrue);
+    });
+
+    testWidgets('a hundred is one bead a tap', (WidgetTester tester) async {
+      await data.userRepository.setSetting(TasbihCounter.settingKey, '37');
+      await data.userRepository.setSetting(TasbihCounter.goalKey, '100');
+      await pumpTasbih(tester);
+      expect(ring(tester).beads, 100);
+      expect(ring(tester).lit, 37);
+
+      await count(tester);
+      expect(ring(tester).lit, 38);
+    });
+
+    testWidgets('past a hundred, a bead is a share of the round', (
+      WidgetTester tester,
+    ) async {
+      await data.userRepository.setSetting(TasbihCounter.settingKey, '9');
+      await data.userRepository.setSetting(TasbihCounter.goalKey, '1000');
+      await pumpTasbih(tester);
+      // The number moves on every tap; the beads on every tenth.
+      expect(find.text('9'), findsOneWidget);
+      expect(find.text('of 1000'), findsOneWidget);
+      expect(ring(tester).beads, BeadRing.maxBeads);
+      expect(ring(tester).lit, 0);
+
+      await count(tester);
+      expect(find.text('10'), findsOneWidget);
+      expect(ring(tester).lit, 1);
+    });
+
+    testWidgets('past a hundred, the last bead lights on the goal', (
+      WidgetTester tester,
+    ) async {
+      await data.userRepository.setSetting(TasbihCounter.settingKey, '998');
+      await data.userRepository.setSetting(TasbihCounter.goalKey, '1000');
+      await pumpTasbih(tester);
+      expect(ring(tester).lit, 99);
+
+      // A tap short of the goal is a bead short of the ring, not a full one.
+      await count(tester);
+      expect(find.text('999'), findsOneWidget);
+      expect(ring(tester).lit, 99);
+
+      await count(tester);
+      await tester.pumpAndSettle();
+      expect(find.text('1000'), findsOneWidget);
+      expect(ring(tester).lit, 100);
+      expect(find.text('×1'), findsOneWidget);
+    });
+
+    testWidgets('of six digits is still a hundred beads', (
+      WidgetTester tester,
+    ) async {
+      await data.userRepository.setSetting(TasbihCounter.settingKey, '500000');
+      await data.userRepository.setSetting(
+        TasbihCounter.goalKey,
+        '${TasbihCounter.maxGoal}',
+      );
+      await pumpTasbih(tester);
+      expect(find.text('500000'), findsOneWidget);
+      expect(ring(tester).beads, BeadRing.maxBeads);
+      expect(ring(tester).lit, 50);
     });
 
     testWidgets(
@@ -331,7 +420,8 @@ void main() {
       expect(find.text('of 33'), findsNothing);
       expect(find.text('×1'), findsNothing);
       expect(find.textContaining('Total'), findsNothing);
-      expect(find.byType(VoussoirStripe), findsNothing);
+      expect(ring(tester).lit, isNull);
+      expect(ring(tester).thumb, (40 - 1) % BeadRing.looseBeads);
       expect(find.text('Goal'), findsOneWidget);
     });
 

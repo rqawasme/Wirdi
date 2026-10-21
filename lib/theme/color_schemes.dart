@@ -29,17 +29,20 @@ import 'package:flutter/material.dart';
 ///     was not intended is the tripwire that says a component picked the wrong
 ///     role, and that only works if the whole tertiary family looks like gold.
 ///
-/// ## Gold is currently unclaimed
+/// ## Gold is the goal's
 ///
 /// `tertiary` was reserved for Quran text. Quran text is now set in `onSurface`
 /// cedar ink — that was the decision after looking at both on a device — which
-/// leaves gold reserved for nothing.
+/// left gold reserved for nothing.
 ///
-/// It stays in the scheme, unmapped, for two reasons. It is still the tripwire:
-/// nothing in `wirdi_theme.dart` routes a component at it, so gold appearing in
-/// the UI still means something reached for the wrong role. And the marginal
+/// It has one claim now, and only one: the tasbih's marker bead and its
+/// tassel, in `BeadRing`. Gold there is the goal — pale while it is ahead,
+/// solid on the tap that reaches it — and it is painted by name, not reached
+/// through a component's default. So it is still the tripwire: nothing in
+/// `wirdi_theme.dart` routes a component at it, and gold anywhere but on that
+/// string still means something reached for the wrong role. The marginal
 /// apparatus of a mushaf — ayah numbers, the sajdah mark, juz and hizb markers
-/// — is the obvious home for it, and is not built yet.
+/// — is the obvious next home for it, and is not built yet.
 ///   * **Shadow.** Transparent in both. Depth here is tonal, and a shadow
 ///     colour that cannot paint anything is a stronger guarantee than an
 ///     elevation of zero that someone later overrides.

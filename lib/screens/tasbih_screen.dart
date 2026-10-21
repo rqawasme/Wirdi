@@ -9,9 +9,9 @@ import '../player/tasbih_counter.dart';
 import '../providers/data_providers.dart';
 import '../providers/settings.dart';
 import '../theme/theme.dart';
+import '../widgets/bead_ring.dart';
 import '../widgets/failure_screen.dart';
 import '../widgets/plate.dart';
-import '../widgets/voussoir_stripe.dart';
 
 /// The tasbih: one number, one tap target, and a way back to zero — with a
 /// goal, if somebody wants one.
@@ -22,13 +22,15 @@ import '../widgets/voussoir_stripe.dart';
 /// switch and across a restart of the app. That is what a hand-held tasbih
 /// does.
 ///
-/// The goal is the marker bead on the string. Set one and the number counts
-/// the round: it climbs to the goal as a stripe under it fills, the tap that
-/// reaches it knocks twice, and the next tap starts the next round at one. A
-/// plate under the stripe counts the rounds and a line under that keeps the
-/// total, so a thousand can be one goal of a thousand or ten rounds of a
-/// hundred, whichever way somebody keeps it. Leave the goal unset and the
-/// screen is the bare counter it always was.
+/// The number sits in a [BeadRing], a string of beads drawn round it. The
+/// goal is the marker bead on that string. Set one and the number counts the
+/// round: it climbs to the goal as the beads fill round it, the tap that
+/// reaches it knocks twice and fills the marker, and the next tap starts the
+/// next round at one. A plate under the ring counts the rounds and a line
+/// under that keeps the total, so a thousand can be one goal of a thousand or
+/// ten rounds of a hundred, whichever way somebody keeps it. Leave the goal
+/// unset and the number is the bare count it always was, on a loose string
+/// with one bead lit where the thumb is.
 ///
 /// It is the counting screen the wird player is not: the player counts
 /// *something*, a step at a time, and stops when the wird is done. When the
@@ -163,10 +165,20 @@ class _Tasbih extends StatelessWidget {
 /// splash on every tap is a flash of motion on every count, which is the one
 /// place this screen keeps still.
 ///
+/// ## The ring
+///
+/// Drawn at its one size and scaled down whole on a screen with less room,
+/// rather than redrawn smaller, so the beads and the number inside them stay
+/// in proportion. The number is scaled down again inside the ring, for the
+/// reason it always was: it is 72dp before the OS text scale touches it, and
+/// a count in the thousands at the largest accessibility size is wider than
+/// the ring's middle. Scaling down keeps it one line and still the largest
+/// thing on the screen.
+///
 /// ## Reaching the goal
 ///
-/// The tap that lands on the goal, or on a multiple of it, swells the number
-/// and the stripe once and lets them settle back, over one
+/// The tap that lands on the goal, or on a multiple of it, swells the ring
+/// and the number in it once and lets them settle back, over one
 /// [WirdiMotion.completion] beat. Scale only, and painted rather than laid
 /// out, so nothing around them moves, and the numeral has already changed on
 /// the frame of the tap — the swell happens to the new number, it does not
@@ -174,29 +186,19 @@ class _Tasbih extends StatelessWidget {
 ///
 /// A reader who has turned animations off in the OS, and a theme whose
 /// completion beat is zero, get the same screen with nothing swelling: the
-/// two knocks and the caption say it on their own.
+/// two knocks, the filled marker bead and the caption say it on their own.
 class _TapToCount extends StatefulWidget {
   const _TapToCount({required this.counter});
 
   final TasbihCounter counter;
 
-  /// How wide the goal's stripe is. A third or so of the screen's width either
-  /// side of the number on a phone: wide enough to read as a bar at a glance,
-  /// narrow enough to sit under the number rather than across the screen like
-  /// the rule under the app bar.
-  static const double stripeWidth = 240;
-
-  /// At most one segment per logical pixel of [stripeWidth]. A goal of a
-  /// thousand is not a thousand rectangles painted on every tap; it is a
-  /// stripe that moves every fourth one, and the numeral above it moves on
-  /// all of them.
-  static const int maxStripeSegments = 240;
-
-  /// How far the number and the stripe swell at the peak, as a fraction of
-  /// their size. Enough to see out of the corner of an eye that is on the
-  /// beads rather than the screen; not enough to read as a bounce.
+  /// How far the ring and the number swell at the peak, as a fraction of
+  /// their size. The number swells inside the ring's swell, so it grows a
+  /// little more than the beads round it. Enough to see out of the corner of
+  /// an eye that is on the beads rather than the screen; not enough to read
+  /// as a bounce.
   static const double numeralSwell = 0.08;
-  static const double stripeSwell = 0.67;
+  static const double ringSwell = 0.04;
 
   @override
   State<_TapToCount> createState() => _TapToCountState();
@@ -278,9 +280,21 @@ class _TapToCountState extends State<_TapToCount>
     final TasbihCounter counter = widget.counter;
     final int? goal = counter.goal;
     // With a goal the number is the round, like the beads between two marker
-    // beads: it climbs to the goal with the stripe and starts again with it.
+    // beads: it climbs to the goal with the ring and starts again with it.
     // Without one it is the count, as it always was.
     final int shown = goal == null ? counter.count : counter.roundTaps;
+
+    final Widget numeral = AnimatedBuilder(
+      animation: _swell,
+      builder: (BuildContext context, Widget? child) => Transform.scale(
+        scale: 1 + _TapToCount.numeralSwell * _swell.value,
+        child: child,
+      ),
+      child: Text(
+        '$shown',
+        style: type.tasbihCount.copyWith(color: colors.primary),
+      ),
+    );
 
     return Semantics(
       button: true,
@@ -301,51 +315,44 @@ class _TapToCountState extends State<_TapToCount>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                // Shrunk to fit rather than wrapped or clipped: the numeral is
-                // 72dp before the OS text scale touches it, and a count in the
-                // thousands at the largest accessibility size is wider than a
-                // phone. Scaling down keeps it one line and still the largest
-                // thing on the screen.
+                // See "The ring" above for both of these.
                 Flexible(
-                  child: AnimatedBuilder(
-                    animation: _swell,
-                    builder: (BuildContext context, Widget? child) =>
-                        Transform.scale(
-                          scale: 1 + _TapToCount.numeralSwell * _swell.value,
-                          child: child,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: AnimatedBuilder(
+                      animation: _swell,
+                      builder: (BuildContext context, Widget? child) =>
+                          Transform.scale(
+                            scale: 1 + _TapToCount.ringSwell * _swell.value,
+                            alignment: BeadRing.centre,
+                            child: child,
+                          ),
+                      child: _ring(
+                        counter,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              numeral,
+                              if (goal != null)
+                                Text(
+                                  'of $goal',
+                                  maxLines: 1,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: colors.onSurfaceVariant,
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        '$shown',
-                        style: type.tasbihCount.copyWith(color: colors.primary),
                       ),
                     ),
                   ),
                 ),
                 if (goal != null) ...<Widget>[
-                  const SizedBox(height: WirdiMetrics.space4),
-                  AnimatedBuilder(
-                    animation: _swell,
-                    builder: (BuildContext context, Widget? child) =>
-                        Transform.scale(
-                          scaleY: 1 + _TapToCount.stripeSwell * _swell.value,
-                          child: child,
-                        ),
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: _TapToCount.stripeWidth,
-                      ),
-                      child: _stripe(counter, goal),
-                    ),
-                  ),
                   const SizedBox(height: WirdiMetrics.space2),
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: _TapToCount.stripeWidth,
-                    ),
-                    child: _RoundLine(counter: counter, goal: goal),
-                  ),
+                  _Rounds(counter: counter),
                   const SizedBox(height: WirdiMetrics.space2),
                   _Total(counter: counter, goal: goal),
                 ],
@@ -365,19 +372,21 @@ class _TapToCountState extends State<_TapToCount>
     );
   }
 
-  /// The round so far, filling toward the goal.
+  /// The round so far, filling toward the goal — or, with no goal, a loose
+  /// string with the thumb's bead lit.
   ///
-  /// Counted rather than given a fraction, for the reason
-  /// [VoussoirStripe.counted] gives. Past [_TapToCount.maxStripeSegments] the
-  /// round is scaled down in whole numbers, quantised down, so the last
-  /// segment lights on the goal and not a tap before it.
-  static Widget _stripe(TasbihCounter counter, int goal) {
-    final int segments = goal < _TapToCount.maxStripeSegments
-        ? goal
-        : _TapToCount.maxStripeSegments;
-    return VoussoirStripe.counted(
-      lit: counter.roundTaps * segments ~/ goal,
-      of: segments,
+  /// Counted in whole numbers rather than as a fraction, for the reason
+  /// `VoussoirStripe.counted` gives. Past [BeadRing.maxBeads] the round is
+  /// scaled down to the beads there are, quantised down, so the last bead
+  /// lights on the goal and not a tap before it.
+  static Widget _ring(TasbihCounter counter, {required Widget child}) {
+    final int? goal = counter.goal;
+    if (goal == null) return BeadRing.loose(count: counter.count, child: child);
+    final int beads = goal < BeadRing.maxBeads ? goal : BeadRing.maxBeads;
+    return BeadRing.counted(
+      lit: counter.roundTaps * beads ~/ goal,
+      of: beads,
+      child: child,
     );
   }
 
@@ -396,8 +405,8 @@ class _TapToCountState extends State<_TapToCount>
   }
 }
 
-/// Under the stripe: what the round is counting to, and how many rounds there
-/// have been.
+/// Under the ring: how many rounds there have been. What the round is
+/// counting to is inside the ring, under the number it is counting.
 ///
 /// The rounds are a [Plate], `×3` the way a dhikr said three times is `×3`
 /// everywhere else in the app — the goal, so many times over. It is there from
@@ -408,11 +417,10 @@ class _TapToCountState extends State<_TapToCount>
 ///
 /// The same plate at the hundredth round as at the first. Nothing escalates,
 /// which is the rule the home tiles and the finished wird keep too.
-class _RoundLine extends StatelessWidget {
-  const _RoundLine({required this.counter, required this.goal});
+class _Rounds extends StatelessWidget {
+  const _Rounds({required this.counter});
 
   final TasbihCounter counter;
-  final int goal;
 
   @override
   Widget build(BuildContext context) {
@@ -426,29 +434,16 @@ class _RoundLine extends StatelessWidget {
         ? Duration.zero
         : theme.extension<WirdiMotion>()!.standard;
 
+    // Centred under the ring, so a round count that gains a digit grows
+    // evenly either side of the tassel above it. In a row, because a plate
+    // given the column's whole width would take it.
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Expanded(
-          child: Text(
-            'of $goal',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ),
-        const SizedBox(width: WirdiMetrics.space2),
-        // Right-aligned, so a round count that gains a digit grows away from
-        // the goal rather than pushing it.
         AnimatedSwitcher(
           duration: fade,
           switchInCurve: WirdiMotion.easingDecelerate,
           switchOutCurve: WirdiMotion.easingAccelerate,
-          layoutBuilder: (Widget? current, List<Widget> previous) => Stack(
-            alignment: Alignment.centerRight,
-            children: <Widget>[...previous, ?current],
-          ),
           child: Plate(key: ValueKey<int>(rounds), label: '×$rounds'),
         ),
       ],
@@ -462,7 +457,7 @@ class _RoundLine extends StatelessWidget {
 /// name on it, where a trailing phrase made it read as half a sentence.
 ///
 /// Until the first round is done the number on the screen *is* the total, so
-/// saying it again under the stripe would be the same number twice. Its line
+/// saying it again under the ring would be the same number twice. Its line
 /// is held open all the same — kept in the layout and not painted — so the
 /// column does not jump up on the tap after the goal, which is the tap the eye
 /// is most likely to be on.
