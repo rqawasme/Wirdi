@@ -244,7 +244,7 @@ void main() {
     await shootSheet(1, '01b3-commit-sheet-one-day');
     await openTab(WirdiTab.tasbih, '01c-tasbih');
 
-    // The goal: the sheet it is chosen from, the stripe part way, the tap that
+    // The goal: the sheet it is chosen from, the ring part way, the tap that
     // reaches it caught at the top of its swell and then settled, and the
     // count carried on past it into the next round.
     Future<void> countTasbih(int taps) async {
@@ -299,7 +299,7 @@ void main() {
       settingsProvider.notifier,
     );
 
-    // The tasbih past its goal in dark, where the stripe is brick on dark
+    // The tasbih past its goal in dark, where the beads are brick on dark
     // stone. Shot here, while the shell is still the top route.
     await settings.setThemeMode(ThemeMode.dark);
     await openTab(WirdiTab.tasbih, '01e2-tasbih-goal-dark');

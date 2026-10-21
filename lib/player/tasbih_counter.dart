@@ -150,13 +150,13 @@ class TasbihCounter extends ChangeNotifier {
   }
 
   /// How far into the current round the count is, from 0 to [goal]: the
-  /// number the screen shows with a goal, and how full the stripe is. Zero
-  /// with no goal.
+  /// number the screen shows with a goal, and how many of the ring's beads
+  /// are lit. Zero with no goal.
   ///
   /// Exactly on a multiple it is the whole round, not none of it: the tap that
-  /// lands on 33 fills the stripe, and the tap after it starts the next one.
-  /// A stripe that emptied on the very tap that reached the goal would say the
-  /// opposite of what the knock just said.
+  /// lands on 33 lights the last bead, and the tap after it starts the next
+  /// round. A ring that emptied on the very tap that reached the goal would
+  /// say the opposite of what the knock just said.
   int get roundTaps {
     final int? goal = _goal;
     if (goal == null) return 0;
