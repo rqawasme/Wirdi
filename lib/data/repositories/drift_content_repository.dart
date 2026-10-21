@@ -79,7 +79,7 @@ class DriftContentRepository implements ContentRepository {
 
   @override
   Future<ContentMetadata> metadata() async {
-    // Six rows; one round trip each would be six statements for a screen shown
+    // A handful of rows; one round trip each would be six statements for a screen shown
     // once, so they are read together and looked up in Dart.
     final List<MetaRow> rows = await _db.allMeta().get();
     final Map<String, String> meta = <String, String>{
@@ -92,6 +92,7 @@ class DriftContentRepository implements ContentRepository {
       schemaVersion: int.tryParse(meta['schema_version'] ?? '') ?? 0,
       quranSource: meta['quran_source'] ?? 'unknown',
       translationEdition: meta['translation_edition'] ?? 'unknown',
+      transliterationEdition: meta['transliteration_edition'],
       contentChecksum: meta['content_checksum'] ?? '',
       builtAt: DateTime.tryParse(meta['built_at'] ?? '')?.toLocal(),
     );

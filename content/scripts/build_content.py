@@ -179,8 +179,15 @@ def run_validator(sources_dir: Path) -> None:
         raise BuildError("validation failed; fix the errors above and rebuild")
 
 
-def load_quran(quran_dir: Path, require: bool) -> tuple[list, list, dict[str, str]]:
-    """Load the generated Quran JSON. Returns (surahs, ayahs, meta)."""
+def load_quran(
+    quran_dir: Path, require: bool
+) -> tuple[list, list, dict[str, str | None]]:
+    """Load the generated Quran JSON. Returns (surahs, ayahs, meta).
+
+    `transliteration_edition` is None when the import ran without a
+    transliteration file, which is allowed: every `ayahs.transliteration` is
+    NULL then, and there is nothing to credit.
+    """
     surahs_path = quran_dir / "surahs.json"
     ayahs_path = quran_dir / "ayahs.json"
     missing = [p for p in (surahs_path, ayahs_path) if not p.exists()]
@@ -203,7 +210,11 @@ def load_quran(quran_dir: Path, require: bool) -> tuple[list, list, dict[str, st
             "         references an ayah or a surah will not resolve, and\n"
             "         verify_content.py will fail until you run import_quran.py.\n"
         )
-        return [], [], {"quran_source": MISSING, "translation_edition": MISSING}
+        return [], [], {
+            "quran_source": MISSING,
+            "translation_edition": MISSING,
+            "transliteration_edition": None,
+        }
 
     surah_doc = read_json(surahs_path)
     ayah_doc = read_json(ayahs_path)
@@ -214,6 +225,7 @@ def load_quran(quran_dir: Path, require: bool) -> tuple[list, list, dict[str, st
         {
             "quran_source": meta.get("quran_source") or MISSING,
             "translation_edition": meta.get("translation_edition") or MISSING,
+            "transliteration_edition": meta.get("transliteration_edition") or None,
         },
     )
 
@@ -530,6 +542,10 @@ def build(args: argparse.Namespace) -> int:
             "translation_edition": quran_meta["translation_edition"],
             "content_checksum": checksum,
         }
+        # Only when there is one. The About screen credits it when the row is
+        # there, and a row saying "none" would be a credit to nobody.
+        if quran_meta["transliteration_edition"]:
+            meta_rows["transliteration_edition"] = quran_meta["transliteration_edition"]
         conn.executemany(
             "INSERT INTO meta (key, value) VALUES (?, ?)", sorted(meta_rows.items())
         )

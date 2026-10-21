@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wirdi/app_version.dart';
+import 'package:wirdi/data/content_database.dart';
 import 'package:wirdi/data/wirdi_data.dart';
 import 'package:wirdi/providers/data_providers.dart';
 import 'package:wirdi/routes.dart';
@@ -124,6 +125,42 @@ void main() {
       expect(inSheet(family), findsOneWidget);
     }
     expect(inSheet('Fonts'), findsOneWidget);
+  });
+
+  group('the transliteration', () {
+    Finder inSheet(String text) => find.descendant(
+      of: find.byType(AboutContent),
+      matching: find.text(text),
+    );
+
+    testWidgets('is credited to the file the build recorded', (
+      WidgetTester tester,
+    ) async {
+      await dbs.content
+          .into(dbs.content.meta)
+          .insert(
+            MetaCompanion.insert(
+              key: 'transliteration_edition',
+              value: 'PLACEHOLDER transliteration file',
+            ),
+          );
+      await pumpSettings(tester);
+      await openSheet(tester);
+
+      expect(inSheet('Transliteration'), findsOneWidget);
+      expect(inSheet('PLACEHOLDER transliteration file'), findsOneWidget);
+    });
+
+    testWidgets('has no section in a build without one', (
+      WidgetTester tester,
+    ) async {
+      // The fixture records none, and its verses carry none.
+      await pumpSettings(tester);
+      await openSheet(tester);
+
+      expect(inSheet('Translation'), findsOneWidget);
+      expect(inSheet('Transliteration'), findsNothing);
+    });
   });
 
   testWidgets('it dismisses back to Settings', (WidgetTester tester) async {

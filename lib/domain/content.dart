@@ -218,6 +218,7 @@ final class ContentMetadata {
     required this.quranSource,
     required this.translationEdition,
     required this.contentChecksum,
+    this.transliterationEdition,
     this.builtAt,
   });
 
@@ -230,6 +231,13 @@ final class ContentMetadata {
   final String quranSource;
 
   final String translationEdition;
+
+  /// The QUL file the verses' transliteration was imported from.
+  ///
+  /// Null for a build made without one, which also has no transliteration to
+  /// show — so there is nothing to credit, rather than a credit to "unknown".
+  /// `verify_content.py` fails a build that has the one without the other.
+  final String? transliterationEdition;
 
   /// SHA-256 over the content rows. Same sources, same checksum.
   final String contentChecksum;

@@ -163,6 +163,11 @@ thrown away what the other convention writes down — its `z` is ز, ذ and ظ
 alike — so a conversion would have to guess, in Quran text. Replacing it means
 importing a different QUL transliteration, not rewriting this one.
 
+Its source is credited in the app's About sheet, from `meta.transliteration_edition`
+in `content.db` — the file name of #7 as the import recorded it.
+`verify_content.py` fails a build whose verses carry a transliteration that
+`meta` does not name a source for.
+
 ## A note on `has_bismillah`
 
 `surahs.has_bismillah` is derived as "1 for every surah except 9", **not** from QUL's

@@ -64,6 +64,16 @@ void _tests(File file) {
     expect(await repo.ayahRange(2, 285, 999), hasLength(2));
   });
 
+  test('the verse transliteration is credited', () async {
+    final ContentRepository repo = DriftContentRepository(content);
+    final ContentMetadata meta = await repo.metadata();
+    final Ayah first = (await repo.ayahRange(1, 1, 1)).single;
+
+    // Shown under every verse, so the About sheet has to say where it is from.
+    expect(first.transliteration, isNotNull);
+    expect(meta.transliterationEdition, isNotNull);
+  });
+
   test('bundledContentStamp describes the content that was built', () async {
     final ContentRepository repo = DriftContentRepository(content);
     final ContentMetadata meta = await repo.metadata();
