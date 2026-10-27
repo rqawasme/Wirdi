@@ -10,7 +10,6 @@ import 'package:wirdi/routes.dart';
 import 'package:wirdi/screens/wird_player_screen.dart';
 import 'package:wirdi/theme/theme.dart';
 import 'package:wirdi/widgets/ayah_block.dart';
-import 'package:wirdi/widgets/collection_row.dart';
 import 'package:wirdi/widgets/dhikr_block.dart';
 import 'package:wirdi/widgets/voussoir_stripe.dart';
 
@@ -569,21 +568,21 @@ void main() {
       // collections list, which is a tab away.
       await tester.tap(find.text('Collections'));
       await settle(tester);
-      // The row itself no longer opens anything — only its buttons do — so the
-      // play button is found scoped to this row rather than by tapping the
-      // name. The button beside it opens the contents, which is not the player.
-      final Finder row = find.ancestor(
-        of: find.text('PLACEHOLDER collection 1 english'),
-        matching: find.byType(CollectionRow),
-      );
-      await tester.tap(
-        find.descendant(of: row, matching: find.byTooltip('Recite')),
-      );
+      // The row opens the collection's page, and the page's Recite button —
+      // Resume, since this one is part-way — opens the player.
+      await tester.tap(find.text('PLACEHOLDER collection 1 english'));
+      await settle(tester);
+      await tester.tap(find.widgetWithIcon(FilledButton, Icons.play_arrow));
       await settle(tester);
       expect(find.text('14 of 14'), findsOneWidget);
       expect(find.text('Repeat 1 of 3'), findsOneWidget);
 
-      final Finder text = find.text('PLACEHOLDER dhikr 1003 translation');
+      // The player's, and not the line for the same dhikr on the page under
+      // it.
+      final Finder text = find.descendant(
+        of: find.byType(WirdPlayerScreen),
+        matching: find.text('PLACEHOLDER dhikr 1003 translation'),
+      );
       await tester.tap(text);
       await tester.pump();
       await tester.tap(text);
@@ -627,7 +626,7 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
       await settle(tester);
 
-      // Back on the list it was opened from, with the row marked.
+      // Back on the page it was opened from, which says so.
       expect(find.textContaining('Done today'), findsOneWidget);
     });
 

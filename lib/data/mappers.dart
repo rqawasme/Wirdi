@@ -97,7 +97,28 @@ CollectionSummary builtinSummaryFromRow(CollectionRow row) => CollectionSummary(
   author: row.author,
   type: collectionTypeFromSql(row.type),
   sortOrder: row.sortOrder,
+  series: _seriesFromRow(row),
 );
+
+/// Null unless the row names both halves of a series. The build will not
+/// write one without the other; a row that has one anyway is read as a
+/// collection on its own rather than as a series with no Arabic name.
+CollectionSeries? _seriesFromRow(CollectionRow row) {
+  final String? name = row.seriesNameEnglish;
+  final String? nameArabic = row.seriesNameArabic;
+  if (name == null || nameArabic == null) return null;
+  final int? weekday = row.seriesWeekday;
+  return CollectionSeries(
+    name: name,
+    nameArabic: nameArabic,
+    weekday:
+        weekday != null &&
+            weekday >= DateTime.monday &&
+            weekday <= DateTime.sunday
+        ? weekday
+        : null,
+  );
+}
 
 CollectionSummary userSummaryFromRow(UserCollectionRow row) =>
     CollectionSummary(

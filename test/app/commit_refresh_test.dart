@@ -67,14 +67,31 @@ void main() {
     await settle(tester);
   }
 
-  /// Commits the first collection in the list through the row menu, taking the
-  /// sheet's defaults: Today, every day.
-  Future<void> commitFirstRow(WidgetTester tester) async {
-    await tester.tap(find.byTooltip('Commit to my practice').first);
+  /// Opens [name]'s page from the list and comes back to the list after
+  /// [then] has run on it.
+  Future<void> onPage(
+    WidgetTester tester,
+    String name,
+    Future<void> Function() then,
+  ) async {
+    await tester.tap(find.text(name));
     await settle(tester);
-    await tester.tap(find.text('Commit'));
+    await then();
+    await tester.tap(find.byTooltip('Back'));
     await settle(tester);
   }
+
+  /// Commits [name] from its page, taking the sheet's defaults: Today, every
+  /// day.
+  Future<void> commitFromPage(WidgetTester tester, String name) =>
+      onPage(tester, name, () async {
+        await tester.tap(find.widgetWithText(OutlinedButton, 'Add to Home'));
+        await settle(tester);
+        await tester.tap(find.text('Commit'));
+        await settle(tester);
+      });
+
+  const String builtin = 'PLACEHOLDER collection 1 english';
 
   testWidgets('a collection committed on Collections is on Home', (
     WidgetTester tester,
@@ -83,7 +100,7 @@ void main() {
     expect(find.text('Nothing committed yet'), findsOneWidget);
 
     await openTab(tester, 'Collections');
-    await commitFirstRow(tester);
+    await commitFromPage(tester, builtin);
     await openTab(tester, 'Home');
 
     // The whole point of the tab: what was just committed is on it.
@@ -102,10 +119,10 @@ void main() {
     expect(find.byType(CollectionTile), findsOneWidget);
 
     await openTab(tester, 'Collections');
-    await tester.tap(find.byTooltip('More').first);
-    await settle(tester);
-    await tester.tap(find.text('Remove from home'));
-    await settle(tester);
+    await onPage(tester, builtin, () async {
+      await tester.tap(find.widgetWithText(TextButton, 'Remove from Home'));
+      await settle(tester);
+    });
     await openTab(tester, 'Home');
 
     expect(find.byType(CollectionTile), findsNothing);
@@ -129,22 +146,26 @@ void main() {
 
     // Moved to Fridays, which is what today is.
     await openTab(tester, 'Collections');
-    await tester.tap(find.byTooltip('Change when committed').first);
-    await settle(tester);
-    await tester.tap(
-      find.byWidgetPredicate(
-        (Widget widget) => widget is Text && widget.semanticsLabel == 'Monday',
-      ),
-    );
-    await settle(tester);
-    await tester.tap(
-      find.byWidgetPredicate(
-        (Widget widget) => widget is Text && widget.semanticsLabel == 'Friday',
-      ),
-    );
-    await settle(tester);
-    await tester.tap(find.text('Save'));
-    await settle(tester);
+    await onPage(tester, builtin, () async {
+      await tester.tap(find.widgetWithText(TextButton, 'Change'));
+      await settle(tester);
+      await tester.tap(
+        find.byWidgetPredicate(
+          (Widget widget) =>
+              widget is Text && widget.semanticsLabel == 'Monday',
+        ),
+      );
+      await settle(tester);
+      await tester.tap(
+        find.byWidgetPredicate(
+          (Widget widget) =>
+              widget is Text && widget.semanticsLabel == 'Friday',
+        ),
+      );
+      await settle(tester);
+      await tester.tap(find.text('Save'));
+      await settle(tester);
+    });
 
     await openTab(tester, 'Home');
     expect(find.byType(CollectionTile), findsOneWidget);
@@ -162,16 +183,20 @@ void main() {
     // The menu's, and not the empty state's button of the same name.
     await tester.tap(find.text('New collection').last);
     await settle(tester);
-    await tester.enterText(find.byType(TextField).first, 'Surah al-Kahf');
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Name'),
+      'Surah al-Kahf',
+    );
     await settle(tester);
     await tester.tap(find.text('Create'));
     await settle(tester);
 
-    // Creating lands in the editor; back out of it to the list.
+    // Creating lands in the editor; back out of it to the list, which has
+    // turned to Yours, where the new collection is.
     await tester.tap(find.byTooltip('Back'));
     await settle(tester);
 
-    await commitFirstRow(tester);
+    await commitFromPage(tester, 'Surah al-Kahf');
     await openTab(tester, 'Home');
 
     expect(find.text('Surah al-Kahf'), findsOneWidget);
@@ -185,13 +210,13 @@ void main() {
       // The menu's, and not the empty state's button of the same name.
       await tester.tap(find.text('New collection').last);
       await settle(tester);
-      await tester.enterText(find.byType(TextField).first, name);
+      await tester.enterText(find.widgetWithText(TextField, 'Name'), name);
       await settle(tester);
       await tester.tap(find.text('Create'));
       await settle(tester);
       await tester.tap(find.byTooltip('Back'));
       await settle(tester);
-      await commitFirstRow(tester);
+      await commitFromPage(tester, name);
     }
 
     testWidgets('renaming it renames the tile', (WidgetTester tester) async {
@@ -202,11 +227,11 @@ void main() {
       await openTab(tester, 'Home');
       expect(find.text('Surah al-Kahf'), findsOneWidget);
 
-      // Back to the list, into the editor, rename.
+      // Back to the list, through its page into the editor, rename.
       await openTab(tester, 'Collections');
-      await tester.tap(find.byTooltip('More').first);
+      await tester.tap(find.text('Surah al-Kahf'));
       await settle(tester);
-      await tester.tap(find.text('Edit'));
+      await tester.tap(find.widgetWithText(OutlinedButton, 'Edit'));
       await settle(tester);
       // The name lives in the editor's own overflow menu, alongside the
       // description the same form asks for.
@@ -217,6 +242,9 @@ void main() {
       await tester.enterText(find.byType(TextField).first, 'Al-Kahf, Fridays');
       await settle(tester);
       await tester.tap(find.text('Save'));
+      await settle(tester);
+      // Out of the editor, and out of the page.
+      await tester.tap(find.byTooltip('Back'));
       await settle(tester);
       await tester.tap(find.byTooltip('Back'));
       await settle(tester);
@@ -237,12 +265,16 @@ void main() {
       expect(find.byType(CollectionTile), findsOneWidget);
 
       await openTab(tester, 'Collections');
-      await tester.tap(find.byTooltip('More').first);
+      await tester.tap(find.text('Surah al-Kahf'));
+      await settle(tester);
+      await tester.tap(find.byTooltip('More'));
       await settle(tester);
       await tester.tap(find.text('Delete'));
       await settle(tester);
       await tester.tap(find.text('Delete').last);
       await settle(tester);
+      // The page closes itself: what it was about is gone.
+      expect(find.text('Surah al-Kahf'), findsNothing);
 
       await openTab(tester, 'Home');
       expect(find.byType(CollectionTile), findsNothing);

@@ -173,6 +173,53 @@ void _tests(File file) {
     );
   });
 
+  test("Dala'il al-Khayrat is one series: a part a day and a closing one", () {
+    return Future<void>(() async {
+      final CollectionRepository repo = DriftCollectionRepository(
+        content: content,
+        user: user,
+      );
+      final List<CollectionSummary> parts = <CollectionSummary>[
+        for (final CollectionSummary s in await repo.all())
+          if (s.series?.name == "Dala'il al-Khayrat") s,
+      ];
+
+      // Seven days and the closing supplication, which is on none of them —
+      // the list draws the eight as one row with the week on it.
+      expect(parts, hasLength(8));
+      expect(
+        <int?>[for (final CollectionSummary p in parts) p.series!.weekday],
+        unorderedEquals(<int?>[
+          DateTime.monday,
+          DateTime.tuesday,
+          DateTime.wednesday,
+          DateTime.thursday,
+          DateTime.friday,
+          DateTime.saturday,
+          DateTime.sunday,
+          null,
+        ]),
+      );
+      // Part 1 is Monday's, which is how the week strip lines them up.
+      expect(
+        parts
+            .firstWhere(
+              (CollectionSummary p) => p.series!.weekday == DateTime.monday,
+            )
+            .name,
+        contains('Part 1'),
+      );
+      // Nothing else is part of a series.
+      expect(
+        (await repo.all()).where(
+          (CollectionSummary s) =>
+              s.series != null && s.series!.name != "Dala'il al-Khayrat",
+        ),
+        isEmpty,
+      );
+    });
+  });
+
   test('the adhkar collections reference the Quran rather than repeat it', () {
     return Future<void>(() async {
       final CollectionRepository repo = DriftCollectionRepository(

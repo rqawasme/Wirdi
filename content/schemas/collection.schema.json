@@ -25,6 +25,26 @@
       "type": "integer",
       "description": "Display order among collections. Lower sorts first."
     },
+    "series": {
+      "type": "object",
+      "required": ["name_english", "name_arabic"],
+      "additionalProperties": false,
+      "description": "Optional. Marks this collection as one part of a work recited in parts, such as the seven daily parts of Dala'il al-Khayrat and its closing supplication. Every part names its series identically, and the app lists the whole series as one row. Omit when unused.",
+      "properties": {
+        "name_english": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The series' own name, written the same in every part: it is what ties the parts together."
+        },
+        "name_arabic": { "type": "string", "minLength": 1 },
+        "weekday": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 7,
+          "description": "Optional. The day of the week this part is said on, 1 = Monday to 7 = Sunday. Omit for a part said on no set day, such as a closing supplication."
+        }
+      }
+    },
     "items": {
       "type": "array",
       "minItems": 1,

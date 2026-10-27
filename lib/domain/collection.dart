@@ -8,6 +8,32 @@ import 'progress.dart';
 /// User collections do not have one.
 enum CollectionType { wird, dhikrSet, surahSet }
 
+/// The larger work a built-in collection is one part of.
+///
+/// Dala'il al-Khayrat is eight collections — a part for each day of the week
+/// and a closing supplication — and the collections list draws them as one
+/// row with the week on it rather than as eight rows that differ by a word.
+/// The parts are tied together by [name] alone, which the content build checks
+/// every part spells the same way.
+final class CollectionSeries {
+  const CollectionSeries({
+    required this.name,
+    required this.nameArabic,
+    this.weekday,
+  });
+
+  final String name;
+
+  final String nameArabic;
+
+  /// The day this part is said on, as a [DateTime] weekday constant. Null for
+  /// a part said on no set day.
+  final int? weekday;
+
+  @override
+  String toString() => 'CollectionSeries($name, weekday: $weekday)';
+}
+
 /// A collection in a list, without its items resolved.
 ///
 /// Built-ins carry the extra fields `content.db` holds for them; a user
@@ -21,6 +47,7 @@ final class CollectionSummary {
     this.description,
     this.author,
     this.type,
+    this.series,
   });
 
   final CollectionId id;
@@ -39,6 +66,9 @@ final class CollectionSummary {
 
   /// Built-ins only.
   final CollectionType? type;
+
+  /// Built-ins only, and only the ones that are a part of something larger.
+  final CollectionSeries? series;
 
   final int sortOrder;
 

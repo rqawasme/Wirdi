@@ -240,8 +240,8 @@ shows only the collections the user has *committed* to and that fall on today,
 grouped under Today, Morning and Evening in that fixed order, as square tiles
 two to a row. A section with nothing in it is not rendered at all — no header,
 no placeholder — because a header over nothing is a promise the screen is not
-keeping. Committing happens in the collections list's row menu, which is where a
-collection is also copied, edited and deleted.
+keeping. Committing happens on a collection's own page, opened from a row on the
+Collections tab, which is where a collection is also copied, edited and deleted.
 
 **A selected segment is brick, not a tonal step.** Depth in this app is tonal
 and selection is not: a tonal step against a tonal surface is a difference you
@@ -456,7 +456,7 @@ does not ask: it takes back one tap, which is what a mis-tap costs.
 ### The wird player
 
 The counter, and the screen the app is for. It opens from a tile on Home, or
-from a row in the collections list.
+from the Recite button on a collection's page.
 
 **Its state is a plain object.** `lib/player/wird_player.dart` is a
 `ChangeNotifier` and knows nothing about widgets, so counting, undo across a
@@ -600,7 +600,7 @@ The run of days is read back **after** the completion is written, on the same
 ordered chain, so the number includes the wird just finished; until that read
 lands the line is simply absent rather than guessed at. The screen no longer
 leaves on its own — it waits for the tap, and goes back to whichever of Home or
-the collections list opened it. The beat the screen used to hold still for is
+the collection's page opened it. The beat the screen used to hold still for is
 now the reveal, and it is still a guard: the finished step takes no tap until
 all three lines have landed, because a tasbih is counted faster than a screen
 changes and the tap after the last one is already on its way down.
@@ -642,10 +642,10 @@ full — the Arabic, the transliteration, the translation, the collection's own
 note on it, and the reference it cites — in a sheet, capped at most of the
 screen's height and scrolled inside that cap.
 
-The row's button used to open the player instead, which meant the only way to
-find out what a wird contained was to start reciting it, and backing out of one
-leaves a progress row behind. Looking and reciting are two buttons now, and the
-player kept its own.
+It used to be the player that a row opened, which meant the only way to find out
+what a wird contained was to start reciting it, and backing out of one leaves a
+progress row behind. Opening is looking now, and reciting is the first button on
+the page.
 
 A `SurahItem` resolves to surah metadata only — Al-Baqarah alone is 286 verses
 and a list has no use for the text — so the sheet is where that expansion
@@ -677,29 +677,47 @@ puts the repeat blocks back over the runs they occupied.
 
 **The description is shown, and it can be changed.** It was write-only for two
 phases: the form asked for one when a collection was made, the column carried
-it in both databases, and no widget ever read it back. It is now a line on the
-collections row — capped at two lines, so a long one cannot push the row's
-actual state off the bottom at a large text scale — and the whole thing,
-unclipped, above the contents screen's list. Names say what a collection is,
-the description says what it is for, and the meta line says what state it is in
-today, which is the order they sit in.
-
-It is deliberately absent from the row's screen-reader label. A blurb read out
-on each of fourteen rows turns a scan down the list into a recital; the
-contents screen reads it in full, which is where somebody who wanted it went.
+it in both databases, and no widget ever read it back. It is shown whole,
+unclipped, at the top of the collection's page. It was a two-line excerpt on
+every row of the list for a while too, and that is what made the list a wall
+of text; it came off the rows when they were redone, below.
 
 `rename` became `CollectionRepository.updateDetails`, one statement writing both
 columns. The form asks both questions at once, and a rename that lands while the
 description it was written alongside does not is worse than a refusal. Emptying
 the field clears it, which is the only way there is to take one off.
 
-**Four buttons made the row change shape.** The names, the description and the
-meta line each take the row's full width now, and the buttons share the bottom
-line with the meta rather than standing to the right of the lot. At three
-buttons standing beside it was fine; at four, a hundred and sixty points of
-button took enough off a four-hundred-point row to wrap "Wird of Imam al-Nawawi"
-onto three lines. The meta line is short and the space to its right was empty.
-The row is no taller for the move, and the names stop paying for the actions.
+**The Collections tab is two shelves, and a row is one tap.** It was three
+stacked lists — the user's collections, a row for the user's adhkar, and the
+built-ins — and every collection row carried four icon buttons: contents,
+recite, commit, and a menu for the rest. Nobody could say which icon was which
+without long-pressing for a tooltip, and whether something was on Home was the
+difference between a filled house and an outlined one.
+
+Now a switch at the top picks the **Library**, which is what the app ships, or
+**Yours**, which is what the user made: their collections, and the way through
+to their adhkar. The tab opens on Yours once there is anything in it and on the
+Library before, and making a collection or a copy turns it to Yours, so the
+thing just made is in front of whoever made it. The Library has a search field
+over it, matching English and Arabic names alike.
+
+A row is the names, the item count, today's state, and — in brick, in words —
+whether it is on Home and when: "On Home · Evening · Fridays". Tapping it opens
+the collection's page, which is where the actions went, each with its name on
+it: **Recite** (or **Resume at item 5 of 47**, with the item marked "Up next"
+in the list below), **Add to Home**, and **Make a copy** for a built-in or
+**Edit** for one of the user's own. A collection that is on Home says so on a
+plate with **Change** and **Remove from Home** beside it. Copying and deleting
+one of the user's own sit in the page's menu, being rarer and, in deleting's
+case, final.
+
+**A series is one row.** Dala'il al-Khayrat is eight collections, and as eight
+rows it was a third of the Library, the same name eight times over. Each of its
+files now names the series it belongs to and, for the seven daily parts, its
+weekday (see `content/README.md`), and the Library draws the eight as one row:
+the name once, today's part, and the week as seven squares with today's filled
+in brick. Each day opens its own part; the closing supplication, which is on no
+day, is a line under the week.
 
 `addItem` does not return the id of the row it wrote and `setRepeatGroup` is
 addressed by item id, so the copy is resolved once after the items are in and
@@ -838,9 +856,10 @@ the content build's job. A dhikr with no translation is found by its Arabic, and
 read out by it too: `DhikrRow`'s screen-reader label falls back to the Arabic,
 which leaves a reader with no Arabic voice exactly where a sighted reader is.
 
-**"Your adhkar" hangs off the collections list**, at the bottom, under the
-built-ins. Not a fifth tab — four is the ceiling — and not a second icon in the
-app bar, whose one collections-only action is already "New collection". A dhikr
+**"Your adhkar" is on the Yours shelf of the Collections tab**, under the
+user's own collections. Not a fifth tab — four is the ceiling — and not a second
+icon in the app bar, whose one collections-only action is already the + that
+makes a collection or a dhikr. A dhikr
 is edited and deleted from that screen and nowhere else: a collection *names*
 its adhkar without owning them, and offering "delete this dhikr" from inside one
 collection would be offering, from there, to change another.

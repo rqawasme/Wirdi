@@ -228,20 +228,49 @@ void main() {
       await shoot(tester, name);
     }
 
+    // Yours, which is where the tab opens once the user has made something;
+    // then the Library, with Dala'il al-Khayrat as one row; then a built-in's
+    // own page, which is where the actions are.
     await openTab(WirdiTab.collections, '01b-collections');
+    await tester.tap(find.text('Library'));
+    await settle(tester);
+    await shoot(tester, '01b0-library');
+    await tester.scrollUntilVisible(
+      find.text("Dala'il al-Khayrat"),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settle(tester);
+    await shoot(tester, '01b0-library-series');
+    await tester.tap(find.text("Dala'il al-Khayrat"));
+    await settle(tester);
+    await shoot(tester, '01b1-collection-page');
+    await tester.tap(find.byTooltip('Back'));
+    await settle(tester);
+    await tester.tap(find.text('Yours'));
+    await settle(tester);
+
     // The sheet that decides all of the above, in both of its states: every
     // day, which is the default and what most commitments are, and a single
-    // day, which is what the picker exists for.
-    Future<void> shootSheet(int row, String name) async {
-      await tester.tap(find.byTooltip('Change when committed').at(row));
+    // day, which is what the picker exists for. Reached from each
+    // collection's page, where Change sits beside what it changes.
+    Future<void> shootSheet(String collection, String name) async {
+      await tester.tap(find.text(collection));
+      await settle(tester);
+      await tester.tap(find.widgetWithText(TextButton, 'Change'));
       await settle(tester);
       await shoot(tester, name);
       Navigator.of(tester.element(find.byType(SegmentedButton<int>))).pop();
       await settle(tester);
+      await tester.tap(find.byTooltip('Back'));
+      await settle(tester);
     }
 
-    await shootSheet(0, '01b2-commit-sheet-every-day');
-    await shootSheet(1, '01b3-commit-sheet-one-day');
+    await shootSheet(
+      'Ayat al-Kursi, three times',
+      '01b2-commit-sheet-every-day',
+    );
+    await shootSheet('Surah al-Kahf', '01b3-commit-sheet-one-day');
     await openTab(WirdiTab.tasbih, '01c-tasbih');
 
     // The goal: the sheet it is chosen from, the ring part way, the tap that

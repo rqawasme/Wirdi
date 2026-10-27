@@ -1,17 +1,35 @@
 import 'package:flutter/material.dart';
 
+import '../domain/commitment.dart';
 import '../providers/collections.dart';
 import '../theme/theme.dart';
+import 'weekday_name.dart';
 
-/// One collection, as a row in a list about *managing* collections.
+/// One collection, as a row in the collections list.
 ///
-/// This is the form the collections list and the dhikr list use. Its opposite
-/// number is `CollectionTile`, the square form on the home screen: a tile is
-/// for doing today's wird and says how far through it you are, a row is for
-/// finding, copying, editing and deleting a collection and says what is in it.
+/// Its opposite number is `CollectionTile`, the square form on the home
+/// screen: a tile is for doing today's wird and says how far through it you
+/// are, a row is for finding a collection and says what state it is in.
 /// Neither substitutes for the other.
 ///
-/// The completed-today mark is deliberately quiet — a small check in
+/// **One tap target, and it opens the collection.** The row used to carry four
+/// icon buttons — look inside, recite, commit, and a menu for the rest — and
+/// they were the complaint: four glyphs on every row of a long list, each to
+/// be learned, with nothing to say which was which but a tooltip nobody on a
+/// phone ever sees. The collection page now has those actions as buttons with
+/// their names on them, so the row only has to get somebody there.
+///
+/// **What it says** is the names, how many items, and today's state — done,
+/// part-way, or nothing at all — plus whether the collection is on Home and
+/// when. That last used to be the difference between a filled house and an
+/// outlined one; it is words now, in brick, because it is the one thing on the
+/// row the user decided rather than the app.
+///
+/// The description is not on the row. It was capped at two lines and it was
+/// what made every row a paragraph; it is on the collection page in full,
+/// which is where somebody who wanted it went.
+///
+/// The completed-today mark stays quiet — a small check in
 /// [ColorScheme.onSurfaceVariant], on the same line as the item count and in
 /// the same colour as it. Finishing a daily wird is the expected outcome, not
 /// an achievement, and a row that congratulates you every evening stops
@@ -20,8 +38,8 @@ class CollectionRow extends StatelessWidget {
   const CollectionRow({
     super.key,
     required this.listing,
-    this.onTap,
-    this.trailing,
+    required this.onTap,
+    this.commitment,
   });
 
   /// The most of a row the Arabic name may take before it starts wrapping.
@@ -29,16 +47,10 @@ class CollectionRow extends StatelessWidget {
 
   final CollectionListing listing;
 
-  /// What tapping the row's body does. Null when the row is informational
-  /// only and everything actionable lives in [trailing] instead — the
-  /// collections list does this, so it isn't announced as a button with
-  /// nothing distinguishing it from the icon buttons beside it.
-  final VoidCallback? onTap;
+  final VoidCallback onTap;
 
-  /// What sits at the trailing edge, outside the row's own semantics: the
-  /// overflow menu in the collections list, and nothing at all in a list that
-  /// offers no actions.
-  final Widget? trailing;
+  /// Null when the collection is not on Home.
+  final Commitment? commitment;
 
   @override
   Widget build(BuildContext context) {
@@ -46,173 +58,179 @@ class CollectionRow extends StatelessWidget {
     final WirdiTypography type = theme.extension<WirdiTypography>()!;
     final Color quiet = theme.colorScheme.onSurfaceVariant;
     final String? nameArabic = listing.summary.nameArabic;
-    final String? description = listing.summary.description;
-    final Widget? trailing = this.trailing;
-    final VoidCallback? onTap = this.onTap;
+    final Commitment? commitment = this.commitment;
+    final String? home = commitment == null
+        ? null
+        : onHomeLabel(context, commitment);
 
-    final String items =
-        '${listing.itemCount} ${listing.itemCount == 1 ? 'item' : 'items'}';
+    final String items = itemCountLabel(listing.itemCount);
     final String state = listing.completedToday
         ? 'done today'
         : listing.inProgress
         ? 'part-way through'
         : 'not started today';
 
-    // The names, the description and the meta line all get the row's whole
-    // width; the buttons share the bottom line with the meta rather than
-    // standing to the right of the lot.
-    //
-    // They used to stand beside it, which was fine at three of them and is not
-    // at four: a hundred and sixty points of button took enough off a
-    // four-hundred-point row to wrap "Wird of Imam al-Nawawi" onto three
-    // lines. The meta line is short and the space to its right was empty, so
-    // that is where they went. The row is no taller for it, and the names stop
-    // paying for the actions.
-    final Widget text = ExcludeSemantics(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) => Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Expanded(
-                  child: Text(listing.name, style: theme.textTheme.titleMedium),
-                ),
-                if (nameArabic != null) ...<Widget>[
-                  const SizedBox(width: WirdiMetrics.space4),
-                  // Capped rather than given a flex share: an Arabic name that
-                  // needs a third of the row should not take half of it and
-                  // wrap the English name that would otherwise have fitted.
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: constraints.maxWidth * arabicShare,
-                    ),
-                    child: Directionality(
-                      textDirection: TextDirection.rtl,
-                      child: Text(
-                        nameArabic,
-                        style: type.arabicTitle,
-                        locale: const Locale('ar'),
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
+    // The name, the count and today's state, and Home when it is. Not the
+    // Arabic name, which a screen reader set to English reads as noise, and
+    // not the button's job, which the semantics already say.
+    final String label = <String>[listing.name, items, state, ?home].join(', ');
+
+    return Semantics(
+      container: true,
+      button: true,
+      label: label,
+      // The tap is the node's own: excluding what is under it excludes the
+      // InkWell's action too, and a button a screen reader cannot press is a
+      // label.
+      onTap: onTap,
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            WirdiMetrics.space4,
+            WirdiMetrics.space3,
+            WirdiMetrics.space2,
+            WirdiMetrics.space3,
           ),
-          if (description != null && description.isNotEmpty) ...<Widget>[
-            const SizedBox(height: WirdiMetrics.space2),
-            // Between the names and the meta line, because that is the order
-            // the three of them answer questions in: the names say what this
-            // is, the description says what it is for, and the meta line says
-            // what state it is in today.
-            //
-            // A size step above the meta line beneath it, in the same quiet
-            // ink. Two lines at the same size in the same colour run together;
-            // this one is prose and the one under it is chrome, and the step is
-            // what says which is which.
-            //
-            // Capped at two lines: a long description must not push the row's
-            // actual state off the bottom at a large text scale.
-            Text(
-              description,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodyMedium?.copyWith(color: quiet),
-            ),
-          ],
-        ],
-      ),
-    );
-
-    // The label is the name, the count and today's state — and deliberately
-    // not the description. A blurb read out on each of fourteen rows turns a
-    // scan down the list into a recital; the description is read in full on
-    // the contents screen, which is where somebody who wanted it went.
-    final String label = '${listing.name}, $items, $state';
-
-    final Widget titled = onTap == null
-        ? Semantics(container: true, label: label, child: text)
-        : Semantics(
-            container: true,
-            button: true,
-            label: label,
-            child: InkWell(onTap: onTap, child: text),
-          );
-
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        WirdiMetrics.space4,
-        WirdiMetrics.space4,
-        // The buttons carry their own padding; without them the row needs its
-        // own on that edge.
-        trailing == null ? WirdiMetrics.space4 : WirdiMetrics.space2,
-        trailing == null ? WirdiMetrics.space4 : WirdiMetrics.space2,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          titled,
-          const SizedBox(height: WirdiMetrics.space2),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+          child: Row(
             children: <Widget>[
               Expanded(
-                child: ExcludeSemantics(
-                  child: _Meta(listing: listing, items: items, colour: quiet),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    LayoutBuilder(
+                      builder:
+                          (BuildContext context, BoxConstraints constraints) =>
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Text(
+                                      listing.name,
+                                      style: theme.textTheme.titleMedium,
+                                    ),
+                                  ),
+                                  if (nameArabic != null) ...<Widget>[
+                                    const SizedBox(width: WirdiMetrics.space4),
+                                    // Capped rather than given a flex share:
+                                    // an Arabic name that needs a third of the
+                                    // row should not take half of it and wrap
+                                    // the English name that would otherwise
+                                    // have fitted.
+                                    ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                        maxWidth:
+                                            constraints.maxWidth * arabicShare,
+                                      ),
+                                      child: Directionality(
+                                        textDirection: TextDirection.rtl,
+                                        child: Text(
+                                          nameArabic,
+                                          style: type.arabicTitle,
+                                          locale: const Locale('ar'),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                    ),
+                    const SizedBox(height: WirdiMetrics.space1),
+                    CollectionMeta(
+                      items: items,
+                      completedToday: listing.completedToday,
+                      inProgress: listing.inProgress,
+                      home: home,
+                    ),
+                  ],
                 ),
               ),
-              // Outside the row's own semantics rather than inside it: a menu
-              // that opens the only way to copy a built-in should not be
-              // something a screen reader has to find inside a button.
-              ?trailing,
+              const SizedBox(width: WirdiMetrics.space2),
+              Icon(Icons.chevron_right, color: quiet),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
-/// The item count, and what state the collection is in today.
-class _Meta extends StatelessWidget {
-  const _Meta({
-    required this.listing,
+/// "1 item", "16 items".
+String itemCountLabel(int count) => '$count ${count == 1 ? 'item' : 'items'}';
+
+/// Where a commitment puts a collection, as the row and the collection page
+/// say it: "On Home · Morning", "On Home · Evening · Fridays".
+///
+/// The Today section says nothing after "On Home": a collection in it is not
+/// tied to a time, and "On Home · Today" reads as if it were only today.
+String onHomeLabel(BuildContext context, Commitment commitment) {
+  final Weekdays days = commitment.days;
+  final List<int> weekdays = days.weekdays;
+  return <String>[
+    'On Home',
+    if (commitment.section != DailySection.today) commitment.section.label,
+    if (!days.isEveryDay && weekdays.length == 1)
+      '${weekdayName(context, weekdays.single)}s'
+    else if (!days.isEveryDay)
+      '${weekdays.length} days a week',
+  ].join(' · ');
+}
+
+/// The line under a collection's name: its item count, and what state it is
+/// in today.
+///
+/// One paragraph rather than a row of boxes: the check and the house are
+/// inline glyphs in the sentence, so a long label or a large accessibility
+/// text scale wraps the line instead of overflowing it.
+class CollectionMeta extends StatelessWidget {
+  const CollectionMeta({
+    super.key,
     required this.items,
-    required this.colour,
+    required this.completedToday,
+    required this.inProgress,
+    this.home,
   });
 
-  final CollectionListing listing;
   final String items;
-  final Color colour;
+  final bool completedToday;
+  final bool inProgress;
+
+  /// [onHomeLabel], or null when the collection is not on Home.
+  final String? home;
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle? style = Theme.of(
-      context,
-    ).textTheme.bodySmall?.copyWith(color: colour);
+    final ThemeData theme = Theme.of(context);
+    final Color quiet = theme.colorScheme.onSurfaceVariant;
+    final Color brick = theme.colorScheme.primary;
+    final TextStyle? style = theme.textTheme.bodySmall?.copyWith(color: quiet);
+    final String? home = this.home;
 
-    // One paragraph rather than a row of boxes: the check is an inline glyph
-    // in the sentence, so a long name or a large accessibility text scale
-    // wraps the line instead of overflowing it.
     return Text.rich(
       TextSpan(
         children: <InlineSpan>[
           TextSpan(text: items),
-          if (listing.completedToday) ...<InlineSpan>[
+          if (completedToday) ...<InlineSpan>[
             const TextSpan(text: ' · '),
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
-              child: Icon(
-                Icons.check,
-                size: WirdiMetrics.space4,
-                color: colour,
-              ),
+              child: Icon(Icons.check, size: WirdiMetrics.space4, color: quiet),
             ),
             const TextSpan(text: ' Done today'),
-          ] else if (listing.inProgress)
+          ] else if (inProgress)
             const TextSpan(text: ' · Part-way through'),
+          if (home != null) ...<InlineSpan>[
+            const TextSpan(text: '   '),
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: Icon(Icons.home, size: WirdiMetrics.space4, color: brick),
+            ),
+            TextSpan(
+              text: ' $home',
+              style: TextStyle(color: brick, fontWeight: FontWeight.w500),
+            ),
+          ],
         ],
       ),
       style: style,
