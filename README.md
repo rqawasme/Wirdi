@@ -32,9 +32,10 @@ The collections authored and built in are the **wird of Imam al-Nawawi**; the
 **morning** and **evening adhkar**, summarised from the works of Shaykh Abd
 al-Aziz al-Tarefe; **al-Wird al-Latif** of Imam al-Haddad, morning and evening;
 **Hizb al-Bahr** of Imam Abu al-Hasan al-Shadhili; **Dala'il al-Khayrat** of
-Imam Muhammad al-Jazuli, a part for each day of the week and its closing
-supplication; the **Wazifa ash-Shadhiliyya**, built around the Salat
-al-Mashishiyya of Sayyidi Abd al-Salam ibn Mashish; **Wird as-Sakran** of Imam
+Imam Muhammad al-Jazuli, a part for each day of the week and its opening,
+intention, completion and closing supplications; the **Wazifa
+ash-Shadhiliyya**, built around the Salat al-Mashishiyya of Sayyidi Abd
+al-Salam ibn Mashish; **Wird as-Sakran** of Imam
 Abu Bakr al-Sakran al-Saqqaf; **Hizb al-Nasr**, the Litany of Victory — two
 different litanies of that name, one by Imam al-Haddad and one by Imam
 al-Shadhili, which is why those two carry their author in the name; **Dua
@@ -64,12 +65,12 @@ compares consonantal skeletons, so a copy that merely spells `Allah` differently
 or moves a comma does not slip past.
 
 The collections' Quranic portions are **not** transcribed either: al-Fatiha,
-al-Ikhlas, al-Falaq, al-Nas, Ayat al-Kursi, the last two verses of al-Baqarah,
-the passages al-Wird al-Latif draws from al-Muminun, al-Rum, al-Hashr and
-al-Saffat, and the passages Hizb al-Bahr draws from Maryam, Ya Sin, Ta Ha,
-al-Rahman, Ghafir, al-Buruj and al-Araf are `surah` and `ayah` items resolved
-out of the imported mushaf, so that text exists in exactly one place in the
-database.
+al-Ikhlas, al-Falaq, al-Nas, Ayat al-Kursi, the first five and the last two
+verses of al-Baqarah, the passages al-Wird al-Latif draws from al-Muminun,
+al-Rum, al-Hashr and al-Saffat, and the passages Hizb al-Bahr draws from Maryam,
+Ya Sin, Ta Ha, al-Rahman, Ghafir, al-Buruj and al-Araf are `surah` and `ayah`
+items resolved out of the imported mushaf, so that text exists in exactly one
+place in the database.
 
 Some litanies quote a verse only **in part** — the tails of 2:137, 12:64, 9:129,
 18:10, 3:173, 33:69, 3:45, 21:87, 4:45 and 2:285, the openings of 28:85 and
