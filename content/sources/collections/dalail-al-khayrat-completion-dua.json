@@ -1,0 +1,23 @@
+{
+  "id": 26,
+  "name_arabic": "دُعَاءُ إِتْمَامِ دَلَائِلِ الْخَيْرَاتِ",
+  "name_english": "Dala'il al-Khayrat — Supplication of Completion",
+  "description": "Said on completing the recitation of Dala'il al-Khayrat.",
+  "author": "Imam Muhammad al-Jazuli",
+  "type": "wird",
+  "sort_order": 37,
+  "items": [
+    {
+      "dhikr": 29001
+    },
+    {
+      "dhikr": 29002
+    },
+    {
+      "dhikr": 29003
+    },
+    {
+      "dhikr": 29004
+    }
+  ]
+}

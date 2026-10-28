@@ -1,0 +1,53 @@
+{
+  "id": 24,
+  "name_arabic": "دُعَاءُ افْتِتَاحِ دَلَائِلِ الْخَيْرَاتِ",
+  "name_english": "Dala'il al-Khayrat — Opening Supplication",
+  "description": "Said before beginning the recitation of Dala'il al-Khayrat.",
+  "author": "Imam Muhammad al-Jazuli",
+  "type": "wird",
+  "sort_order": 27,
+  "items": [
+    {
+      "dhikr": 2001
+    },
+    {
+      "dhikr": 27001
+    },
+    {
+      "dhikr": 27002
+    },
+    {
+      "dhikr": 27003
+    },
+    {
+      "dhikr": 26046,
+      "count": 3
+    },
+    {
+      "dhikr": 2034,
+      "count": 3
+    },
+    {
+      "dhikr": 8001
+    },
+    {
+      "surah": 112,
+      "count": 3
+    },
+    {
+      "surah": 113
+    },
+    {
+      "surah": 114
+    },
+    {
+      "surah": 1
+    },
+    {
+      "dhikr": 2001
+    },
+    {
+      "ayah": "2:1-5"
+    }
+  ]
+}

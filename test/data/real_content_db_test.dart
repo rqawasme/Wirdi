@@ -150,6 +150,9 @@ void _tests(File file) {
         'b:21',
         'b:22',
         'b:23',
+        'b:24',
+        'b:25',
+        'b:26',
       ]),
     );
     expect(
@@ -169,6 +172,9 @@ void _tests(File file) {
         'Ratib al-Haddad',
         'Ratib al-Attas',
         'Waking up from sleep',
+        "Dala'il al-Khayrat — Opening Supplication",
+        "Dala'il al-Khayrat — Supplication of Intention",
+        "Dala'il al-Khayrat — Supplication of Completion",
       ]),
     );
   });
