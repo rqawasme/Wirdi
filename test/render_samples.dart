@@ -229,8 +229,8 @@ void main() {
     }
 
     // Yours, which is where the tab opens once the user has made something;
-    // then the Library, with Dala'il al-Khayrat as one row; then a built-in's
-    // own page, which is where the actions are.
+    // then the Library, with Dala'il al-Khayrat as one row; then its page of
+    // parts, and one part's own page, which is where the actions are.
     await openTab(WirdiTab.collections, '01b-collections');
     await tester.tap(find.text('Library'));
     await settle(tester);
@@ -244,7 +244,12 @@ void main() {
     await shoot(tester, '01b0-library-series');
     await tester.tap(find.text("Dala'il al-Khayrat"));
     await settle(tester);
+    await shoot(tester, '01b0-series-page');
+    await tester.tap(find.text('Part 2 (Tuesday)'));
+    await settle(tester);
     await shoot(tester, '01b1-collection-page');
+    await tester.tap(find.byTooltip('Back'));
+    await settle(tester);
     await tester.tap(find.byTooltip('Back'));
     await settle(tester);
     await tester.tap(find.text('Yours'));

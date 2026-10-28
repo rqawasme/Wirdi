@@ -40,6 +40,7 @@ class CollectionRow extends StatelessWidget {
     required this.listing,
     required this.onTap,
     this.commitment,
+    this.title,
   });
 
   /// The most of a row the Arabic name may take before it starts wrapping.
@@ -52,12 +53,14 @@ class CollectionRow extends StatelessWidget {
   /// Null when the collection is not on Home.
   final Commitment? commitment;
 
+  /// What the row calls the collection, when not its whole name: on a series'
+  /// page, "Part 1 (Monday)" says what "Dala'il al-Khayrat — Part 1 (Monday)"
+  /// does under a heading that already says Dala'il al-Khayrat. A screen
+  /// reader still hears the whole name.
+  final String? title;
+
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final WirdiTypography type = theme.extension<WirdiTypography>()!;
-    final Color quiet = theme.colorScheme.onSurfaceVariant;
-    final String? nameArabic = listing.summary.nameArabic;
     final Commitment? commitment = this.commitment;
     final String? home = commitment == null
         ? null
@@ -70,15 +73,62 @@ class CollectionRow extends StatelessWidget {
         ? 'part-way through'
         : 'not started today';
 
-    // The name, the count and today's state, and Home when it is. Not the
-    // Arabic name, which a screen reader set to English reads as noise, and
-    // not the button's job, which the semantics already say.
-    final String label = <String>[listing.name, items, state, ?home].join(', ');
+    return CollectionRowFrame(
+      name: title ?? listing.name,
+      nameArabic: listing.summary.nameArabic,
+      // The name, the count and today's state, and Home when it is. Not the
+      // Arabic name, which a screen reader set to English reads as noise, and
+      // not the button's job, which the semantics already say.
+      semanticLabel: <String>[listing.name, items, state, ?home].join(', '),
+      onTap: onTap,
+      meta: CollectionMeta(
+        items: items,
+        completedToday: listing.completedToday,
+        inProgress: listing.inProgress,
+        home: home,
+      ),
+    );
+  }
+}
+
+/// The shape every row in the collections list shares: the names on one line,
+/// a line of meta under them, and a chevron — one button, which opens
+/// something.
+///
+/// Its own widget so that a row which is not one collection — a series of
+/// them — is the same shape as the rows around it rather than a lookalike that
+/// drifts.
+class CollectionRowFrame extends StatelessWidget {
+  const CollectionRowFrame({
+    super.key,
+    required this.name,
+    required this.meta,
+    required this.semanticLabel,
+    required this.onTap,
+    this.nameArabic,
+  });
+
+  final String name;
+  final String? nameArabic;
+  final Widget meta;
+
+  /// The whole of what a screen reader hears: the row is one node, labelled
+  /// in a sentence, rather than its texts read one by one.
+  final String semanticLabel;
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final WirdiTypography type = theme.extension<WirdiTypography>()!;
+    final Color quiet = theme.colorScheme.onSurfaceVariant;
+    final String? nameArabic = this.nameArabic;
 
     return Semantics(
       container: true,
       button: true,
-      label: label,
+      label: semanticLabel,
       // The tap is the node's own: excluding what is under it excludes the
       // InkWell's action too, and a button a screen reader cannot press is a
       // label.
@@ -107,7 +157,7 @@ class CollectionRow extends StatelessWidget {
                                 children: <Widget>[
                                   Expanded(
                                     child: Text(
-                                      listing.name,
+                                      name,
                                       style: theme.textTheme.titleMedium,
                                     ),
                                   ),
@@ -121,7 +171,8 @@ class CollectionRow extends StatelessWidget {
                                     ConstrainedBox(
                                       constraints: BoxConstraints(
                                         maxWidth:
-                                            constraints.maxWidth * arabicShare,
+                                            constraints.maxWidth *
+                                            CollectionRow.arabicShare,
                                       ),
                                       child: Directionality(
                                         textDirection: TextDirection.rtl,
@@ -137,12 +188,7 @@ class CollectionRow extends StatelessWidget {
                               ),
                     ),
                     const SizedBox(height: WirdiMetrics.space1),
-                    CollectionMeta(
-                      items: items,
-                      completedToday: listing.completedToday,
-                      inProgress: listing.inProgress,
-                      home: home,
-                    ),
+                    meta,
                   ],
                 ),
               ),

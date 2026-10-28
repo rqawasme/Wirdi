@@ -716,11 +716,16 @@ case, final.
 parts and the opening, intention, closing and completion supplications — and as
 eleven rows it was half the Library, the same name over and over. Each of its
 files now names the series it belongs to and, for the seven daily parts, its
-weekday (see `content/README.md`), and the Library draws the eleven as one row:
-the name once, today's part, and the week as seven squares with today's filled
-in brick. Each day opens its own part. The four supplications are on no day, so
-each is a line of its own where it is said: the opening and the intention above
-the week, the closing and the completion below it.
+weekday (see `content/README.md`), and the Library draws the eleven as one row,
+the same shape as every row around it: the name once, "11 parts", and On Home
+when any of them is. It opens a page of the parts in the order they are said —
+the opening and the intention, the seven days, the closing and the completion —
+each an ordinary row that opens that part's own page.
+
+It was a week strip first, with today's part filled in brick and the
+supplications as lines above and below it. That made one row of the list a
+dozen things to tap where every other row is one, and put a calendar on the tab
+that is about what the app contains; what today holds is Home's.
 
 `addItem` does not return the id of the row it wrote and `setRepeatGroup` is
 addressed by item id, so the copy is resolved once after the items are in and

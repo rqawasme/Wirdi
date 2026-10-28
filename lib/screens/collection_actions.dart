@@ -40,6 +40,17 @@ Future<void> openCollection(
   }
 }
 
+/// Opens the page of a series' parts, by the name they share.
+///
+/// Nothing to refresh on the way back: each part on that page is opened
+/// through [openCollection], which refreshes on its own way back.
+Future<void> openSeries(BuildContext context, String name) =>
+    Navigator.pushNamed(
+      context,
+      Routes.collectionSeries,
+      arguments: CollectionSeriesArguments(name: name),
+    );
+
 /// Opens [id] in the player.
 Future<void> reciteCollection(
   BuildContext context,

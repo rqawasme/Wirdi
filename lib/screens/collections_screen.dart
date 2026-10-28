@@ -7,7 +7,6 @@ import '../domain/commitment.dart';
 import '../providers/adhkar.dart';
 import '../providers/collections.dart';
 import '../providers/home.dart';
-import '../providers/streak.dart';
 import '../quran/arabic_text.dart';
 import '../routes.dart';
 import '../theme/theme.dart';
@@ -137,7 +136,6 @@ class _ShelvesState extends ConsumerState<_Shelves> {
     Map<CollectionId, Commitment> commitments,
   ) {
     final List<_Entry> entries = _filter(_group(builtin), _query);
-    final DateTime today = ref.watch(clockProvider)();
 
     return ListView(
       // Its own key so each shelf keeps its own place: back to the Library
@@ -186,9 +184,8 @@ class _ShelvesState extends ConsumerState<_Shelves> {
                 CollectionSeriesRow(
                   series: series,
                   parts: parts,
-                  today: today,
                   commitments: commitments,
-                  onOpen: (CollectionId id) => openCollection(context, ref, id),
+                  onTap: () => openSeries(context, series.name),
                 ),
             },
           ),

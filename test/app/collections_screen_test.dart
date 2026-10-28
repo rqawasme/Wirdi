@@ -10,6 +10,7 @@ import 'package:wirdi/providers/collections.dart';
 import 'package:wirdi/providers/data_providers.dart';
 import 'package:wirdi/routes.dart';
 import 'package:wirdi/screens/collection_contents_screen.dart';
+import 'package:wirdi/screens/collection_series_screen.dart';
 import 'package:wirdi/screens/collections_screen.dart';
 import 'package:wirdi/theme/theme.dart';
 import 'package:wirdi/widgets/collection_row.dart';
@@ -340,7 +341,7 @@ void main() {
   });
 
   group('a series', () {
-    /// Four parts of one work: two said on set days, and one on none before
+    /// Four parts of one work: two said on set days, and one on no day before
     /// them and one after.
     Future<void> seedSeries() async {
       Future<void> part(int id, int sortOrder, String name, int? weekday) => dbs
@@ -366,7 +367,7 @@ void main() {
       await part(33, 17, 'PLACEHOLDER series — Closing', null);
     }
 
-    testWidgets('is one row, with its parts on it', (
+    testWidgets('is one row, the same shape as the rows around it', (
       WidgetTester tester,
     ) async {
       await seedSeries();
@@ -374,30 +375,86 @@ void main() {
 
       expect(find.byType(CollectionSeriesRow), findsOneWidget);
       expect(find.text('PLACEHOLDER series'), findsOneWidget);
-      // The parts are days, not rows of their own.
-      expect(find.text('PLACEHOLDER series — Monday part'), findsNothing);
-      expect(find.text('Mon'), findsOneWidget);
-      expect(find.text('Fri'), findsOneWidget);
-      // A part on no set day is a line under the week, named without the
-      // series' name in front of it.
-      expect(find.textContaining('Closing'), findsOneWidget);
+      expect(find.textContaining('4 parts'), findsOneWidget);
+      // The parts are on the series' own page, not drawn into the list: no
+      // part names, and no week.
+      expect(find.textContaining('Monday part'), findsNothing);
+      expect(find.textContaining('Closing'), findsNothing);
+      expect(find.text('Mon'), findsNothing);
     });
 
-    testWidgets('a part on no day sits where it is said: before the week or '
-        'after it', (WidgetTester tester) async {
+    testWidgets('is one button a screen reader can press', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle semantics = tester.ensureSemantics();
       await seedSeries();
       await pumpList(tester);
 
-      double top(String text) =>
-          tester.getTopLeft(find.textContaining(text)).dy;
-      expect(top('Opening'), lessThan(top('Mon')));
-      expect(top('Mon'), lessThan(top('Closing')));
+      expect(
+        tester.getSemantics(find.byType(CollectionSeriesRow)),
+        isSemantics(
+          isButton: true,
+          hasTapAction: true,
+          label: 'PLACEHOLDER series, 4 parts',
+        ),
+      );
+      semantics.dispose();
     });
 
-    testWidgets('a day opens its own part', (WidgetTester tester) async {
+    testWidgets('says On Home when any part is', (WidgetTester tester) async {
+      await seedSeries();
+      await dbs.userRepository().commit(
+        const BuiltinCollectionId(32),
+        DailySection.today,
+      );
+      await pumpList(tester);
+
+      final Finder row = find.byType(CollectionSeriesRow);
+      expect(
+        find.descendant(of: row, matching: find.textContaining('On Home')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('opens a page of its parts, in the order they are said', (
+      WidgetTester tester,
+    ) async {
       await seedSeries();
       await pumpList(tester, withRouter: true);
-      await tester.tap(find.text('Fri'));
+      await tester.tap(find.text('PLACEHOLDER series'));
+      await settle(tester);
+
+      expect(find.byType(CollectionSeriesScreen), findsOneWidget);
+      expect(find.text('4 parts, in the order they are said'), findsOneWidget);
+      // Each named without the series' name in front of it, which the app
+      // bar already says.
+      final List<double> tops = <double>[
+        for (final String part in <String>[
+          'Opening',
+          'Monday part',
+          'Friday part',
+          'Closing',
+        ])
+          tester.getTopLeft(find.text(part)).dy,
+      ];
+      expect(tops, orderedEquals(<double>[...tops]..sort()));
+      expect(
+        find.descendant(
+          of: find.byType(CollectionSeriesScreen),
+          matching: find.byType(CollectionRow),
+        ),
+        findsNWidgets(4),
+      );
+    });
+
+    testWidgets("a part on the series' page opens that part", (
+      WidgetTester tester,
+    ) async {
+      await seedSeries();
+      await pumpList(tester, withRouter: true);
+      await tester.tap(find.text('PLACEHOLDER series'));
+      await settle(tester);
+      await tester.tap(find.text('Friday part'));
       await settle(tester);
 
       expect(

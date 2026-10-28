@@ -12,8 +12,8 @@ enum CollectionType { wird, dhikrSet, surahSet }
 ///
 /// Dala'il al-Khayrat is eleven collections — a part for each day of the week,
 /// and the opening, intention, closing and completion supplications — and the
-/// collections list draws them as one row with the week on it rather than as
-/// eleven rows that differ by a word or two.
+/// collections list draws them as one row that opens a page of the parts,
+/// rather than as eleven rows that differ by a word or two.
 /// The parts are tied together by [name] alone, which the content build checks
 /// every part spells the same way.
 final class CollectionSeries {
