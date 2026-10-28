@@ -340,7 +340,8 @@ void main() {
   });
 
   group('a series', () {
-    /// Three parts of one work: two said on set days and one on none.
+    /// Four parts of one work: two said on set days, and one on none before
+    /// them and one after.
     Future<void> seedSeries() async {
       Future<void> part(int id, int sortOrder, String name, int? weekday) => dbs
           .content
@@ -359,6 +360,7 @@ void main() {
               seriesWeekday: Value<int?>(weekday),
             ),
           );
+      await part(30, 14, 'PLACEHOLDER series — Opening', null);
       await part(31, 15, 'PLACEHOLDER series — Monday part', DateTime.monday);
       await part(32, 16, 'PLACEHOLDER series — Friday part', DateTime.friday);
       await part(33, 17, 'PLACEHOLDER series — Closing', null);
@@ -379,6 +381,17 @@ void main() {
       // A part on no set day is a line under the week, named without the
       // series' name in front of it.
       expect(find.textContaining('Closing'), findsOneWidget);
+    });
+
+    testWidgets('a part on no day sits where it is said: before the week or '
+        'after it', (WidgetTester tester) async {
+      await seedSeries();
+      await pumpList(tester);
+
+      double top(String text) =>
+          tester.getTopLeft(find.textContaining(text)).dy;
+      expect(top('Opening'), lessThan(top('Mon')));
+      expect(top('Mon'), lessThan(top('Closing')));
     });
 
     testWidgets('a day opens its own part', (WidgetTester tester) async {

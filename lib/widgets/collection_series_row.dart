@@ -10,16 +10,18 @@ import 'weekday_name.dart';
 
 /// A work recited in parts, as one row: its name, today's part, and the week.
 ///
-/// Dala'il al-Khayrat is eight collections, and as eight rows it was a third
-/// of the list — the same name eight times over, differing by a weekday in
-/// brackets. As one row the name is said once, and the parts are what they
-/// actually are to somebody reciting them: days of the week, with today's
-/// marked out.
+/// Dala'il al-Khayrat is eleven collections, and as eleven rows it was most of
+/// the list — the same name over and over, differing by a weekday in brackets
+/// or the name of a supplication. As one row the name is said once, and the
+/// parts are what they actually are to somebody reciting them: days of the
+/// week, with today's marked out.
 ///
 /// The header opens today's part, which is the one somebody tapping the name
-/// on a Tuesday means. Each day opens its own part, and a part said on no set
-/// day — the closing supplication — sits under the week as a line of its own,
-/// since it is not a day and drawing it as one would say it was.
+/// on a Tuesday means. Each day opens its own part. A part said on no set day
+/// — the opening and closing supplications and those like them — is a line of
+/// its own, since it is not a day and drawing it as one would say it was. It
+/// sits where it is said: above the week when it comes before the daily parts,
+/// below it when it comes after.
 ///
 /// Today is filled brick, the one place in the list a row is told apart by
 /// colour: the week strip is a calendar, and a calendar that does not say
@@ -61,9 +63,25 @@ class CollectionSeriesRow extends StatelessWidget {
       for (final CollectionListing part in parts)
         if (part.summary.series?.weekday case final int day) day: part,
     };
-    final List<CollectionListing> undated = <CollectionListing>[
+    // Before the week or after it, by where the content build sorts it
+    // against the first daily part. With no daily parts at all, everything is
+    // after the header, which is the only place left.
+    final int? weekStarts = byDay.isEmpty
+        ? null
+        : byDay.values
+              .map((CollectionListing p) => p.summary.sortOrder)
+              .reduce((int a, int b) => a < b ? a : b);
+    final List<CollectionListing> before = <CollectionListing>[
       for (final CollectionListing part in parts)
-        if (part.summary.series?.weekday == null) part,
+        if (part.summary.series?.weekday == null &&
+            weekStarts != null &&
+            part.summary.sortOrder < weekStarts)
+          part,
+    ];
+    final List<CollectionListing> after = <CollectionListing>[
+      for (final CollectionListing part in parts)
+        if (part.summary.series?.weekday == null && !before.contains(part))
+          part,
     ];
     final CollectionListing? todays = byDay[today.weekday];
     final CollectionListing first = todays ?? parts.first;
@@ -164,6 +182,9 @@ class CollectionSeriesRow extends StatelessWidget {
               ),
             ),
           ),
+          for (final CollectionListing part in before)
+            _UndatedPart(series: series, part: part, onOpen: onOpen),
+          if (before.isNotEmpty) const SizedBox(height: WirdiMetrics.space2),
           if (byDay.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(
@@ -190,7 +211,7 @@ class CollectionSeriesRow extends StatelessWidget {
                 ],
               ),
             ),
-          for (final CollectionListing part in undated)
+          for (final CollectionListing part in after)
             _UndatedPart(series: series, part: part, onOpen: onOpen),
         ],
       ),

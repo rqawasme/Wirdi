@@ -198,8 +198,10 @@ Omit them when unused; do not write `null`.
 
 A work recited in parts is one collection per part, each with a `series`
 saying which work it belongs to. Dala'il al-Khayrat is the case it was made
-for: seven daily parts and a closing supplication, eight files, listed in the
-app as one row with the week on it.
+for: seven daily parts and four supplications said around them, eleven files,
+listed in the app as one row with the week on it. A part with no `weekday` is
+drawn above the week when it sorts before the daily parts and below it when it
+sorts after, so `sort_order` decides which.
 
 ```json
 "series": {
@@ -212,8 +214,8 @@ app as one row with the week on it.
 - **`name_english`** ties the parts together, so write it identically in every
   part. `name_arabic` must agree across them too.
 - **`weekday`** is optional: the day the part is said on, `1` for Monday to `7`
-  for Sunday. Omit it for a part said on no set day, like the closing
-  supplication. Two parts of one series cannot share a day.
+  for Sunday. Omit it for a part said on no set day, like the opening or
+  closing supplication. Two parts of one series cannot share a day.
 
 The build refuses a series with only one part: that is a collection with a
 heading, and the `series` field should come off.

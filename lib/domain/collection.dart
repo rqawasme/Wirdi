@@ -10,9 +10,10 @@ enum CollectionType { wird, dhikrSet, surahSet }
 
 /// The larger work a built-in collection is one part of.
 ///
-/// Dala'il al-Khayrat is eight collections — a part for each day of the week
-/// and a closing supplication — and the collections list draws them as one
-/// row with the week on it rather than as eight rows that differ by a word.
+/// Dala'il al-Khayrat is eleven collections — a part for each day of the week,
+/// and the opening, intention, closing and completion supplications — and the
+/// collections list draws them as one row with the week on it rather than as
+/// eleven rows that differ by a word or two.
 /// The parts are tied together by [name] alone, which the content build checks
 /// every part spells the same way.
 final class CollectionSeries {

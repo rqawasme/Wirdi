@@ -150,6 +150,9 @@ void _tests(File file) {
         'b:21',
         'b:22',
         'b:23',
+        'b:24',
+        'b:25',
+        'b:26',
       ]),
     );
     expect(
@@ -169,24 +172,29 @@ void _tests(File file) {
         'Ratib al-Haddad',
         'Ratib al-Attas',
         'Waking up from sleep',
+        "Dala'il al-Khayrat — Opening Supplication",
+        "Dala'il al-Khayrat — Supplication of Intention",
+        "Dala'il al-Khayrat — Supplication of Completion",
       ]),
     );
   });
 
-  test("Dala'il al-Khayrat is one series: a part a day and a closing one", () {
+  test("Dala'il al-Khayrat is one series: a part a day, and the supplications "
+      'said around them', () {
     return Future<void>(() async {
       final CollectionRepository repo = DriftCollectionRepository(
         content: content,
         user: user,
       );
+      final List<CollectionSummary> all = await repo.all();
       final List<CollectionSummary> parts = <CollectionSummary>[
-        for (final CollectionSummary s in await repo.all())
+        for (final CollectionSummary s in all)
           if (s.series?.name == "Dala'il al-Khayrat") s,
       ];
 
-      // Seven days and the closing supplication, which is on none of them —
-      // the list draws the eight as one row with the week on it.
-      expect(parts, hasLength(8));
+      // Seven days, and four supplications on none of them — the opening,
+      // the intention, the closing and the completion. The list draws the
+      // eleven as one row with the week on it.
       expect(
         <int?>[for (final CollectionSummary p in parts) p.series!.weekday],
         unorderedEquals(<int?>[
@@ -198,6 +206,21 @@ void _tests(File file) {
           DateTime.saturday,
           DateTime.sunday,
           null,
+          null,
+          null,
+          null,
+        ]),
+      );
+      // Every collection named for it is in it: one left out would be a row
+      // of its own beside the series, which is what the series is for
+      // avoiding.
+      expect(
+        <String>[
+          for (final CollectionSummary s in all)
+            if (s.name.startsWith("Dala'il al-Khayrat")) s.name,
+        ],
+        unorderedEquals(<String>[
+          for (final CollectionSummary p in parts) p.name,
         ]),
       );
       // Part 1 is Monday's, which is how the week strip lines them up.
@@ -211,7 +234,7 @@ void _tests(File file) {
       );
       // Nothing else is part of a series.
       expect(
-        (await repo.all()).where(
+        all.where(
           (CollectionSummary s) =>
               s.series != null && s.series!.name != "Dala'il al-Khayrat",
         ),
