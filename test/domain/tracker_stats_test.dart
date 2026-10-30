@@ -140,6 +140,63 @@ void main() {
     });
   });
 
+  group('lastDueDays', () {
+    test('with an every-day mask, is the last seven calendar days', () {
+      expect(lastDueDays(Weekdays.everyDay, now: now, count: 7), <String>[
+        for (int back = 6; back >= 0; back--) dateKeyDaysBefore(now, back),
+      ]);
+    });
+
+    test('under a one-day mask, is that day and only that day', () {
+      // Seven Fridays, not one Friday and six days nothing was owed on. This
+      // is the whole fix: a Friday wird kept three weeks running has three
+      // brick squares on its card, not one.
+      expect(
+        lastDueDays(fridayOnly, now: now, count: 7),
+        fridays(7).reversed.toList(),
+      );
+    });
+
+    test('ends on today when today is one of the days', () {
+      final List<String> keys = lastDueDays(
+        Weekdays.of(<int>[DateTime.tuesday]),
+        now: now,
+        count: 7,
+      );
+      expect(keys.last, today);
+      expect(keys, hasLength(7));
+    });
+
+    test('under a two-day mask, each of the two days is a mark', () {
+      // Mondays and Thursdays, alternating, the most recent being yesterday.
+      expect(
+        lastDueDays(
+          Weekdays.of(<int>[DateTime.monday, DateTime.thursday]),
+          now: now,
+          count: 7,
+        ),
+        <String>[
+          '2026-08-24', // Monday
+          '2026-08-27', // Thursday
+          '2026-08-31',
+          '2026-09-03',
+          '2026-09-07',
+          '2026-09-10',
+          '2026-09-14',
+        ],
+      );
+    });
+
+    test('is empty for a mask that never comes round', () {
+      // Not reachable from the picker, but a stored zero has to mean
+      // something, and walking forty-nine days to find nothing is not it.
+      expect(
+        lastDueDays(const Weekdays.fromMask(0), now: now, count: 7),
+        isEmpty,
+      );
+    });
+  });
+
   group('stateOf', () {
     test('a completion counts even on a day it was not due', () {
       // The player does not consult the mask, so a Friday wird recited on a

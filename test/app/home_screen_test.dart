@@ -88,6 +88,24 @@ void main() {
     );
   }
 
+  /// The week strip of the only tile on the screen, oldest first: true where a
+  /// mark is brick.
+  List<bool> stripMarks(WidgetTester tester) {
+    final ColorScheme scheme = WirdiTheme.light().colorScheme;
+    return tester
+        .widgetList<Container>(
+          find.descendant(
+            of: find.byType(CollectionTile),
+            matching: find.byType(Container),
+          ),
+        )
+        .map(
+          (Container c) =>
+              (c.decoration! as BoxDecoration).color == scheme.primary,
+        )
+        .toList();
+  }
+
   group('the greeting', () {
     testWidgets('states the date, the salutation and the day', (
       WidgetTester tester,
@@ -587,6 +605,106 @@ void main() {
 
       expect(find.text('3 Wednesdays. Keep going.'), findsOneWidget);
       expect(find.text('Day one. Keep going.'), findsNothing);
+    });
+
+    testWidgets('a weekly wird\'s strip is its own days, not the calendar\'s', (
+      WidgetTester tester,
+    ) async {
+      // The strip used to be the last seven calendar days. For a wird that
+      // comes round on Wednesdays that is one Wednesday and six days it was
+      // never owed on, so three Wednesdays kept in a row drew as seven grey
+      // squares under a line saying "3 Wednesdays. Keep going." — a run that
+      // looked like a row of misses. Seven Wednesdays, three of them brick,
+      // and today's still to do.
+      final UserRepository user = dbs.userRepository(clock: () => now);
+      await user.commit(
+        mixed,
+        DailySection.today,
+        days: Weekdays.of(<int>[DateTime.wednesday]),
+      );
+      for (final int back in <int>[7, 14, 21]) {
+        await user.logCompletion(mixed, now.subtract(Duration(days: back)));
+      }
+
+      await pumpApp(tester);
+
+      expect(find.text('3 Wednesdays. Keep going.'), findsOneWidget);
+      expect(stripMarks(tester), <bool>[
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        false,
+      ]);
+      // Read out in the same noun as the run.
+      expect(
+        find.bySemanticsLabel(RegExp('3 of the last 7 Wednesdays')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('a weekly wird done today ends its strip in brick', (
+      WidgetTester tester,
+    ) async {
+      final UserRepository user = dbs.userRepository(clock: () => now);
+      await user.commit(
+        mixed,
+        DailySection.today,
+        days: Weekdays.of(<int>[DateTime.wednesday]),
+      );
+      for (final int back in <int>[0, 7, 14, 21]) {
+        await user.logCompletion(mixed, now.subtract(Duration(days: back)));
+      }
+
+      await pumpApp(tester);
+
+      // Four in a row counting today, and four marks.
+      expect(find.text('4 Wednesdays and counting.'), findsOneWidget);
+      expect(stripMarks(tester), <bool>[
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+      ]);
+    });
+
+    testWidgets('a wird on two weekdays has a mark for each of them', (
+      WidgetTester tester,
+    ) async {
+      // Mondays and Wednesdays. Every one of them kept for the last three
+      // weeks, and nothing on the five days a week it is not owed on — which
+      // the calendar-day strip drew as grey.
+      final UserRepository user = dbs.userRepository(clock: () => now);
+      await user.commit(
+        mixed,
+        DailySection.today,
+        days: Weekdays.of(<int>[DateTime.monday, DateTime.wednesday]),
+      );
+      // 2 September 2026 is a Wednesday: Mondays are 2, 9 and 16 days back,
+      // Wednesdays 7 and 14.
+      for (final int back in <int>[2, 7, 9, 14, 16]) {
+        await user.logCompletion(mixed, now.subtract(Duration(days: back)));
+      }
+
+      await pumpApp(tester);
+
+      // Five kept, and the earliest mark predates them: grey, as a day before
+      // a wird existed always has been.
+      expect(find.text('5 days. Keep going.'), findsOneWidget);
+      expect(stripMarks(tester), <bool>[
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+      ]);
     });
 
     testWidgets('a finished run says so, and does not say it twice', (

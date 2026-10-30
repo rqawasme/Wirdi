@@ -82,7 +82,8 @@ class CollectionTile extends StatelessWidget {
 
   final bool completedToday;
 
-  /// The last seven days, oldest first: true on a day this was completed.
+  /// The last seven days it came round on, oldest first: true on a day this
+  /// was completed. For a collection committed to Fridays, seven Fridays.
   /// Empty to draw no strip at all.
   final List<bool> week;
 
@@ -243,10 +244,14 @@ class CollectionTile extends StatelessWidget {
   /// The strip, as a count rather than seven read-out days. "Four of the last
   /// seven days" is what the row is for; which four is not something anybody
   /// listens through seven words to learn.
+  ///
+  /// In the same noun as the run: a strip of seven Fridays is read out as
+  /// Fridays, not as days.
   String get _weekLabel {
     final int done = week.where((bool day) => day).length;
-    if (done == 0) return 'None of the last ${week.length} days';
-    return '$done of the last ${week.length} days';
+    final String many = '${streakUnit ?? 'day'}s';
+    if (done == 0) return 'None of the last ${week.length} $many';
+    return '$done of the last ${week.length} $many';
   }
 }
 
@@ -278,7 +283,12 @@ class _ArabicLine extends StatelessWidget {
   }
 }
 
-/// The last seven days of this collection, as seven marks.
+/// The last seven days this collection came round on, as seven marks.
+///
+/// Days it came round on, not calendar days, so a mark is always a day there
+/// was something to do. A Friday wird's strip is seven Fridays; the Saturdays
+/// to Thursdays between them are not drawn, because a grey square for a day
+/// nothing was owed on reads as a day that was missed.
 ///
 /// A day is the same mark the tracker's calendar uses — a filled square in
 /// [ColorScheme.primary] at the 4dp plate radius, not a circle and not a badge
