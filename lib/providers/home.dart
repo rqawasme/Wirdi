@@ -13,7 +13,8 @@ import 'collections.dart';
 import 'data_providers.dart';
 import 'streak.dart';
 
-/// How many days of history a card's week strip shows.
+/// How many marks a card's week strip shows: the last this-many days the
+/// collection came round on.
 const int weekStripDays = 7;
 
 /// One committed collection, as its tile on the home screen shows it.
@@ -56,8 +57,14 @@ final class CommittedCollection {
   /// not celebrate.
   final bool completedToday;
 
-  /// The last seven days, oldest first and today last: true on a day this
-  /// collection was completed.
+  /// The last seven days it came round on, oldest first and today last: true
+  /// on a day this collection was completed.
+  ///
+  /// Due days, the same unit as [streak] — see [lastDueDays]. For a collection
+  /// committed to every day that is the last seven days; for one committed to
+  /// Fridays it is the last seven Fridays. Counted in calendar days, a Friday
+  /// wird kept three weeks running showed one brick square and six grey ones
+  /// under a line saying "3 Fridays".
   ///
   /// This collection's own history, not the app's. The streak on the greeting
   /// spans everything and answers "have I kept at it"; this answers "have I
@@ -186,7 +193,7 @@ final FutureProvider<HomeView> homeViewProvider = FutureProvider<HomeView>((
         totalCount: _repetitions(resolved.steps),
         doneCount: _repetitionsDone(resolved.steps, progress),
         completedToday: history.contains(dateKey(today)),
-        week: _week(history, today),
+        week: _week(history, commitment.days, today),
         // Counted in days it came round on, the way the tracker counts it. A
         // calendar-day run on a collection committed to Fridays could never
         // read higher than one, so the tile and the tracker would have said
@@ -270,14 +277,14 @@ final class HomeCommitments {
   }
 }
 
-/// The last seven days for one collection, oldest first.
+/// The last seven days one collection came round on, oldest first.
 ///
 /// Cut from the history the caller already holds rather than read back out of
 /// the database: the run needs the whole thing anyway, and a windowed query for
-/// seven days of it would be a second read for a subset of the first.
-List<bool> _week(Set<String> history, DateTime today) => <bool>[
-  for (int back = weekStripDays - 1; back >= 0; back--)
-    history.contains(dateKeyDaysBefore(today, back)),
+/// seven of its days would be a second read for a subset of the first.
+List<bool> _week(Set<String> history, Weekdays days, DateTime today) => <bool>[
+  for (final String key in lastDueDays(days, now: today, count: weekStripDays))
+    history.contains(key),
 ];
 
 String _earlier(String a, String b) => a.compareTo(b) <= 0 ? a : b;

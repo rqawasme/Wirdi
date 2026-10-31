@@ -203,6 +203,42 @@ int dueStreak(
   return streak;
 }
 
+/// The last [count] days [days] comes round on, up to and including today,
+/// oldest first.
+///
+/// What a home card's strip is drawn from. A strip of the last seven
+/// *calendar* days showed a Friday wird as one Friday and six grey squares for
+/// days it was never owed on, so a run of three read as a row of failures
+/// while the line above it said "3 Fridays. Keep going." Each mark is a day it
+/// came round on, and the days in between are not drawn because there was
+/// nothing to do on them.
+///
+/// Today is the last key only when it is itself one of [days]. On the home
+/// screen it always is — a card is only there on a day it falls on — but the
+/// rule is the mask's, not the caller's.
+///
+/// Every day the mask holds comes round once a week, so the walk is bounded by
+/// [count] weeks. A mask with no days in it never comes round, and the answer
+/// is empty.
+List<String> lastDueDays(
+  Weekdays days, {
+  required DateTime now,
+  required int count,
+}) {
+  if (days.isEmpty || count <= 0) return const <String>[];
+
+  final List<String> keys = <String>[];
+  for (
+    int offset = 0;
+    offset < count * DateTime.daysPerWeek && keys.length < count;
+    offset++
+  ) {
+    final String key = dateKeyDaysBefore(now, offset);
+    if (days.contains(weekdayOf(key))) keys.add(key);
+  }
+  return keys.reversed.toList();
+}
+
 /// One week of the tracker's chart.
 final class WeekPoint {
   const WeekPoint({
