@@ -80,10 +80,38 @@ listing. A website is optional; the repository will do.
 | --- | --- | --- |
 | App icon | 512 × 512 PNG | `assets/icon/play_store_icon.png`, written by `tool/render_app_icons.py` |
 | Feature graphic | 1024 × 500 PNG, no alpha | `assets/icon/play_feature_graphic.png`, written by the same script: the tasbih on the limestone cream over the voussoir rule. No text, since the app's name is beside it wherever Play shows it |
-| Phone screenshots | 2 to 8, 16:9 or 9:16, 320–3840 px a side | From a phone: Home with a commitment, the wird player mid-count, a surah, the tracker, the collections list |
+| Phone screenshots | 2 to 8, 16:9 or 9:16, 320–3840 px a side | `assets/store/01-home.png` to `08-dark.png`, written by `test/render_store_screenshots.dart`. Upload all eight, in that order |
 
-Screenshots from a release build on a real phone look like what people will
-get: no debug banner, and the real fonts.
+The eight phone screenshots are posts rather than bare screens: a headline and
+one line over the real app on a phone, 1080 × 1920 and 24-bit PNG with no
+alpha, which is what Play needs for them to be eligible for its featured
+placements. The screens are the app itself — pumped with the bundled fonts and
+the real `content.db`, over a user database seeded with a few weeks of
+somebody keeping their adhkar — so they show what a release build draws, with
+no debug banner.
+
+| # | Headline | Screen |
+| --- | --- | --- |
+| 1 | Your daily wird, waiting for you | Home: six commitments, three done |
+| 2 | Tap anywhere to count | The wird player, part-way through a dhikr of ten |
+| 3 | The great litanies, built in | Collections → Library |
+| 4 | On the days you choose | The commit sheet: al-Kahf on Fridays, with a reminder |
+| 5 | The Quran, verse by verse | Al-Fatiha in the reading view |
+| 6 | A tasbih for everything else | The tasbih, 22 of a goal of 33 |
+| 7 | See the days you kept | The tracker |
+| 8 | Private by design | The wird player in dark |
+
+Rendering them needs the content database built and synced first:
+
+```bash
+python3 content/scripts/build_content.py
+tool/sync_content_asset.sh
+flutter test test/render_store_screenshots.dart   # -> assets/store/*.png
+```
+
+The headlines are in the file beside the screens they caption; change the
+copy there and rerun, rather than editing the PNGs. The home screen and the
+tracker read today's date, so a rerun on another day shows other days.
 
 ## App content
 

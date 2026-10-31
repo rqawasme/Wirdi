@@ -33,6 +33,14 @@ editing the SVG or the PNGs:
 python3 tool/render_app_icons.py
 ```
 
+## Store screenshots
+
+`store/` holds the eight phone screenshots for the Google Play listing, written
+by `test/render_store_screenshots.dart`. Like the two listing images in
+`icon/`, they are uploaded to Play Console by hand and are not bundled with the
+app. Rerun the script rather than editing them; `docs/PLAY_LISTING.md` has the
+command and what each one shows.
+
 ## content.db
 
 `content.db` belongs here, and is **not committed**. It is a build artifact:
