@@ -79,12 +79,20 @@ void main() {
       await settle(tester);
     }
 
-    /// Opens the commit sheet for the first collection in the list, which is
-    /// the mixed built-in.
+    /// Opens the mixed built-in's page from the collections list, and on it
+    /// the commit sheet: Add to Home when it is not on Home yet, Change when it
+    /// is.
     Future<void> openSheet(WidgetTester tester) async {
       await tester.tap(find.text('Collections'));
       await settle(tester);
-      await tester.tap(find.byTooltip('Commit to my practice').first);
+      await tester.tap(find.text('PLACEHOLDER collection 1 english'));
+      await settle(tester);
+      final Finder add = find.widgetWithText(OutlinedButton, 'Add to Home');
+      await tester.tap(
+        add.evaluate().isEmpty
+            ? find.widgetWithText(TextButton, 'Change')
+            : add,
+      );
       await settle(tester);
     }
 
@@ -187,10 +195,7 @@ void main() {
             reminder: const ReminderTime(6, 15),
           );
       await pumpApp(tester);
-      await tester.tap(find.text('Collections'));
-      await settle(tester);
-      await tester.tap(find.byTooltip('Change when committed').first);
-      await settle(tester);
+      await openSheet(tester);
 
       expect(find.text('6:15 AM'), findsOneWidget);
 
@@ -217,10 +222,7 @@ void main() {
         reminder: const ReminderTime(6, 15),
       );
       await pumpApp(tester);
-      await tester.tap(find.text('Collections'));
-      await settle(tester);
-      await tester.tap(find.byTooltip('Change when committed').first);
-      await settle(tester);
+      await openSheet(tester);
 
       expect(
         find.text(

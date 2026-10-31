@@ -1,14 +1,20 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:wirdi/data/content_database.dart' show CollectionsCompanion;
 import 'package:wirdi/data/wirdi_data.dart';
 import 'package:wirdi/domain/domain.dart';
+import 'package:wirdi/providers/collections.dart';
 import 'package:wirdi/providers/data_providers.dart';
 import 'package:wirdi/routes.dart';
+import 'package:wirdi/screens/collection_contents_screen.dart';
+import 'package:wirdi/screens/collection_series_screen.dart';
 import 'package:wirdi/screens/collections_screen.dart';
 import 'package:wirdi/theme/theme.dart';
 import 'package:wirdi/widgets/collection_row.dart';
+import 'package:wirdi/widgets/collection_series_row.dart';
 
 import '../support/fixtures.dart';
 
@@ -167,66 +173,320 @@ void main() {
     expect(find.textContaining('Part-way through'), findsNothing);
   });
 
-  /// The row itself opens nothing — only its buttons do — so a button is found
-  /// scoped to its own row rather than by tapping the name.
-  Future<void> tapRowButton(WidgetTester tester, String tooltip) async {
+  testWidgets('a row opens the collection page, not the player', (
+    WidgetTester tester,
+  ) async {
+    await pumpList(tester, withRouter: true);
+    await tester.tap(find.text('PLACEHOLDER collection 1 english'));
+    await settle(tester);
+
+    // The actions the row used to carry, with their names on them.
+    expect(find.widgetWithText(FilledButton, 'Recite'), findsOneWidget);
+    expect(find.widgetWithText(OutlinedButton, 'Add to Home'), findsOneWidget);
+    expect(find.widgetWithText(OutlinedButton, 'Make a copy'), findsOneWidget);
+    // And the contents, not the player: no step counter, and the whole
+    // collection on one screen rather than one item of it.
+    expect(find.text('1 of 14'), findsNothing);
+    await tester.scrollUntilVisible(
+      find.text('Repeated 3 times'),
+      200,
+      // The page's own list: the shell's are still mounted under the route.
+      scrollable: find
+          .descendant(
+            of: find.byType(CollectionContentsScreen),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    expect(find.text('PLACEHOLDER dhikr 1001 arabic'), findsOneWidget);
+  });
+
+  testWidgets('a row has no buttons of its own', (WidgetTester tester) async {
+    await pumpList(tester);
+
     final Finder row = find.ancestor(
       of: find.text('PLACEHOLDER collection 1 english'),
       matching: find.byType(CollectionRow),
     );
-    await tester.tap(
-      find.descendant(of: row, matching: find.byTooltip(tooltip)),
+    // Four icons on every row was the complaint this answers. A menu button
+    // is an IconButton underneath, so this covers the overflow too.
+    expect(
+      find.descendant(of: row, matching: find.byType(IconButton)),
+      findsNothing,
     );
-    await settle(tester);
-  }
-
-  testWidgets("a row's contents button opens what is in the collection", (
-    WidgetTester tester,
-  ) async {
-    await pumpList(tester, withRouter: true);
-    await tapRowButton(tester, 'See what is in it');
-
-    // The contents, not the player: no step counter, and the whole collection
-    // on one screen rather than one item of it.
-    expect(find.text('1 of 14'), findsNothing);
-    expect(find.text('PLACEHOLDER dhikr 1001 arabic'), findsOneWidget);
-    expect(find.text('Repeated 3 times'), findsOneWidget);
   });
 
-  testWidgets("a row's play button opens the player", (
+  testWidgets('a row is one button a screen reader can press', (
     WidgetTester tester,
   ) async {
-    await pumpList(tester, withRouter: true);
-    await tapRowButton(tester, 'Recite');
-
-    expect(find.text('1 of 14'), findsOneWidget);
-    expect(find.text('PLACEHOLDER dhikr 1001 arabic'), findsOneWidget);
-  });
-
-  testWidgets('a description is shown when there is one, and not when there '
-      'is not', (WidgetTester tester) async {
+    final SemanticsHandle semantics = tester.ensureSemantics();
     await pumpList(tester);
 
-    expect(find.text('PLACEHOLDER collection 1 description'), findsOneWidget);
-    // The second fixture carries none, the way nine of the fourteen real
-    // built-ins do. Nothing is drawn in its place.
-    expect(find.text('PLACEHOLDER collection 2 description'), findsNothing);
+    expect(
+      tester.getSemantics(find.byType(CollectionRow).first),
+      isSemantics(
+        isButton: true,
+        hasTapAction: true,
+        label: 'PLACEHOLDER collection 1 english, 6 items, not started today',
+      ),
+    );
+    semantics.dispose();
+  });
+
+  testWidgets('the description is left to the collection page', (
+    WidgetTester tester,
+  ) async {
+    await pumpList(tester);
+
+    // Two lines of it on every row is what made the list a wall of text.
+    expect(find.text('PLACEHOLDER collection 1 description'), findsNothing);
+  });
+
+  testWidgets('a collection on Home says so in words', (
+    WidgetTester tester,
+  ) async {
+    await dbs.userRepository().commit(mixed, DailySection.morning);
+
+    await pumpList(tester);
+
+    // It was a filled house against an outlined one, which nobody could read.
+    expect(find.textContaining('On Home · Morning'), findsOneWidget);
+  });
+
+  testWidgets('a commitment to some days names them', (
+    WidgetTester tester,
+  ) async {
+    await dbs.userRepository().commit(
+      mixed,
+      DailySection.evening,
+      days: Weekdays.of(<int>[DateTime.friday]),
+    );
+
+    await pumpList(tester);
+
+    expect(find.textContaining('On Home · Evening · Fridays'), findsOneWidget);
+  });
+
+  group('the two shelves', () {
+    testWidgets('opens on the Library before anything of the user\'s own', (
+      WidgetTester tester,
+    ) async {
+      await pumpList(tester);
+
+      final SegmentedButton<CollectionShelf> shelves = tester.widget(
+        find.byType(SegmentedButton<CollectionShelf>),
+      );
+      expect(shelves.selected, <CollectionShelf>{CollectionShelf.library});
+      expect(find.text('PLACEHOLDER collection 1 english'), findsOneWidget);
+    });
+
+    testWidgets('and on Yours once there is something', (
+      WidgetTester tester,
+    ) async {
+      await dbs.collectionRepository().create('Mine');
+
+      await pumpList(tester);
+
+      expect(find.text('Mine'), findsOneWidget);
+      // The built-ins are a tap away rather than under the user's own.
+      expect(find.text('PLACEHOLDER collection 1 english'), findsNothing);
+    });
+
+    testWidgets('Yours holds the user\'s collections and adhkar', (
+      WidgetTester tester,
+    ) async {
+      await pumpList(tester);
+      await tester.tap(find.text('Yours'));
+      await settle(tester);
+
+      expect(find.text('Nothing of your own yet'), findsOneWidget);
+      expect(find.text('None written yet'), findsOneWidget);
+      expect(find.text('Write a dhikr'), findsOneWidget);
+      expect(find.text('PLACEHOLDER collection 1 english'), findsNothing);
+    });
+
+    testWidgets('a new collection is offered at the foot of the user\'s own', (
+      WidgetTester tester,
+    ) async {
+      await dbs.collectionRepository().create('Mine');
+
+      await pumpList(tester);
+
+      expect(find.widgetWithText(TextButton, 'New collection'), findsOneWidget);
+    });
+  });
+
+  group('searching the library', () {
+    testWidgets('narrows the list to what matches', (
+      WidgetTester tester,
+    ) async {
+      await pumpList(tester);
+      await tester.enterText(find.byType(TextField), 'collection 2');
+      await settle(tester);
+
+      expect(find.text('PLACEHOLDER collection 2 english'), findsOneWidget);
+      expect(find.text('PLACEHOLDER collection 1 english'), findsNothing);
+    });
+
+    testWidgets('and says so when nothing does', (WidgetTester tester) async {
+      await pumpList(tester);
+      await tester.enterText(find.byType(TextField), 'nothing like it');
+      await settle(tester);
+
+      expect(
+        find.text('Nothing in the library matches “nothing like it”.'),
+        findsOneWidget,
+      );
+    });
+  });
+
+  group('a series', () {
+    /// Four parts of one work: two said on set days, and one on no day before
+    /// them and one after.
+    Future<void> seedSeries() async {
+      Future<void> part(int id, int sortOrder, String name, int? weekday) => dbs
+          .content
+          .into(dbs.content.collections)
+          .insert(
+            CollectionsCompanion.insert(
+              id: Value<int>(id),
+              nameArabic: 'PLACEHOLDER part $id arabic',
+              nameEnglish: name,
+              type: 'wird',
+              sortOrder: sortOrder,
+              seriesNameEnglish: const Value<String>('PLACEHOLDER series'),
+              seriesNameArabic: const Value<String>(
+                'PLACEHOLDER series arabic',
+              ),
+              seriesWeekday: Value<int?>(weekday),
+            ),
+          );
+      await part(30, 14, 'PLACEHOLDER series — Opening', null);
+      await part(31, 15, 'PLACEHOLDER series — Monday part', DateTime.monday);
+      await part(32, 16, 'PLACEHOLDER series — Friday part', DateTime.friday);
+      await part(33, 17, 'PLACEHOLDER series — Closing', null);
+    }
+
+    testWidgets('is one row, the same shape as the rows around it', (
+      WidgetTester tester,
+    ) async {
+      await seedSeries();
+      await pumpList(tester);
+
+      expect(find.byType(CollectionSeriesRow), findsOneWidget);
+      expect(find.text('PLACEHOLDER series'), findsOneWidget);
+      expect(find.textContaining('4 parts'), findsOneWidget);
+      // The parts are on the series' own page, not drawn into the list: no
+      // part names, and no week.
+      expect(find.textContaining('Monday part'), findsNothing);
+      expect(find.textContaining('Closing'), findsNothing);
+      expect(find.text('Mon'), findsNothing);
+    });
+
+    testWidgets('is one button a screen reader can press', (
+      WidgetTester tester,
+    ) async {
+      final SemanticsHandle semantics = tester.ensureSemantics();
+      await seedSeries();
+      await pumpList(tester);
+
+      expect(
+        tester.getSemantics(find.byType(CollectionSeriesRow)),
+        isSemantics(
+          isButton: true,
+          hasTapAction: true,
+          label: 'PLACEHOLDER series, 4 parts',
+        ),
+      );
+      semantics.dispose();
+    });
+
+    testWidgets('says On Home when any part is', (WidgetTester tester) async {
+      await seedSeries();
+      await dbs.userRepository().commit(
+        const BuiltinCollectionId(32),
+        DailySection.today,
+      );
+      await pumpList(tester);
+
+      final Finder row = find.byType(CollectionSeriesRow);
+      expect(
+        find.descendant(of: row, matching: find.textContaining('On Home')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('opens a page of its parts, in the order they are said', (
+      WidgetTester tester,
+    ) async {
+      await seedSeries();
+      await pumpList(tester, withRouter: true);
+      await tester.tap(find.text('PLACEHOLDER series'));
+      await settle(tester);
+
+      expect(find.byType(CollectionSeriesScreen), findsOneWidget);
+      expect(find.text('4 parts, in the order they are said'), findsOneWidget);
+      // Each named without the series' name in front of it, which the app
+      // bar already says.
+      final List<double> tops = <double>[
+        for (final String part in <String>[
+          'Opening',
+          'Monday part',
+          'Friday part',
+          'Closing',
+        ])
+          tester.getTopLeft(find.text(part)).dy,
+      ];
+      expect(tops, orderedEquals(<double>[...tops]..sort()));
+      expect(
+        find.descendant(
+          of: find.byType(CollectionSeriesScreen),
+          matching: find.byType(CollectionRow),
+        ),
+        findsNWidgets(4),
+      );
+    });
+
+    testWidgets("a part on the series' page opens that part", (
+      WidgetTester tester,
+    ) async {
+      await seedSeries();
+      await pumpList(tester, withRouter: true);
+      await tester.tap(find.text('PLACEHOLDER series'));
+      await settle(tester);
+      await tester.tap(find.text('Friday part'));
+      await settle(tester);
+
+      expect(
+        find.widgetWithText(AppBar, 'PLACEHOLDER series — Friday part'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('a search for a part finds the series', (
+      WidgetTester tester,
+    ) async {
+      await seedSeries();
+      await pumpList(tester);
+      await tester.enterText(find.byType(TextField), 'friday');
+      await settle(tester);
+
+      expect(find.text('PLACEHOLDER series'), findsOneWidget);
+      expect(find.text('PLACEHOLDER collection 1 english'), findsNothing);
+    });
   });
 
   group('the shapes a row has to survive', () {
-    testWidgets('a described row keeps its four buttons and its meta line at '
-        'the largest text scale', (WidgetTester tester) async {
-      // The row changed shape for the fourth button: names, description and
-      // meta each take the full width now, and the buttons share the bottom
-      // line with the meta. This is the scale that decides whether that was
-      // enough.
+    testWidgets('a row keeps its names and its meta line at the largest text '
+        'scale', (WidgetTester tester) async {
+      await dbs.userRepository().commit(mixed, DailySection.morning);
       await pumpList(tester, textScaler: const TextScaler.linear(2));
       expect(tester.takeException(), isNull);
-      // At 2x the sections above the built-ins fill the first screen, and a
-      // row the list has not scrolled to is a row it has not built.
       await tester.scrollUntilVisible(
         find.text('PLACEHOLDER collection 1 english'),
         200,
+        // The list's, and not the search field's own.
+        scrollable: find.byType(Scrollable).first,
       );
       await settle(tester);
 
@@ -234,39 +494,14 @@ void main() {
         of: find.text('PLACEHOLDER collection 1 english'),
         matching: find.byType(CollectionRow),
       );
-
-      // All four still there and still distinguishable.
-      for (final String tooltip in <String>[
-        'See what is in it',
-        'Recite',
-        'Commit to my practice',
-        'More',
-      ]) {
-        expect(
-          find.descendant(of: row, matching: find.byTooltip(tooltip)),
-          findsOneWidget,
-          reason: '$tooltip went missing at 2x',
-        );
-      }
-
-      // And the row still says what state it is in. The description is capped
-      // at two lines precisely so it cannot push this off the bottom.
       expect(
         find.descendant(of: row, matching: find.textContaining('items')),
         findsOneWidget,
       );
-    });
-
-    testWidgets('a long description is clipped rather than unbounded', (
-      WidgetTester tester,
-    ) async {
-      await pumpList(tester);
-
-      final Text description = tester.widget<Text>(
-        find.text('PLACEHOLDER collection 1 description'),
+      expect(
+        find.descendant(of: row, matching: find.textContaining('On Home')),
+        findsOneWidget,
       );
-      expect(description.maxLines, 2);
-      expect(description.overflow, TextOverflow.ellipsis);
     });
   });
 }

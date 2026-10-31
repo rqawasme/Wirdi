@@ -164,6 +164,8 @@ void main() {
       WidgetTester tester,
     ) async {
       await pumpApp(tester);
+      await tester.tap(find.text('Yours'));
+      await settle(tester);
 
       expect(find.text('Nothing of your own yet'), findsOneWidget);
       expect(find.byType(EmptyState), findsOneWidget);
@@ -184,22 +186,29 @@ void main() {
   });
 
   group('your adhkar', () {
-    testWidgets('sit between your collections and the built-ins', (
+    testWidgets('are on Yours, under your collections', (
       WidgetTester tester,
     ) async {
       await pumpApp(tester);
+      await tester.tap(find.text('Yours'));
+      await settle(tester);
 
-      // At the foot of the built-ins nobody found them.
-      final double yours = tester.getTopLeft(find.text('Your Adhkar')).dy;
+      // With everything else the user made, and not at the foot of the
+      // built-ins, where nobody found them.
       expect(
-        tester.getTopLeft(find.text('Your Collections')).dy,
-        lessThan(yours),
-      );
-      expect(
-        yours,
-        lessThan(tester.getTopLeft(find.text('Noble Collections')).dy),
+        // The group's label, and not the app bar's or the tab's.
+        tester
+            .getTopLeft(
+              find.descendant(
+                of: find.byType(ListView),
+                matching: find.text('Collections'),
+              ),
+            )
+            .dy,
+        lessThan(tester.getTopLeft(find.text('Adhkar you wrote')).dy),
       );
       expect(find.text('None written yet'), findsOneWidget);
+      expect(find.text('PLACEHOLDER collection 1 english'), findsNothing);
     });
 
     testWidgets('can be written from the +', (WidgetTester tester) async {
@@ -251,9 +260,10 @@ void main() {
     ) async {
       await pumpApp(tester);
 
-      await tester.tap(find.byTooltip('More').first);
+      // From the built-in's own page, where the button says what it does.
+      await tester.tap(find.text('PLACEHOLDER collection 1 english'));
       await settle(tester);
-      await tester.tap(find.text('Make a copy I can edit'));
+      await tester.tap(find.widgetWithText(OutlinedButton, 'Make a copy'));
       await settle(tester);
 
       // Prefilled, so the common case is one confirmation.
@@ -286,8 +296,27 @@ void main() {
           .resolve(made.id);
       expect(resolved.entries.length, 6);
       expect(resolved.steps.length, 14);
+
+      // And back out to the list, which has turned to where the copy is.
+      await tester.tap(find.byTooltip('Back'));
+      await settle(tester);
+      await tester.tap(find.byTooltip('Back'));
+      await settle(tester);
+      expect(
+        find.text('Copy of PLACEHOLDER collection 1 english'),
+        findsOneWidget,
+      );
+      expect(find.text('PLACEHOLDER collection 1 english'), findsNothing);
     });
   });
+
+  /// Opens the first built-in's page and its Add to Home sheet.
+  Future<void> openCommitSheet(WidgetTester tester) async {
+    await tester.tap(find.text('PLACEHOLDER collection 1 english'));
+    await settle(tester);
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Add to Home'));
+    await settle(tester);
+  }
 
   /// Taps one day of the picker, by the full name the segment carries for a
   /// screen reader.
@@ -311,8 +340,7 @@ void main() {
     ) async {
       await pumpApp(tester);
 
-      await tester.tap(find.byTooltip('Commit to my practice').first);
-      await settle(tester);
+      await openCommitSheet(tester);
 
       // Three sections, seven days, and a default that says so in words.
       for (final DailySection section in DailySection.values) {
@@ -327,8 +355,7 @@ void main() {
     ) async {
       await pumpApp(tester);
 
-      await tester.tap(find.byTooltip('Commit to my practice').first);
-      await settle(tester);
+      await openCommitSheet(tester);
       await tester.tap(find.text('Commit'));
       await settle(tester);
 
@@ -343,8 +370,7 @@ void main() {
     ) async {
       await pumpApp(tester);
 
-      await tester.tap(find.byTooltip('Commit to my practice').first);
-      await settle(tester);
+      await openCommitSheet(tester);
 
       // Turn six of the seven off, leaving Friday: al-Kahf on a Friday is the
       // case the day picker exists for.
@@ -373,8 +399,7 @@ void main() {
     ) async {
       await pumpApp(tester);
 
-      await tester.tap(find.byTooltip('Commit to my practice').first);
-      await settle(tester);
+      await openCommitSheet(tester);
 
       for (final String day in <String>[
         'Monday',

@@ -125,7 +125,10 @@ CREATE TABLE collections (
     description  TEXT,
     author       TEXT,
     type         TEXT    NOT NULL,
-    sort_order   INTEGER NOT NULL
+    sort_order   INTEGER NOT NULL,
+    series_name_english TEXT,
+    series_name_arabic  TEXT,
+    series_weekday      INTEGER
 );
 
 CREATE TABLE collection_items (
@@ -297,6 +300,7 @@ def load_collections(
             raise BuildError(
                 f"{rel(path)}: type {doc['type']!r} is not one of {list(COLLECTION_TYPES)}"
             )
+        series: dict[str, Any] = doc.get("series") or {}
 
         collections.append(
             {
@@ -307,6 +311,10 @@ def load_collections(
                 "author": doc.get("author"),
                 "type": doc["type"],
                 "sort_order": doc["sort_order"],
+                "series_name_english": series.get("name_english"),
+                "series_name_arabic": series.get("name_arabic"),
+                "series_weekday": series.get("weekday"),
+                "_file": path,
             }
         )
 
@@ -343,6 +351,7 @@ def load_collections(
             [i for i in items if i["collection_id"] == collection_id], rel(path)
         )
 
+    check_series(collections)
     return collections, items
 
 
@@ -416,6 +425,46 @@ def check_repeat_groups(items: list[dict[str, Any]], filename: str) -> None:
                 f"{filename}: repeat_group {group} is not contiguous "
                 f"(positions {positions}); a repeat group must be a single block"
             )
+
+
+def check_series(collections: list[dict[str, Any]]) -> None:
+    """The parts of one series agree on its Arabic name and on their days.
+
+    A series is tied together by its English name alone, so a part whose Arabic
+    name differs is a typo the app would otherwise show as whichever part it
+    read first. Two parts on the same weekday would leave the app unable to say
+    which one is today's, and a series of one is a collection with a heading.
+    """
+    by_name: dict[str, list[dict[str, Any]]] = {}
+    for collection in collections:
+        name = collection["series_name_english"]
+        if name is not None:
+            by_name.setdefault(name, []).append(collection)
+
+    for name, parts in by_name.items():
+        files = ", ".join(rel(p["_file"]) for p in parts)
+        if len(parts) < 2:
+            raise BuildError(
+                f"{files}: series {name!r} has only one part; a series lists "
+                f"several collections as one row, so drop the series field"
+            )
+        arabic = {p["series_name_arabic"] for p in parts}
+        if len(arabic) > 1:
+            raise BuildError(
+                f"series {name!r} has conflicting name_arabic values "
+                f"{sorted(arabic)} across {files}; every part must agree"
+            )
+        days: dict[int, Path] = {}
+        for part in parts:
+            day = part["series_weekday"]
+            if day is None:
+                continue
+            if day in days:
+                raise BuildError(
+                    f"series {name!r}: {rel(part['_file'])} and "
+                    f"{rel(days[day])} are both weekday {day}"
+                )
+            days[day] = part["_file"]
 
 
 # --------------------------------------------------------------------------
@@ -525,7 +574,8 @@ def build(args: argparse.Namespace) -> int:
 
         insert(conn, "collections", [
             "id", "name_arabic", "name_english", "description", "author",
-            "type", "sort_order",
+            "type", "sort_order", "series_name_english", "series_name_arabic",
+            "series_weekday",
         ], collection_rows)
 
         insert(conn, "collection_items", [

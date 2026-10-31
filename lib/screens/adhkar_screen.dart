@@ -187,9 +187,8 @@ class _AdhkarScreenState extends ConsumerState<AdhkarScreen> {
 ///
 /// Its own row rather than [DhikrRow], which the pickers share: a picker's row
 /// is a choice, and the whole of it is one tap. This one carries two actions
-/// and a line of state, which is the shape `CollectionRow` settled on for the
-/// same reason — the actions share the bottom line with the meta rather than
-/// standing to the right of the text and taking the width off it.
+/// and a line of state, and the actions share the bottom line with the meta
+/// rather than standing to the right of the text and taking the width off it.
 class _DhikrRow extends StatelessWidget {
   const _DhikrRow({
     required this.dhikr,

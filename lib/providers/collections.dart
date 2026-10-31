@@ -1,11 +1,14 @@
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show FutureProviderFamily;
 
 import '../domain/collection.dart';
 import '../domain/collection_id.dart';
+import '../domain/playback_step.dart';
 import '../domain/progress.dart';
 import '../domain/repositories.dart';
 import 'data_providers.dart';
+import 'editing.dart';
 
 /// A collection as the list shows it: the summary, plus the three things a row
 /// says about it that the summary does not carry.
@@ -88,3 +91,72 @@ final FutureProvider<List<CollectionListing>> collectionListingsProvider =
       }
       return listings;
     }, name: 'collectionListings');
+
+/// The two halves of the Collections tab.
+///
+/// Two, because there are two kinds of thing in it: what the app ships, which
+/// can be read, recited and copied, and what the user made, which can also be
+/// changed. They were three stacked lists once — the user's collections, the
+/// user's adhkar, and the built-ins — and a scroll down one list to find which
+/// of the three you were in.
+enum CollectionShelf {
+  library('Library'),
+  yours('Yours');
+
+  const CollectionShelf(this.label);
+
+  final String label;
+}
+
+/// Which shelf the Collections tab is showing, or null while nobody has
+/// chosen one.
+///
+/// Null is not Library. Until a shelf has been picked the screen decides from
+/// what there is — Yours, once the user has made something of their own, since
+/// what somebody made is what they come back for — and a provider cannot see
+/// that without reading the list itself.
+///
+/// A provider rather than the screen's own state so that the flows which make
+/// a collection can turn the tab to Yours on their way out: a copy made from
+/// the Library is not on the Library shelf, and coming back from the editor to
+/// a list that does not show it reads as the copy having gone nowhere.
+final class CollectionShelfController extends Notifier<CollectionShelf?> {
+  @override
+  CollectionShelf? build() => null;
+
+  void select(CollectionShelf shelf) => state = shelf;
+}
+
+final NotifierProvider<CollectionShelfController, CollectionShelf?>
+collectionShelfProvider =
+    NotifierProvider<CollectionShelfController, CollectionShelf?>(
+      CollectionShelfController.new,
+      name: 'collectionShelf',
+    );
+
+/// The step the player would pick [CollectionId] up at, or null when it would
+/// start from the top.
+///
+/// The same rule [collectionListingsProvider] applies for "Part-way through":
+/// validated through [ResolvedCollection.resumableFrom], and a position at the
+/// very beginning is not progress. The collection page uses it to say Resume
+/// rather than Recite, and to mark the item it would resume at.
+///
+/// Auto-disposed, so a page opened again reads the progress again: a wird can
+/// be recited from Home between two visits, and a page that still offered to
+/// resume a wird finished since would be offering a place that is gone.
+final FutureProviderFamily<PlaybackStep?, CollectionId> resumeStepProvider =
+    FutureProvider.autoDispose.family<PlaybackStep?, CollectionId>((
+      Ref ref,
+      CollectionId id,
+    ) async {
+      final ResolvedCollection resolved = await ref.watch(
+        resolvedCollectionProvider(id).future,
+      );
+      final WirdProgress? progress = resolved.resumableFrom(
+        await ref.watch(userRepositoryProvider).progress(id),
+      );
+      if (progress == null) return null;
+      if (progress.stepIndex == 0 && progress.currentCount == 0) return null;
+      return resolved.steps[progress.stepIndex];
+    }, name: 'resumeStep');
