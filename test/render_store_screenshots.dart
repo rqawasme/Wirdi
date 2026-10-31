@@ -18,10 +18,17 @@
 /// palette and type, so the whole set comes from one command and nothing but
 /// the SDK.
 ///
-/// They are 1080 × 1920: 9:16, which is what Play wants for a screenshot to be
-/// eligible for its featured placements, and saved as 24-bit PNG with no alpha
-/// channel, which is what Play accepts. They are dated: the home screen and
-/// the tracker read today's date, so a rerun on another day gives other days.
+/// Every post comes in two shapes, from the same captures and the same words:
+///
+///   * `assets/store/*.png` — 1080 × 1920, 9:16, the caption over the phone.
+///     What Play wants for a screenshot to be eligible for its featured
+///     placements, and what goes up to Play Console.
+///   * `assets/store/landscape/*.png` — 1920 × 1080, 16:9, the caption beside
+///     the phone. For the website, not for Play.
+///
+/// Both are saved as 24-bit PNG with no alpha channel, which is what Play
+/// accepts. They are dated: the home screen and the tracker read today's date,
+/// so a rerun on another day gives other days.
 library;
 
 import 'dart:async';
@@ -46,10 +53,6 @@ import 'package:wirdi/theme/theme.dart';
 import 'package:wirdi/widgets/bottom_nav.dart';
 import 'package:wirdi/wirdi_app.dart';
 
-/// Where the posts go. Committed: they are uploaded to Play Console by hand,
-/// like the icon and the feature graphic beside them in `assets/icon/`.
-const String outputDirectory = 'assets/store';
-
 /// The phone the app is drawn on, in logical pixels.
 ///
 /// A width most Android phones are within a few dp of, and a height a little
@@ -61,15 +64,84 @@ const Size screenSize = Size(400, 780);
 /// its app bars by and [_StatusBar] is drawn into.
 const double statusBarHeight = 24;
 
-/// Pixels per logical pixel of the screen as it lands in the post.
-///
-/// The screen is rasterised at exactly the size it is drawn at — 720 × 1404 —
-/// so the post copies it pixel for pixel rather than resampling it.
-const double screenScale = 1.8;
+/// The device pixel ratio the app is laid out at. Each [_Format] rasterises
+/// the screen again at its own [_Format.screenScale], so this decides nothing
+/// about the pixels that end up in a post.
+const double layoutScale = 1.8;
 
-/// The post, in pixels. Drawn at a device pixel ratio of one, so every length
-/// in [_Post] is a pixel.
-const Size postSize = Size(1080, 1920);
+/// A shape of post: its size, where it is written, and every length in it.
+///
+/// Posts are drawn at a device pixel ratio of one, so each of these is a
+/// pixel.
+final class _Format {
+  const _Format({
+    required this.directory,
+    required this.size,
+    required this.screenScale,
+    required this.bezel,
+    required this.outerRadius,
+    required this.stripeSegment,
+    required this.headlineSize,
+    required this.lineSize,
+  });
+
+  /// 9:16, the caption over the phone: the Play listing.
+  static const _Format portrait = _Format(
+    // Committed: uploaded to Play Console by hand, like the icon and the
+    // feature graphic beside them in `assets/icon/`.
+    directory: 'assets/store',
+    size: Size(1080, 1920),
+    screenScale: 1.8,
+    bezel: 14,
+    outerRadius: 64,
+    stripeSegment: 36,
+    headlineSize: 72,
+    lineSize: 34,
+  );
+
+  /// 16:9, the caption beside the phone: the website.
+  ///
+  /// The phone is as tall as the post leaves room for, which makes it smaller
+  /// than in [portrait]; the bezel and the corners shrink with it, so it is
+  /// the same phone further away.
+  static const _Format landscape = _Format(
+    directory: 'assets/store/landscape',
+    size: Size(1920, 1080),
+    screenScale: 1.15,
+    bezel: 9,
+    outerRadius: 41,
+    stripeSegment: 40,
+    headlineSize: 84,
+    lineSize: 36,
+  );
+
+  static const List<_Format> all = <_Format>[portrait, landscape];
+
+  final String directory;
+  final Size size;
+
+  /// Pixels per logical pixel of the screen as it lands in the post.
+  ///
+  /// The screen is rasterised at exactly the size it is drawn at — 720 × 1404
+  /// in portrait, 460 × 897 in landscape — so the post copies it pixel for
+  /// pixel rather than resampling it.
+  final double screenScale;
+
+  final double bezel;
+  final double outerRadius;
+  final double stripeSegment;
+  final double headlineSize;
+  final double lineSize;
+
+  bool get isLandscape => size.width > size.height;
+
+  Size get screen => screenSize * screenScale;
+
+  Size get phone => Size(screen.width + 2 * bezel, screen.height + 2 * bezel);
+}
+
+/// Every post's top edge: the app's rule.
+const double stripeHeight = 14;
 
 Future<void> loadFont(String family, List<String> paths) async {
   final FontLoader loader = FontLoader(family);
@@ -192,39 +264,86 @@ class _StatusBar extends StatelessWidget {
   }
 }
 
-/// One post: what it says, and the screen it says it about.
+/// One post: what it says, and the screen it says it about, in [format].
 class _Post extends StatelessWidget {
   const _Post({
+    required this.format,
     required this.screen,
     required this.headline,
     required this.line,
     this.dark = false,
   });
 
+  final _Format format;
   final ui.Image screen;
   final String headline;
   final String line;
   final bool dark;
-
-  static const double margin = 88;
-  static const double stripeHeight = 14;
-  static const double stripeSegment = 36;
-  static const double bezel = 14;
-  static const double outerRadius = 64;
-  static const double bottomMargin = 56;
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = dark
         ? WirdiColorSchemes.dark
         : WirdiColorSchemes.light;
-    final double screenWidth = screenSize.width * screenScale;
-    final double screenHeight = screenSize.height * screenScale;
-    final double phoneWidth = screenWidth + 2 * bezel;
-    final double phoneHeight = screenHeight + 2 * bezel;
+    final Size size = format.size;
+    final Size phone = format.phone;
+
+    final Widget words = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          headline,
+          style: TextStyle(
+            fontFamily: WirdiFonts.latin,
+            fontWeight: FontWeight.w500,
+            fontSize: format.headlineSize,
+            height: 1.1,
+            letterSpacing: -format.headlineSize / 48,
+            color: scheme.onSurface,
+          ),
+        ),
+        SizedBox(height: format.lineSize * 0.6),
+        Text(
+          line,
+          style: TextStyle(
+            fontFamily: WirdiFonts.latin,
+            fontWeight: FontWeight.w400,
+            fontSize: format.lineSize,
+            height: 1.35,
+            color: scheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+
+    final Widget device = DecoratedBox(
+      decoration: BoxDecoration(
+        color: dark ? const Color(0xFF0B0907) : scheme.onSurface,
+        borderRadius: BorderRadius.circular(format.outerRadius),
+        border: dark
+            ? Border.all(color: scheme.surfaceBright, width: format.bezel / 7)
+            : null,
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(format.bezel),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(
+            format.outerRadius - format.bezel,
+          ),
+          child: RawImage(
+            image: screen,
+            width: format.screen.width,
+            height: format.screen.height,
+            fit: BoxFit.fill,
+            filterQuality: FilterQuality.high,
+          ),
+        ),
+      ),
+    );
 
     return SizedBox.fromSize(
-      size: postSize,
+      size: size,
       child: ColoredBox(
         color: scheme.surface,
         child: Stack(
@@ -238,70 +357,38 @@ class _Post extends StatelessWidget {
                 painter: _Voussoirs(
                   brick: scheme.primary,
                   stone: scheme.surfaceContainerHigh,
-                  segment: stripeSegment,
+                  segment: format.stripeSegment,
                 ),
               ),
             ),
-            Positioned(
-              top: 96,
-              left: margin,
-              right: margin,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    headline,
-                    style: TextStyle(
-                      fontFamily: WirdiFonts.latin,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 72,
-                      height: 1.1,
-                      letterSpacing: -1.5,
-                      color: scheme.onSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    line,
-                    style: TextStyle(
-                      fontFamily: WirdiFonts.latin,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 34,
-                      height: 1.35,
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
+            if (format.isLandscape) ...<Widget>[
+              // The caption on the left, centred on the phone; the phone on
+              // the right, centred in what the stripe leaves.
+              Positioned(
+                left: 168,
+                width: 940,
+                top: stripeHeight,
+                bottom: 0,
+                child: Align(alignment: Alignment.centerLeft, child: words),
               ),
-            ),
-            Positioned(
-              left: (postSize.width - phoneWidth) / 2,
-              top: postSize.height - bottomMargin - phoneHeight,
-              width: phoneWidth,
-              height: phoneHeight,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: dark ? const Color(0xFF0B0907) : scheme.onSurface,
-                  borderRadius: BorderRadius.circular(outerRadius),
-                  border: dark
-                      ? Border.all(color: scheme.surfaceBright, width: 2)
-                      : null,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(bezel),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(outerRadius - bezel),
-                    child: RawImage(
-                      image: screen,
-                      width: screenWidth,
-                      height: screenHeight,
-                      fit: BoxFit.fill,
-                      filterQuality: FilterQuality.high,
-                    ),
-                  ),
-                ),
+              Positioned(
+                left: size.width - 300 - phone.width,
+                top: ((stripeHeight + size.height - phone.height) / 2)
+                    .roundToDouble(),
+                width: phone.width,
+                height: phone.height,
+                child: device,
               ),
-            ),
+            ] else ...<Widget>[
+              Positioned(top: 96, left: 88, right: 88, child: words),
+              Positioned(
+                left: (size.width - phone.width) / 2,
+                top: size.height - 56 - phone.height,
+                width: phone.width,
+                height: phone.height,
+                child: device,
+              ),
+            ],
           ],
         ),
       ),
@@ -338,13 +425,27 @@ class _Voussoirs extends CustomPainter {
 }
 
 /// What a post says about a screen.
+///
+/// [wideHeadline] is the headline broken for the landscape caption, which is
+/// a narrower column in larger type; null where the portrait break serves
+/// both. The line under it reads the same in both.
 final class _Caption {
-  const _Caption(this.name, this.headline, this.line, {this.dark = false});
+  const _Caption(
+    this.name,
+    this.headline,
+    this.line, {
+    this.wideHeadline,
+    this.dark = false,
+  });
 
   final String name;
   final String headline;
+  final String? wideHeadline;
   final String line;
   final bool dark;
+
+  String headlineFor(_Format format) =>
+      format.isLandscape ? wideHeadline ?? headline : headline;
 }
 
 void main() {
@@ -462,19 +563,27 @@ void main() {
 
     // ---- The screens. -----------------------------------------------------
 
-    tester.view.physicalSize = screenSize * screenScale;
-    tester.view.devicePixelRatio = screenScale;
+    tester.view.physicalSize = screenSize * layoutScale;
+    tester.view.devicePixelRatio = layoutScale;
     tester.view.padding = const FakeViewPadding(
-      top: statusBarHeight * screenScale,
+      top: statusBarHeight * layoutScale,
     );
     tester.view.viewPadding = const FakeViewPadding(
-      top: statusBarHeight * screenScale,
+      top: statusBarHeight * layoutScale,
     );
     addTearDown(tester.view.reset);
 
-    final Map<String, ui.Image> screens = <String, ui.Image>{};
+    // Each screen rasterised once per format, at the size that format draws
+    // it: a second rasterisation rather than a resample, so both are sharp.
+    final Map<_Format, Map<String, ui.Image>> screens =
+        <_Format, Map<String, ui.Image>>{
+          for (final _Format format in _Format.all)
+            format: <String, ui.Image>{},
+        };
     Future<void> keep(String name) async {
-      screens[name] = await capture(tester, screenScale);
+      for (final _Format format in _Format.all) {
+        screens[format]![name] = await capture(tester, format.screenScale);
+      }
     }
 
     Future<void> pumpPhone({required bool dark}) async {
@@ -618,18 +727,21 @@ void main() {
         'Tap anywhere to count',
         'One dhikr at a time, in Arabic with\n'
             'transliteration and translation.',
+        wideHeadline: 'Tap anywhere\nto count',
       ),
       _Caption(
         'library',
         'The great litanies, built in',
         'al-Nawawi, al-Wird al-Latif, Hizb al-Bahr,\n'
             "Dala'il al-Khayrat and more — or make your own.",
+        wideHeadline: 'The great litanies,\nbuilt in',
       ),
       _Caption(
         'commit',
         'On the days you choose',
         'Every day, or al-Kahf on Fridays — with\n'
             'a reminder at the time you pick.',
+        wideHeadline: 'On the days\nyou choose',
       ),
       _Caption(
         'quran',
@@ -648,53 +760,62 @@ void main() {
         'See the days you kept',
         'Days in a row, a calendar and the weeks\n'
             'behind you — or turn it off.',
+        wideHeadline: 'See the days\nyou kept',
       ),
       _Caption(
         'dark',
         'Private by design',
         'No account, no ads, no internet.\n'
             'Nothing you do leaves your phone.',
+        wideHeadline: 'Private\nby design',
         dark: true,
       ),
     ];
 
-    tester.view.physicalSize = postSize;
     tester.view.devicePixelRatio = 1;
     tester.view.resetPadding();
     tester.view.resetViewPadding();
 
-    for (int i = 0; i < captions.length; i++) {
-      final _Caption caption = captions[i];
-      await tester.pumpWidget(
-        Directionality(
-          textDirection: TextDirection.ltr,
-          child: RepaintBoundary(
-            key: shotKey,
-            child: _Post(
-              screen: screens[caption.name]!,
-              headline: caption.headline,
-              line: caption.line,
-              dark: caption.dark,
+    for (final _Format format in _Format.all) {
+      tester.view.physicalSize = format.size;
+      for (int i = 0; i < captions.length; i++) {
+        final _Caption caption = captions[i];
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: RepaintBoundary(
+              key: shotKey,
+              child: _Post(
+                format: format,
+                screen: screens[format]![caption.name]!,
+                headline: caption.headlineFor(format),
+                line: caption.line,
+                dark: caption.dark,
+              ),
             ),
           ),
-        ),
-      );
-      await tester.pump();
-      final ui.Image post = await capture(tester, 1);
-      final String number = '${i + 1}'.padLeft(2, '0');
-      await tester.binding.runAsync<void>(() async {
-        final ByteData rgba = (await post.toByteData())!;
-        final File out = File('$outputDirectory/$number-${caption.name}.png');
-        await out.parent.create(recursive: true);
-        await out.writeAsBytes(
-          encodeOpaquePng(rgba.buffer.asUint8List(), post.width, post.height),
-          flush: true,
         );
-      });
-      post.dispose();
+        await tester.pump();
+        final ui.Image post = await capture(tester, 1);
+        final String number = '${i + 1}'.padLeft(2, '0');
+        await tester.binding.runAsync<void>(() async {
+          final ByteData rgba = (await post.toByteData())!;
+          final File out = File(
+            '${format.directory}/$number-${caption.name}.png',
+          );
+          await out.parent.create(recursive: true);
+          await out.writeAsBytes(
+            encodeOpaquePng(rgba.buffer.asUint8List(), post.width, post.height),
+            flush: true,
+          );
+        });
+        post.dispose();
+      }
     }
-    for (final ui.Image screen in screens.values) {
-      screen.dispose();
+    for (final Map<String, ui.Image> byName in screens.values) {
+      for (final ui.Image screen in byName.values) {
+        screen.dispose();
+      }
     }
   });
 }

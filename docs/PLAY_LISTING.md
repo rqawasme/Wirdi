@@ -109,6 +109,10 @@ tool/sync_content_asset.sh
 flutter test test/render_store_screenshots.dart   # -> assets/store/*.png
 ```
 
+The same command writes a landscape version of each post to
+`assets/store/landscape/` — 1920 × 1080, the caption beside the phone. Those
+are for the website, not for Play.
+
 The headlines are in the file beside the screens they caption; change the
 copy there and rerun, rather than editing the PNGs. The home screen and the
 tracker read today's date, so a rerun on another day shows other days.

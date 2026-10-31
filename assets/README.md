@@ -38,7 +38,8 @@ python3 tool/render_app_icons.py
 `store/` holds the eight phone screenshots for the Google Play listing, written
 by `test/render_store_screenshots.dart`. Like the two listing images in
 `icon/`, they are uploaded to Play Console by hand and are not bundled with the
-app. Rerun the script rather than editing them; `docs/PLAY_LISTING.md` has the
+app. `store/landscape/` is the same eight posts at 1920 × 1080, for the
+website. Rerun the script rather than editing them; `docs/PLAY_LISTING.md` has the
 command and what each one shows.
 
 ## content.db
