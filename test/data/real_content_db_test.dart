@@ -179,6 +179,70 @@ void _tests(File file) {
     );
   });
 
+  test("Dala'il al-Khayrat is one series: a part a day, and the supplications "
+      'said around them', () {
+    return Future<void>(() async {
+      final CollectionRepository repo = DriftCollectionRepository(
+        content: content,
+        user: user,
+      );
+      final List<CollectionSummary> all = await repo.all();
+      final List<CollectionSummary> parts = <CollectionSummary>[
+        for (final CollectionSummary s in all)
+          if (s.series?.name == "Dala'il al-Khayrat") s,
+      ];
+
+      // Seven days, and four supplications on none of them — the opening,
+      // the intention, the closing and the completion. The list draws the
+      // eleven as one row with the week on it.
+      expect(
+        <int?>[for (final CollectionSummary p in parts) p.series!.weekday],
+        unorderedEquals(<int?>[
+          DateTime.monday,
+          DateTime.tuesday,
+          DateTime.wednesday,
+          DateTime.thursday,
+          DateTime.friday,
+          DateTime.saturday,
+          DateTime.sunday,
+          null,
+          null,
+          null,
+          null,
+        ]),
+      );
+      // Every collection named for it is in it: one left out would be a row
+      // of its own beside the series, which is what the series is for
+      // avoiding.
+      expect(
+        <String>[
+          for (final CollectionSummary s in all)
+            if (s.name.startsWith("Dala'il al-Khayrat")) s.name,
+        ],
+        unorderedEquals(<String>[
+          for (final CollectionSummary p in parts) p.name,
+        ]),
+      );
+      // Part 1 is Monday's, which is how the week strip lines them up.
+      expect(
+        parts
+            .firstWhere(
+              (CollectionSummary p) => p.series!.weekday == DateTime.monday,
+            )
+            .name,
+        contains('Part 1'),
+      );
+      // Nothing else is part of a series.
+      expect(
+        all.where(
+          (CollectionSummary s) =>
+              s.series != null && s.series!.name != "Dala'il al-Khayrat",
+        ),
+        isEmpty,
+      );
+    });
+  });
+
   test('the adhkar collections reference the Quran rather than repeat it', () {
     return Future<void>(() async {
       final CollectionRepository repo = DriftCollectionRepository(

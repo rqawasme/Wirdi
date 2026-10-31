@@ -265,4 +265,109 @@ void main() {
 
     expect(find.text('PLACEHOLDER dhikr 1004 arabic'), findsOneWidget);
   });
+
+  group('what can be done from the page', () {
+    testWidgets('a built-in can be recited, put on Home and copied, and not '
+        'edited', (WidgetTester tester) async {
+      await pumpContents(tester, mixed);
+
+      expect(find.widgetWithText(FilledButton, 'Recite'), findsOneWidget);
+      expect(
+        find.widgetWithText(OutlinedButton, 'Add to Home'),
+        findsOneWidget,
+      );
+      expect(
+        find.widgetWithText(OutlinedButton, 'Make a copy'),
+        findsOneWidget,
+      );
+      expect(find.widgetWithText(OutlinedButton, 'Edit'), findsNothing);
+      // And it says why not, once.
+      expect(
+        find.textContaining('Built-in collections stay as they were written'),
+        findsOneWidget,
+      );
+      // A built-in has nothing to delete, so no menu to delete it from.
+      expect(find.byTooltip('More'), findsNothing);
+    });
+
+    testWidgets('one of the user\'s own can be edited, and copied or deleted '
+        'from its menu', (WidgetTester tester) async {
+      final UserCollectionId id = await data.collectionRepository.create(
+        'Mine',
+      );
+      await data.collectionRepository.addItem(id, const ContentRef.dhikr(1001));
+      await pumpContents(tester, id);
+
+      expect(find.widgetWithText(OutlinedButton, 'Edit'), findsOneWidget);
+      expect(find.widgetWithText(OutlinedButton, 'Make a copy'), findsNothing);
+
+      await tester.tap(find.byTooltip('More'));
+      await settle(tester);
+      expect(find.text('Make a copy'), findsOneWidget);
+      expect(find.text('Delete'), findsOneWidget);
+    });
+
+    testWidgets('an empty collection has nothing to recite', (
+      WidgetTester tester,
+    ) async {
+      final UserCollectionId empty = await data.collectionRepository.create(
+        'Nothing in it',
+      );
+      await pumpContents(tester, empty);
+
+      final FilledButton recite = tester.widget<FilledButton>(
+        find.widgetWithText(FilledButton, 'Recite'),
+      );
+      expect(recite.onPressed, isNull);
+    });
+
+    testWidgets('part-way through, it says where it would resume and marks '
+        'the item', (WidgetTester tester) async {
+      final ResolvedCollection resolved = await data.collectionRepository
+          .resolve(mixed);
+      // Step 6 is the first pass through the repeat block, which is the
+      // fifth item as the page counts them.
+      await data.userRepository.saveProgress(
+        WirdProgress.atStep(
+          collectionId: mixed,
+          step: resolved.steps[5],
+          currentCount: 0,
+        ),
+      );
+      await pumpContents(tester, mixed);
+
+      expect(
+        find.widgetWithText(FilledButton, 'Resume at item 5 of 6'),
+        findsOneWidget,
+      );
+      expect(find.text('Up next'), findsOneWidget);
+    });
+
+    testWidgets('on Home, it says when, and can be changed or removed', (
+      WidgetTester tester,
+    ) async {
+      await data.userRepository.commit(
+        mixed,
+        DailySection.morning,
+        days: Weekdays.of(<int>[DateTime.friday]),
+      );
+      await pumpContents(tester, mixed);
+
+      expect(find.text('On your Home · Morning'), findsOneWidget);
+      expect(find.text('Fridays only.'), findsOneWidget);
+      expect(find.widgetWithText(TextButton, 'Change'), findsOneWidget);
+      // Already on Home, so not offered again.
+      expect(find.widgetWithText(OutlinedButton, 'Add to Home'), findsNothing);
+
+      await tester.tap(find.widgetWithText(TextButton, 'Remove from Home'));
+      await settle(tester);
+
+      expect(await data.userRepository.commitments(), isEmpty);
+      expect(find.text('On your Home · Morning'), findsNothing);
+      expect(
+        find.widgetWithText(OutlinedButton, 'Add to Home'),
+        findsOneWidget,
+      );
+    });
+  });
 }

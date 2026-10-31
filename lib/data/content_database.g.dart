@@ -2083,6 +2083,40 @@ class Collections extends Table with TableInfo<Collections, CollectionRow> {
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL',
   );
+  static const VerificationMeta _seriesNameEnglishMeta = const VerificationMeta(
+    'seriesNameEnglish',
+  );
+  late final GeneratedColumn<String> seriesNameEnglish =
+      GeneratedColumn<String>(
+        'series_name_english',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        $customConstraints: '',
+      );
+  static const VerificationMeta _seriesNameArabicMeta = const VerificationMeta(
+    'seriesNameArabic',
+  );
+  late final GeneratedColumn<String> seriesNameArabic = GeneratedColumn<String>(
+    'series_name_arabic',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _seriesWeekdayMeta = const VerificationMeta(
+    'seriesWeekday',
+  );
+  late final GeneratedColumn<int> seriesWeekday = GeneratedColumn<int>(
+    'series_weekday',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -2092,6 +2126,9 @@ class Collections extends Table with TableInfo<Collections, CollectionRow> {
     author,
     type,
     sortOrder,
+    seriesNameEnglish,
+    seriesNameArabic,
+    seriesWeekday,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2158,6 +2195,33 @@ class Collections extends Table with TableInfo<Collections, CollectionRow> {
     } else if (isInserting) {
       context.missing(_sortOrderMeta);
     }
+    if (data.containsKey('series_name_english')) {
+      context.handle(
+        _seriesNameEnglishMeta,
+        seriesNameEnglish.isAcceptableOrUnknown(
+          data['series_name_english']!,
+          _seriesNameEnglishMeta,
+        ),
+      );
+    }
+    if (data.containsKey('series_name_arabic')) {
+      context.handle(
+        _seriesNameArabicMeta,
+        seriesNameArabic.isAcceptableOrUnknown(
+          data['series_name_arabic']!,
+          _seriesNameArabicMeta,
+        ),
+      );
+    }
+    if (data.containsKey('series_weekday')) {
+      context.handle(
+        _seriesWeekdayMeta,
+        seriesWeekday.isAcceptableOrUnknown(
+          data['series_weekday']!,
+          _seriesWeekdayMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -2195,6 +2259,18 @@ class Collections extends Table with TableInfo<Collections, CollectionRow> {
         DriftSqlType.int,
         data['${effectivePrefix}sort_order'],
       )!,
+      seriesNameEnglish: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}series_name_english'],
+      ),
+      seriesNameArabic: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}series_name_arabic'],
+      ),
+      seriesWeekday: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}series_weekday'],
+      ),
     );
   }
 
@@ -2215,6 +2291,9 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
   final String? author;
   final String type;
   final int sortOrder;
+  final String? seriesNameEnglish;
+  final String? seriesNameArabic;
+  final int? seriesWeekday;
   const CollectionRow({
     required this.id,
     required this.nameArabic,
@@ -2223,6 +2302,9 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
     this.author,
     required this.type,
     required this.sortOrder,
+    this.seriesNameEnglish,
+    this.seriesNameArabic,
+    this.seriesWeekday,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2238,6 +2320,15 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
     }
     map['type'] = Variable<String>(type);
     map['sort_order'] = Variable<int>(sortOrder);
+    if (!nullToAbsent || seriesNameEnglish != null) {
+      map['series_name_english'] = Variable<String>(seriesNameEnglish);
+    }
+    if (!nullToAbsent || seriesNameArabic != null) {
+      map['series_name_arabic'] = Variable<String>(seriesNameArabic);
+    }
+    if (!nullToAbsent || seriesWeekday != null) {
+      map['series_weekday'] = Variable<int>(seriesWeekday);
+    }
     return map;
   }
 
@@ -2254,6 +2345,13 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
       author: serializer.fromJson<String?>(json['author']),
       type: serializer.fromJson<String>(json['type']),
       sortOrder: serializer.fromJson<int>(json['sort_order']),
+      seriesNameEnglish: serializer.fromJson<String?>(
+        json['series_name_english'],
+      ),
+      seriesNameArabic: serializer.fromJson<String?>(
+        json['series_name_arabic'],
+      ),
+      seriesWeekday: serializer.fromJson<int?>(json['series_weekday']),
     );
   }
   @override
@@ -2267,6 +2365,9 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
       'author': serializer.toJson<String?>(author),
       'type': serializer.toJson<String>(type),
       'sort_order': serializer.toJson<int>(sortOrder),
+      'series_name_english': serializer.toJson<String?>(seriesNameEnglish),
+      'series_name_arabic': serializer.toJson<String?>(seriesNameArabic),
+      'series_weekday': serializer.toJson<int?>(seriesWeekday),
     };
   }
 
@@ -2278,6 +2379,9 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
     Value<String?> author = const Value.absent(),
     String? type,
     int? sortOrder,
+    Value<String?> seriesNameEnglish = const Value.absent(),
+    Value<String?> seriesNameArabic = const Value.absent(),
+    Value<int?> seriesWeekday = const Value.absent(),
   }) => CollectionRow(
     id: id ?? this.id,
     nameArabic: nameArabic ?? this.nameArabic,
@@ -2286,6 +2390,15 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
     author: author.present ? author.value : this.author,
     type: type ?? this.type,
     sortOrder: sortOrder ?? this.sortOrder,
+    seriesNameEnglish: seriesNameEnglish.present
+        ? seriesNameEnglish.value
+        : this.seriesNameEnglish,
+    seriesNameArabic: seriesNameArabic.present
+        ? seriesNameArabic.value
+        : this.seriesNameArabic,
+    seriesWeekday: seriesWeekday.present
+        ? seriesWeekday.value
+        : this.seriesWeekday,
   );
   CollectionRow copyWithCompanion(CollectionsCompanion data) {
     return CollectionRow(
@@ -2302,6 +2415,15 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
       author: data.author.present ? data.author.value : this.author,
       type: data.type.present ? data.type.value : this.type,
       sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      seriesNameEnglish: data.seriesNameEnglish.present
+          ? data.seriesNameEnglish.value
+          : this.seriesNameEnglish,
+      seriesNameArabic: data.seriesNameArabic.present
+          ? data.seriesNameArabic.value
+          : this.seriesNameArabic,
+      seriesWeekday: data.seriesWeekday.present
+          ? data.seriesWeekday.value
+          : this.seriesWeekday,
     );
   }
 
@@ -2314,7 +2436,10 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
           ..write('description: $description, ')
           ..write('author: $author, ')
           ..write('type: $type, ')
-          ..write('sortOrder: $sortOrder')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('seriesNameEnglish: $seriesNameEnglish, ')
+          ..write('seriesNameArabic: $seriesNameArabic, ')
+          ..write('seriesWeekday: $seriesWeekday')
           ..write(')'))
         .toString();
   }
@@ -2328,6 +2453,9 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
     author,
     type,
     sortOrder,
+    seriesNameEnglish,
+    seriesNameArabic,
+    seriesWeekday,
   );
   @override
   bool operator ==(Object other) =>
@@ -2339,7 +2467,10 @@ class CollectionRow extends DataClass implements Insertable<CollectionRow> {
           other.description == this.description &&
           other.author == this.author &&
           other.type == this.type &&
-          other.sortOrder == this.sortOrder);
+          other.sortOrder == this.sortOrder &&
+          other.seriesNameEnglish == this.seriesNameEnglish &&
+          other.seriesNameArabic == this.seriesNameArabic &&
+          other.seriesWeekday == this.seriesWeekday);
 }
 
 class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
@@ -2350,6 +2481,9 @@ class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
   final Value<String?> author;
   final Value<String> type;
   final Value<int> sortOrder;
+  final Value<String?> seriesNameEnglish;
+  final Value<String?> seriesNameArabic;
+  final Value<int?> seriesWeekday;
   const CollectionsCompanion({
     this.id = const Value.absent(),
     this.nameArabic = const Value.absent(),
@@ -2358,6 +2492,9 @@ class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
     this.author = const Value.absent(),
     this.type = const Value.absent(),
     this.sortOrder = const Value.absent(),
+    this.seriesNameEnglish = const Value.absent(),
+    this.seriesNameArabic = const Value.absent(),
+    this.seriesWeekday = const Value.absent(),
   });
   CollectionsCompanion.insert({
     this.id = const Value.absent(),
@@ -2367,6 +2504,9 @@ class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
     this.author = const Value.absent(),
     required String type,
     required int sortOrder,
+    this.seriesNameEnglish = const Value.absent(),
+    this.seriesNameArabic = const Value.absent(),
+    this.seriesWeekday = const Value.absent(),
   }) : nameArabic = Value(nameArabic),
        nameEnglish = Value(nameEnglish),
        type = Value(type),
@@ -2379,6 +2519,9 @@ class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
     Expression<String>? author,
     Expression<String>? type,
     Expression<int>? sortOrder,
+    Expression<String>? seriesNameEnglish,
+    Expression<String>? seriesNameArabic,
+    Expression<int>? seriesWeekday,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2388,6 +2531,9 @@ class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
       if (author != null) 'author': author,
       if (type != null) 'type': type,
       if (sortOrder != null) 'sort_order': sortOrder,
+      if (seriesNameEnglish != null) 'series_name_english': seriesNameEnglish,
+      if (seriesNameArabic != null) 'series_name_arabic': seriesNameArabic,
+      if (seriesWeekday != null) 'series_weekday': seriesWeekday,
     });
   }
 
@@ -2399,6 +2545,9 @@ class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
     Value<String?>? author,
     Value<String>? type,
     Value<int>? sortOrder,
+    Value<String?>? seriesNameEnglish,
+    Value<String?>? seriesNameArabic,
+    Value<int?>? seriesWeekday,
   }) {
     return CollectionsCompanion(
       id: id ?? this.id,
@@ -2408,6 +2557,9 @@ class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
       author: author ?? this.author,
       type: type ?? this.type,
       sortOrder: sortOrder ?? this.sortOrder,
+      seriesNameEnglish: seriesNameEnglish ?? this.seriesNameEnglish,
+      seriesNameArabic: seriesNameArabic ?? this.seriesNameArabic,
+      seriesWeekday: seriesWeekday ?? this.seriesWeekday,
     );
   }
 
@@ -2435,6 +2587,15 @@ class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
     if (sortOrder.present) {
       map['sort_order'] = Variable<int>(sortOrder.value);
     }
+    if (seriesNameEnglish.present) {
+      map['series_name_english'] = Variable<String>(seriesNameEnglish.value);
+    }
+    if (seriesNameArabic.present) {
+      map['series_name_arabic'] = Variable<String>(seriesNameArabic.value);
+    }
+    if (seriesWeekday.present) {
+      map['series_weekday'] = Variable<int>(seriesWeekday.value);
+    }
     return map;
   }
 
@@ -2447,7 +2608,10 @@ class CollectionsCompanion extends UpdateCompanion<CollectionRow> {
           ..write('description: $description, ')
           ..write('author: $author, ')
           ..write('type: $type, ')
-          ..write('sortOrder: $sortOrder')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('seriesNameEnglish: $seriesNameEnglish, ')
+          ..write('seriesNameArabic: $seriesNameArabic, ')
+          ..write('seriesWeekday: $seriesWeekday')
           ..write(')'))
         .toString();
   }
@@ -4421,6 +4585,9 @@ typedef $CollectionsCreateCompanionBuilder =
       Value<String?> author,
       required String type,
       required int sortOrder,
+      Value<String?> seriesNameEnglish,
+      Value<String?> seriesNameArabic,
+      Value<int?> seriesWeekday,
     });
 typedef $CollectionsUpdateCompanionBuilder =
     CollectionsCompanion Function({
@@ -4431,6 +4598,9 @@ typedef $CollectionsUpdateCompanionBuilder =
       Value<String?> author,
       Value<String> type,
       Value<int> sortOrder,
+      Value<String?> seriesNameEnglish,
+      Value<String?> seriesNameArabic,
+      Value<int?> seriesWeekday,
     });
 
 class $CollectionsFilterComposer
@@ -4474,6 +4644,21 @@ class $CollectionsFilterComposer
 
   ColumnFilters<int> get sortOrder => $composableBuilder(
     column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get seriesNameEnglish => $composableBuilder(
+    column: $table.seriesNameEnglish,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get seriesNameArabic => $composableBuilder(
+    column: $table.seriesNameArabic,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get seriesWeekday => $composableBuilder(
+    column: $table.seriesWeekday,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -4521,6 +4706,21 @@ class $CollectionsOrderingComposer
     column: $table.sortOrder,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get seriesNameEnglish => $composableBuilder(
+    column: $table.seriesNameEnglish,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get seriesNameArabic => $composableBuilder(
+    column: $table.seriesNameArabic,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get seriesWeekday => $composableBuilder(
+    column: $table.seriesWeekday,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $CollectionsAnnotationComposer
@@ -4558,6 +4758,21 @@ class $CollectionsAnnotationComposer
 
   GeneratedColumn<int> get sortOrder =>
       $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<String> get seriesNameEnglish => $composableBuilder(
+    column: $table.seriesNameEnglish,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get seriesNameArabic => $composableBuilder(
+    column: $table.seriesNameArabic,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get seriesWeekday => $composableBuilder(
+    column: $table.seriesWeekday,
+    builder: (column) => column,
+  );
 }
 
 class $CollectionsTableManager
@@ -4598,6 +4813,9 @@ class $CollectionsTableManager
                 Value<String?> author = const Value.absent(),
                 Value<String> type = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
+                Value<String?> seriesNameEnglish = const Value.absent(),
+                Value<String?> seriesNameArabic = const Value.absent(),
+                Value<int?> seriesWeekday = const Value.absent(),
               }) => CollectionsCompanion(
                 id: id,
                 nameArabic: nameArabic,
@@ -4606,6 +4824,9 @@ class $CollectionsTableManager
                 author: author,
                 type: type,
                 sortOrder: sortOrder,
+                seriesNameEnglish: seriesNameEnglish,
+                seriesNameArabic: seriesNameArabic,
+                seriesWeekday: seriesWeekday,
               ),
           createCompanionCallback:
               ({
@@ -4616,6 +4837,9 @@ class $CollectionsTableManager
                 Value<String?> author = const Value.absent(),
                 required String type,
                 required int sortOrder,
+                Value<String?> seriesNameEnglish = const Value.absent(),
+                Value<String?> seriesNameArabic = const Value.absent(),
+                Value<int?> seriesWeekday = const Value.absent(),
               }) => CollectionsCompanion.insert(
                 id: id,
                 nameArabic: nameArabic,
@@ -4624,6 +4848,9 @@ class $CollectionsTableManager
                 author: author,
                 type: type,
                 sortOrder: sortOrder,
+                seriesNameEnglish: seriesNameEnglish,
+                seriesNameArabic: seriesNameArabic,
+                seriesWeekday: seriesWeekday,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

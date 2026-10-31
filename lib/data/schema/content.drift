@@ -66,7 +66,10 @@ CREATE TABLE collections (
     description  TEXT,
     author       TEXT,
     type         TEXT    NOT NULL,
-    sort_order   INTEGER NOT NULL
+    sort_order   INTEGER NOT NULL,
+    series_name_english TEXT,
+    series_name_arabic  TEXT,
+    series_weekday      INTEGER
 ) AS CollectionRow;
 
 CREATE TABLE collection_items (

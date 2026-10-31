@@ -8,6 +8,7 @@ import 'screens/adhkar_screen.dart';
 import 'screens/app_shell.dart';
 import 'screens/collection_contents_screen.dart';
 import 'screens/collection_edit_screen.dart';
+import 'screens/collection_series_screen.dart';
 import 'screens/dhikr_edit_screen.dart';
 import 'screens/pickers/ayah_picker_screen.dart';
 import 'screens/pickers/dhikr_picker_screen.dart';
@@ -38,10 +39,14 @@ abstract final class Routes {
 
   static const String player = '/player';
 
-  /// What is in a collection, read-only. Built-in or the user's own — this is
-  /// the screen a row in the collections list opens, and the player is the
-  /// button beside the one that opens it.
+  /// A collection's own page: what is in it, and what can be done with it.
+  /// Built-in or the user's own — this is the screen a row in the collections
+  /// list opens, and the player is its Recite button.
   static const String collectionContents = '/collection/contents';
+
+  /// The parts of a work recited in parts, such as Dala'il al-Khayrat, which
+  /// the Library lists as one row.
+  static const String collectionSeries = '/collection/series';
 
   /// Editing one of the user's own collections.
   static const String collectionEdit = '/collection/edit';
@@ -96,6 +101,15 @@ final class CollectionContentsArguments {
   /// edited, but it can be read, and reading one is the commonest reason to
   /// open this screen.
   final CollectionId collectionId;
+}
+
+/// Which series a [Routes.collectionSeries] push is opening, by the name its
+/// parts share.
+@immutable
+final class CollectionSeriesArguments {
+  const CollectionSeriesArguments({required this.name});
+
+  final String name;
 }
 
 /// Which collection a [Routes.collectionEdit] push is editing.
@@ -173,6 +187,20 @@ abstract final class WirdiRouter {
           settings,
           (BuildContext _) =>
               CollectionContentsScreen(collectionId: arguments.collectionId),
+        );
+
+      case Routes.collectionSeries:
+        final Object? arguments = settings.arguments;
+        if (arguments is! CollectionSeriesArguments) {
+          throw ArgumentError.value(
+            arguments,
+            'settings.arguments',
+            'pushing ${Routes.collectionSeries} needs CollectionSeriesArguments',
+          );
+        }
+        return _page(
+          settings,
+          (BuildContext _) => CollectionSeriesScreen(name: arguments.name),
         );
 
       case Routes.collectionEdit:

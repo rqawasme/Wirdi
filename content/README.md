@@ -194,6 +194,31 @@ Omit them when unused; do not write `null`.
   rules.
 - **`note`** — a rubric shown with that item.
 
+### Series
+
+A work recited in parts is one collection per part, each with a `series`
+saying which work it belongs to. Dala'il al-Khayrat is the case it was made
+for: seven daily parts and four supplications said around them, eleven files,
+listed in the app's Library as one row that opens a page of the parts. That
+page lists them by `sort_order`, so it decides the order they are read in.
+
+```json
+"series": {
+  "name_english": "Dala'il al-Khayrat",
+  "name_arabic": "دَلَائِلُ الْخَيْرَاتِ",
+  "weekday": 1
+}
+```
+
+- **`name_english`** ties the parts together, so write it identically in every
+  part. `name_arabic` must agree across them too.
+- **`weekday`** is optional: the day the part is said on, `1` for Monday to `7`
+  for Sunday. Omit it for a part said on no set day, like the opening or
+  closing supplication. Two parts of one series cannot share a day.
+
+The build refuses a series with only one part: that is a collection with a
+heading, and the `series` field should come off.
+
 The worked example above is a real, valid file: it is
 `examples/collections/example.json`, and it exercises every feature of the format.
 Its companion is `examples/adhkar/example.json`. Copy them as starting points —

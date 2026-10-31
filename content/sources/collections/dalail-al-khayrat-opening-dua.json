@@ -6,6 +6,10 @@
   "author": "Imam Muhammad al-Jazuli",
   "type": "wird",
   "sort_order": 27,
+  "series": {
+    "name_english": "Dala'il al-Khayrat",
+    "name_arabic": "دَلَائِلُ الْخَيْرَاتِ"
+  },
   "items": [
     {
       "dhikr": 2001

@@ -7,4 +7,4 @@
 // The value sits on its own line because dart format puts it there: the
 // declaration does not fit in 80 columns, and CI checks formatting.
 const String bundledContentStamp =
-    '0.12.0 d9ecb15726092de85ab8df799895086473869915bcd3227fb2a4b130014d68e2';
+    '0.12.0 0cea2b22f462af68f0854cf1f7fb441972cd21486ba562509ee0fbed7a9ebd13';

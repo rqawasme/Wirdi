@@ -221,12 +221,12 @@ final FutureProvider<HomeView> homeViewProvider = FutureProvider<HomeView>((
   );
 }, name: 'homeView');
 
-/// Every commitment by collection, for the collections list's menu. Absent
-/// means not committed.
+/// Every commitment by collection, for the collections list and a
+/// collection's page. Absent means not committed.
 ///
 /// Unfiltered, unlike [homeViewProvider]: the list is about what the app
 /// contains, so a commitment for Fridays is still a commitment on a Tuesday
-/// and the menu has to be able to say so.
+/// and the row has to be able to say so.
 final FutureProvider<Map<CollectionId, Commitment>> commitmentsProvider =
     FutureProvider<Map<CollectionId, Commitment>>((Ref ref) async {
       final List<Commitment> commitments = await ref
